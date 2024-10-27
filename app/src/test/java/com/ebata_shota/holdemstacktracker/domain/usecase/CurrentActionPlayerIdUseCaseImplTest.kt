@@ -119,7 +119,6 @@ class CurrentActionPlayerIdUseCaseImplTest {
     @Test
     fun preflop_after_SB_1to2() {
         val players = createPlayers(3)
-        val lastPlayerId = 1L
         val currentModel = createModel(
             players = players,
             btnId = players.last().id,
@@ -129,7 +128,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
                     actionStateList = listOf(
                         ActionState.Blind(
                             actionId = 0L,
-                            playerId = lastPlayerId,
+                            playerId = players[1].id,
                             betSize = 1.0f
                         )
                     )
@@ -143,7 +142,6 @@ class CurrentActionPlayerIdUseCaseImplTest {
     @Test
     fun preflop_after_BB_2to0() {
         val players = createPlayers(3)
-        val lastPlayerId = 2L
         val currentModel = createModel(
             players = players,
             btnId = players.last().id,
@@ -153,12 +151,12 @@ class CurrentActionPlayerIdUseCaseImplTest {
                     actionStateList = listOf(
                         ActionState.Blind(
                             actionId = 0L,
-                            playerId = 1L,
+                            playerId = players[1].id,
                             betSize = 1.0f
                         ),
                         ActionState.Blind(
-                            actionId = 0L,
-                            playerId = lastPlayerId,
+                            actionId = 1L,
+                            playerId = players[2].id,
                             betSize = 2.0f
                         )
                     )
@@ -167,5 +165,38 @@ class CurrentActionPlayerIdUseCaseImplTest {
         )
         val currentActionPlayerId = useCase.getCurrentActionPlayerId(currentModel)
         assertEquals(0L, currentActionPlayerId)
+    }
+
+    @Test
+    fun preflop_2_after_BTN_0to1() {
+        val players = createPlayers(3)
+        val currentModel = createModel(
+            players = players,
+            btnId = players.last().id,
+            phaseStateList = listOf(
+                PhaseState.PreFlop(
+                    phaseId = 0L,
+                    actionStateList = listOf(
+                        ActionState.Blind(
+                            actionId = 0L,
+                            playerId = players[1].id,
+                            betSize = 1.0f
+                        ),
+                        ActionState.Blind(
+                            actionId = 1L,
+                            playerId = players[2].id,
+                            betSize = 2.0f
+                        ),
+                        ActionState.Raise(
+                            actionId = 2L,
+                            playerId = players[0].id,
+                            betSize = 5.0f
+                        )
+                    )
+                )
+            )
+        )
+        val currentActionPlayerId = useCase.getCurrentActionPlayerId(currentModel)
+        assertEquals(1L, currentActionPlayerId)
     }
 }
