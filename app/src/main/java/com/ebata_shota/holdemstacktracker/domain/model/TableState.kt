@@ -11,6 +11,7 @@ data class TableState(
     val podInfoList: List<PodState>,
     val playerOrder: List<Long>,
     val btnPlayerId: Long,
+    val currentActionPlayer: Long,
     val phaseStateList: List<PhaseState>,
     val ruleStatus: RuleState,
     val startTime: LocalDateTime
