@@ -67,13 +67,13 @@ class CurrentActionPlayerIdUseCaseImplTest {
     }
 
     @Test
-    fun currentActionPlayerId_default() {
+    fun default_model() {
         val currentActionPlayerId = useCase.getCurrentActionPlayerId(model)
         assertNull(currentActionPlayerId)
     }
 
     @Test
-    fun currentActionPlayerId_preflop_after_BTN_0to1() {
+    fun preflop_after_BTN_0to1() {
         val players = createPlayers(2)
         val currentModel = createModel(
             players = players,
@@ -84,7 +84,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
     }
 
     @Test
-    fun currentActionPlayerId_preflop_after_BTN_1to2() {
+    fun preflop_after_BTN_1to2() {
         val players = createPlayers(3)
         val currentModel = createModel(
             players = players,
@@ -95,7 +95,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
     }
 
     @Test
-    fun currentActionPlayerId_preflop_BTN_1to0() {
+    fun preflop_BTN_1to0() {
         val players = createPlayers(2)
         val currentModel = createModel(
             players = players,
@@ -106,7 +106,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
     }
 
     @Test
-    fun currentActionPlayerId_preflop_BTN_2to0() {
+    fun preflop_BTN_2to0() {
         val players = createPlayers(3)
         val currentModel = createModel(
             players = players,
@@ -117,7 +117,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
     }
 
     @Test
-    fun currentActionPlayerId_preflop_after_SB_1to2() {
+    fun preflop_after_SB_1to2() {
         val players = createPlayers(3)
         val lastPlayerId = 1L
         val currentModel = createModel(
@@ -141,7 +141,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
     }
 
     @Test
-    fun currentActionPlayerId_preflop_after_BB_2to0() {
+    fun preflop_after_BB_2to0() {
         val players = createPlayers(3)
         val lastPlayerId = 2L
         val currentModel = createModel(
