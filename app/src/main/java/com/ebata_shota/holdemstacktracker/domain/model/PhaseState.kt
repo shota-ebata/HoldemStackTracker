@@ -35,6 +35,10 @@ sealed interface PhaseState {
         override val phaseId: Long
     ) : PhaseState
 
+    data class PotSettlement(
+        override val phaseId: Long
+    ) : PhaseState
+
 }
 
 
