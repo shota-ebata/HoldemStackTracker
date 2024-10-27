@@ -41,7 +41,7 @@ constructor() : CurrentActionPlayerIdUseCase {
                 throw IllegalStateException("basePlayerId=$basePlayerId がplayerOrderに存在しない")
             }
         }
-        // basePlayerIdの次のプレイヤーのIndexを返す
+        // basePlayerIdの次のプレイヤーのIDを返す
         return if (playerOrderLastIndex == lastActionPlayerIndex) {
             // 最後なら0
             playerOrder[0]
