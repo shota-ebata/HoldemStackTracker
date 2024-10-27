@@ -3,7 +3,7 @@ package com.ebata_shota.holdemstacktracker.domain.model
 import java.time.LocalDateTime
 
 data class TableState(
-    val tableId: Long,
+    val id: Long,
     val version: Int,
     val name: String,
     val hostPlayerId: Long,
