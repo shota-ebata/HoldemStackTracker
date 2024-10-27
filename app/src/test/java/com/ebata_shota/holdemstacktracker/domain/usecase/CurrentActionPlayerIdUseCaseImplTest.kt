@@ -258,7 +258,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
             phaseStateList = listOf(
                 getClosedPreFlop(players),
                 PhaseState.Flop(
-                    phaseId = 0L,
+                    phaseId = 1L,
                     actionStateList = listOf(
                         ActionState.Check(
                             actionId = 0L,
