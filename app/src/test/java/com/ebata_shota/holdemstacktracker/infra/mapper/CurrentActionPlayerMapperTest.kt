@@ -1,17 +1,15 @@
-package com.ebata_shota.holdemstacktracker.domain.usecase
+package com.ebata_shota.holdemstacktracker.infra.mapper
 
 import com.ebata_shota.holdemstacktracker.domain.model.ActionState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerState
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.CurrentActionPlayerIdUseCaseImpl
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 
-class CurrentActionPlayerIdUseCaseImplTest {
-
-    private lateinit var useCase: CurrentActionPlayerIdUseCaseImpl
+class CurrentActionPlayerMapperTest {
+    private lateinit var mapper: CurrentActionPlayerMapper
 
     private fun createPlayers(num: Int) = (0 until num).map {
         PlayerState(
@@ -24,12 +22,12 @@ class CurrentActionPlayerIdUseCaseImplTest {
 
     @Before
     fun setup() {
-        useCase = CurrentActionPlayerIdUseCaseImpl()
+        mapper = CurrentActionPlayerMapper()
     }
 
     @Test
     fun default_model() {
-        val currentActionPlayerId = useCase.getCurrentActionPlayerId(
+        val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = emptyList(),
             basePlayerId = 0L,
             phaseStateList = emptyList()
@@ -40,7 +38,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
     @Test
     fun preflop_after_BTN_0to1() {
         val players = createPlayers(2)
-        val currentActionPlayerId = useCase.getCurrentActionPlayerId(
+        val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = players.map { it.id },
             basePlayerId = players[0].id,
             phaseStateList = listOf(
@@ -56,7 +54,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
     @Test
     fun preflop_after_BTN_1to2() {
         val players = createPlayers(3)
-        val currentActionPlayerId = useCase.getCurrentActionPlayerId(
+        val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = players.map { it.id },
             basePlayerId = players[1].id,
             phaseStateList = listOf(
@@ -72,7 +70,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
     @Test
     fun preflop_after_BTN_1to0() {
         val players = createPlayers(2)
-        val currentActionPlayerId = useCase.getCurrentActionPlayerId(
+        val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = players.map { it.id },
             basePlayerId = players[1].id,
             phaseStateList = listOf(
@@ -88,7 +86,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
     @Test
     fun preflop_after_BTN_2to0() {
         val players = createPlayers(3)
-        val currentActionPlayerId = useCase.getCurrentActionPlayerId(
+        val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = players.map { it.id },
             basePlayerId = players[2].id,
             phaseStateList = listOf(
@@ -104,7 +102,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
     @Test
     fun preflop_after_SB_1to2() {
         val players = createPlayers(3)
-        val currentActionPlayerId = useCase.getCurrentActionPlayerId(
+        val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = players.map { it.id },
             basePlayerId = players[0].id,
             phaseStateList = listOf(
@@ -126,7 +124,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
     @Test
     fun preflop_after_BB_2to0() {
         val players = createPlayers(3)
-        val currentActionPlayerId = useCase.getCurrentActionPlayerId(
+        val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = players.map { it.id },
             basePlayerId = players[0].id,
             phaseStateList = listOf(
@@ -153,7 +151,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
     @Test
     fun preflop_2_after_BTN_0to1() {
         val players = createPlayers(3)
-        val currentActionPlayerId = useCase.getCurrentActionPlayerId(
+        val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = players.map { it.id },
             basePlayerId = players[0].id,
             phaseStateList = listOf(
@@ -216,7 +214,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
     @Test
     fun flop_after_BTN_0to1() {
         val players = createPlayers(3)
-        val currentActionPlayerId = useCase.getCurrentActionPlayerId(
+        val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = players.map { it.id },
             basePlayerId = players[0].id,
             phaseStateList = listOf(
@@ -233,7 +231,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
     @Test
     fun flop_after_SB_1to2() {
         val players = createPlayers(3)
-        val currentActionPlayerId = useCase.getCurrentActionPlayerId(
+        val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = players.map { it.id },
             basePlayerId = players[0].id,
             phaseStateList = listOf(
