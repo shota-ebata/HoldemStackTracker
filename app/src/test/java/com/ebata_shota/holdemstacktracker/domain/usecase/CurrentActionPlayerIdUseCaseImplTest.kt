@@ -95,7 +95,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
     }
 
     @Test
-    fun preflop_BTN_1to0() {
+    fun preflop_after_BTN_1to0() {
         val players = createPlayers(2)
         val currentModel = createModel(
             players = players,
@@ -106,7 +106,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
     }
 
     @Test
-    fun preflop_BTN_2to0() {
+    fun preflop_after_BTN_2to0() {
         val players = createPlayers(3)
         val currentModel = createModel(
             players = players,
