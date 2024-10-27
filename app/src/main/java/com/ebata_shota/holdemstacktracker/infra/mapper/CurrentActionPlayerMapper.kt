@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.infra.mapper
 
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -9,11 +10,11 @@ class CurrentActionPlayerMapper
 @Inject
 constructor() {
     fun mapCurrentActionPlayerId(
-        playerOrder: List<Long>,
-        basePlayerId: Long,
+        playerOrder: List<PlayerId>,
+        basePlayerId: PlayerId,
         phaseStateList: List<PhaseState>
-    ): Long? = phaseStateList.lastOrNull()?.let { phaseState ->
-        val lastActionPlayerId: Long? = when (phaseState) {
+    ): PlayerId? = phaseStateList.lastOrNull()?.let { phaseState ->
+        val lastActionPlayerId: PlayerId? = when (phaseState) {
             is PhaseState.BetPhase -> phaseState.actionStateList.lastOrNull()?.playerId
             else -> return@let null
         }
@@ -29,7 +30,7 @@ constructor() {
         )
     }
 
-    private fun getCurrentActionPlayerId(playerOrder: List<Long>, basePlayerId: Long?): Long {
+    private fun getCurrentActionPlayerId(playerOrder: List<PlayerId>, basePlayerId: PlayerId?): PlayerId {
         val playerOrderLastIndex = playerOrder.lastIndex
         if (playerOrderLastIndex == -1) {
             throw IllegalStateException("playerOrderが空")

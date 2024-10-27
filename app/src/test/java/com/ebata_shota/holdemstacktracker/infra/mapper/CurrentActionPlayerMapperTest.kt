@@ -2,6 +2,7 @@ package com.ebata_shota.holdemstacktracker.infra.mapper
 
 import com.ebata_shota.holdemstacktracker.domain.model.ActionState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -13,7 +14,7 @@ class CurrentActionPlayerMapperTest {
 
     private fun createPlayers(num: Int) = (0 until num).map {
         PlayerState(
-            id = it.toLong(),
+            id = PlayerId(it.toLong()),
             name = "name_$it",
             stack = 200.0f,
             isLeaved = false
@@ -29,7 +30,7 @@ class CurrentActionPlayerMapperTest {
     fun default_model() {
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = emptyList(),
-            basePlayerId = 0L,
+            basePlayerId = PlayerId(0L),
             phaseStateList = emptyList()
         )
         assertNull(currentActionPlayerId)
@@ -48,7 +49,8 @@ class CurrentActionPlayerMapperTest {
                 )
             )
         )
-        assertEquals(1L, currentActionPlayerId)
+        val expected =  PlayerId(1L)
+        assertEquals(expected, currentActionPlayerId)
     }
 
     @Test
@@ -64,7 +66,8 @@ class CurrentActionPlayerMapperTest {
                 )
             )
         )
-        assertEquals(2L, currentActionPlayerId)
+        val expected =  PlayerId(2L)
+        assertEquals(expected, currentActionPlayerId)
     }
 
     @Test
@@ -80,7 +83,8 @@ class CurrentActionPlayerMapperTest {
                 )
             )
         )
-        assertEquals(0L, currentActionPlayerId)
+        val expected =  PlayerId(0L)
+        assertEquals(expected, currentActionPlayerId)
     }
 
     @Test
@@ -96,7 +100,8 @@ class CurrentActionPlayerMapperTest {
                 )
             )
         )
-        assertEquals(0L, currentActionPlayerId)
+        val expected =  PlayerId(0L)
+        assertEquals(expected, currentActionPlayerId)
     }
 
     @Test
@@ -118,7 +123,8 @@ class CurrentActionPlayerMapperTest {
                 )
             )
         )
-        assertEquals(2L, currentActionPlayerId)
+        val expected =  PlayerId(2L)
+        assertEquals(expected, currentActionPlayerId)
     }
 
     @Test
@@ -145,7 +151,8 @@ class CurrentActionPlayerMapperTest {
                 )
             )
         )
-        assertEquals(0L, currentActionPlayerId)
+        val expected =  PlayerId(0L)
+        assertEquals(expected, currentActionPlayerId)
     }
 
     @Test
@@ -177,7 +184,8 @@ class CurrentActionPlayerMapperTest {
                 )
             )
         )
-        assertEquals(1L, currentActionPlayerId)
+        val expected =  PlayerId(1L)
+        assertEquals(expected, currentActionPlayerId)
     }
 
     private fun getClosedPreFlop(players: List<PlayerState>) = PhaseState.PreFlop(
@@ -225,7 +233,8 @@ class CurrentActionPlayerMapperTest {
                 )
             )
         )
-        assertEquals(1L, currentActionPlayerId)
+        val expected =  PlayerId(1L)
+        assertEquals(expected, currentActionPlayerId)
     }
 
     @Test
@@ -247,6 +256,7 @@ class CurrentActionPlayerMapperTest {
                 )
             )
         )
-        assertEquals(2L, currentActionPlayerId)
+        val expected =  PlayerId(2L)
+        assertEquals(expected, currentActionPlayerId)
     }
 }
