@@ -39,6 +39,10 @@ sealed interface PhaseState {
         override val phaseId: Long
     ) : PhaseState
 
+    data class End(
+        override val phaseId: Long
+    ) : PhaseState
+
 }
 
 
