@@ -99,7 +99,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
         val players = createPlayers(2)
         val currentModel = createModel(
             players = players,
-            btnId = players.last().id
+            btnId = players[1].id
         )
         val currentActionPlayerId = useCase.getCurrentActionPlayerId(currentModel)
         assertEquals(0L, currentActionPlayerId)
@@ -110,7 +110,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
         val players = createPlayers(3)
         val currentModel = createModel(
             players = players,
-            btnId = players.last().id
+            btnId = players[2].id
         )
         val currentActionPlayerId = useCase.getCurrentActionPlayerId(currentModel)
         assertEquals(0L, currentActionPlayerId)
@@ -121,7 +121,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
         val players = createPlayers(3)
         val currentModel = createModel(
             players = players,
-            btnId = players.last().id,
+            btnId = players[0].id,
             phaseStateList = listOf(
                 PhaseState.PreFlop(
                     phaseId = 0L,
@@ -144,7 +144,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
         val players = createPlayers(3)
         val currentModel = createModel(
             players = players,
-            btnId = players.last().id,
+            btnId = players[0].id,
             phaseStateList = listOf(
                 PhaseState.PreFlop(
                     phaseId = 0L,
@@ -172,7 +172,7 @@ class CurrentActionPlayerIdUseCaseImplTest {
         val players = createPlayers(3)
         val currentModel = createModel(
             players = players,
-            btnId = players.last().id,
+            btnId = players[0].id,
             phaseStateList = listOf(
                 PhaseState.PreFlop(
                     phaseId = 0L,
