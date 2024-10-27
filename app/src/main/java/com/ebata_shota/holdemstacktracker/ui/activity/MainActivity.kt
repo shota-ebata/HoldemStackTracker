@@ -1,4 +1,4 @@
-package com.ebata_shota.holdemstacktracker
+package com.ebata_shota.holdemstacktracker.ui.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
