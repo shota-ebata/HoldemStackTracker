@@ -37,7 +37,7 @@ class CurrentActionPlayerMapperTest {
     }
 
     @Test
-    fun preflop_after_BTN_0to1() {
+    fun preFlop_after_BTN_0to1() {
         val players = createPlayers(2)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = players.map { it.id },
@@ -54,7 +54,7 @@ class CurrentActionPlayerMapperTest {
     }
 
     @Test
-    fun preflop_after_BTN_1to2() {
+    fun preFlop_after_BTN_1to2() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = players.map { it.id },
@@ -71,7 +71,7 @@ class CurrentActionPlayerMapperTest {
     }
 
     @Test
-    fun preflop_after_BTN_1to0() {
+    fun preFlop_after_BTN_1to0() {
         val players = createPlayers(2)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = players.map { it.id },
@@ -88,7 +88,7 @@ class CurrentActionPlayerMapperTest {
     }
 
     @Test
-    fun preflop_after_BTN_2to0() {
+    fun preFlop_after_BTN_2to0() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = players.map { it.id },
@@ -105,7 +105,7 @@ class CurrentActionPlayerMapperTest {
     }
 
     @Test
-    fun preflop_after_SB_1to2() {
+    fun preFlop_after_SB_1to2() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = players.map { it.id },
@@ -128,7 +128,7 @@ class CurrentActionPlayerMapperTest {
     }
 
     @Test
-    fun preflop_after_BB_2to0() {
+    fun preFlop_after_BB_2to0() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = players.map { it.id },
@@ -156,7 +156,7 @@ class CurrentActionPlayerMapperTest {
     }
 
     @Test
-    fun preflop_2_after_BTN_0to1() {
+    fun preFlop_2_after_BTN_0to1() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = players.map { it.id },
