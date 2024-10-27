@@ -29,31 +29,18 @@ constructor() {
         // 最後にアクションした人の次の人が
         // 現在のアクションを行うプレイヤー
         // else
-        // lastActionPlayerIdがnullの場合は
+        // lastActionPlayerId がnullの場合は
         // つまり、誰もアクションしていないフェーズの開始時
         // BTNの次の人からアクションを開始する
-        getCurrentActionPlayerId(
-            playerOrder = playerOrder,
-            basePlayerId = lastActionPlayerId ?: btnPlayerId
-        )
-    }
-
-    private fun getCurrentActionPlayerId(playerOrder: List<PlayerId>, basePlayerId: PlayerId?): PlayerId {
-        val playerOrderLastIndex = playerOrder.lastIndex
-        if (playerOrderLastIndex == -1) {
-            throw IllegalStateException("playerOrderが空")
-        }
-        val lastActionPlayerIndex = playerOrder.indexOf(basePlayerId).apply {
+        val lastPlayerId = lastActionPlayerId ?: btnPlayerId
+        val lastActionPlayerIndex = playerOrder.indexOf(lastPlayerId).apply {
             if (this@apply == -1) {
-                throw IllegalStateException("basePlayerId=$basePlayerId がplayerOrderに存在しない")
+                throw IllegalStateException("lastPlayerId=$lastPlayerId がplayerOrderに存在しない")
             }
         }
-        // basePlayerIdの次のプレイヤーのIDを返す
-        return if (playerOrderLastIndex == lastActionPlayerIndex) {
-            // 最後なら0
-            playerOrder[0]
-        } else {
-            playerOrder[lastActionPlayerIndex + 1]
-        }
+        // lastPlayerId の次のプレイヤーのIDが現在のアクションプレイヤー
+        // リストの最後に到達したら先頭に戻る
+        val nextIndex = (lastActionPlayerIndex + 1) % playerOrder.size
+        return playerOrder[nextIndex]
     }
 }
