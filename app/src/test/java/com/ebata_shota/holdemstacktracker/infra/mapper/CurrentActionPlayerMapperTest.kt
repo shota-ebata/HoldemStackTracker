@@ -14,7 +14,7 @@ class CurrentActionPlayerMapperTest {
 
     private fun createPlayers(num: Int) = (0 until num).map {
         PlayerState(
-            id = PlayerId(it.toLong()),
+            id = PlayerId(it.toString()),
             name = "name_$it",
             stack = 200.0f,
             isLeaved = false
@@ -30,7 +30,7 @@ class CurrentActionPlayerMapperTest {
     fun default_model() {
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
             playerOrder = emptyList(),
-            btnPlayerId = PlayerId(0L),
+            btnPlayerId = PlayerId("0"),
             phaseStateList = emptyList()
         )
         assertNull(currentActionPlayerId)
@@ -49,7 +49,7 @@ class CurrentActionPlayerMapperTest {
                 )
             )
         )
-        val expected =  PlayerId(1L)
+        val expected =  PlayerId("1")
         assertEquals(expected, currentActionPlayerId)
     }
 
@@ -66,7 +66,7 @@ class CurrentActionPlayerMapperTest {
                 )
             )
         )
-        val expected =  PlayerId(2L)
+        val expected =  PlayerId("2")
         assertEquals(expected, currentActionPlayerId)
     }
 
@@ -83,7 +83,7 @@ class CurrentActionPlayerMapperTest {
                 )
             )
         )
-        val expected =  PlayerId(0L)
+        val expected =  PlayerId("0")
         assertEquals(expected, currentActionPlayerId)
     }
 
@@ -100,7 +100,7 @@ class CurrentActionPlayerMapperTest {
                 )
             )
         )
-        val expected =  PlayerId(0L)
+        val expected =  PlayerId("0")
         assertEquals(expected, currentActionPlayerId)
     }
 
@@ -123,7 +123,7 @@ class CurrentActionPlayerMapperTest {
                 )
             )
         )
-        val expected =  PlayerId(2L)
+        val expected =  PlayerId("2")
         assertEquals(expected, currentActionPlayerId)
     }
 
@@ -151,7 +151,7 @@ class CurrentActionPlayerMapperTest {
                 )
             )
         )
-        val expected =  PlayerId(0L)
+        val expected =  PlayerId("0")
         assertEquals(expected, currentActionPlayerId)
     }
 
@@ -184,7 +184,7 @@ class CurrentActionPlayerMapperTest {
                 )
             )
         )
-        val expected =  PlayerId(1L)
+        val expected =  PlayerId("1")
         assertEquals(expected, currentActionPlayerId)
     }
 
@@ -233,7 +233,7 @@ class CurrentActionPlayerMapperTest {
                 )
             )
         )
-        val expected =  PlayerId(1L)
+        val expected =  PlayerId("1")
         assertEquals(expected, currentActionPlayerId)
     }
 
@@ -256,7 +256,7 @@ class CurrentActionPlayerMapperTest {
                 )
             )
         )
-        val expected =  PlayerId(2L)
+        val expected =  PlayerId("2")
         assertEquals(expected, currentActionPlayerId)
     }
 }
