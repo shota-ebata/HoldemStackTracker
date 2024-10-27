@@ -9,9 +9,17 @@ import javax.inject.Singleton
 class CurrentActionPlayerMapper
 @Inject
 constructor() {
+    /**
+     * アクション履歴（phaseStateList）から
+     * 現在のアクションプレイヤーを決める
+     *
+     * @param playerOrderWithoutLeavedPlayer プレイヤーの順番（離席プレイヤーを除いた）
+     * @param btnPlayerId ボタンプレイヤー
+     * @param phaseStateList
+     */
     fun mapCurrentActionPlayerId(
-        playerOrder: List<PlayerId>,
-        basePlayerId: PlayerId,
+        playerOrderWithoutLeavedPlayer: List<PlayerId>,
+        btnPlayerId: PlayerId,
         phaseStateList: List<PhaseState>
     ): PlayerId? = phaseStateList.lastOrNull()?.let { phaseState ->
         val lastActionPlayerId: PlayerId? = when (phaseState) {
@@ -22,11 +30,11 @@ constructor() {
         // 現在のアクションを行うプレイヤー
         // else
         // lastActionPlayerIdがnullの場合は
-        // つまり、だれもアクションしていないフェーズの開始時
+        // つまり、誰もアクションしていないフェーズの開始時
         // BTNの次の人からアクションを開始する
         getCurrentActionPlayerId(
-            playerOrder = playerOrder,
-            basePlayerId = lastActionPlayerId ?: basePlayerId
+            playerOrder = playerOrderWithoutLeavedPlayer,
+            basePlayerId = lastActionPlayerId ?: btnPlayerId
         )
     }
 

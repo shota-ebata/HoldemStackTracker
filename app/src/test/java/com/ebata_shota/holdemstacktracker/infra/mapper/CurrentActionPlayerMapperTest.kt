@@ -29,8 +29,8 @@ class CurrentActionPlayerMapperTest {
     @Test
     fun default_model() {
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrder = emptyList(),
-            basePlayerId = PlayerId(0L),
+            playerOrderWithoutLeavedPlayer = emptyList(),
+            btnPlayerId = PlayerId(0L),
             phaseStateList = emptyList()
         )
         assertNull(currentActionPlayerId)
@@ -40,8 +40,8 @@ class CurrentActionPlayerMapperTest {
     fun preflop_after_BTN_0to1() {
         val players = createPlayers(2)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrder = players.map { it.id },
-            basePlayerId = players[0].id,
+            playerOrderWithoutLeavedPlayer = players.map { it.id },
+            btnPlayerId = players[0].id,
             phaseStateList = listOf(
                 PhaseState.PreFlop(
                     phaseId = 0L,
@@ -57,8 +57,8 @@ class CurrentActionPlayerMapperTest {
     fun preflop_after_BTN_1to2() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrder = players.map { it.id },
-            basePlayerId = players[1].id,
+            playerOrderWithoutLeavedPlayer = players.map { it.id },
+            btnPlayerId = players[1].id,
             phaseStateList = listOf(
                 PhaseState.PreFlop(
                     phaseId = 0L,
@@ -74,8 +74,8 @@ class CurrentActionPlayerMapperTest {
     fun preflop_after_BTN_1to0() {
         val players = createPlayers(2)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrder = players.map { it.id },
-            basePlayerId = players[1].id,
+            playerOrderWithoutLeavedPlayer = players.map { it.id },
+            btnPlayerId = players[1].id,
             phaseStateList = listOf(
                 PhaseState.PreFlop(
                     phaseId = 0L,
@@ -91,8 +91,8 @@ class CurrentActionPlayerMapperTest {
     fun preflop_after_BTN_2to0() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrder = players.map { it.id },
-            basePlayerId = players[2].id,
+            playerOrderWithoutLeavedPlayer = players.map { it.id },
+            btnPlayerId = players[2].id,
             phaseStateList = listOf(
                 PhaseState.PreFlop(
                     phaseId = 0L,
@@ -108,8 +108,8 @@ class CurrentActionPlayerMapperTest {
     fun preflop_after_SB_1to2() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrder = players.map { it.id },
-            basePlayerId = players[0].id,
+            playerOrderWithoutLeavedPlayer = players.map { it.id },
+            btnPlayerId = players[0].id,
             phaseStateList = listOf(
                 PhaseState.PreFlop(
                     phaseId = 0L,
@@ -131,8 +131,8 @@ class CurrentActionPlayerMapperTest {
     fun preflop_after_BB_2to0() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrder = players.map { it.id },
-            basePlayerId = players[0].id,
+            playerOrderWithoutLeavedPlayer = players.map { it.id },
+            btnPlayerId = players[0].id,
             phaseStateList = listOf(
                 PhaseState.PreFlop(
                     phaseId = 0L,
@@ -159,8 +159,8 @@ class CurrentActionPlayerMapperTest {
     fun preflop_2_after_BTN_0to1() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrder = players.map { it.id },
-            basePlayerId = players[0].id,
+            playerOrderWithoutLeavedPlayer = players.map { it.id },
+            btnPlayerId = players[0].id,
             phaseStateList = listOf(
                 PhaseState.PreFlop(
                     phaseId = 0L,
@@ -223,8 +223,8 @@ class CurrentActionPlayerMapperTest {
     fun flop_after_BTN_0to1() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrder = players.map { it.id },
-            basePlayerId = players[0].id,
+            playerOrderWithoutLeavedPlayer = players.map { it.id },
+            btnPlayerId = players[0].id,
             phaseStateList = listOf(
                 getClosedPreFlop(players),
                 PhaseState.Flop(
@@ -241,8 +241,8 @@ class CurrentActionPlayerMapperTest {
     fun flop_after_SB_1to2() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrder = players.map { it.id },
-            basePlayerId = players[0].id,
+            playerOrderWithoutLeavedPlayer = players.map { it.id },
+            btnPlayerId = players[0].id,
             phaseStateList = listOf(
                 getClosedPreFlop(players),
                 PhaseState.Flop(
