@@ -13,12 +13,12 @@ constructor() {
      * アクション履歴（phaseStateList）から
      * 現在のアクションプレイヤーを決める
      *
-     * @param playerOrderWithoutLeavedPlayer プレイヤーの順番（離席プレイヤーを除いた）
+     * @param playerOrder プレイヤーの順番
      * @param btnPlayerId ボタンプレイヤー
      * @param phaseStateList
      */
     fun mapCurrentActionPlayerId(
-        playerOrderWithoutLeavedPlayer: List<PlayerId>,
+        playerOrder: List<PlayerId>,
         btnPlayerId: PlayerId,
         phaseStateList: List<PhaseState>
     ): PlayerId? = phaseStateList.lastOrNull()?.let { phaseState ->
@@ -33,7 +33,7 @@ constructor() {
         // つまり、誰もアクションしていないフェーズの開始時
         // BTNの次の人からアクションを開始する
         getCurrentActionPlayerId(
-            playerOrder = playerOrderWithoutLeavedPlayer,
+            playerOrder = playerOrder,
             basePlayerId = lastActionPlayerId ?: btnPlayerId
         )
     }

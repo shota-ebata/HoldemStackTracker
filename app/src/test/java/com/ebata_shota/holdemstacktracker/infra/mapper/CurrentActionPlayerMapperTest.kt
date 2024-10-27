@@ -29,7 +29,7 @@ class CurrentActionPlayerMapperTest {
     @Test
     fun default_model() {
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrderWithoutLeavedPlayer = emptyList(),
+            playerOrder = emptyList(),
             btnPlayerId = PlayerId(0L),
             phaseStateList = emptyList()
         )
@@ -40,7 +40,7 @@ class CurrentActionPlayerMapperTest {
     fun preflop_after_BTN_0to1() {
         val players = createPlayers(2)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrderWithoutLeavedPlayer = players.map { it.id },
+            playerOrder = players.map { it.id },
             btnPlayerId = players[0].id,
             phaseStateList = listOf(
                 PhaseState.PreFlop(
@@ -57,7 +57,7 @@ class CurrentActionPlayerMapperTest {
     fun preflop_after_BTN_1to2() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrderWithoutLeavedPlayer = players.map { it.id },
+            playerOrder = players.map { it.id },
             btnPlayerId = players[1].id,
             phaseStateList = listOf(
                 PhaseState.PreFlop(
@@ -74,7 +74,7 @@ class CurrentActionPlayerMapperTest {
     fun preflop_after_BTN_1to0() {
         val players = createPlayers(2)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrderWithoutLeavedPlayer = players.map { it.id },
+            playerOrder = players.map { it.id },
             btnPlayerId = players[1].id,
             phaseStateList = listOf(
                 PhaseState.PreFlop(
@@ -91,7 +91,7 @@ class CurrentActionPlayerMapperTest {
     fun preflop_after_BTN_2to0() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrderWithoutLeavedPlayer = players.map { it.id },
+            playerOrder = players.map { it.id },
             btnPlayerId = players[2].id,
             phaseStateList = listOf(
                 PhaseState.PreFlop(
@@ -108,7 +108,7 @@ class CurrentActionPlayerMapperTest {
     fun preflop_after_SB_1to2() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrderWithoutLeavedPlayer = players.map { it.id },
+            playerOrder = players.map { it.id },
             btnPlayerId = players[0].id,
             phaseStateList = listOf(
                 PhaseState.PreFlop(
@@ -131,7 +131,7 @@ class CurrentActionPlayerMapperTest {
     fun preflop_after_BB_2to0() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrderWithoutLeavedPlayer = players.map { it.id },
+            playerOrder = players.map { it.id },
             btnPlayerId = players[0].id,
             phaseStateList = listOf(
                 PhaseState.PreFlop(
@@ -159,7 +159,7 @@ class CurrentActionPlayerMapperTest {
     fun preflop_2_after_BTN_0to1() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrderWithoutLeavedPlayer = players.map { it.id },
+            playerOrder = players.map { it.id },
             btnPlayerId = players[0].id,
             phaseStateList = listOf(
                 PhaseState.PreFlop(
@@ -223,7 +223,7 @@ class CurrentActionPlayerMapperTest {
     fun flop_after_BTN_0to1() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrderWithoutLeavedPlayer = players.map { it.id },
+            playerOrder = players.map { it.id },
             btnPlayerId = players[0].id,
             phaseStateList = listOf(
                 getClosedPreFlop(players),
@@ -241,7 +241,7 @@ class CurrentActionPlayerMapperTest {
     fun flop_after_SB_1to2() {
         val players = createPlayers(3)
         val currentActionPlayerId = mapper.mapCurrentActionPlayerId(
-            playerOrderWithoutLeavedPlayer = players.map { it.id },
+            playerOrder = players.map { it.id },
             btnPlayerId = players[0].id,
             phaseStateList = listOf(
                 getClosedPreFlop(players),
