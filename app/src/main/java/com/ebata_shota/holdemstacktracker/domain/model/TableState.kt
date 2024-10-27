@@ -10,6 +10,7 @@ data class TableState(
     val players: List<PlayerState>,
     val podInfoList: List<PodState>,
     val playerOrder: List<Long>,
+    val btnPlayerId: Long,
     val phaseStatusList: List<PhaseState>,
     val ruleStatus: RuleState,
     val startTime: LocalDateTime
