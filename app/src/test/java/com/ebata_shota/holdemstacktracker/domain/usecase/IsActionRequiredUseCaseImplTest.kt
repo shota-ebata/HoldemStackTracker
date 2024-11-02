@@ -323,4 +323,26 @@ class IsActionRequiredUseCaseImplTest {
         )
         executeAndAssert(actionStateList, expected = false)
     }
+
+    @Test
+    fun flop_SB_Check_BB_Check_BIN_Skip() {
+        // prepare
+        val actionStateList = listOf(
+            ActionState.Check(actionId = 0L, playerId = PlayerId("0")),
+            ActionState.Check(actionId = 1L, playerId = PlayerId("1")),
+            ActionState.Skip(actionId = 2L, playerId = PlayerId("2")),
+        )
+        executeAndAssert(actionStateList, expected = false)
+    }
+
+    @Test
+    fun flop_SB_Check_BB_Skip_BIN_Check() {
+        // prepare
+        val actionStateList = listOf(
+            ActionState.Check(actionId = 0L, playerId = PlayerId("0")),
+            ActionState.Skip(actionId = 1L, playerId = PlayerId("1")),
+            ActionState.Check(actionId = 2L, playerId = PlayerId("2")),
+        )
+        executeAndAssert(actionStateList, expected = false)
+    }
 }
