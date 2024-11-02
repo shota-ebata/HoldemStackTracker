@@ -1,5 +1,8 @@
 package com.ebata_shota.holdemstacktracker.domain.repository
 
-interface PrefRepository {
+import kotlinx.coroutines.flow.Flow
 
+
+interface PrefRepository {
+    val myPlayerId: Flow<String>
 }
