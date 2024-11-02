@@ -1,15 +1,11 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
-import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
+import com.ebata_shota.holdemstacktracker.createDummyTableState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
-import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.RuleState
-import com.ebata_shota.holdemstacktracker.domain.model.TableState
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
-import java.time.LocalDateTime
 
 
 class GetLatestBetPhaseUseCaseImplTest {
@@ -20,26 +16,9 @@ class GetLatestBetPhaseUseCaseImplTest {
         usecase = GetLatestBetPhaseUseCaseImpl()
     }
 
-    private fun createTableState(
-        phaseStateList: List<PhaseState>
-    ) = TableState(
-        id = 0L,
-        version = 0,
-        name = "dummy",
-        hostPlayerId = PlayerId(""),
-        players = emptyList(),
-        podStateList = emptyList(),
-        playerOrder = emptyList(),
-        btnPlayerId = PlayerId(""),
-        currentActionPlayer = PlayerId(""),
-        phaseStateList = phaseStateList,
-        ruleStatus = RuleState.LingGame(sbSize = 100.0f, bbSize = 200.0f, BetViewMode.Number),
-        startTime = LocalDateTime.now()
-    )
-
     @Test
     fun getLatestBet_Standby() {
-        val tableState = createTableState(
+        val tableState = createDummyTableState(
             phaseStateList = listOf(
                 PhaseState.Standby(phaseId = 0L)
             )
@@ -51,7 +30,7 @@ class GetLatestBetPhaseUseCaseImplTest {
 
     @Test
     fun getLatestBet_PreFlop() {
-        val tableState = createTableState(
+        val tableState = createDummyTableState(
             phaseStateList = listOf(
                 PhaseState.Standby(phaseId = 0L),
                 PhaseState.PreFlop(phaseId = 1L, actionStateList = emptyList())
@@ -63,7 +42,7 @@ class GetLatestBetPhaseUseCaseImplTest {
 
     @Test
     fun getLatestBet_Flop() {
-        val tableState = createTableState(
+        val tableState = createDummyTableState(
             phaseStateList = listOf(
                 PhaseState.Standby(phaseId = 0L),
                 PhaseState.PreFlop(phaseId = 1L, actionStateList = emptyList()),
@@ -76,7 +55,7 @@ class GetLatestBetPhaseUseCaseImplTest {
 
     @Test
     fun getLatestBet_Turn() {
-        val tableState = createTableState(
+        val tableState = createDummyTableState(
             phaseStateList = listOf(
                 PhaseState.Standby(phaseId = 0L),
                 PhaseState.PreFlop(phaseId = 1L, actionStateList = emptyList()),
@@ -90,7 +69,7 @@ class GetLatestBetPhaseUseCaseImplTest {
 
     @Test
     fun getLatestBet_River() {
-        val tableState = createTableState(
+        val tableState = createDummyTableState(
             phaseStateList = listOf(
                 PhaseState.Standby(phaseId = 0L),
                 PhaseState.PreFlop(phaseId = 1L, actionStateList = emptyList()),
@@ -105,7 +84,7 @@ class GetLatestBetPhaseUseCaseImplTest {
 
     @Test
     fun getLatestBet_ShowDown() {
-        val tableState = createTableState(
+        val tableState = createDummyTableState(
             phaseStateList = listOf(
                 PhaseState.Standby(phaseId = 0L),
                 PhaseState.PreFlop(phaseId = 1L, actionStateList = emptyList()),
@@ -122,7 +101,7 @@ class GetLatestBetPhaseUseCaseImplTest {
 
     @Test
     fun getLatestBet_PotSettlement() {
-        val tableState = createTableState(
+        val tableState = createDummyTableState(
             phaseStateList = listOf(
                 PhaseState.Standby(phaseId = 0L),
                 PhaseState.PreFlop(phaseId = 1L, actionStateList = emptyList()),
@@ -140,7 +119,7 @@ class GetLatestBetPhaseUseCaseImplTest {
 
     @Test
     fun getLatestBet_End() {
-        val tableState = createTableState(
+        val tableState = createDummyTableState(
             phaseStateList = listOf(
                 PhaseState.Standby(phaseId = 0L),
                 PhaseState.PreFlop(phaseId = 1L, actionStateList = emptyList()),

@@ -8,7 +8,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableState
 import java.time.LocalDateTime
 
 fun createDummyTableState(
-    phaseStateList: List<PhaseState>
+    playerOrder: List<PlayerId> = emptyList(),
+    phaseStateList: List<PhaseState> = emptyList()
 ) = TableState(
     id = 0L,
     version = 0,
@@ -16,7 +17,7 @@ fun createDummyTableState(
     hostPlayerId = PlayerId(""),
     players = emptyList(),
     podStateList = emptyList(),
-    playerOrder = emptyList(),
+    playerOrder = playerOrder,
     btnPlayerId = PlayerId(""),
     currentActionPlayer = PlayerId(""),
     phaseStateList = phaseStateList,
