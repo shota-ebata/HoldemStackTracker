@@ -345,4 +345,15 @@ class IsActionRequiredUseCaseImplTest {
         )
         executeAndAssert(actionStateList, expected = false)
     }
+
+    @Test
+    fun flop_SB_Check_BB_Check_BIN_Bet() {
+        // prepare
+        val actionStateList = listOf(
+            ActionState.Check(actionId = 0L, playerId = PlayerId("0")),
+            ActionState.Check(actionId = 1L, playerId = PlayerId("1")),
+            ActionState.Bet(actionId = 2L, playerId = PlayerId("2"), betSize = 200.0f),
+        )
+        executeAndAssert(actionStateList, expected = true)
+    }
 }
