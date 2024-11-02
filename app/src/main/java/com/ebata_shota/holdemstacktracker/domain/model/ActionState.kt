@@ -14,6 +14,11 @@ sealed interface ActionState {
         override val betSize: Float
     ) : BetAction
 
+    data class Fold(
+        override val actionId: Long,
+        override val playerId: PlayerId
+    ) : ActionState
+
     data class Check(
         override val actionId: Long,
         override val playerId: PlayerId
