@@ -4,11 +4,11 @@ import java.time.LocalDateTime
 
 data class TableState(
     val id: Long,
-    val version: Int,
+    val version: Long,
     val name: String,
     val hostPlayerId: PlayerId,
     val players: List<PlayerState>,
-    val podInfoList: List<PodState>,
+    val podStateList: List<PodState>,
     val playerOrder: List<PlayerId>,
     val btnPlayerId: PlayerId,
     val currentActionPlayer: PlayerId,
