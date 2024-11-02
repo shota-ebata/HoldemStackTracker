@@ -33,8 +33,8 @@ constructor() {
         // つまり、誰もアクションしていないフェーズの開始時
         // BTNの次の人からアクションを開始する
         val lastPlayerId = lastActionPlayerId ?: btnPlayerId
-        val lastActionPlayerIndex = playerOrder.indexOf(lastPlayerId).apply {
-            if (this@apply == -1) {
+        val lastActionPlayerIndex = playerOrder.indexOf(lastPlayerId).also {
+            if (it == -1) {
                 throw IllegalStateException("lastPlayerId=$lastPlayerId がplayerOrderに存在しない")
             }
         }
