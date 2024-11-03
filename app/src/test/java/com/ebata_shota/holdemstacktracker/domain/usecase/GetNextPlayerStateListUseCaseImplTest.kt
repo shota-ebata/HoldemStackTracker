@@ -1,0 +1,298 @@
+package com.ebata_shota.holdemstacktracker.domain.usecase
+
+import com.ebata_shota.holdemstacktracker.domain.model.ActionState
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerState
+import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextPlayerStateListUseCaseImpl
+import io.mockk.clearMocks
+import io.mockk.every
+import io.mockk.mockk
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Test
+
+class GetNextPlayerStateListUseCaseImplTest {
+    private lateinit var usecase: GetNextPlayerStateListUseCaseImpl
+
+    private val prefRepository: PrefRepository = mockk()
+
+    @Before
+    fun setup() {
+        usecase = GetNextPlayerStateListUseCaseImpl(
+            prefRepository = prefRepository
+        )
+    }
+
+
+    @After
+    fun reset() {
+        clearMocks(prefRepository)
+    }
+
+    private fun executeAndAssert(
+        pendingBetPerPlayer: Map<PlayerId, Float> = emptyMap(),
+        players: List<PlayerState>,
+        action: ActionState,
+        expected: List<PlayerState>,
+    ) {
+        runTest {
+            // execute
+            val actual: List<PlayerState> = usecase.invoke(
+                pendingBetPerPlayer = pendingBetPerPlayer,
+                players = players,
+                action = action
+            )
+            // assert
+            assertEquals(expected, actual)
+        }
+    }
+
+    @Test
+    fun action_Blind() {
+        // prepare
+        every { prefRepository.myPlayerId } returns flowOf("0")
+        val players = listOf(
+            PlayerState(id = PlayerId("0"), name = "0", stack = 1000.0f, isLeaved = false),
+            PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
+            PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
+        )
+        val action = ActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f)
+        executeAndAssert(
+            players = players,
+            action = action,
+            expected = listOf(
+                PlayerState(id = PlayerId("0"), name = "0", stack = 900.0f, isLeaved = false),
+                PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
+                PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
+            )
+        )
+    }
+
+    @Test
+    fun action_Call() {
+        // prepare
+        every { prefRepository.myPlayerId } returns flowOf("0")
+        val players = listOf(
+            PlayerState(id = PlayerId("0"), name = "0", stack = 1000.0f, isLeaved = false),
+            PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
+            PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
+        )
+        val action = ActionState.Call(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f)
+        executeAndAssert(
+            players = players,
+            action = action,
+            expected = listOf(
+                PlayerState(id = PlayerId("0"), name = "0", stack = 900.0f, isLeaved = false),
+                PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
+                PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
+            )
+        )
+    }
+
+    @Test
+    fun action_Raise() {
+        // prepare
+        every { prefRepository.myPlayerId } returns flowOf("0")
+        val players = listOf(
+            PlayerState(id = PlayerId("0"), name = "0", stack = 1000.0f, isLeaved = false),
+            PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
+            PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
+        )
+        val action = ActionState.Raise(actionId = 0L, playerId = PlayerId("0"), betSize = 400.0f)
+        executeAndAssert(
+            players = players,
+            action = action,
+            expected = listOf(
+                PlayerState(id = PlayerId("0"), name = "0", stack = 600.0f, isLeaved = false),
+                PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
+                PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
+            )
+        )
+    }
+
+    @Test
+    fun action_Bet() {
+        // prepare
+        every { prefRepository.myPlayerId } returns flowOf("0")
+        val players = listOf(
+            PlayerState(id = PlayerId("0"), name = "0", stack = 1000.0f, isLeaved = false),
+            PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
+            PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
+        )
+        val action = ActionState.Bet(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f)
+        executeAndAssert(
+            players = players,
+            action = action,
+            expected = listOf(
+                PlayerState(id = PlayerId("0"), name = "0", stack = 900.0f, isLeaved = false),
+                PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
+                PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
+            )
+        )
+    }
+
+    @Test
+    fun action_AllIn() {
+        // prepare
+        every { prefRepository.myPlayerId } returns flowOf("0")
+        val players = listOf(
+            PlayerState(id = PlayerId("0"), name = "0", stack = 1000.0f, isLeaved = false),
+            PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
+            PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
+        )
+        val action = ActionState.AllIn(actionId = 0L, playerId = PlayerId("0"), betSize = 1000.0f)
+        executeAndAssert(
+            players = players,
+            action = action,
+            expected = listOf(
+                PlayerState(id = PlayerId("0"), name = "0", stack = 0.0f, isLeaved = false),
+                PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
+                PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
+            )
+        )
+    }
+
+    @Test
+    fun action_Check() {
+        // prepare
+        every { prefRepository.myPlayerId } returns flowOf("0")
+        val players = listOf(
+            PlayerState(id = PlayerId("0"), name = "0", stack = 1000.0f, isLeaved = false),
+            PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
+            PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
+        )
+        val action = ActionState.Check(actionId = 0L, playerId = PlayerId("0"))
+        executeAndAssert(
+            players = players,
+            action = action,
+            expected = listOf(
+                PlayerState(id = PlayerId("0"), name = "0", stack = 1000.0f, isLeaved = false),
+                PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
+                PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
+            )
+        )
+    }
+
+    @Test
+    fun action_Fold() {
+        // prepare
+        every { prefRepository.myPlayerId } returns flowOf("0")
+        val players = listOf(
+            PlayerState(id = PlayerId("0"), name = "0", stack = 1000.0f, isLeaved = false),
+            PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
+            PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
+        )
+        val action = ActionState.Fold(actionId = 0L, playerId = PlayerId("0"))
+        executeAndAssert(
+            players = players,
+            action = action,
+            expected = listOf(
+                PlayerState(id = PlayerId("0"), name = "0", stack = 1000.0f, isLeaved = false),
+                PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
+                PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
+            )
+        )
+    }
+
+    @Test
+    fun action_Skip() {
+        // prepare
+        every { prefRepository.myPlayerId } returns flowOf("0")
+        val players = listOf(
+            PlayerState(id = PlayerId("0"), name = "0", stack = 1000.0f, isLeaved = false),
+            PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
+            PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
+        )
+        val action = ActionState.Skip(actionId = 0L, playerId = PlayerId("0"))
+        executeAndAssert(
+            players = players,
+            action = action,
+            expected = listOf(
+                PlayerState(id = PlayerId("0"), name = "0", stack = 1000.0f, isLeaved = false),
+                PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
+                PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
+            )
+        )
+    }
+
+    @Test
+    fun action_BTN_Call_And_SB_Call() {
+        // prepare
+        every { prefRepository.myPlayerId } returns flowOf("0")
+        val pendingBetPerPlayer = mapOf(
+            PlayerId("0") to 100.0f,
+            PlayerId("1") to 200.0f,
+            PlayerId("2") to 200.0f,
+        )
+        val players = listOf(
+            PlayerState(id = PlayerId("0"), name = "0", stack = 900.0f, isLeaved = false),
+            PlayerState(id = PlayerId("1"), name = "1", stack = 800.0f, isLeaved = false),
+            PlayerState(id = PlayerId("2"), name = "2", stack = 800.0f, isLeaved = false),
+        )
+        val action = ActionState.Call(actionId = 0L, playerId = PlayerId("0"), betSize = 200.0f)
+        executeAndAssert(
+            pendingBetPerPlayer = pendingBetPerPlayer,
+            players = players,
+            action = action,
+            expected = listOf(
+                PlayerState(id = PlayerId("0"), name = "0", stack = 800.0f, isLeaved = false),
+                PlayerState(id = PlayerId("1"), name = "1", stack = 800.0f, isLeaved = false),
+                PlayerState(id = PlayerId("2"), name = "2", stack = 800.0f, isLeaved = false),
+            )
+        )
+    }
+
+    @Test
+    fun action_BTN_Call_And_SB_AllIn() {
+        // prepare
+        every { prefRepository.myPlayerId } returns flowOf("0")
+        val pendingBetPerPlayer = mapOf(
+            PlayerId("0") to 100.0f,
+            PlayerId("1") to 200.0f,
+            PlayerId("2") to 200.0f,
+        )
+        val players = listOf(
+            PlayerState(id = PlayerId("0"), name = "0", stack = 900.0f, isLeaved = false),
+            PlayerState(id = PlayerId("1"), name = "1", stack = 800.0f, isLeaved = false),
+            PlayerState(id = PlayerId("2"), name = "2", stack = 800.0f, isLeaved = false),
+        )
+        val action = ActionState.AllIn(actionId = 0L, playerId = PlayerId("0"), betSize = 1000.0f)
+        executeAndAssert(
+            pendingBetPerPlayer = pendingBetPerPlayer,
+            players = players,
+            action = action,
+            expected = listOf(
+                PlayerState(id = PlayerId("0"), name = "0", stack = 0.0f, isLeaved = false),
+                PlayerState(id = PlayerId("1"), name = "1", stack = 800.0f, isLeaved = false),
+                PlayerState(id = PlayerId("2"), name = "2", stack = 800.0f, isLeaved = false),
+            )
+        )
+    }
+
+    @Test
+    fun action_SB_Check_and_BB_Bet() {
+        // prepare
+        every { prefRepository.myPlayerId } returns flowOf("1")
+        val pendingBetPerPlayer = emptyMap<PlayerId, Float>()
+        val players = listOf(
+            PlayerState(id = PlayerId("0"), name = "0", stack = 800.0f, isLeaved = false),
+            PlayerState(id = PlayerId("1"), name = "1", stack = 800.0f, isLeaved = false),
+            PlayerState(id = PlayerId("2"), name = "2", stack = 800.0f, isLeaved = false),
+        )
+        val action = ActionState.Bet(actionId = 0L, playerId = PlayerId("1"), betSize = 200.0f)
+        executeAndAssert(
+            pendingBetPerPlayer = pendingBetPerPlayer,
+            players = players,
+            action = action,
+            expected = listOf(
+                PlayerState(id = PlayerId("0"), name = "0", stack = 800.0f, isLeaved = false),
+                PlayerState(id = PlayerId("1"), name = "1", stack = 600.0f, isLeaved = false),
+                PlayerState(id = PlayerId("2"), name = "2", stack = 800.0f, isLeaved = false),
+            )
+        )
+    }
+}
