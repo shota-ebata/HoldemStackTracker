@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
-import com.ebata_shota.holdemstacktracker.domain.model.ActionState
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetPerPlayerUseCaseImpl
@@ -25,9 +25,9 @@ class GetPendingBetPerPlayerUseCaseImplTest {
     fun getMaxBetSize_call_getMaxBetSizeUseCase() {
         // prepare
         val actionStateList = listOf(
-            ActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f),
-            ActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0f),
-            ActionState.Call(actionId = 2L, playerId = PlayerId("2"), betSize = 200.0f),
+            BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f),
+            BetPhaseActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0f),
+            BetPhaseActionState.Call(actionId = 2L, playerId = PlayerId("2"), betSize = 200.0f),
         )
         val playerOrder: List<PlayerId> = listOf(
             PlayerId("0"),
@@ -59,7 +59,7 @@ class GetPendingBetPerPlayerUseCaseImplTest {
             PlayerId("1"),
             PlayerId("2"),
         ),
-        actionStateList: List<ActionState>,
+        actionStateList: List<BetPhaseActionState>,
         expected: Map<PlayerId, Float>
     ) {
         val actual: Map<PlayerId, Float> = usecase.invoke(
@@ -73,9 +73,9 @@ class GetPendingBetPerPlayerUseCaseImplTest {
     fun preFlop_BB_BB_And_BTN_Call() {
         // prepare
         val actionStateList = listOf(
-            ActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f),
-            ActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0f),
-            ActionState.Call(actionId = 2L, playerId = PlayerId("2"), betSize = 200.0f),
+            BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f),
+            BetPhaseActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0f),
+            BetPhaseActionState.Call(actionId = 2L, playerId = PlayerId("2"), betSize = 200.0f),
         )
         executeAndAssert(
             actionStateList = actionStateList,
@@ -91,9 +91,9 @@ class GetPendingBetPerPlayerUseCaseImplTest {
     fun preFlop_BB_BB_And_BTN_Fold() {
         // prepare
         val actionStateList = listOf(
-            ActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f),
-            ActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0f),
-            ActionState.Fold(actionId = 2L, playerId = PlayerId("2")),
+            BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f),
+            BetPhaseActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0f),
+            BetPhaseActionState.Fold(actionId = 2L, playerId = PlayerId("2")),
         )
         executeAndAssert(
             actionStateList = actionStateList,
@@ -108,10 +108,10 @@ class GetPendingBetPerPlayerUseCaseImplTest {
     fun preFlop_BB_BB_And_BTN_Call_BB_Call() {
         // prepare
         val actionStateList = listOf(
-            ActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f),
-            ActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0f),
-            ActionState.Call(actionId = 2L, playerId = PlayerId("2"), betSize = 200.0f),
-            ActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 200.0f),
+            BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f),
+            BetPhaseActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0f),
+            BetPhaseActionState.Call(actionId = 2L, playerId = PlayerId("2"), betSize = 200.0f),
+            BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 200.0f),
         )
         executeAndAssert(
             actionStateList = actionStateList,

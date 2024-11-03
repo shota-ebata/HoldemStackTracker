@@ -4,7 +4,7 @@ sealed interface PhaseState {
     val phaseId: Long
 
     sealed interface BetPhase : PhaseState {
-        val actionStateList: List<ActionState>
+        val actionStateList: List<BetPhaseActionState>
     }
 
     data class Standby(
@@ -13,22 +13,22 @@ sealed interface PhaseState {
 
     data class PreFlop(
         override val phaseId: Long,
-        override val actionStateList: List<ActionState>
+        override val actionStateList: List<BetPhaseActionState>
     ) : BetPhase
 
     data class Flop(
         override val phaseId: Long,
-        override val actionStateList: List<ActionState>
+        override val actionStateList: List<BetPhaseActionState>
     ) : BetPhase
 
     data class Turn(
         override val phaseId: Long,
-        override val actionStateList: List<ActionState>
+        override val actionStateList: List<BetPhaseActionState>
     ) : BetPhase
 
     data class River(
         override val phaseId: Long,
-        override val actionStateList: List<ActionState>
+        override val actionStateList: List<BetPhaseActionState>
     ) : BetPhase
 
     data class ShowDown(

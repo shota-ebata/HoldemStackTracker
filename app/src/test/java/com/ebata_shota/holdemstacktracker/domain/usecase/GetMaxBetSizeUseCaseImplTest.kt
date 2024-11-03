@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
-import com.ebata_shota.holdemstacktracker.domain.model.ActionState
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import org.junit.Assert.assertEquals
@@ -29,11 +29,11 @@ class GetMaxBetSizeUseCaseImplTest {
     fun getMaxBetSize_all_check() {
         val actual = usecase.invoke(
             actionStateList = listOf(
-                ActionState.Check(
+                BetPhaseActionState.Check(
                     actionId = 0L,
                     playerId = PlayerId("")
                 ),
-                ActionState.Check(
+                BetPhaseActionState.Check(
                     actionId = 0L,
                     playerId = PlayerId("")
                 )
@@ -44,40 +44,40 @@ class GetMaxBetSizeUseCaseImplTest {
     }
 
     private fun createFullActions() = listOf(
-        ActionState.Blind(
+        BetPhaseActionState.Blind(
             actionId = 0L,
             playerId = PlayerId(""),
             betSize = 100.0f
         ),
-        ActionState.Blind(
+        BetPhaseActionState.Blind(
             actionId = 0L,
             playerId = PlayerId(""),
             betSize = 200.0f
         ),
-        ActionState.Call(
+        BetPhaseActionState.Call(
             actionId = 0L,
             playerId = PlayerId(""),
             betSize = 200.0f
         ),
-        ActionState.Raise(
+        BetPhaseActionState.Raise(
             actionId = 0L,
             playerId = PlayerId(""),
             betSize = 400.0f
         ),
-        ActionState.Fold(
+        BetPhaseActionState.Fold(
             actionId = 0L,
             playerId = PlayerId("")
         ),
-        ActionState.Skip(
+        BetPhaseActionState.Skip(
             actionId = 0L,
             playerId = PlayerId("")
         ),
-        ActionState.AllIn(
+        BetPhaseActionState.AllIn(
             actionId = 0L,
             playerId = PlayerId(""),
             betSize = 1000.0f
         ),
-        ActionState.AllIn(
+        BetPhaseActionState.AllIn(
             actionId = 0L,
             playerId = PlayerId(""),
             betSize = 900.0f

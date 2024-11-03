@@ -1,10 +1,10 @@
 package com.ebata_shota.holdemstacktracker.domain.model
 
-sealed interface ActionState {
+sealed interface BetPhaseActionState {
     val actionId: Long
     val playerId: PlayerId
 
-    sealed interface BetAction : ActionState {
+    sealed interface BetAction : BetPhaseActionState {
         val betSize: Float
     }
 
@@ -17,12 +17,12 @@ sealed interface ActionState {
     data class Fold(
         override val actionId: Long,
         override val playerId: PlayerId
-    ) : ActionState
+    ) : BetPhaseActionState
 
     data class Check(
         override val actionId: Long,
         override val playerId: PlayerId
-    ) : ActionState
+    ) : BetPhaseActionState
 
     data class Call(
         override val actionId: Long,
@@ -51,5 +51,5 @@ sealed interface ActionState {
     data class Skip(
         override val actionId: Long,
         override val playerId: PlayerId
-    ) : ActionState
+    ) : BetPhaseActionState
 }

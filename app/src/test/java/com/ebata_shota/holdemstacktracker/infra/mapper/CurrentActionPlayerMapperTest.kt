@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.infra.mapper
 
-import com.ebata_shota.holdemstacktracker.domain.model.ActionState
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerState
@@ -114,7 +114,7 @@ class CurrentActionPlayerMapperTest {
                 PhaseState.PreFlop(
                     phaseId = 0L,
                     actionStateList = listOf(
-                        ActionState.Blind(
+                        BetPhaseActionState.Blind(
                             actionId = 0L,
                             playerId = players[1].id,
                             betSize = 1.0f
@@ -137,12 +137,12 @@ class CurrentActionPlayerMapperTest {
                 PhaseState.PreFlop(
                     phaseId = 0L,
                     actionStateList = listOf(
-                        ActionState.Blind(
+                        BetPhaseActionState.Blind(
                             actionId = 0L,
                             playerId = players[1].id,
                             betSize = 1.0f
                         ),
-                        ActionState.Blind(
+                        BetPhaseActionState.Blind(
                             actionId = 1L,
                             playerId = players[2].id,
                             betSize = 2.0f
@@ -165,17 +165,17 @@ class CurrentActionPlayerMapperTest {
                 PhaseState.PreFlop(
                     phaseId = 0L,
                     actionStateList = listOf(
-                        ActionState.Blind(
+                        BetPhaseActionState.Blind(
                             actionId = 0L,
                             playerId = players[1].id,
                             betSize = 1.0f
                         ),
-                        ActionState.Blind(
+                        BetPhaseActionState.Blind(
                             actionId = 1L,
                             playerId = players[2].id,
                             betSize = 2.0f
                         ),
-                        ActionState.Raise(
+                        BetPhaseActionState.Raise(
                             actionId = 2L,
                             playerId = players[0].id,
                             betSize = 5.0f
@@ -191,27 +191,27 @@ class CurrentActionPlayerMapperTest {
     private fun getClosedPreFlop(players: List<PlayerState>) = PhaseState.PreFlop(
         phaseId = 0L,
         actionStateList = listOf(
-            ActionState.Blind(
+            BetPhaseActionState.Blind(
                 actionId = 0L,
                 playerId = players[1].id,
                 betSize = 1.0f
             ),
-            ActionState.Blind(
+            BetPhaseActionState.Blind(
                 actionId = 1L,
                 playerId = players[2].id,
                 betSize = 2.0f
             ),
-            ActionState.Raise(
+            BetPhaseActionState.Raise(
                 actionId = 2L,
                 playerId = players[0].id,
                 betSize = 5.0f
             ),
-            ActionState.Call(
+            BetPhaseActionState.Call(
                 actionId = 3L,
                 playerId = players[1].id,
                 betSize = 5.0f
             ),
-            ActionState.Call(
+            BetPhaseActionState.Call(
                 actionId = 4L,
                 playerId = players[2].id,
                 betSize = 5.0f
@@ -248,7 +248,7 @@ class CurrentActionPlayerMapperTest {
                 PhaseState.Flop(
                     phaseId = 1L,
                     actionStateList = listOf(
-                        ActionState.Check(
+                        BetPhaseActionState.Check(
                             actionId = 0L,
                             playerId = players[1].id
                         )

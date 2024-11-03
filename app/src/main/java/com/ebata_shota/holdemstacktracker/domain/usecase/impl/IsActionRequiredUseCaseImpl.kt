@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
-import com.ebata_shota.holdemstacktracker.domain.model.ActionState
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.TableState
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
@@ -29,13 +29,13 @@ constructor(
         return lastActionList.any { action ->
             when (action) {
                 // オールインはこれ以上アクションできない判断
-                is ActionState.AllIn -> false
+                is BetPhaseActionState.AllIn -> false
                 // AllIn以外のベットアクションでコールに必要なベットサイズと異なる場合は、アクションが必要
-                is ActionState.BetAction -> action.betSize != callBetSize
+                is BetPhaseActionState.BetAction -> action.betSize != callBetSize
                 // コールに必要なベットサイズが0.0より大きい場合checkでは不足している
-                is ActionState.Check -> callBetSize > 0.0f
-                is ActionState.Fold -> false
-                is ActionState.Skip -> false
+                is BetPhaseActionState.Check -> callBetSize > 0.0f
+                is BetPhaseActionState.Fold -> false
+                is BetPhaseActionState.Skip -> false
             }
         }
     }

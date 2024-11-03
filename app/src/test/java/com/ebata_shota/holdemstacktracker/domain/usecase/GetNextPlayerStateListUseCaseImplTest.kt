@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
-import com.ebata_shota.holdemstacktracker.domain.model.ActionState
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerState
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
@@ -36,7 +36,7 @@ class GetNextPlayerStateListUseCaseImplTest {
     private fun executeAndAssert(
         pendingBetPerPlayer: Map<PlayerId, Float> = emptyMap(),
         players: List<PlayerState>,
-        action: ActionState,
+        action: BetPhaseActionState,
         expected: List<PlayerState>,
     ) {
         runTest {
@@ -60,7 +60,7 @@ class GetNextPlayerStateListUseCaseImplTest {
             PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
             PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
         )
-        val action = ActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f)
+        val action = BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f)
         executeAndAssert(
             players = players,
             action = action,
@@ -81,7 +81,7 @@ class GetNextPlayerStateListUseCaseImplTest {
             PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
             PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
         )
-        val action = ActionState.Call(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f)
+        val action = BetPhaseActionState.Call(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f)
         executeAndAssert(
             players = players,
             action = action,
@@ -102,7 +102,7 @@ class GetNextPlayerStateListUseCaseImplTest {
             PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
             PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
         )
-        val action = ActionState.Raise(actionId = 0L, playerId = PlayerId("0"), betSize = 400.0f)
+        val action = BetPhaseActionState.Raise(actionId = 0L, playerId = PlayerId("0"), betSize = 400.0f)
         executeAndAssert(
             players = players,
             action = action,
@@ -123,7 +123,7 @@ class GetNextPlayerStateListUseCaseImplTest {
             PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
             PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
         )
-        val action = ActionState.Bet(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f)
+        val action = BetPhaseActionState.Bet(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f)
         executeAndAssert(
             players = players,
             action = action,
@@ -144,7 +144,7 @@ class GetNextPlayerStateListUseCaseImplTest {
             PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
             PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
         )
-        val action = ActionState.AllIn(actionId = 0L, playerId = PlayerId("0"), betSize = 1000.0f)
+        val action = BetPhaseActionState.AllIn(actionId = 0L, playerId = PlayerId("0"), betSize = 1000.0f)
         executeAndAssert(
             players = players,
             action = action,
@@ -165,7 +165,7 @@ class GetNextPlayerStateListUseCaseImplTest {
             PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
             PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
         )
-        val action = ActionState.Check(actionId = 0L, playerId = PlayerId("0"))
+        val action = BetPhaseActionState.Check(actionId = 0L, playerId = PlayerId("0"))
         executeAndAssert(
             players = players,
             action = action,
@@ -186,7 +186,7 @@ class GetNextPlayerStateListUseCaseImplTest {
             PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
             PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
         )
-        val action = ActionState.Fold(actionId = 0L, playerId = PlayerId("0"))
+        val action = BetPhaseActionState.Fold(actionId = 0L, playerId = PlayerId("0"))
         executeAndAssert(
             players = players,
             action = action,
@@ -207,7 +207,7 @@ class GetNextPlayerStateListUseCaseImplTest {
             PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
             PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
         )
-        val action = ActionState.Skip(actionId = 0L, playerId = PlayerId("0"))
+        val action = BetPhaseActionState.Skip(actionId = 0L, playerId = PlayerId("0"))
         executeAndAssert(
             players = players,
             action = action,
@@ -233,7 +233,7 @@ class GetNextPlayerStateListUseCaseImplTest {
             PlayerState(id = PlayerId("1"), name = "1", stack = 800.0f, isLeaved = false),
             PlayerState(id = PlayerId("2"), name = "2", stack = 800.0f, isLeaved = false),
         )
-        val action = ActionState.Call(actionId = 0L, playerId = PlayerId("0"), betSize = 200.0f)
+        val action = BetPhaseActionState.Call(actionId = 0L, playerId = PlayerId("0"), betSize = 200.0f)
         executeAndAssert(
             pendingBetPerPlayer = pendingBetPerPlayer,
             players = players,
@@ -260,7 +260,7 @@ class GetNextPlayerStateListUseCaseImplTest {
             PlayerState(id = PlayerId("1"), name = "1", stack = 800.0f, isLeaved = false),
             PlayerState(id = PlayerId("2"), name = "2", stack = 800.0f, isLeaved = false),
         )
-        val action = ActionState.AllIn(actionId = 0L, playerId = PlayerId("0"), betSize = 1000.0f)
+        val action = BetPhaseActionState.AllIn(actionId = 0L, playerId = PlayerId("0"), betSize = 1000.0f)
         executeAndAssert(
             pendingBetPerPlayer = pendingBetPerPlayer,
             players = players,
@@ -283,7 +283,7 @@ class GetNextPlayerStateListUseCaseImplTest {
             PlayerState(id = PlayerId("1"), name = "1", stack = 800.0f, isLeaved = false),
             PlayerState(id = PlayerId("2"), name = "2", stack = 800.0f, isLeaved = false),
         )
-        val action = ActionState.Bet(actionId = 0L, playerId = PlayerId("1"), betSize = 200.0f)
+        val action = BetPhaseActionState.Bet(actionId = 0L, playerId = PlayerId("1"), betSize = 200.0f)
         executeAndAssert(
             pendingBetPerPlayer = pendingBetPerPlayer,
             players = players,
