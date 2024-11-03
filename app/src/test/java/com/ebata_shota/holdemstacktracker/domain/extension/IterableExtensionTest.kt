@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.domain.extension
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Test
 
 class IterableExtensionTest {
@@ -42,8 +43,8 @@ class IterableExtensionTest {
 
     @Test
     fun mapAtIndex_3() {
-        val actual = listOf(1, 2, 3).mapAtIndex(index = 3) { it + 100 }
-        val expected = listOf(1, 2, 3)
-        assertEquals(expected, actual)
+        assertThrows(IndexOutOfBoundsException::class.java)  {
+            listOf(1, 2, 3).mapAtIndex(index = 3) { it + 100 }
+        }
     }
 }

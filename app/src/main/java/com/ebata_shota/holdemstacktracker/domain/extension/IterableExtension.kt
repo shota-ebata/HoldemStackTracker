@@ -5,11 +5,7 @@ inline fun <T> Iterable<T>.indexOfFirstOrNull(predicate: (T) -> Boolean): Int? {
 }
 
 inline fun <T> Iterable<T>.mapAtIndex(index: Int, transform: (T) -> T): List<T> {
-    return this.mapIndexed { i, t ->
-        if (i == index) {
-            transform(t)
-        } else {
-            t
-        }
-    }
+    val updatedMutableList = toMutableList()
+    updatedMutableList[index] = transform(updatedMutableList[index])
+    return updatedMutableList
 }
