@@ -66,6 +66,11 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    testImplementation(libs.io.mockk.mockk)
+
+    // coroutines
+    implementation(libs.org.jetbrains.kotlinx.coroutine.android)
+    testImplementation(libs.org.jetbrains.kotlinx.coroutine.test)
 
     // hilt
     implementation(libs.dagger.hilt.android)
