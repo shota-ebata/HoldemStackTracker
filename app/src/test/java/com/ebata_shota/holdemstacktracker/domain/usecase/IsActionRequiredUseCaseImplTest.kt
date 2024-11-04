@@ -330,7 +330,7 @@ class IsActionRequiredUseCaseImplTest {
         val actionStateList = listOf(
             BetPhaseActionState.Check(actionId = 0L, playerId = PlayerId("0")),
             BetPhaseActionState.Check(actionId = 1L, playerId = PlayerId("1")),
-            BetPhaseActionState.Skip(actionId = 2L, playerId = PlayerId("2")),
+            BetPhaseActionState.FoldSkip(actionId = 2L, playerId = PlayerId("2")),
         )
         executeAndAssert(actionStateList, expected = false)
     }

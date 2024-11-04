@@ -35,7 +35,8 @@ constructor(
                 // コールに必要なベットサイズが0.0より大きい場合checkでは不足している
                 is BetPhaseActionState.Check -> callBetSize > 0.0f
                 is BetPhaseActionState.Fold -> false
-                is BetPhaseActionState.Skip -> false
+                is BetPhaseActionState.FoldSkip -> false
+                is BetPhaseActionState.AllInSkip -> false
             }
         }
     }

@@ -207,7 +207,7 @@ class GetNextPlayerStateListUseCaseImplTest {
             PlayerState(id = PlayerId("1"), name = "1", stack = 1000.0f, isLeaved = false),
             PlayerState(id = PlayerId("2"), name = "2", stack = 1000.0f, isLeaved = false),
         )
-        val action = BetPhaseActionState.Skip(actionId = 0L, playerId = PlayerId("0"))
+        val action = BetPhaseActionState.FoldSkip(actionId = 0L, playerId = PlayerId("0"))
         executeAndAssert(
             players = players,
             action = action,

@@ -68,7 +68,7 @@ class GetMaxBetSizeUseCaseImplTest {
             actionId = 0L,
             playerId = PlayerId("")
         ),
-        BetPhaseActionState.Skip(
+        BetPhaseActionState.FoldSkip(
             actionId = 0L,
             playerId = PlayerId("")
         ),
