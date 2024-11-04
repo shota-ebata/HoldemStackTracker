@@ -4,7 +4,6 @@ import com.ebata_shota.holdemstacktracker.createDummyTableState
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsActionRequiredUseCaseImpl
 import io.mockk.every
@@ -21,42 +20,8 @@ class IsActionRequiredUseCaseImplTest {
     @Before
     fun setup() {
         usecase = IsActionRequiredUseCaseImpl(
-            getLatestBetPhase = GetLatestBetPhaseUseCaseImpl(),
             getMaxBetSizeUseCase = GetMaxBetSizeUseCaseImpl()
         )
-    }
-
-    @Test
-    fun call_getLatestBetPhaseUseCase() {
-        // prepare
-        val getLatestBetPhaseUseCase: GetLatestBetPhaseUseCase = mockk()
-        val getMaxBetSizeUseCase: GetMaxBetSizeUseCase = mockk()
-        usecase = IsActionRequiredUseCaseImpl(
-            getLatestBetPhase = getLatestBetPhaseUseCase,
-            getMaxBetSizeUseCase = getMaxBetSizeUseCase
-        )
-        val playerOrder = listOf(
-            PlayerId("0"),
-            PlayerId("1"),
-            PlayerId("2")
-        )
-        val latestTableState = createDummyTableState(
-            playerOrder = playerOrder
-        )
-        val lastActionList = listOf<BetPhaseActionState>()
-        every { getLatestBetPhaseUseCase.invoke(latestTableState) } returns PhaseState.PreFlop(
-            phaseId = 0L,
-            actionStateList = lastActionList
-        )
-        every { getMaxBetSizeUseCase.invoke(any()) } returns 0.0f
-
-        // execute
-        usecase.invoke(latestTableState)
-
-        // assert
-        verify(exactly = 1) {
-            getLatestBetPhaseUseCase.invoke(latestTableState)
-        }
     }
 
     @Test
@@ -65,7 +30,6 @@ class IsActionRequiredUseCaseImplTest {
         val getLatestBetPhaseUseCase: GetLatestBetPhaseUseCase = mockk()
         val getMaxBetSizeUseCase: GetMaxBetSizeUseCase = mockk()
         usecase = IsActionRequiredUseCaseImpl(
-            getLatestBetPhase = getLatestBetPhaseUseCase,
             getMaxBetSizeUseCase = getMaxBetSizeUseCase
         )
         val playerOrder = listOf(
@@ -84,7 +48,10 @@ class IsActionRequiredUseCaseImplTest {
         every { getMaxBetSizeUseCase.invoke(any()) } returns 0.0f
 
         // execute
-        usecase.invoke(latestTableState)
+        usecase.invoke(
+            playerOrder = playerOrder,
+            actionStateList = actionStateList
+        )
 
         // assert
         verify(exactly = 1) {
@@ -101,16 +68,11 @@ class IsActionRequiredUseCaseImplTest {
         ),
         expected: Boolean
     ) {
-        val latestTableState = createDummyTableState(
-            playerOrder = playerOrder,
-            phaseStateList = listOf(
-                PhaseState.Standby(phaseId = 0L),
-                PhaseState.PreFlop(phaseId = 1L, actionStateList = actionStateList)
-            )
-        )
-
         // execute
-        val actual: Boolean = usecase.invoke(latestTableState)
+        val actual: Boolean = usecase.invoke(
+            playerOrder = playerOrder,
+            actionStateList = actionStateList
+        )
 
         // assert
         assertEquals(expected, actual)
@@ -340,7 +302,7 @@ class IsActionRequiredUseCaseImplTest {
         // prepare
         val actionStateList = listOf(
             BetPhaseActionState.Check(actionId = 0L, playerId = PlayerId("0")),
-            BetPhaseActionState.Skip(actionId = 1L, playerId = PlayerId("1")),
+            BetPhaseActionState.FoldSkip(actionId = 1L, playerId = PlayerId("1")),
             BetPhaseActionState.Check(actionId = 2L, playerId = PlayerId("2")),
         )
         executeAndAssert(actionStateList, expected = false)

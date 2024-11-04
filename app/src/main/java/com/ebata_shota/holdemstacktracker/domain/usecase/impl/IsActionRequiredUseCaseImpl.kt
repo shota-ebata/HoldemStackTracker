@@ -1,9 +1,7 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.BetPhase
-import com.ebata_shota.holdemstacktracker.domain.model.TableState
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import javax.inject.Inject
@@ -11,14 +9,15 @@ import javax.inject.Inject
 class IsActionRequiredUseCaseImpl
 @Inject
 constructor(
-    private val getLatestBetPhase: GetLatestBetPhaseUseCase,
     private val getMaxBetSizeUseCase: GetMaxBetSizeUseCase
 ) : IsActionRequiredUseCase {
-    override fun invoke(latestTableState: TableState): Boolean {
-        val latestPhase: BetPhase = getLatestBetPhase.invoke(latestTableState)
+    override fun invoke(
+        playerOrder: List<PlayerId>,
+        actionStateList: List<BetPhaseActionState>
+    ): Boolean {
         // 全員の最後のアクションを一つづつ取得
-        val playerOrderSize = latestTableState.playerOrder.size
-        val lastActionList = latestPhase.actionStateList.takeLast(playerOrderSize)
+        val playerOrderSize = playerOrder.size
+        val lastActionList = actionStateList.takeLast(playerOrderSize)
         // コールベットサイズ
         val callBetSize: Float = getMaxBetSizeUseCase.invoke(lastActionList)
         // アクション数がプレイヤー人数より少ないなら、アクションが必要な人がいる
