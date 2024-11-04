@@ -35,6 +35,13 @@ sealed interface PhaseState {
         override val phaseId: Long
     ) : PhaseState
 
+    data class AllInOpen(
+        override val phaseId: Long
+    ) : PhaseState
+
+    /**
+     * ポッド決済フェーズ
+     */
     data class PotSettlement(
         override val phaseId: Long
     ) : PhaseState
