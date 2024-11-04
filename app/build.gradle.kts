@@ -24,9 +24,30 @@ android {
     }
 
     buildTypes {
+        debug {
+
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
+
+    flavorDimensions += "mode"
+
+    productFlavors {
+        create("free") {
+            dimension = "mode"
+            applicationIdSuffix = ".free"
+            versionNameSuffix = "-free"
+            buildConfigField(type = "boolean", name = "IS_PREMIUM", value = "false")
+        }
+
+        create("paid") {
+            dimension = "mode"
+            applicationIdSuffix = ".paid"
+            versionNameSuffix = "-paid"
+            buildConfigField(type = "boolean", name = "IS_PREMIUM", value = "true")
         }
     }
     compileOptions {
@@ -38,6 +59,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
