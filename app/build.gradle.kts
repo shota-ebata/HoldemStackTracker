@@ -87,7 +87,7 @@ android {
         }
         getByName("release") {
             isShrinkResources = true
-            isMinifyEnabled = false // TODO: trueかどうか確認する
+            isMinifyEnabled = true // TODO: trueかどうか確認する
             isDebuggable = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
