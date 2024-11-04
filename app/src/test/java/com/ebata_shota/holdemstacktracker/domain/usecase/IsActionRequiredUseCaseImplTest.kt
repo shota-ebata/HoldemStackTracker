@@ -20,7 +20,7 @@ class IsActionRequiredUseCaseImplTest {
     @Before
     fun setup() {
         usecase = IsActionRequiredUseCaseImpl(
-            getMaxBetSizeUseCase = GetMaxBetSizeUseCaseImpl()
+            getMaxBetSize = GetMaxBetSizeUseCaseImpl()
         )
     }
 
@@ -30,7 +30,7 @@ class IsActionRequiredUseCaseImplTest {
         val getLatestBetPhaseUseCase: GetLatestBetPhaseUseCase = mockk()
         val getMaxBetSizeUseCase: GetMaxBetSizeUseCase = mockk()
         usecase = IsActionRequiredUseCaseImpl(
-            getMaxBetSizeUseCase = getMaxBetSizeUseCase
+            getMaxBetSize = getMaxBetSizeUseCase
         )
         val playerOrder = listOf(
             PlayerId("0"),

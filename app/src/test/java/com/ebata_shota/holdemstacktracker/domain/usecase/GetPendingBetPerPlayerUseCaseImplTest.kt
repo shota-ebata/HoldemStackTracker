@@ -17,7 +17,7 @@ class GetPendingBetPerPlayerUseCaseImplTest {
     @Before
     fun setup() {
         usecase = GetPendingBetPerPlayerUseCaseImpl(
-            getMaxBetSizeUseCase = GetMaxBetSizeUseCaseImpl()
+            getMaxBetSize = GetMaxBetSizeUseCaseImpl()
         )
     }
 
@@ -37,7 +37,7 @@ class GetPendingBetPerPlayerUseCaseImplTest {
         val getMaxBetSizeUseCase: GetMaxBetSizeUseCase = mockk()
         every { getMaxBetSizeUseCase.invoke(any()) } returns 200.0f
         usecase = GetPendingBetPerPlayerUseCaseImpl(
-            getMaxBetSizeUseCase = getMaxBetSizeUseCase
+            getMaxBetSize = getMaxBetSizeUseCase
         )
 
         // execute

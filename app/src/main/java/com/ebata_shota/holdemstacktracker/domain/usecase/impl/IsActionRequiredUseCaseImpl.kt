@@ -9,7 +9,7 @@ import javax.inject.Inject
 class IsActionRequiredUseCaseImpl
 @Inject
 constructor(
-    private val getMaxBetSizeUseCase: GetMaxBetSizeUseCase
+    private val getMaxBetSize: GetMaxBetSizeUseCase
 ) : IsActionRequiredUseCase {
     override fun invoke(
         playerOrder: List<PlayerId>,
@@ -19,7 +19,7 @@ constructor(
         val playerOrderSize = playerOrder.size
         val lastActionList = actionStateList.takeLast(playerOrderSize)
         // コールベットサイズ
-        val callBetSize: Float = getMaxBetSizeUseCase.invoke(lastActionList)
+        val callBetSize: Float = getMaxBetSize.invoke(lastActionList)
         // アクション数がプレイヤー人数より少ないなら、アクションが必要な人がいる
         if (lastActionList.size < playerOrderSize) {
             return true

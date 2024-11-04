@@ -28,11 +28,11 @@ class GetNextPlayerStackUseCaseImplTest {
     @Before
     fun setup() {
         usecase = GetNextPlayerStackUseCaseImpl(
-            getLatestBetPhaseUseCase = GetLatestBetPhaseUseCaseImpl(),
-            getPendingBetPerPlayerUseCase = GetPendingBetPerPlayerUseCaseImpl(
-                getMaxBetSizeUseCase = GetMaxBetSizeUseCaseImpl()
+            getLatestBetPhase = GetLatestBetPhaseUseCaseImpl(),
+            getPendingBetPerPlayer = GetPendingBetPerPlayerUseCaseImpl(
+                getMaxBetSize = GetMaxBetSizeUseCaseImpl()
             ),
-            getNextPlayerStateListUseCase = GetNextPlayerStateListUseCaseImpl(
+            getNextPlayerStateList = GetNextPlayerStateListUseCaseImpl(
                 prefRepository = prefRepository
             )
         )
@@ -49,9 +49,9 @@ class GetNextPlayerStackUseCaseImplTest {
         val getNextPlayerStateListUseCase: GetNextPlayerStateListUseCaseImpl = mockk()
 
         usecase = GetNextPlayerStackUseCaseImpl(
-            getLatestBetPhaseUseCase = getLatestBetPhaseUseCase,
-            getPendingBetPerPlayerUseCase = getPendingBetPerPlayerUseCase,
-            getNextPlayerStateListUseCase = getNextPlayerStateListUseCase
+            getLatestBetPhase = getLatestBetPhaseUseCase,
+            getPendingBetPerPlayer = getPendingBetPerPlayerUseCase,
+            getNextPlayerStateList = getNextPlayerStateListUseCase
         )
 
         val mockNextPlayerStateListResult = listOf<PlayerState>(
