@@ -66,7 +66,6 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    testImplementation(libs.io.mockk.mockk)
 
     // coroutines
     implementation(libs.org.jetbrains.kotlinx.coroutine.android)
@@ -76,6 +75,16 @@ dependencies {
     implementation(libs.dagger.hilt.android)
     kapt(libs.dagger.hilt.compiler)
 
+    // hiltWork
+    implementation(libs.androidx.hilt.work)
+    kapt(libs.androidx.hilt.compiler)
+
     // PreferencesDataStore
     implementation(libs.androidx.datastore.preferences)
+
+    // mockk
+    testImplementation(libs.io.mockk.mockk)
+
+    // work
+    implementation(libs.andriodx.work.runtime.ktx)
 }
