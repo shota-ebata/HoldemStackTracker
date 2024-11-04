@@ -79,12 +79,13 @@ dependencies {
     implementation(libs.androidx.hilt.work)
     kapt(libs.androidx.hilt.compiler)
 
+    // work
+    implementation(libs.andriodx.work.runtime.ktx)
+
     // PreferencesDataStore
     implementation(libs.androidx.datastore.preferences)
 
     // mockk
     testImplementation(libs.io.mockk.mockk)
 
-    // work
-    implementation(libs.andriodx.work.runtime.ktx)
 }
