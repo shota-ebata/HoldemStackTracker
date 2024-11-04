@@ -28,6 +28,7 @@ constructor(
     private val getNextPhase: GetNextPhaseUseCase,
     private val getNextPlayerStack: GetNextPlayerStackUseCase,
 ) : GetNextTableStateUseCase {
+
     override suspend fun invoke(
         latestTableState: TableState,
         action: ActionState
