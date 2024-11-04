@@ -16,7 +16,7 @@ class CurrentActionPlayerMapperTest {
         PlayerState(
             id = PlayerId(it.toString()),
             name = "name_$it",
-            stack = 200.0f,
+            stack = 200.0,
             isLeaved = false
         )
     }
@@ -117,7 +117,7 @@ class CurrentActionPlayerMapperTest {
                         BetPhaseActionState.Blind(
                             actionId = 0L,
                             playerId = players[1].id,
-                            betSize = 1.0f
+                            betSize = 1.0
                         )
                     )
                 )
@@ -140,12 +140,12 @@ class CurrentActionPlayerMapperTest {
                         BetPhaseActionState.Blind(
                             actionId = 0L,
                             playerId = players[1].id,
-                            betSize = 1.0f
+                            betSize = 1.0
                         ),
                         BetPhaseActionState.Blind(
                             actionId = 1L,
                             playerId = players[2].id,
-                            betSize = 2.0f
+                            betSize = 2.0
                         )
                     )
                 )
@@ -168,17 +168,17 @@ class CurrentActionPlayerMapperTest {
                         BetPhaseActionState.Blind(
                             actionId = 0L,
                             playerId = players[1].id,
-                            betSize = 1.0f
+                            betSize = 1.0
                         ),
                         BetPhaseActionState.Blind(
                             actionId = 1L,
                             playerId = players[2].id,
-                            betSize = 2.0f
+                            betSize = 2.0
                         ),
                         BetPhaseActionState.Raise(
                             actionId = 2L,
                             playerId = players[0].id,
-                            betSize = 5.0f
+                            betSize = 5.0
                         )
                     )
                 )
@@ -194,27 +194,27 @@ class CurrentActionPlayerMapperTest {
             BetPhaseActionState.Blind(
                 actionId = 0L,
                 playerId = players[1].id,
-                betSize = 1.0f
+                betSize = 1.0
             ),
             BetPhaseActionState.Blind(
                 actionId = 1L,
                 playerId = players[2].id,
-                betSize = 2.0f
+                betSize = 2.0
             ),
             BetPhaseActionState.Raise(
                 actionId = 2L,
                 playerId = players[0].id,
-                betSize = 5.0f
+                betSize = 5.0
             ),
             BetPhaseActionState.Call(
                 actionId = 3L,
                 playerId = players[1].id,
-                betSize = 5.0f
+                betSize = 5.0
             ),
             BetPhaseActionState.Call(
                 actionId = 4L,
                 playerId = players[2].id,
-                betSize = 5.0f
+                betSize = 5.0
             )
         )
     )

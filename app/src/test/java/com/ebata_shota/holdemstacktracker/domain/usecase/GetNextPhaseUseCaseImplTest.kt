@@ -89,8 +89,8 @@ class GetNextPhaseUseCaseImplTest {
                 PreFlop(
                     phaseId = 0L,
                     actionStateList = listOf(
-                        BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f),
-                        BetPhaseActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 100.0f),
+                        BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0),
+                        BetPhaseActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 100.0),
                         BetPhaseActionState.Fold(actionId = 2L, playerId = PlayerId("2")),
                         BetPhaseActionState.Fold(actionId = 3L, playerId = PlayerId("0")),
                     )
@@ -108,11 +108,11 @@ class GetNextPhaseUseCaseImplTest {
                 PreFlop(
                     phaseId = 0L,
                     actionStateList = listOf(
-                        BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f),
-                        BetPhaseActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 100.0f),
+                        BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0),
+                        BetPhaseActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 100.0),
                         BetPhaseActionState.Fold(actionId = 2L, playerId = PlayerId("2")),
-                        BetPhaseActionState.AllIn(actionId = 3L, playerId = PlayerId("0"), betSize = 1000.0f),
-                        BetPhaseActionState.AllIn(actionId = 4L, playerId = PlayerId("1"), betSize = 1500.0f),
+                        BetPhaseActionState.AllIn(actionId = 3L, playerId = PlayerId("0"), betSize = 1000.0),
+                        BetPhaseActionState.AllIn(actionId = 4L, playerId = PlayerId("1"), betSize = 1500.0),
                     )
                 )
             )

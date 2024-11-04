@@ -19,7 +19,7 @@ constructor(
         val playerOrderSize = playerOrder.size
         val lastActionList = actionStateList.takeLast(playerOrderSize)
         // コールベットサイズ
-        val callBetSize: Float = getMaxBetSize.invoke(lastActionList)
+        val callBetSize: Double = getMaxBetSize.invoke(lastActionList)
         // アクション数がプレイヤー人数より少ないなら、アクションが必要な人がいる
         if (lastActionList.size < playerOrderSize) {
             return true
@@ -32,7 +32,7 @@ constructor(
                 // AllIn以外のベットアクションでコールに必要なベットサイズと異なる場合は、アクションが必要
                 is BetPhaseActionState.BetAction -> action.betSize != callBetSize
                 // コールに必要なベットサイズが0.0より大きい場合checkでは不足している
-                is BetPhaseActionState.Check -> callBetSize > 0.0f
+                is BetPhaseActionState.Check -> callBetSize > 0.0
                 is BetPhaseActionState.Fold -> false
                 is BetPhaseActionState.FoldSkip -> false
                 is BetPhaseActionState.AllInSkip -> false

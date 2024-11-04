@@ -7,13 +7,13 @@ import javax.inject.Inject
 class GetMaxBetSizeUseCaseImpl
 @Inject
 constructor() : GetMaxBetSizeUseCase {
-    override fun invoke(actionStateList: List<BetPhaseActionState>): Float {
+    override fun invoke(actionStateList: List<BetPhaseActionState>): Double {
         return actionStateList.maxOfOrNull {
             if (it is BetPhaseActionState.BetAction) {
                 it.betSize
             } else {
-                0.0f
+                0.0
             }
-        } ?: 0.0f
+        } ?: 0.0
     }
 }

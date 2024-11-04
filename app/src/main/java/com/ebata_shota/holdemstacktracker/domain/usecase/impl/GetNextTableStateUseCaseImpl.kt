@@ -80,7 +80,7 @@ constructor(
         } else {
             // もし全員のベットが揃った場合、ポッド更新してフェーズを進める
             // プレイヤーごとの、まだポッドに入っていないベット額
-            val pendingBetPerPlayer: Map<PlayerId, Float> = getPendingBetPerPlayer.invoke(
+            val pendingBetPerPlayer: Map<PlayerId, Double> = getPendingBetPerPlayer.invoke(
                 playerOrder = latestTableState.playerOrder,
                 actionStateList = latestPhase.actionStateList
             )

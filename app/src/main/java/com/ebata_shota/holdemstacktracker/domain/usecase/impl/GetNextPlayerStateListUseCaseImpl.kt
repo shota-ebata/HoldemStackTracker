@@ -24,7 +24,7 @@ constructor(
      * @param action 今回のアクション
      */
     override suspend fun invoke(
-        pendingBetPerPlayer: Map<PlayerId, Float>,
+        pendingBetPerPlayer: Map<PlayerId, Double>,
         players: List<PlayerState>,
         action: BetPhaseActionState
     ): List<PlayerState> {
@@ -35,7 +35,7 @@ constructor(
             is BetPhaseActionState.BetAction -> {
                 // ベットアクションならスタックを減らす
                 players.mapAtIndex(myPlayerStateIndex) {
-                    val latestBetSize: Float = pendingBetPerPlayer[myPlayerId] ?: 0.0f
+                    val latestBetSize: Double = pendingBetPerPlayer[myPlayerId] ?: 0.0
                     // 最後のベットアクションとの差分をスタックから減らす
                     it.copy(stack = it.stack + latestBetSize - action.betSize)
                 }

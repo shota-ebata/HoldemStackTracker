@@ -7,5 +7,8 @@ interface GetPendingBetPerPlayerUseCase {
     /**
      * プレイヤーごとの、まだポッドに入っていないベット額
      */
-    fun invoke(playerOrder: List<PlayerId>, actionStateList: List<BetPhaseActionState>): Map<PlayerId, Float>
+    fun invoke(
+        playerOrder: List<PlayerId>,
+        actionStateList: List<BetPhaseActionState>
+    ): Map<PlayerId, Double>
 }

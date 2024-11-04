@@ -6,7 +6,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerState
 
 interface GetNextPlayerStateListUseCase {
     suspend fun invoke(
-        pendingBetPerPlayer: Map<PlayerId, Float>,
+        pendingBetPerPlayer: Map<PlayerId, Double>,
         players: List<PlayerState>,
         action: BetPhaseActionState
     ): List<PlayerState>

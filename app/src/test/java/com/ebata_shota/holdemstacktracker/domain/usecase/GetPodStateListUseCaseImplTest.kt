@@ -15,7 +15,10 @@ class GetPodStateListUseCaseImplTest {
         usecase = GetPodStateListUseCaseImpl()
     }
 
-    private fun executeAndAssert(pendingBetPerPlayer: Map<PlayerId, Float>, expectedList: List<PodState>) {
+    private fun executeAndAssert(
+        pendingBetPerPlayer: Map<PlayerId, Double>,
+        expectedList: List<PodState>
+    ) {
         // execute
         val updatedPodStateList: List<PodState> = usecase.invoke(
             podStateList = emptyList(),
@@ -31,16 +34,16 @@ class GetPodStateListUseCaseImplTest {
 
     @Test
     fun all_call() {
-        val pendingBetPerPlayer: Map<PlayerId, Float> = mapOf(
-            PlayerId("0") to 200.0f,
-            PlayerId("1") to 200.0f,
-            PlayerId("2") to 200.0f,
+        val pendingBetPerPlayer: Map<PlayerId, Double> = mapOf(
+            PlayerId("0") to 200.0,
+            PlayerId("1") to 200.0,
+            PlayerId("2") to 200.0,
         )
         val expectedList = listOf(
             PodState(
                 id = 0L,
                 podNumber = 0,
-                podSize = 600.0f,
+                podSize = 600.0,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
                     PlayerId("1"),
@@ -54,16 +57,16 @@ class GetPodStateListUseCaseImplTest {
 
     @Test
     fun all_in_2() {
-        val pendingBetPerPlayer: Map<PlayerId, Float> = mapOf(
-            PlayerId("0") to 200.0f,
-            PlayerId("1") to 200.0f,
-            PlayerId("2") to 100.0f,
+        val pendingBetPerPlayer: Map<PlayerId, Double> = mapOf(
+            PlayerId("0") to 200.0,
+            PlayerId("1") to 200.0,
+            PlayerId("2") to 100.0,
         )
         val expectedList = listOf(
             PodState(
                 id = 0L,
                 podNumber = 0,
-                podSize = 300.0f,
+                podSize = 300.0,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
                     PlayerId("1"),
@@ -74,7 +77,7 @@ class GetPodStateListUseCaseImplTest {
             PodState(
                 id = 0L,
                 podNumber = 1,
-                podSize = 200.0f,
+                podSize = 200.0,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
                     PlayerId("1"),
@@ -87,16 +90,16 @@ class GetPodStateListUseCaseImplTest {
 
     @Test
     fun all_in_3() {
-        val pendingBetPerPlayer: Map<PlayerId, Float> = mapOf(
-            PlayerId("0") to 100.0f,
-            PlayerId("1") to 200.0f,
-            PlayerId("2") to 300.0f,
+        val pendingBetPerPlayer: Map<PlayerId, Double> = mapOf(
+            PlayerId("0") to 100.0,
+            PlayerId("1") to 200.0,
+            PlayerId("2") to 300.0,
         )
         val expectedList = listOf(
             PodState(
                 id = 0L,
                 podNumber = 0,
-                podSize = 300.0f,
+                podSize = 300.0,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
                     PlayerId("1"),
@@ -107,7 +110,7 @@ class GetPodStateListUseCaseImplTest {
             PodState(
                 id = 0L,
                 podNumber = 1,
-                podSize = 200.0f,
+                podSize = 200.0,
                 involvedPlayerIds = listOf(
                     PlayerId("1"),
                     PlayerId("2"),
@@ -117,7 +120,7 @@ class GetPodStateListUseCaseImplTest {
             PodState(
                 id = 0L,
                 podNumber = 2,
-                podSize = 100.0f,
+                podSize = 100.0,
                 involvedPlayerIds = listOf(
                     PlayerId("2"),
                 ),

@@ -56,17 +56,17 @@ class GetPlayerLastActionsUseCaseImplTest {
             PhaseState.PreFlop(
                 phaseId = 0L,
                 actionStateList = listOf<BetPhaseActionState>(
-                    Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f),
-                    Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0f),
-                    Call(actionId = 2L, playerId = PlayerId("2"), betSize = 200.0f),
-                    Call(actionId = 3L, playerId = PlayerId("0"), betSize = 200.0f),
+                    Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0),
+                    Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0),
+                    Call(actionId = 2L, playerId = PlayerId("2"), betSize = 200.0),
+                    Call(actionId = 3L, playerId = PlayerId("0"), betSize = 200.0),
                 )
             )
         )
         val expected = mapOf<PlayerId, BetPhaseActionState?>(
-            PlayerId("0") to Call(actionId = 3L, playerId = PlayerId("0"), betSize = 200.0f),
-            PlayerId("1") to Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0f),
-            PlayerId("2") to Call(actionId = 2L, playerId = PlayerId("2"), betSize = 200.0f),
+            PlayerId("0") to Call(actionId = 3L, playerId = PlayerId("0"), betSize = 200.0),
+            PlayerId("1") to Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0),
+            PlayerId("2") to Call(actionId = 2L, playerId = PlayerId("2"), betSize = 200.0),
         )
         executeAndAssert(phaseStateList, expected)
     }
@@ -79,8 +79,8 @@ class GetPlayerLastActionsUseCaseImplTest {
             PhaseState.PreFlop(
                 phaseId = 0L,
                 actionStateList = listOf(
-                    Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f),
-                    Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0f),
+                    Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0),
+                    Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0),
                     Fold(actionId = 2L, playerId = PlayerId("2")),
                     Fold(actionId = 3L, playerId = PlayerId("0")),
                 )
@@ -88,7 +88,7 @@ class GetPlayerLastActionsUseCaseImplTest {
         )
         val expected = mapOf<PlayerId, BetPhaseActionState?>(
             PlayerId("0") to Fold(actionId = 3L, playerId = PlayerId("0")),
-            PlayerId("1") to Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0f),
+            PlayerId("1") to Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0),
             PlayerId("2") to Fold(actionId = 2L, playerId = PlayerId("2")),
         )
         executeAndAssert(phaseStateList, expected)
@@ -102,18 +102,18 @@ class GetPlayerLastActionsUseCaseImplTest {
             PhaseState.PreFlop(
                 phaseId = 0L,
                 actionStateList = listOf(
-                    Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f),
-                    Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0f),
-                    AllIn(actionId = 2L, playerId = PlayerId("2"), betSize = 1000.0f),
-                    AllIn(actionId = 3L, playerId = PlayerId("0"), betSize = 1500.0f),
+                    Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0),
+                    Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0),
+                    AllIn(actionId = 2L, playerId = PlayerId("2"), betSize = 1000.0),
+                    AllIn(actionId = 3L, playerId = PlayerId("0"), betSize = 1500.0),
                     Fold(actionId = 4L, playerId = PlayerId("1")),
                 )
             )
         )
         val expected = mapOf<PlayerId, BetPhaseActionState?>(
-            PlayerId("0") to AllIn(actionId = 3L, playerId = PlayerId("0"), betSize = 1500.0f),
+            PlayerId("0") to AllIn(actionId = 3L, playerId = PlayerId("0"), betSize = 1500.0),
             PlayerId("1") to Fold(actionId = 4L, playerId = PlayerId("1")),
-            PlayerId("2") to AllIn(actionId = 2L, playerId = PlayerId("2"), betSize = 1000.0f),
+            PlayerId("2") to AllIn(actionId = 2L, playerId = PlayerId("2"), betSize = 1000.0),
         )
         executeAndAssert(phaseStateList, expected)
     }

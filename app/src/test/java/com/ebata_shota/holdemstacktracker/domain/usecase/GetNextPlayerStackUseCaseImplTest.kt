@@ -58,7 +58,7 @@ class GetNextPlayerStackUseCaseImplTest {
             PlayerState(
                 id = PlayerId("0"),
                 name = "0",
-                stack = 1000.0f,
+                stack = 1000.0,
                 isLeaved = false
             ),
         )
@@ -70,8 +70,8 @@ class GetNextPlayerStackUseCaseImplTest {
         )
         every { getLatestBetPhaseUseCase.invoke(any()) } returns mockLatestBetPhaseResult
 
-        val mockPendingBetPerPlayerResult = mapOf<PlayerId, Float>(
-            PlayerId("0") to 100.0f,
+        val mockPendingBetPerPlayerResult = mapOf<PlayerId, Double>(
+            PlayerId("0") to 100.0,
         )
         every { getPendingBetPerPlayerUseCase.invoke(any(), any()) } returns mockPendingBetPerPlayerResult
 
@@ -80,7 +80,7 @@ class GetNextPlayerStackUseCaseImplTest {
                 PhaseState.PreFlop(phaseId = 0L, actionStateList = emptyList())
             )
         )
-        val action = BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0f)
+        val action = BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0)
 
         runTest {
             // execute

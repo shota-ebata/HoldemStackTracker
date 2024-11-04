@@ -12,7 +12,7 @@ class GetPodStateListUseCaseImpl
 constructor() : GetPodStateListUseCase {
     override fun invoke(
         podStateList: List<PodState>,
-        pendingBetPerPlayer: Map<PlayerId, Float>
+        pendingBetPerPlayer: Map<PlayerId, Double>
     ): List<PodState> {
         // ポッドに入っていないベットが残っているプレイヤー数
         val pendingBetPlayerCount: Int = pendingBetPerPlayer.size
@@ -30,7 +30,7 @@ constructor() : GetPodStateListUseCase {
 
     private fun getNewPodStateList(
         podStateList: List<PodState>,
-        pendingBetPerPlayer: Map<PlayerId, Float>
+        pendingBetPerPlayer: Map<PlayerId, Double>
     ): List<PodState> {
         // 最新のポッドを取得
         val lastPodState: PodState? = podStateList.lastOrNull()
@@ -42,7 +42,7 @@ constructor() : GetPodStateListUseCase {
             val nextPodNumber = lastPodState?.podNumber?.plus(1) ?: 0
             createPodState(nextPodNumber)
         }
-        var podSize: Float = currentPodState.podSize
+        var podSize: Double = currentPodState.podSize
         val involvedPlayerIds = currentPodState.involvedPlayerIds.toMutableList()
 
         val minBetSize = pendingBetPerPlayer.map { it.value }.min()
@@ -53,7 +53,7 @@ constructor() : GetPodStateListUseCase {
             involvedPlayerIds.add(playerId)
             // Podに入れた分だけ、ベットサイズから減らす
             betSize - minBetSize
-        }.filter { it.value > 0.0f } // ポッドに入っていないベットが残っている人でフィルタリングする
+        }.filter { it.value > 0.0 } // ポッドに入っていないベットが残っている人でフィルタリングする
         // まだポッドに入っていないベットを持っている人がいる場合、このポッドはcloseする
         val isClosed = updatedPendingPrePlayer.isNotEmpty()
         currentPodState = currentPodState.copy(
@@ -81,7 +81,7 @@ constructor() : GetPodStateListUseCase {
     private fun createPodState(podNumber: Int) = PodState(
         id = createPodId(),
         podNumber = podNumber,
-        podSize = 0.0f,
+        podSize = 0.0,
         involvedPlayerIds = emptyList(),
         isClosed = false
     )

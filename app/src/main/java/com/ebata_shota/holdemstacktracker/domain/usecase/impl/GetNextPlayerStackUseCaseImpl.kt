@@ -25,7 +25,7 @@ constructor(
         // BetPhaseでしかActionはできないので
         val latestPhase: BetPhase = getLatestBetPhase.invoke(latestTableState)
         // プレイヤーごとの、まだポッドに入っていないベット額
-        val pendingBetPerPlayer: Map<PlayerId, Float> = getPendingBetPerPlayer.invoke(
+        val pendingBetPerPlayer: Map<PlayerId, Double> = getPendingBetPerPlayer.invoke(
             playerOrder = latestTableState.playerOrder,
             actionStateList = latestPhase.actionStateList
         )

@@ -21,6 +21,6 @@ fun createDummyTableState(
     btnPlayerId = PlayerId(""),
     currentActionPlayer = PlayerId(""),
     phaseStateList = phaseStateList,
-    ruleStatus = RuleState.LingGame(sbSize = 100.0f, bbSize = 200.0f, BetViewMode.Number),
+    ruleStatus = RuleState.LingGame(sbSize = 100.0, bbSize = 200.0, BetViewMode.Number),
     startTime = LocalDateTime.now()
 )

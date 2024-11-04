@@ -8,7 +8,7 @@ sealed interface ActionState {
 sealed interface BetPhaseActionState : ActionState {
 
     sealed interface BetAction : BetPhaseActionState {
-        val betSize: Float
+        val betSize: Double
     }
 
     sealed interface AutoAction
@@ -16,7 +16,7 @@ sealed interface BetPhaseActionState : ActionState {
     data class Blind(
         override val actionId: Long,
         override val playerId: PlayerId,
-        override val betSize: Float
+        override val betSize: Double
     ) : BetAction, AutoAction
 
     sealed interface PlayerAction
@@ -34,25 +34,25 @@ sealed interface BetPhaseActionState : ActionState {
     data class Call(
         override val actionId: Long,
         override val playerId: PlayerId,
-        override val betSize: Float
+        override val betSize: Double
     ) : BetAction, PlayerAction
 
     data class Bet(
         override val actionId: Long,
         override val playerId: PlayerId,
-        override val betSize: Float
+        override val betSize: Double
     ) : BetAction, PlayerAction
 
     data class Raise(
         override val actionId: Long,
         override val playerId: PlayerId,
-        override val betSize: Float
+        override val betSize: Double
     ) : BetAction, PlayerAction
 
     data class AllIn(
         override val actionId: Long,
         override val playerId: PlayerId,
-        override val betSize: Float
+        override val betSize: Double
     ) : BetAction, PlayerAction
 
     sealed interface Skip: AutoAction

@@ -11,6 +11,6 @@ interface GetPodStateListUseCase {
      */
     fun invoke(
         podStateList: List<PodState>,
-        pendingBetPerPlayer: Map<PlayerId, Float>
+        pendingBetPerPlayer: Map<PlayerId, Double>
     ): List<PodState>
 }
