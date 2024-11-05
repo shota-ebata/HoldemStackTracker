@@ -94,23 +94,6 @@ android {
         }
     }
 
-    flavorDimensions += "mode"
-
-    productFlavors {
-        create("free") {
-            dimension = "mode"
-            applicationIdSuffix = ".free"
-            versionNameSuffix = "-free"
-            buildConfigField(type = "boolean", name = "IS_PREMIUM", value = "false")
-        }
-
-        create("paid") {
-            dimension = "mode"
-            applicationIdSuffix = ".paid"
-            versionNameSuffix = "-paid"
-            buildConfigField(type = "boolean", name = "IS_PREMIUM", value = "true")
-        }
-    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
