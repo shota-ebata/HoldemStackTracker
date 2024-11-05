@@ -42,7 +42,7 @@ class GetPodStateListUseCaseImplTest {
         val expectedList = listOf(
             PodState(
                 id = 0L,
-                podNumber = 0,
+                podNumber = 0L,
                 podSize = 600.0,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
@@ -65,7 +65,7 @@ class GetPodStateListUseCaseImplTest {
         val expectedList = listOf(
             PodState(
                 id = 0L,
-                podNumber = 0,
+                podNumber = 0L,
                 podSize = 300.0,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
@@ -76,7 +76,7 @@ class GetPodStateListUseCaseImplTest {
             ),
             PodState(
                 id = 0L,
-                podNumber = 1,
+                podNumber = 1L,
                 podSize = 200.0,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
@@ -98,7 +98,7 @@ class GetPodStateListUseCaseImplTest {
         val expectedList = listOf(
             PodState(
                 id = 0L,
-                podNumber = 0,
+                podNumber = 0L,
                 podSize = 300.0,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
@@ -109,7 +109,7 @@ class GetPodStateListUseCaseImplTest {
             ),
             PodState(
                 id = 0L,
-                podNumber = 1,
+                podNumber = 1L,
                 podSize = 200.0,
                 involvedPlayerIds = listOf(
                     PlayerId("1"),
@@ -119,7 +119,7 @@ class GetPodStateListUseCaseImplTest {
             ),
             PodState(
                 id = 0L,
-                podNumber = 2,
+                podNumber = 2L,
                 podSize = 100.0,
                 involvedPlayerIds = listOf(
                     PlayerId("2"),

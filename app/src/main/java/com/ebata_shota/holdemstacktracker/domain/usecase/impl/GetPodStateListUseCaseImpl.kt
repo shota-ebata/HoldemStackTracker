@@ -39,7 +39,7 @@ constructor() : GetPodStateListUseCase {
             lastPodState
         } else {
             // 以前のポッドがない、もしくは閉じている場合は、新しいポッドを作成する
-            val nextPodNumber = lastPodState?.podNumber?.plus(1) ?: 0
+            val nextPodNumber = lastPodState?.podNumber?.plus(1L) ?: 0L
             createPodState(nextPodNumber)
         }
         var podSize: Double = currentPodState.podSize
@@ -78,7 +78,7 @@ constructor() : GetPodStateListUseCase {
         return getNewPodStateList(updatedPodStateList, updatedPendingPrePlayer)
     }
 
-    private fun createPodState(podNumber: Int) = PodState(
+    private fun createPodState(podNumber: Long) = PodState(
         id = createPodId(),
         podNumber = podNumber,
         podSize = 0.0,
