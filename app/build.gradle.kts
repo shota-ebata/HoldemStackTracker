@@ -154,4 +154,11 @@ dependencies {
     // mockk
     testImplementation(libs.io.mockk.mockk)
 
+    // firebaseBom
+    implementation(platform(libs.firebase.bom))
+    // - crashlytics
+    implementation(libs.firebase.crashlytics.ktx)
+    // - database
+    implementation(libs.firebase.database.ktx)
+
 }
