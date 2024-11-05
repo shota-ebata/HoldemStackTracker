@@ -8,6 +8,9 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.work.WorkManager
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherIO
+import com.google.firebase.Firebase
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.database
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -48,6 +51,12 @@ class AppModule {
         @CoroutineDispatcherIO dispatchersIO: CoroutineDispatcher
     ): CoroutineScope {
         return CoroutineScope(SupervisorJob() + dispatchersIO)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirebaseDatabase(): FirebaseDatabase {
+        return Firebase.database("https://holdemstacktracker-default-rtdb.asia-southeast1.firebasedatabase.app/")
     }
 
 //    @Provides

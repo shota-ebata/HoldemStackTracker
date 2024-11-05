@@ -8,6 +8,8 @@ plugins {
     id("kotlin-kapt")
     alias(libs.plugins.dagger.hilt.android)
     alias(libs.plugins.devtools.ksp)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.crashlytics.plugin)
 }
 
 android {
@@ -156,6 +158,8 @@ dependencies {
 
     // firebaseBom
     implementation(platform(libs.firebase.bom))
+    // - analytics
+    implementation(libs.firebase.analytics.ktx)
     // - crashlytics
     implementation(libs.firebase.crashlytics.ktx)
     // - database
