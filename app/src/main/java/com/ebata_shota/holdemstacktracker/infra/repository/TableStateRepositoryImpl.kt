@@ -2,13 +2,15 @@ package com.ebata_shota.holdemstacktracker.infra.repository
 
 import android.util.Log
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
-import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
-import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import com.ebata_shota.holdemstacktracker.domain.model.TableState
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableStateMapper
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.getValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +24,7 @@ class TableStateRepositoryImpl
 constructor(
     private val prefRepository: PrefRepository,
     private val mapper: TableStateMapper,
+    private val firebaseDatabase: FirebaseDatabase,
     @ApplicationScope
     private val appCoroutineScope: CoroutineScope
 ) : TableStateRepository {
@@ -38,15 +41,30 @@ constructor(
 
     private val tableStateFlow: Flow<TableState> =  flow {
 
+
     }
 
     init {
         appCoroutineScope.launch {
 
-            flow.collect {
 
-            }
         }
+    }
+
+    override fun test() {
+        val ref = firebaseDatabase.getReference("message")
+
+        ref.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val value = snapshot.getValue<String>()
+                Log.d("hoge", "Value is: $value")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("hoge", "Failed to read value.", error.toException())
+            }
+        })
+        ref.setValue("hai??")
     }
 
     override fun getTableStateFlow(tableId: Long): Flow<TableState> {

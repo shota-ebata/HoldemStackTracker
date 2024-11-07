@@ -1,0 +1,112 @@
+{
+  "tables": {
+    "appVersion": "1.0.0",
+    "timestamp": 1234567,
+    "tableId-xxx": {
+      "version": 0,
+      "name": "TableName",
+      "hostPlayerId": "playerId_1",
+      "players": {
+        "0": {
+          "id": "playerId_1",
+          "name": "PlayerName1",
+          "baseStack": 1000.0
+        },
+        "1": {
+          "id": "playerId_2",
+          "name": "PlayerName2",
+          "baseStack": 1000.0
+        },
+        "2": {
+          "id": "playerId_3",
+          "name": "PlayerName3",
+          "baseStack": 1000.0
+        }
+      },
+      "waitPlayers": {
+        "0": {
+          "id": "playerId_4",
+          "name": "PlayerName1"
+        }
+      },
+      "playerOrder": {
+        "0": "playerId_1",
+        "1": "playerId_2",
+        "2": "playerId_3"
+      },
+      "btnPlayerId": "playerId_1",
+      "ruleState": {
+        "betViewModel": "Number",
+        "lingGame": {
+          "sbSize": 100.0,
+          "bbSize": 200.0
+        }
+      }
+    }
+  },
+  "games": {
+    "tableId-xxx": {
+      "version": 0,
+      "timestamp": 1234567,
+      "players": {
+        "playerId_1": {
+          "stack": 1000.0,
+          "isLeaved": false
+        },
+        "playerId_2": {
+          "stack": 1000.0,
+          "isLeaved": false
+        },
+        "playerId_3": {
+          "stack": 1000.0,
+          "isLeaved": false
+        }
+      },
+      "podStateList": {
+        "0": {
+          "podSize": 600.0,
+          "involvedPlayerIds": {
+            "0": "playerId_1",
+            "1": "playerId_2",
+            "2": "playerId_3"
+          },
+          "isClosed": false
+        }
+      },
+      "phaseStateList": {
+        "preFlop": {
+          "actionStateList": {
+            "0": {
+              "playerId": "playerId_1",
+              "type": "Blind",
+              "betSize": 100.0
+            },
+            "1": {
+              "playerId": "playerId_2",
+              "type": "Blind",
+              "betSize": 200.0
+            },
+            "2": {
+              "playerId": "playerId_3",
+              "type": "Call",
+              "betSize": 200.0
+            },
+            "3": {
+              "playerId": "playerId_1",
+              "type": "Call",
+              "betSize": 200.0
+            }
+          }
+        },
+        "flop": {
+          "actionStateList": {
+            "0": {
+              "playerId": "playerId_1",
+              "type": "Check"
+            }
+          }
+        }
+      }
+    }
+  }
+}

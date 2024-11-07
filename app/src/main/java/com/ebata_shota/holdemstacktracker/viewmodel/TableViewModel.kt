@@ -18,9 +18,13 @@ constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val currentTableState = tableStateRepo.getTableStateFlow(
-        tableId = TODO("savedStateから")
+    private val currentTableState get() = tableStateRepo.getTableStateFlow(
+        tableId = 0L // TODO: savedStateから
     )
+
+    fun onCreate() {
+        tableStateRepo.test()
+    }
 
     suspend fun setAction(action: ActionState) {
         val updatedTableState = getNextTableStateUseCase.invoke(

@@ -6,4 +6,6 @@ import kotlinx.coroutines.flow.Flow
 interface TableStateRepository {
     fun getTableStateFlow(tableId: Long): Flow<TableState>
     suspend fun setTableState(newTableState: TableState)
+
+    fun test()
 }
