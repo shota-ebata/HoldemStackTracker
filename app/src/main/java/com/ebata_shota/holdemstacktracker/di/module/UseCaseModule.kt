@@ -5,7 +5,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPlayerStackUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPlayerStateListUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextTableStateUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameStateUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPodStateListUseCase
@@ -41,7 +41,7 @@ interface UseCaseModule {
     fun bindGetNextPlayerStateListUseCase(useCase: GetNextPlayerStateListUseCaseImpl): GetNextPlayerStateListUseCase
 
     @Binds
-    fun bindGetNextTableStateUseCase(useCase: GetNextTableStateUseCaseImpl): GetNextTableStateUseCase
+    fun bindGetNextTableStateUseCase(useCase: GetNextTableStateUseCaseImpl): GetNextGameStateUseCase
 
     @Binds
     fun bindGetPendingBetPerPlayerUseCase(useCase: GetPendingBetPerPlayerUseCaseImpl): GetPendingBetPerPlayerUseCase

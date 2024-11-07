@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.ebata_shota.holdemstacktracker.domain.model.ActionState
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextTableStateUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameStateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -14,7 +14,7 @@ class TableViewModel
 @Inject
 constructor(
     private val tableStateRepo: TableStateRepository,
-    private val getNextTableStateUseCase: GetNextTableStateUseCase,
+    private val getNextGameStateUseCase: GetNextGameStateUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -23,8 +23,8 @@ constructor(
     )
 
     suspend fun setAction(action: ActionState) {
-        val updatedTableState = getNextTableStateUseCase.invoke(
-            latestTableState = currentTableState.first(),
+        val updatedTableState = getNextGameStateUseCase.invoke(
+            latestGameState = currentTableState.first(),
             action = action
         )
         tableStateRepo.setTableState(updatedTableState)

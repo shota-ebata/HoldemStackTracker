@@ -4,13 +4,13 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
-import com.ebata_shota.holdemstacktracker.domain.model.TableState
+import com.ebata_shota.holdemstacktracker.domain.model.GameState
 import java.time.LocalDateTime
 
-fun createDummyTableState(
+fun createDummyGameState(
     playerOrder: List<PlayerId> = emptyList(),
     phaseStateList: List<PhaseState> = emptyList()
-) = TableState(
+) = GameState(
     id = 0L,
     version = 0,
     name = "dummy",

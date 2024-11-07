@@ -8,11 +8,11 @@ import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerState
 import com.ebata_shota.holdemstacktracker.domain.model.PodState
-import com.ebata_shota.holdemstacktracker.domain.model.TableState
+import com.ebata_shota.holdemstacktracker.domain.model.GameState
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPlayerStackUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextTableStateUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameStateUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPodStateListUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
@@ -27,28 +27,28 @@ constructor(
     private val getPodStateList: GetPodStateListUseCase,
     private val getNextPhase: GetNextPhaseUseCase,
     private val getNextPlayerStack: GetNextPlayerStackUseCase,
-) : GetNextTableStateUseCase {
+) : GetNextGameStateUseCase {
 
     override suspend fun invoke(
-        latestTableState: TableState,
+        latestGameState: GameState,
         action: ActionState
-    ): TableState {
+    ): GameState {
         when (action) {
             is BetPhaseActionState -> {
-                return getNextTableFromBetPhaseAction(latestTableState, action)
+                return getNextGameStateFromBetPhaseAction(latestGameState, action)
             }
         }
     }
 
-    private suspend fun getNextTableFromBetPhaseAction(
-        latestTableState: TableState,
+    private suspend fun getNextGameStateFromBetPhaseAction(
+        latestGameState: GameState,
         action: BetPhaseActionState
-    ): TableState {
+    ): GameState {
         // BetPhaseでしかActionはできないので
-        val latestPhase: BetPhase = getLatestBetPhase.invoke(latestTableState)
+        val latestPhase: BetPhase = getLatestBetPhase.invoke(latestGameState)
         // まずはActionを追加
         val updatedActionStateList = latestPhase.actionStateList + action
-        val latestPhaseStateList: List<PhaseState> = latestTableState.phaseStateList
+        val latestPhaseStateList: List<PhaseState> = latestGameState.phaseStateList
         // PhaseListの最後の要素を置き換える
         val updatedPhaseStateList: MutableList<PhaseState> = latestPhaseStateList.mapAtIndex(latestPhaseStateList.lastIndex) {
             // Phaseに反映
@@ -61,19 +61,19 @@ constructor(
         }.toMutableList()
         // プレイヤーのスタック更新
         val updatedPlayers: List<PlayerState> = getNextPlayerStack.invoke(
-            latestTableState = latestTableState,
+            latestGameState = latestGameState,
             action = action
         )
         // アクションしていない人がのこっているか？
         val isActionRequired = isActionRequired.invoke(
-            playerOrder = latestTableState.playerOrder,
+            playerOrder = latestGameState.playerOrder,
             actionStateList = updatedActionStateList
         )
         return if (isActionRequired) {
             // まだアクションできる
             // プレイヤーのスタックをTableStateに反映
-            latestTableState.copy(
-                version = latestTableState.version + 1L,
+            latestGameState.copy(
+                version = latestGameState.version + 1L,
                 players = updatedPlayers,
                 phaseStateList = updatedPhaseStateList
             )
@@ -81,23 +81,23 @@ constructor(
             // もし全員のベットが揃った場合、ポッド更新してフェーズを進める
             // プレイヤーごとの、まだポッドに入っていないベット額
             val pendingBetPerPlayer: Map<PlayerId, Double> = getPendingBetPerPlayer.invoke(
-                playerOrder = latestTableState.playerOrder,
+                playerOrder = latestGameState.playerOrder,
                 actionStateList = latestPhase.actionStateList
             )
             // ベット状況をポッドに反映
             val updatedPodStateList: List<PodState> = getPodStateList.invoke(
-                podStateList = latestTableState.podStateList,
+                podStateList = latestGameState.podStateList,
                 pendingBetPerPlayer = pendingBetPerPlayer
             )
             // フェーズを進める
             val nextPhase = getNextPhase.invoke(
-                playerOrder = latestTableState.playerOrder,
+                playerOrder = latestGameState.playerOrder,
                 phaseStateList = updatedPhaseStateList
             )
             updatedPhaseStateList += nextPhase
             // TableState更新
-            latestTableState.copy(
-                version = latestTableState.version + 1L,
+            latestGameState.copy(
+                version = latestGameState.version + 1L,
                 players = updatedPlayers,
                 phaseStateList = updatedPhaseStateList,
                 podStateList = updatedPodStateList,

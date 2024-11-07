@@ -1,11 +1,11 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.domain.model.ActionState
-import com.ebata_shota.holdemstacktracker.domain.model.TableState
+import com.ebata_shota.holdemstacktracker.domain.model.GameState
 
-interface GetNextTableStateUseCase {
+interface GetNextGameStateUseCase {
     suspend fun invoke(
-        latestTableState: TableState,
+        latestGameState: GameState,
         action: ActionState
-    ): TableState
+    ): GameState
 }

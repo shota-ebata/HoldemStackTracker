@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
-import com.ebata_shota.holdemstacktracker.createDummyTableState
+import com.ebata_shota.holdemstacktracker.createDummyGameState
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -75,7 +75,7 @@ class GetNextPlayerStackUseCaseImplTest {
         )
         every { getPendingBetPerPlayerUseCase.invoke(any(), any()) } returns mockPendingBetPerPlayerResult
 
-        val latestTableState = createDummyTableState(
+        val latestGameState = createDummyGameState(
             phaseStateList = listOf(
                 PhaseState.PreFlop(phaseId = 0L, actionStateList = emptyList())
             )
@@ -85,24 +85,24 @@ class GetNextPlayerStackUseCaseImplTest {
         runTest {
             // execute
             val actual =  usecase.invoke(
-                latestTableState = latestTableState,
+                latestGameState = latestGameState,
                 action = action
             )
 
             // assert
             verify(exactly = 1) {
-                getLatestBetPhaseUseCase.invoke(latestTableState)
+                getLatestBetPhaseUseCase.invoke(latestGameState)
             }
             verify(exactly = 1) {
                 getPendingBetPerPlayerUseCase.invoke(
-                    playerOrder = latestTableState.playerOrder,
+                    playerOrder = latestGameState.playerOrder,
                     actionStateList = mockLatestBetPhaseResult.actionStateList
                 )
             }
             coVerify(exactly = 1) {
                 getNextPlayerStateListUseCase.invoke(
                     pendingBetPerPlayer = mockPendingBetPerPlayerResult,
-                    players = latestTableState.players,
+                    players = latestGameState.players,
                     action = action,
                 )
             }

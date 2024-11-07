@@ -3,7 +3,7 @@ package com.ebata_shota.holdemstacktracker.infra.mapper
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
-import com.ebata_shota.holdemstacktracker.domain.model.TableState
+import com.ebata_shota.holdemstacktracker.domain.model.GameState
 import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -12,9 +12,9 @@ import javax.inject.Singleton
 class TableStateMapper
 @Inject
 constructor() {
-    fun toModel(): TableState {
+    fun toModel(): GameState {
         // TODO
-        return TableState(
+        return GameState(
             id = 0L,
             version = 0,
             name = "dummy",

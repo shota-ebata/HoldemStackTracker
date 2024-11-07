@@ -2,10 +2,7 @@ package com.ebata_shota.holdemstacktracker.infra.repository
 
 import android.util.Log
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
-import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
-import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.RuleState
-import com.ebata_shota.holdemstacktracker.domain.model.TableState
+import com.ebata_shota.holdemstacktracker.domain.model.GameState
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableStateMapper
@@ -36,7 +33,7 @@ constructor(
         }
     }
 
-    private val tableStateFlow: Flow<TableState> =  flow {
+    private val gameStateFlow: Flow<GameState> =  flow {
 
     }
 
@@ -49,16 +46,16 @@ constructor(
         }
     }
 
-    override fun getTableStateFlow(tableId: Long): Flow<TableState> {
-        return tableStateFlow
+    override fun getTableStateFlow(tableId: Long): Flow<GameState> {
+        return gameStateFlow
     }
 
     /**
      * TableStateを更新してFirebaseRealtimeDatabaseに送る
      *
-     * @param newTableState 新しいTableState
+     * @param newGameState 新しいTableState
      */
-    override suspend fun setTableState(newTableState: TableState) {
+    override suspend fun setTableState(newGameState: GameState) {
         TODO("変換して送る")
     }
 }

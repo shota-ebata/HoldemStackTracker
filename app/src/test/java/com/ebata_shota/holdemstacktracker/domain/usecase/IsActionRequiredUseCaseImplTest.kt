@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
-import com.ebata_shota.holdemstacktracker.createDummyTableState
+import com.ebata_shota.holdemstacktracker.createDummyGameState
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -37,11 +37,11 @@ class IsActionRequiredUseCaseImplTest {
             PlayerId("1"),
             PlayerId("2")
         )
-        val latestTableState = createDummyTableState(
+        val latestGameState = createDummyGameState(
             playerOrder = playerOrder
         )
         val actionStateList = listOf<BetPhaseActionState>()
-        every { getLatestBetPhaseUseCase.invoke(latestTableState) } returns PhaseState.PreFlop(
+        every { getLatestBetPhaseUseCase.invoke(latestGameState) } returns PhaseState.PreFlop(
             phaseId = 0L,
             actionStateList = actionStateList
         )
