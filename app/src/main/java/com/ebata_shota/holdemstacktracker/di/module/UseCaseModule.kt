@@ -4,7 +4,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCas
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPlayerStackUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPlayerStateListUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGamePlayerStateListUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameStateUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
@@ -14,8 +14,8 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseU
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextPlayerStackUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextPlayerStateListUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextTableStateUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextGamePlayerStateListUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextGameStateUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetPerPlayerUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionsUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPodStateListUseCaseImpl
@@ -38,10 +38,10 @@ interface UseCaseModule {
     fun bindGetNextPhaseUseCase(useCase: GetNextPhaseUseCaseImpl): GetNextPhaseUseCase
 
     @Binds
-    fun bindGetNextPlayerStateListUseCase(useCase: GetNextPlayerStateListUseCaseImpl): GetNextPlayerStateListUseCase
+    fun bindGetNextGamePlayerStateListUseCase(useCase: GetNextGamePlayerStateListUseCaseImpl): GetNextGamePlayerStateListUseCase
 
     @Binds
-    fun bindGetNextTableStateUseCase(useCase: GetNextTableStateUseCaseImpl): GetNextGameStateUseCase
+    fun bindGetNextTableStateUseCase(useCase: GetNextGameStateUseCaseImpl): GetNextGameStateUseCase
 
     @Binds
     fun bindGetPendingBetPerPlayerUseCase(useCase: GetPendingBetPerPlayerUseCaseImpl): GetPendingBetPerPlayerUseCase

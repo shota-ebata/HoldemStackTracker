@@ -37,9 +37,7 @@ class IsActionRequiredUseCaseImplTest {
             PlayerId("1"),
             PlayerId("2")
         )
-        val latestGameState = createDummyGameState(
-            playerOrder = playerOrder
-        )
+        val latestGameState = createDummyGameState()
         val actionStateList = listOf<BetPhaseActionState>()
         every { getLatestBetPhaseUseCase.invoke(latestGameState) } returns PhaseState.PreFlop(
             phaseId = 0L,

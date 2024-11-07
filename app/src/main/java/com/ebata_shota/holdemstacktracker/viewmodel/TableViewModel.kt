@@ -22,7 +22,9 @@ constructor(
         tableId = TODO("savedStateから")
     )
 
-    suspend fun setAction(action: ActionState) {
+    suspend fun setAction(
+        action: ActionState,
+    ) {
         val updatedTableState = getNextGameStateUseCase.invoke(
             latestGameState = currentTableState.first(),
             action = action

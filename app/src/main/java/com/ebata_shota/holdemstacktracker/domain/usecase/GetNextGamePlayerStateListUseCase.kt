@@ -2,12 +2,12 @@ package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.PlayerState
+import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
 
-interface GetNextPlayerStateListUseCase {
+interface GetNextGamePlayerStateListUseCase {
     suspend fun invoke(
         pendingBetPerPlayer: Map<PlayerId, Double>,
-        players: List<PlayerState>,
+        players: List<GamePlayerState>,
         action: BetPhaseActionState
-    ): List<PlayerState>
+    ): List<GamePlayerState>
 }

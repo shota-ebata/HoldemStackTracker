@@ -6,9 +6,10 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.PlayerState
+import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
 import com.ebata_shota.holdemstacktracker.domain.model.PodState
 import com.ebata_shota.holdemstacktracker.domain.model.GameState
+import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPlayerStackUseCase
@@ -18,7 +19,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetPodStateListUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import javax.inject.Inject
 
-class GetNextTableStateUseCaseImpl
+class GetNextGameStateUseCaseImpl
 @Inject
 constructor(
     private val isActionRequired: IsActionRequiredUseCase,
@@ -60,7 +61,7 @@ constructor(
             }
         }.toMutableList()
         // プレイヤーのスタック更新
-        val updatedPlayers: List<PlayerState> = getNextPlayerStack.invoke(
+        val updatedPlayers: List<GamePlayerState> = getNextPlayerStack.invoke(
             latestGameState = latestGameState,
             action = action
         )

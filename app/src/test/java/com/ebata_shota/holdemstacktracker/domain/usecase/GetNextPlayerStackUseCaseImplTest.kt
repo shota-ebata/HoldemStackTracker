@@ -4,12 +4,12 @@ import com.ebata_shota.holdemstacktracker.createDummyGameState
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.PlayerState
+import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextPlayerStackUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextPlayerStateListUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextGamePlayerStateListUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetPerPlayerUseCaseImpl
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -32,7 +32,7 @@ class GetNextPlayerStackUseCaseImplTest {
             getPendingBetPerPlayer = GetPendingBetPerPlayerUseCaseImpl(
                 getMaxBetSize = GetMaxBetSizeUseCaseImpl()
             ),
-            getNextPlayerStateList = GetNextPlayerStateListUseCaseImpl(
+            getNextPlayerStateList = GetNextGamePlayerStateListUseCaseImpl(
                 prefRepository = prefRepository
             )
         )
@@ -46,23 +46,23 @@ class GetNextPlayerStackUseCaseImplTest {
     fun call_mock() {
         val getLatestBetPhaseUseCase: GetLatestBetPhaseUseCaseImpl = mockk()
         val getPendingBetPerPlayerUseCase: GetPendingBetPerPlayerUseCaseImpl = mockk()
-        val getNextPlayerStateListUseCase: GetNextPlayerStateListUseCaseImpl = mockk()
+        val getNextGamePlayerStateListUseCase: GetNextGamePlayerStateListUseCaseImpl = mockk()
 
         usecase = GetNextPlayerStackUseCaseImpl(
             getLatestBetPhase = getLatestBetPhaseUseCase,
             getPendingBetPerPlayer = getPendingBetPerPlayerUseCase,
-            getNextPlayerStateList = getNextPlayerStateListUseCase
+            getNextPlayerStateList = getNextGamePlayerStateListUseCase
         )
 
-        val mockNextPlayerStateListResult = listOf<PlayerState>(
-            PlayerState(
+        val mockNextPlayerStateListResult = listOf<GamePlayerState>(
+            GamePlayerState(
                 id = PlayerId("0"),
                 name = "0",
                 stack = 1000.0,
                 isLeaved = false
             ),
         )
-        coEvery { getNextPlayerStateListUseCase.invoke(any(), any(), any()) } returns mockNextPlayerStateListResult
+        coEvery { getNextGamePlayerStateListUseCase.invoke(any(), any(), any()) } returns mockNextPlayerStateListResult
 
         val mockLatestBetPhaseResult = PhaseState.PreFlop(
             phaseId = 0L,
@@ -100,7 +100,7 @@ class GetNextPlayerStackUseCaseImplTest {
                 )
             }
             coVerify(exactly = 1) {
-                getNextPlayerStateListUseCase.invoke(
+                getNextGamePlayerStateListUseCase.invoke(
                     pendingBetPerPlayer = mockPendingBetPerPlayerResult,
                     players = latestGameState.players,
                     action = action,
