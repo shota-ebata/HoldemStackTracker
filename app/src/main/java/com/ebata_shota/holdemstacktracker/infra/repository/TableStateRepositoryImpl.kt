@@ -3,8 +3,11 @@ package com.ebata_shota.holdemstacktracker.infra.repository
 import android.util.Log
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.domain.model.GameState
+import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.RealtimeDatabaseRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
+import com.ebata_shota.holdemstacktracker.infra.mapper.GameMapper
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableStateMapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -18,9 +21,11 @@ class TableStateRepositoryImpl
 @Inject
 constructor(
     private val prefRepository: PrefRepository,
-    private val mapper: TableStateMapper,
+    private val realtimeDatabaseRepository: RealtimeDatabaseRepository,
+    private val tableMapper: TableStateMapper,
+    private val gameMapper: GameMapper,
     @ApplicationScope
-    private val appCoroutineScope: CoroutineScope
+    private val appCoroutineScope: CoroutineScope,
 ) : TableStateRepository {
 
 
@@ -40,9 +45,9 @@ constructor(
     init {
         appCoroutineScope.launch {
 
-            flow.collect {
-
-            }
+//            flow.collect {
+//
+//            }
         }
     }
 
@@ -55,7 +60,14 @@ constructor(
      *
      * @param newGameState 新しいTableState
      */
-    override suspend fun setTableState(newGameState: GameState) {
-        TODO("変換して送る")
+    override suspend fun setNewGameState(
+        tableId: TableId,
+        newGameState: GameState
+    ) {
+        val hashMap = gameMapper.mapToHashMap(newGameState)
+        realtimeDatabaseRepository.setGameHashMap(
+            tableId = tableId,
+            gameHashMap = hashMap
+        )
     }
 }
