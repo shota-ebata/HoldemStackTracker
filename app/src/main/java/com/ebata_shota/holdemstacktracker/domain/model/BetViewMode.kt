@@ -5,5 +5,12 @@ import androidx.annotation.Keep
 @Keep
 enum class BetViewMode {
     Number,
-    BB
+    BB;
+
+    companion object {
+        fun of(label: String): BetViewMode {
+            return entries.find { it.name == label }
+                ?: throw IllegalArgumentException("Unsupported label= $label")
+        }
+    }
 }

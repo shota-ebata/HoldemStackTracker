@@ -1,6 +1,10 @@
 package com.ebata_shota.holdemstacktracker.infra.mapper
 
+import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
+import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableState
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -10,12 +14,51 @@ class TableStateMapper
 @Inject
 constructor() {
 
+    private fun Any.getDouble() = (this as? Double) ?: (this as Long).toDouble()
+
+    fun mapToTableState(tableId: TableId, tableMap: Map<*, *>): TableState {
+        return TableState(
+            id = tableId,
+            version = tableMap["version"] as Long,
+            name = tableMap["name"] as String,
+            hostPlayerId = PlayerId(tableMap["hostPlayerId"] as String),
+            ruleState = mapToRuleState(tableMap["rule"] as Map<*, *>),
+            basePlayers = mapToBasePlayers(tableMap["basePlayers"] as List<*>),
+            waitPlayers = (tableMap["waitPlayers"] as? List<*>)?.let {
+                mapToBasePlayers(it)
+            } ?: emptyList(),
+            playerOrder = (tableMap["playerOrder"] as List<*>).map { PlayerId(it as String) },
+            btnPlayerId = PlayerId(tableMap["btnPlayerId"] as String),
+            startTime = tableMap["startTime"] as Long
+        )
+    }
+
+    private fun mapToBasePlayers(basePlayers: List<*>) = basePlayers.map { it as Map<*, *> }.map {
+        PlayerBaseState(
+            id = PlayerId(it["playerId"] as String),
+            name = it["name"] as String,
+            stack = it["stack"]!!.getDouble()
+        )
+    }
+
+    private fun mapToRuleState(rule: Map<*, *>) = when (val ruleType = rule["type"] as String) {
+        "LingGame" -> {
+            RuleState.LingGame(
+                sbSize = rule["sbSize"]!!.getDouble(),
+                bbSize = rule["bbSize"]!!.getDouble(),
+                betViewMode = BetViewMode.of(rule["betViewMode"] as String),
+            )
+        }
+
+        else -> throw IllegalStateException("unsupported ruleType = $ruleType")
+    }
+
     fun toMap(tableState: TableState): Map<String, Any> = hashMapOf(
         "version" to tableState.version,
         "name" to tableState.name,
         "hostPlayerId" to tableState.hostPlayerId.value,
         "btnPlayerId" to tableState.btnPlayerId.value,
-        "ruleStatus" to when (val ruleState = tableState.ruleState) {
+        "rule" to when (val ruleState = tableState.ruleState) {
             is RuleState.LingGame -> {
                 mapOf(
                     "type" to "LingGame",

@@ -4,9 +4,7 @@ import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableState
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
-import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
-import com.ebata_shota.holdemstacktracker.infra.mapper.GameMapper
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableStateMapper
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -19,7 +17,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -37,17 +34,17 @@ constructor(
         "tables"
     )
 
-    private val _gameTableFlow = MutableSharedFlow<TableState>()
-    override val gameTableFlow: Flow<TableState> = _gameTableFlow.asSharedFlow()
+    private val _tableStateFlow = MutableSharedFlow<TableState>()
+    override val tableStateFlow: Flow<TableState> = _tableStateFlow.asSharedFlow()
 
-    fun startCollectTableStateFlow(tableId: TableId) {
+    override fun startCollectTableStateFlow(tableId: TableId) {
         appCoroutineScope.launch {
             val flow = callbackFlow<TableState> {
                 val listener = object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         if (snapshot.exists()) {
-                            val gameMap: Map<*, *> = snapshot.value as Map<*, *>
-//                            trySend(tableMapper.toMap(gameMap))
+                            val tableMap: Map<*, *> = snapshot.value as Map<*, *>
+                            trySend(tableMapper.mapToTableState(tableId, tableMap))
                         }
                     }
 
@@ -61,16 +58,16 @@ constructor(
                     tablesRef.child(tableId.value).removeEventListener(listener)
                 }
             }
-            flow.collect(_gameTableFlow)
+            flow.collect(_tableStateFlow)
 
         }
     }
 
     override suspend fun setTableState(
-        tableState: TableState
+        newTableState: TableState
     ) {
-        val tableMap = tableMapper.toMap(tableState)
-        val tableRef = tablesRef.child(tableState.id.value)
+        val tableMap = tableMapper.toMap(newTableState)
+        val tableRef = tablesRef.child(newTableState.id.value)
         tableRef.setValue(tableMap)
     }
 }

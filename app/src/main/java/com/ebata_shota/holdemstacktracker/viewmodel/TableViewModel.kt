@@ -48,12 +48,19 @@ constructor(
 
     init {
         viewModelScope.launch {
+            tableStateRepo.tableStateFlow.collect {
+                Log.d("hoge", "$it")
+            }
+        }
+
+        viewModelScope.launch {
             gameStateRepository.gameStateFlow.collect {
                 Log.d("hoge", "$it")
             }
         }
 
         viewModelScope.launch {
+            tableStateRepo.startCollectTableStateFlow(TableId("tableId-hage"))
             gameStateRepository.startCollectGameStateFlow(TableId("tableId-hage"))
 //            test()
         }
