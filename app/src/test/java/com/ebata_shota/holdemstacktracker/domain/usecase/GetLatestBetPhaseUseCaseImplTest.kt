@@ -20,7 +20,7 @@ class GetLatestBetPhaseUseCaseImplTest {
     fun getLatestBet_Standby() {
         val gameState = createDummyGameState(
             phaseStateList = listOf(
-                PhaseState.Standby(phaseId = 0L)
+                PhaseState.Standby
             )
         )
         assertThrows(IllegalStateException::class.java) {
@@ -32,8 +32,8 @@ class GetLatestBetPhaseUseCaseImplTest {
     fun getLatestBet_PreFlop() {
         val gameState = createDummyGameState(
             phaseStateList = listOf(
-                PhaseState.Standby(phaseId = 0L),
-                PhaseState.PreFlop(phaseId = 1L, actionStateList = emptyList())
+                PhaseState.Standby,
+                PhaseState.PreFlop(actionStateList = emptyList())
             )
         )
         val phase = usecase.invoke(latestGameState = gameState)
@@ -44,9 +44,9 @@ class GetLatestBetPhaseUseCaseImplTest {
     fun getLatestBet_Flop() {
         val gameState = createDummyGameState(
             phaseStateList = listOf(
-                PhaseState.Standby(phaseId = 0L),
-                PhaseState.PreFlop(phaseId = 1L, actionStateList = emptyList()),
-                PhaseState.Flop(phaseId = 2L, actionStateList = emptyList())
+                PhaseState.Standby,
+                PhaseState.PreFlop(actionStateList = emptyList()),
+                PhaseState.Flop(actionStateList = emptyList())
             )
         )
         val phase = usecase.invoke(latestGameState = gameState)
@@ -57,10 +57,10 @@ class GetLatestBetPhaseUseCaseImplTest {
     fun getLatestBet_Turn() {
         val gameState = createDummyGameState(
             phaseStateList = listOf(
-                PhaseState.Standby(phaseId = 0L),
-                PhaseState.PreFlop(phaseId = 1L, actionStateList = emptyList()),
-                PhaseState.Flop(phaseId = 2L, actionStateList = emptyList()),
-                PhaseState.Turn(phaseId = 3L, actionStateList = emptyList()),
+                PhaseState.Standby,
+                PhaseState.PreFlop(actionStateList = emptyList()),
+                PhaseState.Flop(actionStateList = emptyList()),
+                PhaseState.Turn(actionStateList = emptyList()),
             )
         )
         val phase = usecase.invoke(latestGameState = gameState)
@@ -71,11 +71,11 @@ class GetLatestBetPhaseUseCaseImplTest {
     fun getLatestBet_River() {
         val gameState = createDummyGameState(
             phaseStateList = listOf(
-                PhaseState.Standby(phaseId = 0L),
-                PhaseState.PreFlop(phaseId = 1L, actionStateList = emptyList()),
-                PhaseState.Flop(phaseId = 2L, actionStateList = emptyList()),
-                PhaseState.Turn(phaseId = 3L, actionStateList = emptyList()),
-                PhaseState.River(phaseId = 4L, actionStateList = emptyList()),
+                PhaseState.Standby,
+                PhaseState.PreFlop(actionStateList = emptyList()),
+                PhaseState.Flop(actionStateList = emptyList()),
+                PhaseState.Turn(actionStateList = emptyList()),
+                PhaseState.River(actionStateList = emptyList()),
             )
         )
         val phase = usecase.invoke(latestGameState = gameState)
@@ -86,12 +86,12 @@ class GetLatestBetPhaseUseCaseImplTest {
     fun getLatestBet_ShowDown() {
         val gameState = createDummyGameState(
             phaseStateList = listOf(
-                PhaseState.Standby(phaseId = 0L),
-                PhaseState.PreFlop(phaseId = 1L, actionStateList = emptyList()),
-                PhaseState.Flop(phaseId = 2L, actionStateList = emptyList()),
-                PhaseState.Turn(phaseId = 3L, actionStateList = emptyList()),
-                PhaseState.River(phaseId = 4L, actionStateList = emptyList()),
-                PhaseState.ShowDown(phaseId = 5L),
+                PhaseState.Standby,
+                PhaseState.PreFlop(actionStateList = emptyList()),
+                PhaseState.Flop(actionStateList = emptyList()),
+                PhaseState.Turn(actionStateList = emptyList()),
+                PhaseState.River(actionStateList = emptyList()),
+                PhaseState.ShowDown,
             )
         )
         assertThrows(IllegalStateException::class.java) {
@@ -103,13 +103,13 @@ class GetLatestBetPhaseUseCaseImplTest {
     fun getLatestBet_PotSettlement() {
         val gameState = createDummyGameState(
             phaseStateList = listOf(
-                PhaseState.Standby(phaseId = 0L),
-                PhaseState.PreFlop(phaseId = 1L, actionStateList = emptyList()),
-                PhaseState.Flop(phaseId = 2L, actionStateList = emptyList()),
-                PhaseState.Turn(phaseId = 3L, actionStateList = emptyList()),
-                PhaseState.River(phaseId = 4L, actionStateList = emptyList()),
-                PhaseState.ShowDown(phaseId = 5L),
-                PhaseState.PotSettlement(phaseId = 6L),
+                PhaseState.Standby,
+                PhaseState.PreFlop(actionStateList = emptyList()),
+                PhaseState.Flop(actionStateList = emptyList()),
+                PhaseState.Turn(actionStateList = emptyList()),
+                PhaseState.River(actionStateList = emptyList()),
+                PhaseState.ShowDown,
+                PhaseState.PotSettlement,
             )
         )
         assertThrows(IllegalStateException::class.java) {
@@ -121,14 +121,14 @@ class GetLatestBetPhaseUseCaseImplTest {
     fun getLatestBet_End() {
         val gameState = createDummyGameState(
             phaseStateList = listOf(
-                PhaseState.Standby(phaseId = 0L),
-                PhaseState.PreFlop(phaseId = 1L, actionStateList = emptyList()),
-                PhaseState.Flop(phaseId = 2L, actionStateList = emptyList()),
-                PhaseState.Turn(phaseId = 3L, actionStateList = emptyList()),
-                PhaseState.River(phaseId = 4L, actionStateList = emptyList()),
-                PhaseState.ShowDown(phaseId = 5L),
-                PhaseState.PotSettlement(phaseId = 5L),
-                PhaseState.End(phaseId = 6L),
+                PhaseState.Standby,
+                PhaseState.PreFlop(actionStateList = emptyList()),
+                PhaseState.Flop(actionStateList = emptyList()),
+                PhaseState.Turn(actionStateList = emptyList()),
+                PhaseState.River(actionStateList = emptyList()),
+                PhaseState.ShowDown,
+                PhaseState.PotSettlement,
+                PhaseState.End,
             )
         )
         assertThrows(IllegalStateException::class.java) {

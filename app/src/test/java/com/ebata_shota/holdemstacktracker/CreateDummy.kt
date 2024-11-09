@@ -15,7 +15,6 @@ fun createDummyGameState(
     version = 0,
     players = emptyList(),
     podStateList = emptyList(),
-    currentActionPlayer = PlayerId(""),
     phaseStateList = phaseStateList,
     timestamp = 0L
 )

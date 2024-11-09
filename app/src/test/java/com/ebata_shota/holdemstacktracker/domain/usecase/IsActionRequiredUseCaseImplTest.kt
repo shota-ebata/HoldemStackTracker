@@ -40,7 +40,6 @@ class IsActionRequiredUseCaseImplTest {
         val latestGameState = createDummyGameState()
         val actionStateList = listOf<BetPhaseActionState>()
         every { getLatestBetPhaseUseCase.invoke(latestGameState) } returns PhaseState.PreFlop(
-            phaseId = 0L,
             actionStateList = actionStateList
         )
         every { getMaxBetSizeUseCase.invoke(any()) } returns 0.0

@@ -81,9 +81,8 @@ constructor(
                     )
                 ),
                 phaseStateList = listOf(
-                    PhaseState.Standby(phaseId = 0L),
+                    PhaseState.Standby,
                     PhaseState.PreFlop(
-                        phaseId = 0L,
                         actionStateList = listOf(
                             BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("PlayerId0"), betSize = 100.0),
                             BetPhaseActionState.Blind(actionId = 1L, playerId = PlayerId("PlayerId1"), betSize = 200.0),

@@ -31,7 +31,7 @@ class GetNextPhaseUseCaseImplTest {
         val actual = usecase.invoke(
             playerOrder = listOf(PlayerId("0"), PlayerId("1"), PlayerId("2")),
             phaseStateList = listOf(
-                Standby(phaseId = 0L)
+                Standby
             )
         )
         assert(actual is PreFlop)
@@ -42,7 +42,7 @@ class GetNextPhaseUseCaseImplTest {
         val actual = usecase.invoke(
             playerOrder = listOf(PlayerId("0"), PlayerId("1"), PlayerId("2")),
             phaseStateList = listOf(
-                AllInOpen(phaseId = 0L)
+                AllInOpen
             )
         )
         assert(actual is PotSettlement)
@@ -53,7 +53,7 @@ class GetNextPhaseUseCaseImplTest {
         val actual = usecase.invoke(
             playerOrder = listOf(PlayerId("0"), PlayerId("1"), PlayerId("2")),
             phaseStateList = listOf(
-                ShowDown(phaseId = 0L)
+                ShowDown
             )
         )
         assert(actual is PotSettlement)
@@ -64,7 +64,7 @@ class GetNextPhaseUseCaseImplTest {
         val actual = usecase.invoke(
             playerOrder = listOf(PlayerId("0"), PlayerId("1"), PlayerId("2")),
             phaseStateList = listOf(
-                PotSettlement(phaseId = 0L)
+                PotSettlement
             )
         )
         assert(actual is End)
@@ -75,7 +75,7 @@ class GetNextPhaseUseCaseImplTest {
         val actual = usecase.invoke(
             playerOrder = listOf(PlayerId("0"), PlayerId("1"), PlayerId("2")),
             phaseStateList = listOf(
-                End(phaseId = 0L)
+                End
             )
         )
         assert(actual is Standby)
@@ -87,7 +87,6 @@ class GetNextPhaseUseCaseImplTest {
             playerOrder = listOf(PlayerId("0"), PlayerId("1"), PlayerId("2")),
             phaseStateList = listOf(
                 PreFlop(
-                    phaseId = 0L,
                     actionStateList = listOf(
                         BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0),
                         BetPhaseActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 100.0),
@@ -106,7 +105,6 @@ class GetNextPhaseUseCaseImplTest {
             playerOrder = listOf(PlayerId("0"), PlayerId("1"), PlayerId("2")),
             phaseStateList = listOf(
                 PreFlop(
-                    phaseId = 0L,
                     actionStateList = listOf(
                         BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0),
                         BetPhaseActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 100.0),
@@ -126,7 +124,6 @@ class GetNextPhaseUseCaseImplTest {
             playerOrder = listOf(PlayerId("0"), PlayerId("1"), PlayerId("2")),
             phaseStateList = listOf(
                 PreFlop(
-                    phaseId = 0L,
                     actionStateList = listOf()
                 )
             )
@@ -139,8 +136,8 @@ class GetNextPhaseUseCaseImplTest {
         val actual = usecase.invoke(
             playerOrder = listOf(PlayerId("0"), PlayerId("1"), PlayerId("2")),
             phaseStateList = listOf(
-                PreFlop(phaseId = 0L, actionStateList = emptyList()),
-                Flop(phaseId = 0L, actionStateList = emptyList())
+                PreFlop(actionStateList = emptyList()),
+                Flop(actionStateList = emptyList())
             )
         )
         assert(actual is Turn)
@@ -151,9 +148,9 @@ class GetNextPhaseUseCaseImplTest {
         val actual = usecase.invoke(
             playerOrder = listOf(PlayerId("0"), PlayerId("1"), PlayerId("2")),
             phaseStateList = listOf(
-                PreFlop(phaseId = 0L, actionStateList = emptyList()),
-                Flop(phaseId = 0L, actionStateList = emptyList()),
-                Turn(phaseId = 0L, actionStateList = emptyList())
+                PreFlop(actionStateList = emptyList()),
+                Flop(actionStateList = emptyList()),
+                Turn(actionStateList = emptyList())
             )
         )
         assert(actual is River)
@@ -164,10 +161,10 @@ class GetNextPhaseUseCaseImplTest {
         val actual = usecase.invoke(
             playerOrder = listOf(PlayerId("0"), PlayerId("1"), PlayerId("2")),
             phaseStateList = listOf(
-                PreFlop(phaseId = 0L, actionStateList = emptyList()),
-                Flop(phaseId = 0L, actionStateList = emptyList()),
-                Turn(phaseId = 0L, actionStateList = emptyList()),
-                River(phaseId = 0L, actionStateList = emptyList())
+                PreFlop(actionStateList = emptyList()),
+                Flop(actionStateList = emptyList()),
+                Turn(actionStateList = emptyList()),
+                River(actionStateList = emptyList())
             )
         )
         assert(actual is ShowDown)

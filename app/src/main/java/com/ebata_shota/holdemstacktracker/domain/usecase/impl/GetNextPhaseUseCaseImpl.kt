@@ -16,7 +16,6 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
 import javax.inject.Inject
-import kotlin.random.Random
 
 class GetNextPhaseUseCaseImpl
 @Inject
@@ -28,15 +27,15 @@ constructor(
         phaseStateList: List<PhaseState>
     ): PhaseState {
         return when (val latestPhase: PhaseState? = phaseStateList.lastOrNull()) {
-            is Standby -> PreFlop(phaseId = createPhaseId(), actionStateList = emptyList())
+            is Standby -> PreFlop(actionStateList = emptyList())
             is BetPhase -> getNextPhaseStateFromBetPhase(playerOrder, phaseStateList, latestPhase)
-            is AllInOpen -> PotSettlement(phaseId = createPhaseId())
-            is ShowDown -> PotSettlement(phaseId = createPhaseId())
-            is PotSettlement -> End(phaseId = createPhaseId())
-            is End -> Standby(phaseId = createPhaseId())
+            is AllInOpen -> PotSettlement
+            is ShowDown -> PotSettlement
+            is PotSettlement -> End
+            is End -> Standby
             null -> {
                 // 基本無いはずだが
-                Standby(phaseId = createPhaseId())
+                Standby
             }
         }
     }
@@ -55,7 +54,7 @@ constructor(
         // 降りてないプレイヤーが2人未満（基本的には、1人を除いてFoldしている状態）
         // の場合は決済フェーズへ
         if (activePlayerCount < 2) {
-            return PotSettlement(phaseId = createPhaseId())
+            return PotSettlement
         }
         // AllInプレイヤー人数
         val allInPlayerCount = lastActions.count { (_, lastAction) ->
@@ -64,19 +63,15 @@ constructor(
         // AllInプレイヤーだけが残っている場合は
         if (allInPlayerCount == activePlayerCount) {
             // AllInOpenへ
-            return AllInOpen(phaseId = createPhaseId())
+            return AllInOpen
         }
         // その他の場合は次のべットフェーズへ
         // (フェーズのアクションがすべて終わっている前提で、このメソッドを呼び出している想定）
         return when (latestPhase) {
-            is PreFlop -> Flop(phaseId = createPhaseId(), actionStateList = emptyList())
-            is Flop -> Turn(phaseId = createPhaseId(), actionStateList = emptyList())
-            is Turn -> River(phaseId = createPhaseId(), actionStateList = emptyList())
-            is River -> ShowDown(phaseId = createPhaseId())
+            is PreFlop -> Flop(actionStateList = emptyList())
+            is Flop -> Turn(actionStateList = emptyList())
+            is Turn -> River(actionStateList = emptyList())
+            is River -> ShowDown
         }
-    }
-
-    private fun createPhaseId(): Long {
-        return Random.nextLong()
     }
 }

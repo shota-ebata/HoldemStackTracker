@@ -38,7 +38,7 @@ class GetPlayerLastActionsUseCaseImplTest {
     fun standby() {
         // prepare
         val phaseStateList = listOf(
-            PhaseState.Standby(phaseId = 0L),
+            PhaseState.Standby,
         )
         val expected = mapOf<PlayerId, BetPhaseActionState?>(
             PlayerId("0") to null,
@@ -52,9 +52,8 @@ class GetPlayerLastActionsUseCaseImplTest {
     fun preFlop_allCall() {
         // prepare
         val phaseStateList = listOf(
-            PhaseState.Standby(phaseId = 0L),
+            PhaseState.Standby,
             PhaseState.PreFlop(
-                phaseId = 0L,
                 actionStateList = listOf<BetPhaseActionState>(
                     Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0),
                     Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0),
@@ -75,9 +74,8 @@ class GetPlayerLastActionsUseCaseImplTest {
     fun preFlop_allFold() {
         // prepare
         val phaseStateList = listOf(
-            PhaseState.Standby(phaseId = 0L),
+            PhaseState.Standby,
             PhaseState.PreFlop(
-                phaseId = 0L,
                 actionStateList = listOf(
                     Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0),
                     Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0),
@@ -98,9 +96,8 @@ class GetPlayerLastActionsUseCaseImplTest {
     fun preFlop_2AllIn_1Fold() {
         // prepare
         val phaseStateList = listOf(
-            PhaseState.Standby(phaseId = 0L),
+            PhaseState.Standby,
             PhaseState.PreFlop(
-                phaseId = 0L,
                 actionStateList = listOf(
                     Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0),
                     Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0),

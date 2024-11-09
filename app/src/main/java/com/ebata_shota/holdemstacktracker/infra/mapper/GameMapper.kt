@@ -38,15 +38,15 @@ constructor() {
             val actions = map["actions"] as? List<*>
             val phaseId = index.toLong()
             when (Phase.of(phaseType)) {
-                Phase.Standby -> PhaseState.Standby(phaseId = phaseId)
-                Phase.PreFlop -> PhaseState.PreFlop(phaseId = phaseId, actionStateList = mapToActionStateList(actions!!))
-                Phase.Flop -> PhaseState.Flop(phaseId = phaseId, actionStateList = mapToActionStateList(actions!!))
-                Phase.Turn -> PhaseState.Turn(phaseId = phaseId, actionStateList = mapToActionStateList(actions!!))
-                Phase.River ->  PhaseState.River(phaseId = phaseId, actionStateList = mapToActionStateList(actions!!))
-                Phase.ShowDown -> PhaseState.ShowDown(phaseId = phaseId)
-                Phase.AllInOpen -> PhaseState.AllInOpen(phaseId = phaseId)
-                Phase.PotSettlement -> PhaseState.PotSettlement(phaseId = phaseId)
-                Phase.End -> PhaseState.End(phaseId = phaseId)
+                Phase.Standby -> PhaseState.Standby
+                Phase.PreFlop -> PhaseState.PreFlop(actionStateList = mapToActionStateList(actions!!))
+                Phase.Flop -> PhaseState.Flop(actionStateList = mapToActionStateList(actions!!))
+                Phase.Turn -> PhaseState.Turn(actionStateList = mapToActionStateList(actions!!))
+                Phase.River ->  PhaseState.River(actionStateList = mapToActionStateList(actions!!))
+                Phase.ShowDown -> PhaseState.ShowDown
+                Phase.AllInOpen -> PhaseState.AllInOpen
+                Phase.PotSettlement -> PhaseState.PotSettlement
+                Phase.End -> PhaseState.End
             }
 
         }
