@@ -1,4 +1,4 @@
-package com.ebata_shota.holdemstacktracker.domain.usecase.impl
+package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.domain.model.GameState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId

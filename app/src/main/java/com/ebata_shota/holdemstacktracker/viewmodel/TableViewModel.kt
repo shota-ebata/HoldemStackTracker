@@ -16,9 +16,8 @@ import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameStateUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject

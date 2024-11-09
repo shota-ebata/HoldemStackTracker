@@ -10,7 +10,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerU
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPodStateListUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
