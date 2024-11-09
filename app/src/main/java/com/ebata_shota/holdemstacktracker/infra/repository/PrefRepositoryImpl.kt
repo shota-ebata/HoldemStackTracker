@@ -6,6 +6,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys
 import com.ebata_shota.holdemstacktracker.infra.extension.prefFlow
+import com.ebata_shota.holdemstacktracker.infra.extension.setPrefValue
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -17,7 +18,17 @@ constructor(
     private val randomIdRepository: RandomIdRepository
 ) : PrefRepository {
     override val myPlayerId: Flow<String> by dataStore.prefFlow(
-        key = AppPreferencesKeys.PlayerId,
+        key = AppPreferencesKeys.MyPlayerId,
         defaultValue = { randomIdRepository.generateRandomId() }
     )
+
+    override val myName: Flow<String> by dataStore.prefFlow(
+        key = AppPreferencesKeys.MyName,
+        // FIXME: ちゃんと多言語化対応をすること
+        defaultValue = { "プレイヤー" + randomIdRepository.generateRandomId().take(6) }
+    )
+
+    override suspend fun setMyName(myName: String) {
+        dataStore.setPrefValue(AppPreferencesKeys.MyName, myName)
+    }
 }

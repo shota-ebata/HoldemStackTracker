@@ -47,6 +47,7 @@ constructor() {
                 sbSize = rule["sbSize"]!!.getDouble(),
                 bbSize = rule["bbSize"]!!.getDouble(),
                 betViewMode = BetViewMode.of(rule["betViewMode"] as String),
+                defaultStack = rule["defaultStack"]!!.getDouble()
             )
         }
 
@@ -64,7 +65,8 @@ constructor() {
                     "type" to "LingGame",
                     "betViewMode" to tableState.ruleState.betViewMode.name,
                     "sbSize" to ruleState.sbSize,
-                    "bbSize" to ruleState.bbSize
+                    "bbSize" to ruleState.bbSize,
+                    "defaultStack" to ruleState.defaultStack
                 )
             }
         },

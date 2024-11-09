@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.infra.repository
 
+import android.util.Log
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.domain.model.GameState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
@@ -42,7 +43,9 @@ constructor(
                     override fun onDataChange(snapshot: DataSnapshot) {
                         if (snapshot.exists()) {
                             val gameMap: Map<*, *> = snapshot.value as Map<*, *>
-                            trySend(gameMapper.mapToGameState(gameMap))
+                            val gameState = gameMapper.mapToGameState(gameMap)
+                            Log.d("hoge", "$gameState")
+                            trySend(gameState)
                         }
                     }
 

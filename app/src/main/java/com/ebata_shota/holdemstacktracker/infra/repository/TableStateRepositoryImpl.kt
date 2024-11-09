@@ -1,9 +1,14 @@
 package com.ebata_shota.holdemstacktracker.infra.repository
 
+import android.util.Log
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
+import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableState
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableStateMapper
 import com.google.firebase.database.DataSnapshot
@@ -17,6 +22,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,6 +32,7 @@ class TableStateRepositoryImpl
 constructor(
     firebaseDatabase: FirebaseDatabase,
     private val prefRepository: PrefRepository,
+    private val randomIdRepository: RandomIdRepository,
     private val tableMapper: TableStateMapper,
     @ApplicationScope
     private val appCoroutineScope: CoroutineScope,
@@ -37,6 +45,34 @@ constructor(
     private val _tableStateFlow = MutableSharedFlow<TableState>()
     override val tableStateFlow: Flow<TableState> = _tableStateFlow.asSharedFlow()
 
+    override suspend fun createNewTable(
+        tableId: TableId,
+        tableName: String,
+        ruleState: RuleState
+    ) {
+        val myPlayerId = PlayerId(prefRepository.myPlayerId.first())
+        val myName = prefRepository.myName.first()
+        val tableState = TableState(
+            id = tableId,
+            version = 0L,
+            name = tableName,
+            hostPlayerId = myPlayerId,
+            ruleState = ruleState,
+            playerOrder = listOf(myPlayerId),
+            btnPlayerId = myPlayerId,
+            basePlayers = listOf(
+                PlayerBaseState(
+                    id = myPlayerId,
+                    name = myName,
+                    stack = ruleState.defaultStack
+                )
+            ),
+            waitPlayers = emptyList(),
+            startTime = 0L
+        )
+        setTableState(tableState)
+    }
+
     override fun startCollectTableStateFlow(tableId: TableId) {
         appCoroutineScope.launch {
             val flow = callbackFlow<TableState> {
@@ -44,7 +80,9 @@ constructor(
                     override fun onDataChange(snapshot: DataSnapshot) {
                         if (snapshot.exists()) {
                             val tableMap: Map<*, *> = snapshot.value as Map<*, *>
-                            trySend(tableMapper.mapToTableState(tableId, tableMap))
+                            val tableState = tableMapper.mapToTableState(tableId, tableMap)
+                            Log.d("hoge", "$tableState")
+                            trySend(tableState)
                         }
                     }
 

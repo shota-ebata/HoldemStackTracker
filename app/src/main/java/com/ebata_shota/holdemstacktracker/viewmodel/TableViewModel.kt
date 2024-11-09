@@ -13,10 +13,11 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableState
 import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameStateUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -30,6 +31,7 @@ constructor(
     private val tableStateRepo: TableStateRepository,
     private val gameStateRepository: GameStateRepository,
     private val prefRepository: PrefRepository,
+    private val randomIdRepository: RandomIdRepository,
     private val getNextGameState: GetNextGameStateUseCase,
     private val isActionRequired: IsActionRequiredUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
@@ -59,13 +61,26 @@ constructor(
                 )
                 currentPlayerId == PlayerId(myPlayerId)
             }.collect {
-                Log.d("hoge", "isMy $it")
+                Log.d("hoge", "isCurrentPlayer $it")
             }
         }
 
         viewModelScope.launch {
-            tableStateRepo.startCollectTableStateFlow(TableId("tableId-hage"))
-            gameStateRepository.startCollectGameStateFlow(TableId("tableId-hage"))
+
+//            val tableId = TableId(randomIdRepository.generateRandomId())
+            val tableId = TableId("1fe43fe4-1660-4886-9980-a601b0a493c1")
+//            tableStateRepo.createNewTable(
+//                tableId = tableId,
+//                tableName = "テーブルねーむ",
+//                ruleState = RuleState.LingGame(
+//                    sbSize = 100.0,
+//                    bbSize = 200.0,
+//                    betViewMode = BetViewMode.Number,
+//                    defaultStack = 1000.0
+//                )
+//            )
+            tableStateRepo.startCollectTableStateFlow(tableId)
+            gameStateRepository.startCollectGameStateFlow(tableId)
 //            test()
         }
     }
@@ -80,7 +95,8 @@ constructor(
                 ruleState = RuleState.LingGame(
                     sbSize = 100.0,
                     bbSize = 200.0,
-                    betViewMode = BetViewMode.Number
+                    betViewMode = BetViewMode.Number,
+                    defaultStack = 1000.0
                 ),
                 basePlayers = listOf(
                     PlayerBaseState(
