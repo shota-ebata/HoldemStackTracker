@@ -1,6 +1,6 @@
-package com.ebata_shota.holdemstacktracker.domain.usecase.impl
+package com.ebata_shota.holdemstacktracker.infra.repository
 
-import com.ebata_shota.holdemstacktracker.domain.usecase.RandomIdRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import java.util.UUID
 import javax.inject.Inject
 
