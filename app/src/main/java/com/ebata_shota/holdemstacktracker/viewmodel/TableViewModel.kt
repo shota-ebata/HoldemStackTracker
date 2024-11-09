@@ -84,10 +84,10 @@ constructor(
                     PhaseState.Standby,
                     PhaseState.PreFlop(
                         actionStateList = listOf(
-                            BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("PlayerId0"), betSize = 100.0),
-                            BetPhaseActionState.Blind(actionId = 1L, playerId = PlayerId("PlayerId1"), betSize = 200.0),
-                            BetPhaseActionState.Call(actionId = 2L, playerId = PlayerId("PlayerId2"), betSize = 200.0),
-                            BetPhaseActionState.Call(actionId = 0L, playerId = PlayerId("PlayerId0"), betSize = 200.0)
+                            BetPhaseActionState.Blind(playerId = PlayerId("PlayerId0"), betSize = 100.0),
+                            BetPhaseActionState.Blind(playerId = PlayerId("PlayerId1"), betSize = 200.0),
+                            BetPhaseActionState.Call(playerId = PlayerId("PlayerId2"), betSize = 200.0),
+                            BetPhaseActionState.Call(playerId = PlayerId("PlayerId0"), betSize = 200.0)
                         )
                     )
                 ),

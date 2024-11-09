@@ -30,11 +30,9 @@ class GetMaxBetSizeUseCaseImplTest {
         val actual = usecase.invoke(
             actionStateList = listOf(
                 BetPhaseActionState.Check(
-                    actionId = 0L,
                     playerId = PlayerId("")
                 ),
                 BetPhaseActionState.Check(
-                    actionId = 0L,
                     playerId = PlayerId("")
                 )
             )
@@ -45,40 +43,32 @@ class GetMaxBetSizeUseCaseImplTest {
 
     private fun createFullActions() = listOf(
         BetPhaseActionState.Blind(
-            actionId = 0L,
             playerId = PlayerId(""),
             betSize = 100.0
         ),
         BetPhaseActionState.Blind(
-            actionId = 0L,
             playerId = PlayerId(""),
             betSize = 200.0
         ),
         BetPhaseActionState.Call(
-            actionId = 0L,
             playerId = PlayerId(""),
             betSize = 200.0
         ),
         BetPhaseActionState.Raise(
-            actionId = 0L,
             playerId = PlayerId(""),
             betSize = 400.0
         ),
         BetPhaseActionState.Fold(
-            actionId = 0L,
             playerId = PlayerId("")
         ),
         BetPhaseActionState.FoldSkip(
-            actionId = 0L,
             playerId = PlayerId("")
         ),
         BetPhaseActionState.AllIn(
-            actionId = 0L,
             playerId = PlayerId(""),
             betSize = 1000.0
         ),
         BetPhaseActionState.AllIn(
-            actionId = 0L,
             playerId = PlayerId(""),
             betSize = 900.0
         )

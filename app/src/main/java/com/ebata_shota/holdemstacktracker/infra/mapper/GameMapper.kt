@@ -33,10 +33,9 @@ constructor() {
     }
 
     private fun mapToPhaseStateList(phases: List<*>): List<PhaseState> {
-        return phases.map { it as Map<*, *> }.mapIndexed { index, map ->
-            val phaseType = map["phaseType"] as String
-            val actions = map["actions"] as? List<*>
-            val phaseId = index.toLong()
+        return phases.map { it as Map<*, *> }.map {
+            val phaseType = it["phaseType"] as String
+            val actions = it["actions"] as? List<*>
             when (Phase.of(phaseType)) {
                 Phase.Standby -> PhaseState.Standby
                 Phase.PreFlop -> PhaseState.PreFlop(actionStateList = mapToActionStateList(actions!!))
@@ -53,21 +52,20 @@ constructor() {
     }
 
     private fun mapToActionStateList(actions: List<*>): List<BetPhaseActionState> {
-        return actions.map { it as Map<*, *> }.mapIndexed { index, map ->
-            val playerId = PlayerId(map["playerId"] as String)
-            val actionType = map["actionType"] as String
-            val betSize = map["betSize"]?.getDouble()
-            val actionId = index.toLong()
+        return actions.map { it as Map<*, *> }.map {
+            val playerId = PlayerId(it["playerId"] as String)
+            val actionType = it["actionType"] as String
+            val betSize = it["betSize"]?.getDouble()
             when(BetPhaseAction.of(actionType)) {
-                BetPhaseAction.Blind -> BetPhaseActionState.Blind(actionId = actionId, playerId = playerId, betSize = betSize!!)
-                BetPhaseAction.Fold -> BetPhaseActionState.Fold(actionId = actionId, playerId = playerId)
-                BetPhaseAction.Check -> BetPhaseActionState.Check(actionId = actionId, playerId = playerId)
-                BetPhaseAction.Call -> BetPhaseActionState.Call(actionId = actionId, playerId = playerId, betSize = betSize!!)
-                BetPhaseAction.Bet -> BetPhaseActionState.Bet(actionId = actionId, playerId = playerId, betSize = betSize!!)
-                BetPhaseAction.Raise -> BetPhaseActionState.Raise(actionId = actionId, playerId = playerId, betSize = betSize!!)
-                BetPhaseAction.AllIn -> BetPhaseActionState.AllIn(actionId = actionId, playerId = playerId, betSize = betSize!!)
-                BetPhaseAction.AllInSkip -> BetPhaseActionState.AllInSkip(actionId = actionId, playerId = playerId)
-                BetPhaseAction.FoldSkip -> BetPhaseActionState.FoldSkip(actionId = actionId, playerId = playerId)
+                BetPhaseAction.Blind -> BetPhaseActionState.Blind(playerId = playerId, betSize = betSize!!)
+                BetPhaseAction.Fold -> BetPhaseActionState.Fold(playerId = playerId)
+                BetPhaseAction.Check -> BetPhaseActionState.Check(playerId = playerId)
+                BetPhaseAction.Call -> BetPhaseActionState.Call(playerId = playerId, betSize = betSize!!)
+                BetPhaseAction.Bet -> BetPhaseActionState.Bet(playerId = playerId, betSize = betSize!!)
+                BetPhaseAction.Raise -> BetPhaseActionState.Raise(playerId = playerId, betSize = betSize!!)
+                BetPhaseAction.AllIn -> BetPhaseActionState.AllIn(playerId = playerId, betSize = betSize!!)
+                BetPhaseAction.AllInSkip -> BetPhaseActionState.AllInSkip(playerId = playerId)
+                BetPhaseAction.FoldSkip -> BetPhaseActionState.FoldSkip(playerId = playerId)
             }
         }
     }
