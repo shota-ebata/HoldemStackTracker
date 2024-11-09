@@ -13,7 +13,7 @@ import kotlin.properties.ReadOnlyProperty
 @Suppress("UNCHECKED_CAST")
 fun <T, V> DataStore<Preferences>.prefFlow(
     key: Preferences.Key<V>,
-    defaultValue: V?,
+    defaultValue: () -> V?,
 ) = ReadOnlyProperty<T, Flow<V>> { _, _ ->
     this.data.catch { throwable ->
         if (throwable is IOException) {
@@ -22,7 +22,7 @@ fun <T, V> DataStore<Preferences>.prefFlow(
             throw throwable
         }
     }.map { preferences ->
-        preferences[key] ?: defaultValue as V
+        preferences[key] ?: defaultValue.invoke() as V
     }
 }
 

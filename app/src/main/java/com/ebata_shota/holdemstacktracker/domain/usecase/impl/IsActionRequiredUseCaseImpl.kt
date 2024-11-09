@@ -11,6 +11,10 @@ class IsActionRequiredUseCaseImpl
 constructor(
     private val getMaxBetSize: GetMaxBetSizeUseCase
 ) : IsActionRequiredUseCase {
+
+    /**
+     * アクションが必要な人がいるか？
+     */
     override fun invoke(
         playerOrder: List<PlayerId>,
         actionStateList: List<BetPhaseActionState>

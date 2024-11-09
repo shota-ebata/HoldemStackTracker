@@ -5,24 +5,22 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.domain.model.ActionState
-import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
-import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
-import com.ebata_shota.holdemstacktracker.domain.model.GameState
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.PodState
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableState
 import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameStateUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,14 +30,17 @@ constructor(
     savedStateHandle: SavedStateHandle,
     private val tableStateRepo: TableStateRepository,
     private val gameStateRepository: GameStateRepository,
-    private val getNextGameStateUseCase: GetNextGameStateUseCase,
+    private val prefRepository: PrefRepository,
+    private val getNextGameState: GetNextGameStateUseCase,
+    private val isActionRequired: IsActionRequiredUseCase,
+    private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
 ) : ViewModel() {
 
 
     suspend fun setAction(
         action: ActionState,
     ) {
-//        val updatedTableState = getNextGameStateUseCase.invoke(
+//        val updatedTableState = getNextGameState.invoke(
 //            latestGameState = currentTableState.first(),
 //            action = action
 //        )
@@ -48,14 +49,18 @@ constructor(
 
     init {
         viewModelScope.launch {
-            tableStateRepo.tableStateFlow.collect {
-                Log.d("hoge", "$it")
-            }
-        }
-
-        viewModelScope.launch {
-            gameStateRepository.gameStateFlow.collect {
-                Log.d("hoge", "$it")
+            combine(
+                tableStateRepo.tableStateFlow,
+                gameStateRepository.gameStateFlow,
+                prefRepository.myPlayerId
+            ) { tableState, gameState, myPlayerId ->
+                val currentPlayerId = getCurrentPlayerId.invoke(
+                    btnPlayerId = tableState.btnPlayerId,
+                    gameState = gameState
+                )
+                currentPlayerId == PlayerId(myPlayerId)
+            }.collect {
+                Log.d("hoge", "isMy $it")
             }
         }
 
