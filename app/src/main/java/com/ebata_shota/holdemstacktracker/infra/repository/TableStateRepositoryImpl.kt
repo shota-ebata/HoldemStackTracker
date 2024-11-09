@@ -1,73 +1,76 @@
 package com.ebata_shota.holdemstacktracker.infra.repository
 
-import android.util.Log
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
-import com.ebata_shota.holdemstacktracker.domain.model.GameState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.domain.model.TableState
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
 import com.ebata_shota.holdemstacktracker.infra.mapper.GameMapper
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableStateMapper
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 class TableStateRepositoryImpl
 @Inject
 constructor(
+    firebaseDatabase: FirebaseDatabase,
     private val prefRepository: PrefRepository,
-    private val realtimeDatabaseRepository: GameStateRepository,
     private val tableMapper: TableStateMapper,
-    private val gameMapper: GameMapper,
     @ApplicationScope
     private val appCoroutineScope: CoroutineScope,
 ) : TableStateRepository {
 
+    private val tablesRef: DatabaseReference = firebaseDatabase.getReference(
+        "tables"
+    )
 
-    private val flow: Flow<String> = flow {
-        while (true) {
-            delay(1000L)
-            val value = LocalDateTime.now().toString()
-            Log.d("hoge", "call flow emit($value)")
-            emit(value)
-        }
-    }
+    private val _gameTableFlow = MutableSharedFlow<TableState>()
+    override val gameTableFlow: Flow<TableState> = _gameTableFlow.asSharedFlow()
 
-    private val gameStateFlow: Flow<GameState> =  flow {
-
-    }
-
-    init {
+    fun startCollectTableStateFlow(tableId: TableId) {
         appCoroutineScope.launch {
+            val flow = callbackFlow<TableState> {
+                val listener = object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.exists()) {
+                            val gameMap: Map<*, *> = snapshot.value as Map<*, *>
+//                            trySend(tableMapper.toMap(gameMap))
+                        }
+                    }
 
-//            flow.collect {
-//
-//            }
+                    override fun onCancelled(error: DatabaseError) {
+                        println("Failed to read game data: ${error.message}")
+                    }
+                }
+                tablesRef.child(tableId.value).addValueEventListener(listener)
+
+                awaitClose {
+                    tablesRef.child(tableId.value).removeEventListener(listener)
+                }
+            }
+            flow.collect(_gameTableFlow)
+
         }
     }
 
-    override fun getTableStateFlow(tableId: Long): Flow<GameState> {
-        return gameStateFlow
-    }
-
-    /**
-     * TableStateを更新してFirebaseRealtimeDatabaseに送る
-     *
-     * @param newGameState 新しいTableState
-     */
-    override suspend fun setNewGameState(
-        tableId: TableId,
-        newGameState: GameState
+    override suspend fun setTableState(
+        tableState: TableState
     ) {
-        val hashMap = gameMapper.mapToHashMap(newGameState)
-//        realtimeDatabaseRepository.setGameHashMap(
-//            tableId = tableId,
-//            gameHashMap = hashMap
-//        )
+        val tableMap = tableMapper.toMap(tableState)
+        val tableRef = tablesRef.child(tableState.id.value)
+        tableRef.setValue(tableMap)
     }
 }

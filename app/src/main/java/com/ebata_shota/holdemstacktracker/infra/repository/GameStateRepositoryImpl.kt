@@ -60,6 +60,11 @@ constructor(
         }
     }
 
+    /**
+     * GameStateを更新してFirebaseRealtimeDatabaseに送る
+     *
+     * @param newGameState 新しいGameState
+     */
     override suspend fun setGameHashMap(
         tableId: TableId,
         newGameState: GameState

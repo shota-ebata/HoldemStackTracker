@@ -27,10 +27,10 @@ fun createDummyTableState(
     version = 0L,
     name = "dummy",
     hostPlayerId = PlayerId(""),
-    ruleStatus = RuleState.LingGame(sbSize = 100.0, bbSize = 200.0, BetViewMode.Number),
+    ruleState = RuleState.LingGame(sbSize = 100.0, bbSize = 200.0, BetViewMode.Number),
     playerOrder = playerOrder,
     btnPlayerId = PlayerId(""),
     basePlayers = emptyList(),
     waitPlayers = emptyList(),
-    startTime = LocalDateTime.now()
+    startTime = 0L
 )
