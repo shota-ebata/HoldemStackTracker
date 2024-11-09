@@ -78,7 +78,7 @@ class GetNextPlayerStackUseCaseImplTest {
                 PhaseState.PreFlop(actionStateList = emptyList())
             )
         )
-        val action = BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0)
+        val action = BetPhaseActionState.Blind(playerId = PlayerId("0"), betSize = 100.0)
 
         runTest {
             // execute

@@ -88,10 +88,10 @@ class GetNextPhaseUseCaseImplTest {
             phaseStateList = listOf(
                 PreFlop(
                     actionStateList = listOf(
-                        BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0),
-                        BetPhaseActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 100.0),
-                        BetPhaseActionState.Fold(actionId = 2L, playerId = PlayerId("2")),
-                        BetPhaseActionState.Fold(actionId = 3L, playerId = PlayerId("0")),
+                        BetPhaseActionState.Blind(playerId = PlayerId("0"), betSize = 100.0),
+                        BetPhaseActionState.Blind(playerId = PlayerId("1"), betSize = 100.0),
+                        BetPhaseActionState.Fold(playerId = PlayerId("2")),
+                        BetPhaseActionState.Fold(playerId = PlayerId("0")),
                     )
                 )
             )
@@ -106,11 +106,11 @@ class GetNextPhaseUseCaseImplTest {
             phaseStateList = listOf(
                 PreFlop(
                     actionStateList = listOf(
-                        BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0),
-                        BetPhaseActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 100.0),
-                        BetPhaseActionState.Fold(actionId = 2L, playerId = PlayerId("2")),
-                        BetPhaseActionState.AllIn(actionId = 3L, playerId = PlayerId("0"), betSize = 1000.0),
-                        BetPhaseActionState.AllIn(actionId = 4L, playerId = PlayerId("1"), betSize = 1500.0),
+                        BetPhaseActionState.Blind(playerId = PlayerId("0"), betSize = 100.0),
+                        BetPhaseActionState.Blind(playerId = PlayerId("1"), betSize = 100.0),
+                        BetPhaseActionState.Fold(playerId = PlayerId("2")),
+                        BetPhaseActionState.AllIn(playerId = PlayerId("0"), betSize = 1000.0),
+                        BetPhaseActionState.AllIn(playerId = PlayerId("1"), betSize = 1500.0),
                     )
                 )
             )

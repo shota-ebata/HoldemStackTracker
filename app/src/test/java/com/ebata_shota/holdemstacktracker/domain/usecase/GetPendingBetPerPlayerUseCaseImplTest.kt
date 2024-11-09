@@ -25,9 +25,9 @@ class GetPendingBetPerPlayerUseCaseImplTest {
     fun getMaxBetSize_call_getMaxBetSizeUseCase() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0),
-            BetPhaseActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0),
-            BetPhaseActionState.Call(actionId = 2L, playerId = PlayerId("2"), betSize = 200.0),
+            BetPhaseActionState.Blind(playerId = PlayerId("0"), betSize = 100.0),
+            BetPhaseActionState.Blind(playerId = PlayerId("1"), betSize = 200.0),
+            BetPhaseActionState.Call(playerId = PlayerId("2"), betSize = 200.0),
         )
         val playerOrder: List<PlayerId> = listOf(
             PlayerId("0"),
@@ -73,9 +73,9 @@ class GetPendingBetPerPlayerUseCaseImplTest {
     fun preFlop_BB_BB_And_BTN_Call() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0),
-            BetPhaseActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0),
-            BetPhaseActionState.Call(actionId = 2L, playerId = PlayerId("2"), betSize = 200.0),
+            BetPhaseActionState.Blind(playerId = PlayerId("0"), betSize = 100.0),
+            BetPhaseActionState.Blind(playerId = PlayerId("1"), betSize = 200.0),
+            BetPhaseActionState.Call(playerId = PlayerId("2"), betSize = 200.0),
         )
         executeAndAssert(
             actionStateList = actionStateList,
@@ -91,9 +91,9 @@ class GetPendingBetPerPlayerUseCaseImplTest {
     fun preFlop_BB_BB_And_BTN_Fold() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0),
-            BetPhaseActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0),
-            BetPhaseActionState.Fold(actionId = 2L, playerId = PlayerId("2")),
+            BetPhaseActionState.Blind(playerId = PlayerId("0"), betSize = 100.0),
+            BetPhaseActionState.Blind(playerId = PlayerId("1"), betSize = 200.0),
+            BetPhaseActionState.Fold(playerId = PlayerId("2")),
         )
         executeAndAssert(
             actionStateList = actionStateList,
@@ -108,10 +108,10 @@ class GetPendingBetPerPlayerUseCaseImplTest {
     fun preFlop_BB_BB_And_BTN_Call_BB_Call() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0),
-            BetPhaseActionState.Blind(actionId = 1L, playerId = PlayerId("1"), betSize = 200.0),
-            BetPhaseActionState.Call(actionId = 2L, playerId = PlayerId("2"), betSize = 200.0),
-            BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 200.0),
+            BetPhaseActionState.Blind(playerId = PlayerId("0"), betSize = 100.0),
+            BetPhaseActionState.Blind(playerId = PlayerId("1"), betSize = 200.0),
+            BetPhaseActionState.Call(playerId = PlayerId("2"), betSize = 200.0),
+            BetPhaseActionState.Blind(playerId = PlayerId("0"), betSize = 200.0),
         )
         executeAndAssert(
             actionStateList = actionStateList,
