@@ -5,7 +5,7 @@ import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.domain.model.GameState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
-import com.ebata_shota.holdemstacktracker.domain.repository.RealtimeDatabaseRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
 import com.ebata_shota.holdemstacktracker.infra.mapper.GameMapper
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableStateMapper
@@ -21,7 +21,7 @@ class TableStateRepositoryImpl
 @Inject
 constructor(
     private val prefRepository: PrefRepository,
-    private val realtimeDatabaseRepository: RealtimeDatabaseRepository,
+    private val realtimeDatabaseRepository: GameStateRepository,
     private val tableMapper: TableStateMapper,
     private val gameMapper: GameMapper,
     @ApplicationScope
@@ -65,9 +65,9 @@ constructor(
         newGameState: GameState
     ) {
         val hashMap = gameMapper.mapToHashMap(newGameState)
-        realtimeDatabaseRepository.setGameHashMap(
-            tableId = tableId,
-            gameHashMap = hashMap
-        )
+//        realtimeDatabaseRepository.setGameHashMap(
+//            tableId = tableId,
+//            gameHashMap = hashMap
+//        )
     }
 }

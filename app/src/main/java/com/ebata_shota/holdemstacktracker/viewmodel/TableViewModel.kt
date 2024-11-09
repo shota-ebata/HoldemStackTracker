@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +12,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.PodState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameStateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,9 +24,10 @@ import javax.inject.Inject
 class TableViewModel
 @Inject
 constructor(
+    savedStateHandle: SavedStateHandle,
     private val tableStateRepo: TableStateRepository,
     private val getNextGameStateUseCase: GetNextGameStateUseCase,
-    savedStateHandle: SavedStateHandle
+    private val gameStateRepository: GameStateRepository
 ) : ViewModel() {
 
     private val currentTableState
@@ -44,7 +47,13 @@ constructor(
 
     init {
         viewModelScope.launch {
-            test()
+            gameStateRepository.gameStateFlow.collect {
+                Log.d("hoge", "$it")
+            }
+        }
+
+        viewModelScope.launch {
+            gameStateRepository.startCollectGameStateFlow(TableId("tableId-hage"))
         }
     }
 
@@ -54,9 +63,9 @@ constructor(
             newGameState = GameState(
                 version = 0L,
                 players = listOf(
-                    GamePlayerState(id = PlayerId("PlayerId0"), name = "Player0", stack = 1000.0, isLeaved = false),
-                    GamePlayerState(id = PlayerId("PlayerId1"), name = "Player1", stack = 1000.0, isLeaved = false),
-                    GamePlayerState(id = PlayerId("PlayerId2"), name = "Player2", stack = 1000.0, isLeaved = false),
+                    GamePlayerState(id = PlayerId("PlayerId0"), stack = 1000.0, isLeaved = false),
+                    GamePlayerState(id = PlayerId("PlayerId1"), stack = 1000.0, isLeaved = false),
+                    GamePlayerState(id = PlayerId("PlayerId2"), stack = 1000.0, isLeaved = false),
                 ),
                 podStateList = listOf(
                     PodState(
@@ -71,7 +80,6 @@ constructor(
                         isClosed = false
                     )
                 ),
-                currentActionPlayer = PlayerId("PlayerId0"),
                 phaseStateList = listOf(
                     PhaseState.Standby(phaseId = 0L),
                     PhaseState.PreFlop(

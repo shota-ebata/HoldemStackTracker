@@ -56,18 +56,18 @@ class GetNextGamePlayerStateListUseCaseImplTest {
         // prepare
         every { prefRepository.myPlayerId } returns flowOf("0")
         val players = listOf(
-            GamePlayerState(id = PlayerId("0"), name = "0", stack = 1000.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("1"), name = "1", stack = 1000.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("2"), name = "2", stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("2"), stack = 1000.0, isLeaved = false),
         )
         val action = BetPhaseActionState.Blind(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0)
         executeAndAssert(
             players = players,
             action = action,
             expected = listOf(
-                GamePlayerState(id = PlayerId("0"), name = "0", stack = 900.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("1"), name = "1", stack = 1000.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("2"), name = "2", stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("0"), stack = 900.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("2"), stack = 1000.0, isLeaved = false),
             )
         )
     }
@@ -77,18 +77,18 @@ class GetNextGamePlayerStateListUseCaseImplTest {
         // prepare
         every { prefRepository.myPlayerId } returns flowOf("0")
         val players = listOf(
-            GamePlayerState(id = PlayerId("0"), name = "0", stack = 1000.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("1"), name = "1", stack = 1000.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("2"), name = "2", stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("2"), stack = 1000.0, isLeaved = false),
         )
         val action = BetPhaseActionState.Call(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0)
         executeAndAssert(
             players = players,
             action = action,
             expected = listOf(
-                GamePlayerState(id = PlayerId("0"), name = "0", stack = 900.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("1"), name = "1", stack = 1000.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("2"), name = "2", stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("0"), stack = 900.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("2"), stack = 1000.0, isLeaved = false),
             )
         )
     }
@@ -98,18 +98,18 @@ class GetNextGamePlayerStateListUseCaseImplTest {
         // prepare
         every { prefRepository.myPlayerId } returns flowOf("0")
         val players = listOf(
-            GamePlayerState(id = PlayerId("0"), name = "0", stack = 1000.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("1"), name = "1", stack = 1000.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("2"), name = "2", stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("2"), stack = 1000.0, isLeaved = false),
         )
         val action = BetPhaseActionState.Raise(actionId = 0L, playerId = PlayerId("0"), betSize = 400.0)
         executeAndAssert(
             players = players,
             action = action,
             expected = listOf(
-                GamePlayerState(id = PlayerId("0"), name = "0", stack = 600.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("1"), name = "1", stack = 1000.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("2"), name = "2", stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("0"), stack = 600.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("2"), stack = 1000.0, isLeaved = false),
             )
         )
     }
@@ -119,18 +119,18 @@ class GetNextGamePlayerStateListUseCaseImplTest {
         // prepare
         every { prefRepository.myPlayerId } returns flowOf("0")
         val players = listOf(
-            GamePlayerState(id = PlayerId("0"), name = "0", stack = 1000.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("1"), name = "1", stack = 1000.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("2"), name = "2", stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("2"), stack = 1000.0, isLeaved = false),
         )
         val action = BetPhaseActionState.Bet(actionId = 0L, playerId = PlayerId("0"), betSize = 100.0)
         executeAndAssert(
             players = players,
             action = action,
             expected = listOf(
-                GamePlayerState(id = PlayerId("0"), name = "0", stack = 900.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("1"), name = "1", stack = 1000.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("2"), name = "2", stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("0"), stack = 900.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("2"), stack = 1000.0, isLeaved = false),
             )
         )
     }
@@ -140,18 +140,18 @@ class GetNextGamePlayerStateListUseCaseImplTest {
         // prepare
         every { prefRepository.myPlayerId } returns flowOf("0")
         val players = listOf(
-            GamePlayerState(id = PlayerId("0"), name = "0", stack = 1000.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("1"), name = "1", stack = 1000.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("2"), name = "2", stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("2"), stack = 1000.0, isLeaved = false),
         )
         val action = BetPhaseActionState.AllIn(actionId = 0L, playerId = PlayerId("0"), betSize = 1000.0)
         executeAndAssert(
             players = players,
             action = action,
             expected = listOf(
-                GamePlayerState(id = PlayerId("0"), name = "0", stack = 0.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("1"), name = "1", stack = 1000.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("2"), name = "2", stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("0"), stack = 0.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("2"), stack = 1000.0, isLeaved = false),
             )
         )
     }
@@ -161,18 +161,18 @@ class GetNextGamePlayerStateListUseCaseImplTest {
         // prepare
         every { prefRepository.myPlayerId } returns flowOf("0")
         val players = listOf(
-            GamePlayerState(id = PlayerId("0"), name = "0", stack = 1000.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("1"), name = "1", stack = 1000.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("2"), name = "2", stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("2"), stack = 1000.0, isLeaved = false),
         )
         val action = BetPhaseActionState.Check(actionId = 0L, playerId = PlayerId("0"))
         executeAndAssert(
             players = players,
             action = action,
             expected = listOf(
-                GamePlayerState(id = PlayerId("0"), name = "0", stack = 1000.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("1"), name = "1", stack = 1000.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("2"), name = "2", stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("2"), stack = 1000.0, isLeaved = false),
             )
         )
     }
@@ -182,18 +182,18 @@ class GetNextGamePlayerStateListUseCaseImplTest {
         // prepare
         every { prefRepository.myPlayerId } returns flowOf("0")
         val players = listOf(
-            GamePlayerState(id = PlayerId("0"), name = "0", stack = 1000.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("1"), name = "1", stack = 1000.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("2"), name = "2", stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("2"), stack = 1000.0, isLeaved = false),
         )
         val action = BetPhaseActionState.Fold(actionId = 0L, playerId = PlayerId("0"))
         executeAndAssert(
             players = players,
             action = action,
             expected = listOf(
-                GamePlayerState(id = PlayerId("0"), name = "0", stack = 1000.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("1"), name = "1", stack = 1000.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("2"), name = "2", stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("2"), stack = 1000.0, isLeaved = false),
             )
         )
     }
@@ -203,18 +203,18 @@ class GetNextGamePlayerStateListUseCaseImplTest {
         // prepare
         every { prefRepository.myPlayerId } returns flowOf("0")
         val players = listOf(
-            GamePlayerState(id = PlayerId("0"), name = "0", stack = 1000.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("1"), name = "1", stack = 1000.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("2"), name = "2", stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("2"), stack = 1000.0, isLeaved = false),
         )
         val action = BetPhaseActionState.FoldSkip(actionId = 0L, playerId = PlayerId("0"))
         executeAndAssert(
             players = players,
             action = action,
             expected = listOf(
-                GamePlayerState(id = PlayerId("0"), name = "0", stack = 1000.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("1"), name = "1", stack = 1000.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("2"), name = "2", stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("2"), stack = 1000.0, isLeaved = false),
             )
         )
     }
@@ -229,9 +229,9 @@ class GetNextGamePlayerStateListUseCaseImplTest {
             PlayerId("2") to 200.0,
         )
         val players = listOf(
-            GamePlayerState(id = PlayerId("0"), name = "0", stack = 900.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("1"), name = "1", stack = 800.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("2"), name = "2", stack = 800.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("0"), stack = 900.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("1"), stack = 800.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("2"), stack = 800.0, isLeaved = false),
         )
         val action = BetPhaseActionState.Call(actionId = 0L, playerId = PlayerId("0"), betSize = 200.0)
         executeAndAssert(
@@ -239,9 +239,9 @@ class GetNextGamePlayerStateListUseCaseImplTest {
             players = players,
             action = action,
             expected = listOf(
-                GamePlayerState(id = PlayerId("0"), name = "0", stack = 800.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("1"), name = "1", stack = 800.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("2"), name = "2", stack = 800.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("0"), stack = 800.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("1"), stack = 800.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("2"), stack = 800.0, isLeaved = false),
             )
         )
     }
@@ -256,9 +256,9 @@ class GetNextGamePlayerStateListUseCaseImplTest {
             PlayerId("2") to 200.0,
         )
         val players = listOf(
-            GamePlayerState(id = PlayerId("0"), name = "0", stack = 900.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("1"), name = "1", stack = 800.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("2"), name = "2", stack = 800.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("0"), stack = 900.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("1"), stack = 800.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("2"), stack = 800.0, isLeaved = false),
         )
         val action = BetPhaseActionState.AllIn(actionId = 0L, playerId = PlayerId("0"), betSize = 1000.0)
         executeAndAssert(
@@ -266,9 +266,9 @@ class GetNextGamePlayerStateListUseCaseImplTest {
             players = players,
             action = action,
             expected = listOf(
-                GamePlayerState(id = PlayerId("0"), name = "0", stack = 0.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("1"), name = "1", stack = 800.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("2"), name = "2", stack = 800.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("0"), stack = 0.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("1"), stack = 800.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("2"), stack = 800.0, isLeaved = false),
             )
         )
     }
@@ -279,9 +279,9 @@ class GetNextGamePlayerStateListUseCaseImplTest {
         every { prefRepository.myPlayerId } returns flowOf("1")
         val pendingBetPerPlayer = emptyMap<PlayerId, Double>()
         val players = listOf(
-            GamePlayerState(id = PlayerId("0"), name = "0", stack = 800.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("1"), name = "1", stack = 800.0, isLeaved = false),
-            GamePlayerState(id = PlayerId("2"), name = "2", stack = 800.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("0"), stack = 800.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("1"), stack = 800.0, isLeaved = false),
+            GamePlayerState(id = PlayerId("2"), stack = 800.0, isLeaved = false),
         )
         val action = BetPhaseActionState.Bet(actionId = 0L, playerId = PlayerId("1"), betSize = 200.0)
         executeAndAssert(
@@ -289,9 +289,9 @@ class GetNextGamePlayerStateListUseCaseImplTest {
             players = players,
             action = action,
             expected = listOf(
-                GamePlayerState(id = PlayerId("0"), name = "0", stack = 800.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("1"), name = "1", stack = 600.0, isLeaved = false),
-                GamePlayerState(id = PlayerId("2"), name = "2", stack = 800.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("0"), stack = 800.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("1"), stack = 600.0, isLeaved = false),
+                GamePlayerState(id = PlayerId("2"), stack = 800.0, isLeaved = false),
             )
         )
     }
