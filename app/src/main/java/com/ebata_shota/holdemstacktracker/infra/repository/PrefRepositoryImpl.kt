@@ -18,6 +18,6 @@ constructor(
 ) : PrefRepository {
     override val myPlayerId: Flow<String> by dataStore.prefFlow(
         key = AppPreferencesKeys.PlayerId,
-        defaultValue = { randomIdRepository.generateRandomPlayerId() }
+        defaultValue = { randomIdRepository.generateRandomId() }
     )
 }

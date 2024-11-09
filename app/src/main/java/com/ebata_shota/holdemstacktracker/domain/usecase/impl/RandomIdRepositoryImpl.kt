@@ -10,7 +10,7 @@ constructor(
 
 ) : RandomIdRepository {
 
-    override fun generateRandomPlayerId(): String {
+    override fun generateRandomId(): String {
         return UUID.randomUUID().toString()
     }
 }
