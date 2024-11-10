@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface GameStateRepository {
     val gameStateFlow: Flow<GameState>
 
-    suspend fun setGameHashMap(
+    suspend fun setGameState(
         tableId: TableId,
         newGameState: GameState
     )

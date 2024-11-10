@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.infra.repository
 
 import android.util.Log
+import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -55,6 +56,7 @@ constructor(
         val tableState = TableState(
             id = tableId,
             version = 0L,
+            appVersion = BuildConfig.VERSION_CODE.toLong(),
             name = tableName,
             hostPlayerId = myPlayerId,
             ruleState = ruleState,

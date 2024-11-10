@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.infra.mapper
 
+import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.domain.model.ActionState
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
@@ -17,18 +18,14 @@ class GameMapper
 @Inject
 constructor() {
     fun mapToGameState(gameMap: Map<*, *>): GameState {
-        val version = gameMap["version"] as Long
-        val timestamp = gameMap["timestamp"] as Long
-        val players = gameMap["players"] as List<*>
-        val pods = gameMap["pods"] as List<*>
-        val phases = gameMap["phases"] as List<*>
 
         return GameState(
-            version = version,
-            players = mapToGamePlayerStateList(players),
-            podStateList = mapToPodStateList(pods),
-            phaseStateList = mapToPhaseStateList(phases),
-            timestamp = timestamp
+            version = gameMap["gameVersion"] as Long,
+            appVersion = gameMap["appVersion"] as Long,
+            players = mapToGamePlayerStateList(gameMap["players"] as List<*>),
+            podStateList = mapToPodStateList(gameMap["pods"] as List<*>),
+            phaseStateList = mapToPhaseStateList(gameMap["phases"] as List<*>),
+            timestamp = gameMap["timestamp"] as Long
         )
     }
 
@@ -105,7 +102,8 @@ constructor() {
     fun mapToHashMap(
         newGameState: GameState
     ): HashMap<String, Any> = hashMapOf(
-        "version" to newGameState.version,
+        "gameVersion" to newGameState.version,
+        "appVersion" to newGameState.appVersion,
         "timestamp" to newGameState.timestamp,
         "players" to mapPlayers(newGameState.players),
         "pods" to mapPods(newGameState.podStateList),

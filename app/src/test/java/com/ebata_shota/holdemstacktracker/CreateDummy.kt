@@ -14,6 +14,7 @@ fun createDummyGameState(
     phaseStateList: List<PhaseState> = emptyList()
 ) = GameState(
     version = 0,
+    appVersion = BuildConfig.VERSION_CODE.toLong(),
     players = players,
     podStateList = emptyList(),
     phaseStateList = phaseStateList,
@@ -26,6 +27,7 @@ fun createDummyTableState(
 ) = TableState(
     id = TableId("0L"),
     version = 0L,
+    appVersion = BuildConfig.VERSION_CODE.toLong(),
     name = "dummy",
     hostPlayerId = PlayerId(""),
     ruleState = RuleState.LingGame(sbSize = 100.0, bbSize = 200.0, betViewMode = BetViewMode.Number, defaultStack = 1000.0),

@@ -5,6 +5,7 @@ package com.ebata_shota.holdemstacktracker.domain.model
  */
 data class GameState(
     val version: Long,
+    val appVersion: Long,
     val players: List<GamePlayerState>,
     val podStateList: List<PodState>,
     val phaseStateList: List<PhaseState>,

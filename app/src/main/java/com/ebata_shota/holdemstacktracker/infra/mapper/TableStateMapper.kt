@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.infra.mapper
 
+import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -19,7 +20,8 @@ constructor() {
     fun mapToTableState(tableId: TableId, tableMap: Map<*, *>): TableState {
         return TableState(
             id = tableId,
-            version = tableMap["version"] as Long,
+            version = tableMap["tableVersion"] as Long,
+            appVersion = tableMap["appVersion"] as Long,
             name = tableMap["name"] as String,
             hostPlayerId = PlayerId(tableMap["hostPlayerId"] as String),
             ruleState = mapToRuleState(tableMap["rule"] as Map<*, *>),
@@ -55,7 +57,8 @@ constructor() {
     }
 
     fun toMap(tableState: TableState): Map<String, Any> = hashMapOf(
-        "version" to tableState.version,
+        "tableVersion" to tableState.version,
+        "appVersion" to tableState.appVersion,
         "name" to tableState.name,
         "hostPlayerId" to tableState.hostPlayerId.value,
         "btnPlayerId" to tableState.btnPlayerId.value,

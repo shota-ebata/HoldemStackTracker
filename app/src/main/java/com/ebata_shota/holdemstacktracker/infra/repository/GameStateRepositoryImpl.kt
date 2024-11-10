@@ -68,7 +68,7 @@ constructor(
      *
      * @param newGameState 新しいGameState
      */
-    override suspend fun setGameHashMap(
+    override suspend fun setGameState(
         tableId: TableId,
         newGameState: GameState
     ) {
