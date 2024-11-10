@@ -31,29 +31,29 @@ android {
 
     signingConfigs {
         val signFileBase = file("./../key_store_info.properties")
-//        getByName("debug") {
-//            if (signFileBase.exists()) {
-//                val signingProps = Properties()
-//                signingProps.load(FileInputStream(signFileBase))
-//                storeFile = file(signingProps["debugStoreFilePathValue"] as String)
-//                storePassword = signingProps["debugKeyStorePassword"] as String
-//                keyAlias = signingProps["debugKeyAliasValue"] as String
-//                keyPassword = signingProps["debugKeyPasswordValue"] as String
-//            } else {
-//                val debugKeystoreFileName = "debug-keystore.keystore"
-//                System.getenv("DEBUG_KEY_STORE_BASE64")?.let { base64 ->
-//                    val decoder = Base64.getMimeDecoder()
-//                    File(debugKeystoreFileName).also { file ->
-//                        file.createNewFile()
-//                        file.writeBytes(decoder.decode(base64))
-//                    }
-//                }
-//                storeFile = rootProject.file(debugKeystoreFileName)
-//                storePassword = System.getenv("DEBUG_KEY_STORE_PASSWORD")
-//                keyAlias = System.getenv("DEBUG_KEY_ALIAS_VALUE")
-//                keyPassword = System.getenv("DEBUG_KEY_PASSWORD_VALUE")
-//            }
-//        }
+        getByName("debug") {
+            if (signFileBase.exists()) {
+                val signingProps = Properties()
+                signingProps.load(FileInputStream(signFileBase))
+                storeFile = file(signingProps["debugStoreFilePathValue"] as String)
+                storePassword = signingProps["debugKeyStorePassword"] as String
+                keyAlias = signingProps["debugKeyAliasValue"] as String
+                keyPassword = signingProps["debugKeyPasswordValue"] as String
+            } else {
+                val debugKeystoreFileName = "debug-keystore.keystore"
+                System.getenv("DEBUG_KEY_STORE_BASE64")?.let { base64 ->
+                    val decoder = Base64.getMimeDecoder()
+                    File(debugKeystoreFileName).also { file ->
+                        file.createNewFile()
+                        file.writeBytes(decoder.decode(base64))
+                    }
+                }
+                storeFile = rootProject.file(debugKeystoreFileName)
+                storePassword = System.getenv("DEBUG_KEY_STORE_PASSWORD")
+                keyAlias = System.getenv("DEBUG_KEY_ALIAS_VALUE")
+                keyPassword = System.getenv("DEBUG_KEY_PASSWORD_VALUE")
+            }
+        }
         create("release") {
             if (signFileBase.exists()) {
                 val signingProps = Properties()
