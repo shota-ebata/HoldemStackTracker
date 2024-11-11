@@ -1,4 +1,4 @@
-package com.ebata_shota.holdemstacktracker.viewmodel
+package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

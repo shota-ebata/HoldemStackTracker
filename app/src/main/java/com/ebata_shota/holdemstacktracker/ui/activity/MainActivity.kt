@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
-import com.ebata_shota.holdemstacktracker.viewmodel.TableViewModel
+import com.ebata_shota.holdemstacktracker.ui.viewmodel.TableViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

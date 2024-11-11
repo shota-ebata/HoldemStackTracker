@@ -1,5 +1,6 @@
-package com.ebata_shota.holdemstacktracker.viewmodel
+package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
+import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -19,6 +20,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameStateUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
+import com.ebata_shota.holdemstacktracker.ui.extension.param
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -37,6 +39,8 @@ constructor(
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
 ) : ViewModel() {
 
+    private val tableIdString: String by savedStateHandle.param()
+    private val tableId: TableId = TableId(tableIdString)
 
     suspend fun setAction(
         action: ActionState,
@@ -66,7 +70,7 @@ constructor(
         }
 
         viewModelScope.launch {
-            val tableId = TableId("1fe43fe4-1660-4886-9980-a601b0a493c1")
+//            val tableId = TableId("1fe43fe4-1660-4886-9980-a601b0a493c1")
             tableStateRepository.startCollectTableFlow(tableId)
             gameStateRepository.startCollectGameFlow(tableId)
 //            test(tableId)
@@ -152,5 +156,11 @@ constructor(
             )
         )
 
+    }
+
+    companion object {
+        fun bundle(tableId: TableId) = Bundle().apply {
+            putString(TableViewModel::tableIdString.name, tableId.value)
+        }
     }
 }
