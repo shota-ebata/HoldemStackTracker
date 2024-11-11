@@ -39,6 +39,7 @@ constructor(
     private var collectGameJob: Job? = null
 
     override fun startCollectGameFlow(tableId: TableId) {
+        stopCollectGameFlow()
         collectGameJob = appCoroutineScope.launch {
             val flow = callbackFlow {
                 val listener = object : ValueEventListener {

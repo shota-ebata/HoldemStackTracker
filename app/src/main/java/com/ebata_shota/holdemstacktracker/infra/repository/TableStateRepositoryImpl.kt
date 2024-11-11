@@ -85,6 +85,7 @@ constructor(
     private var collectTableJob: Job? = null
 
     override fun startCollectTableFlow(tableId: TableId) {
+        stopCollectTableFlow()
         collectTableJob = appCoroutineScope.launch {
             val flow = callbackFlow {
                 val listener = object : ValueEventListener {
