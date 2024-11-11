@@ -5,12 +5,13 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import kotlinx.coroutines.flow.Flow
 
 interface GameStateRepository {
-    val gameStateFlow: Flow<GameState>
+    val gameFlow: Flow<GameState>
 
-    suspend fun setGameState(
+    suspend fun sendGameState(
         tableId: TableId,
         newGameState: GameState
     )
 
-    fun startCollectGameStateFlow(tableId: TableId)
+    fun startCollectGameFlow(tableId: TableId)
+    fun stopCollectGameFlow()
 }

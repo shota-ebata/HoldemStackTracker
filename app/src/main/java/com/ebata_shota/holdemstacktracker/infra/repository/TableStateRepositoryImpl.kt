@@ -19,9 +19,10 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
@@ -46,8 +47,8 @@ constructor(
         "tables"
     )
 
-    private val _tableStateFlow = MutableSharedFlow<TableState>()
-    override val tableStateFlow: Flow<TableState> = _tableStateFlow.asSharedFlow()
+    private val _tableFlow = MutableSharedFlow<TableState>()
+    override val tableFlow: SharedFlow<TableState> = _tableFlow.asSharedFlow()
 
     override suspend fun createNewTable(
         tableId: TableId,
@@ -77,12 +78,14 @@ constructor(
                 waitPlayers = emptyList(),
                 startTime = 0L
             )
-            setTableState(tableState)
+            sendTableState(tableState)
         }
     }
 
-    override fun startCollectTableStateFlow(tableId: TableId) {
-        appCoroutineScope.launch {
+    private var collectTableJob: Job? = null
+
+    override fun startCollectTableFlow(tableId: TableId) {
+        collectTableJob = appCoroutineScope.launch {
             val flow = callbackFlow {
                 val listener = object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
@@ -103,11 +106,15 @@ constructor(
                     tablesRef.child(tableId.value).removeEventListener(listener)
                 }
             }
-            flow.collect(_tableStateFlow)
+            flow.collect(_tableFlow)
         }
     }
 
-    override suspend fun setTableState(
+    override fun stopCollectTableFlow() {
+        collectTableJob?.cancel()
+    }
+
+    override suspend fun sendTableState(
         newTableState: TableState
     ) {
         val tableMap = tableMapper.toMap(newTableState)

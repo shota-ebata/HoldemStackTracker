@@ -3,10 +3,10 @@ package com.ebata_shota.holdemstacktracker.domain.repository
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableState
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 
 interface TableStateRepository {
-    val tableStateFlow: Flow<TableState>
+    val tableFlow: SharedFlow<TableState>
 
     suspend fun createNewTable(
         tableId: TableId,
@@ -14,6 +14,7 @@ interface TableStateRepository {
         ruleState: RuleState
     )
 
-    fun startCollectTableStateFlow(tableId: TableId)
-    suspend fun setTableState(newTableState: TableState)
+    fun startCollectTableFlow(tableId: TableId)
+    fun stopCollectTableFlow()
+    suspend fun sendTableState(newTableState: TableState)
 }

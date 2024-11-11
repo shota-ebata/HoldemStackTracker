@@ -11,6 +11,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -32,11 +33,13 @@ constructor(
         "games"
     )
 
-    private val _gameStateFlow = MutableSharedFlow<GameState>()
-    override val gameStateFlow: Flow<GameState> = _gameStateFlow.asSharedFlow()
+    private val _gameFlow = MutableSharedFlow<GameState>()
+    override val gameFlow: Flow<GameState> = _gameFlow.asSharedFlow()
 
-    override fun startCollectGameStateFlow(tableId: TableId) {
-        appCoroutineScope.launch {
+    private var collectGameJob: Job? = null
+
+    override fun startCollectGameFlow(tableId: TableId) {
+        collectGameJob = appCoroutineScope.launch {
             val flow = callbackFlow {
                 val listener = object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
@@ -57,8 +60,12 @@ constructor(
                     gamesRef.child(tableId.value).removeEventListener(listener)
                 }
             }
-            flow.collect(_gameStateFlow)
+            flow.collect(_gameFlow)
         }
+    }
+
+    override fun stopCollectGameFlow() {
+        collectGameJob?.cancel()
     }
 
     /**
@@ -66,7 +73,7 @@ constructor(
      *
      * @param newGameState 新しいGameState
      */
-    override suspend fun setGameState(
+    override suspend fun sendGameState(
         tableId: TableId,
         newGameState: GameState
     ) {

@@ -15,7 +15,6 @@ import com.ebata_shota.holdemstacktracker.domain.model.PodState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
-import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameStateUseCase
@@ -30,10 +29,9 @@ class TableViewModel
 @Inject
 constructor(
     savedStateHandle: SavedStateHandle,
-    private val tableStateRepo: TableStateRepository,
+    private val tableStateRepository: TableStateRepository,
     private val gameStateRepository: GameStateRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
-    private val randomIdRepository: RandomIdRepository,
     private val getNextGameState: GetNextGameStateUseCase,
     private val isActionRequired: IsActionRequiredUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
@@ -53,8 +51,8 @@ constructor(
     init {
         viewModelScope.launch {
             combine(
-                tableStateRepo.tableStateFlow,
-                gameStateRepository.gameStateFlow,
+                tableStateRepository.tableFlow,
+                gameStateRepository.gameFlow,
                 firebaseAuthRepository.uidFlow
             ) { tableState, gameState, uid ->
                 val currentPlayerId = getCurrentPlayerId.invoke(
@@ -68,20 +66,9 @@ constructor(
         }
 
         viewModelScope.launch {
-//            val tableId = TableId(randomIdRepository.generateRandomId())
             val tableId = TableId("1fe43fe4-1660-4886-9980-a601b0a493c1")
-//            tableStateRepo.createNewTable(
-//                tableId = tableId,
-//                tableName = "テーブルねーむ",
-//                ruleState = RuleState.LingGame(
-//                    sbSize = 100.0,
-//                    bbSize = 200.0,
-//                    betViewMode = BetViewMode.Number,
-//                    defaultStack = 1000.0
-//                )
-//            )
-            tableStateRepo.startCollectTableStateFlow(tableId)
-            gameStateRepository.startCollectGameStateFlow(tableId)
+            tableStateRepository.startCollectTableFlow(tableId)
+            gameStateRepository.startCollectGameFlow(tableId)
 //            test(tableId)
         }
     }
@@ -127,7 +114,7 @@ constructor(
 //                startTime = 0L
 //            )
 //        )
-        gameStateRepository.setGameState(
+        gameStateRepository.sendGameState(
             tableId = tableId,
             newGameState = GameState(
                 version = 0L,
@@ -164,5 +151,6 @@ constructor(
                 timestamp = 0L
             )
         )
+
     }
 }
