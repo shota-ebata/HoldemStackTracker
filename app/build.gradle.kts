@@ -164,5 +164,9 @@ dependencies {
     implementation(libs.firebase.crashlytics.ktx)
     // - database
     implementation(libs.firebase.database.ktx)
+    // - Auth
+    implementation(libs.firebase.auth.ktx)
+    // - config
+    implementation(libs.firebase.config)
 
 }

@@ -47,6 +47,8 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 firebase-analytics-ktx = { group = "com.google.firebase", name = "firebase-analytics-ktx"}
 firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics-ktx"}
 firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx"}
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx"}
+firebase-config = { group = "com.google.firebase", name = "firebase-config"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

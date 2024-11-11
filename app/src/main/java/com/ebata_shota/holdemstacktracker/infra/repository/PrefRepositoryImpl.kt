@@ -17,18 +17,13 @@ constructor(
     private val dataStore: DataStore<Preferences>,
     private val randomIdRepository: RandomIdRepository
 ) : PrefRepository {
-    override val myPlayerId: Flow<String> by dataStore.prefFlow(
-        key = AppPreferencesKeys.MyPlayerId,
-        defaultValue = { randomIdRepository.generateRandomId() }
-    )
 
     override val myName: Flow<String> by dataStore.prefFlow(
         key = AppPreferencesKeys.MyName,
-        // FIXME: ちゃんと多言語化対応をすること
-        defaultValue = { "プレイヤー" + randomIdRepository.generateRandomId().take(6) }
+        defaultValue = { "Player" + randomIdRepository.generateRandomId().take(6) }
     )
 
-    override suspend fun setMyName(myName: String) {
+    override suspend fun saveMyName(myName: String) {
         dataStore.setPrefValue(AppPreferencesKeys.MyName, myName)
     }
 }

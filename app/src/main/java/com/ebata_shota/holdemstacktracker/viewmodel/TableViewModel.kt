@@ -13,8 +13,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.PodState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
-import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
@@ -32,7 +32,7 @@ constructor(
     savedStateHandle: SavedStateHandle,
     private val tableStateRepo: TableStateRepository,
     private val gameStateRepository: GameStateRepository,
-    private val prefRepository: PrefRepository,
+    private val firebaseAuthRepository: FirebaseAuthRepository,
     private val randomIdRepository: RandomIdRepository,
     private val getNextGameState: GetNextGameStateUseCase,
     private val isActionRequired: IsActionRequiredUseCase,
@@ -55,20 +55,19 @@ constructor(
             combine(
                 tableStateRepo.tableStateFlow,
                 gameStateRepository.gameStateFlow,
-                prefRepository.myPlayerId
-            ) { tableState, gameState, myPlayerId ->
+                firebaseAuthRepository.uidFlow
+            ) { tableState, gameState, uid ->
                 val currentPlayerId = getCurrentPlayerId.invoke(
                     btnPlayerId = tableState.btnPlayerId,
                     gameState = gameState
                 )
-                currentPlayerId == PlayerId(myPlayerId)
+                currentPlayerId == PlayerId(uid)
             }.collect {
                 Log.d("hoge", "isCurrentPlayer $it")
             }
         }
 
         viewModelScope.launch {
-
 //            val tableId = TableId(randomIdRepository.generateRandomId())
             val tableId = TableId("1fe43fe4-1660-4886-9980-a601b0a493c1")
 //            tableStateRepo.createNewTable(

@@ -3,9 +3,9 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
-import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
-import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
+import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGamePlayerStateListUseCase
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -13,7 +13,7 @@ import javax.inject.Inject
 class GetNextGamePlayerStateListUseCaseImpl
 @Inject
 constructor(
-    private val prefRepository: PrefRepository
+    private val firebaseAuthRepository: FirebaseAuthRepository
 ) : GetNextGamePlayerStateListUseCase {
     /**
      * ベット状況(pendingBetPerPlayer)に合わせて
@@ -28,7 +28,7 @@ constructor(
         players: List<GamePlayerState>,
         action: BetPhaseActionState
     ): List<GamePlayerState> {
-        val myPlayerId = PlayerId(prefRepository.myPlayerId.first())
+        val myPlayerId = PlayerId(firebaseAuthRepository.uidFlow.first())
         val myPlayerStateIndex = players.indexOfFirstOrNull { it.id == myPlayerId }
             ?: throw IllegalStateException("Player not found")
         return when (action) {
