@@ -108,7 +108,8 @@ android {
         buildConfig = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        // https://developer.android.com/jetpack/androidx/releases/compose-kotlin?hl=ja#pre-release_kotlin_compatibility
+        kotlinCompilerExtensionVersion = "1.5.13"
     }
     packaging {
         resources {
