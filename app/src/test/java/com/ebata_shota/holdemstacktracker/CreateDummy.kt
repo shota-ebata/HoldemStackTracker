@@ -30,7 +30,7 @@ fun createDummyTableState(
     appVersion = BuildConfig.VERSION_CODE.toLong(),
     name = "dummy",
     hostPlayerId = PlayerId(""),
-    ruleState = RuleState.LingGame(sbSize = 100.0, bbSize = 200.0, betViewMode = BetViewMode.Number, defaultStack = 1000.0),
+    ruleState = RuleState.RingGame(sbSize = 100.0, bbSize = 200.0, betViewMode = BetViewMode.Number, defaultStack = 1000.0),
     playerOrder = playerOrder,
     btnPlayerId = PlayerId(""),
     basePlayers = emptyList(),
