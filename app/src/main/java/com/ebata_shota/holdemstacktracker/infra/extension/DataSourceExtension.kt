@@ -22,7 +22,27 @@ fun <T, V> DataStore<Preferences>.prefFlow(
             throw throwable
         }
     }.map { preferences ->
+        // FIXME: nullがデフォルト扱いになってしまうのをどうにかしたい
         preferences[key] ?: defaultValue.invoke() as V
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+fun <T, V, P> DataStore<Preferences>.prefFlow(
+    key: Preferences.Key<P>,
+    defaultValue: () -> V?,
+    mapToModel: (P) -> V,
+) = ReadOnlyProperty<T, Flow<V>> { _, _ ->
+    this@prefFlow.data.catch { throwable ->
+        if (throwable is IOException) {
+            emit(emptyPreferences())
+        } else {
+            throw throwable
+        }
+    }.map { preferences ->
+        preferences[key]?.let {
+            mapToModel(it)
+        } ?: defaultValue.invoke() as V
     }
 }
 
