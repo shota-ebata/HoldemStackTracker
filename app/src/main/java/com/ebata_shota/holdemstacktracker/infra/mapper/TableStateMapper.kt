@@ -1,6 +1,5 @@
 package com.ebata_shota.holdemstacktracker.infra.mapper
 
-import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -44,8 +43,8 @@ constructor() {
     }
 
     private fun mapToRuleState(rule: Map<*, *>) = when (val ruleType = rule["type"] as String) {
-        "LingGame" -> {
-            RuleState.LingGame(
+        "RingGame" -> {
+            RuleState.RingGame(
                 sbSize = rule["sbSize"]!!.getDouble(),
                 bbSize = rule["bbSize"]!!.getDouble(),
                 betViewMode = BetViewMode.of(rule["betViewMode"] as String),
@@ -63,9 +62,9 @@ constructor() {
         "hostPlayerId" to tableState.hostPlayerId.value,
         "btnPlayerId" to tableState.btnPlayerId.value,
         "rule" to when (val ruleState = tableState.ruleState) {
-            is RuleState.LingGame -> {
+            is RuleState.RingGame -> {
                 mapOf(
-                    "type" to "LingGame",
+                    "type" to "RingGame",
                     "betViewMode" to tableState.ruleState.betViewMode.name,
                     "sbSize" to ruleState.sbSize,
                     "bbSize" to ruleState.bbSize,
