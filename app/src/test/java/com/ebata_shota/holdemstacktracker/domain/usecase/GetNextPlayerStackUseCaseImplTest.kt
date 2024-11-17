@@ -5,6 +5,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
+import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
@@ -23,7 +24,7 @@ import org.junit.Test
 
 class GetNextPlayerStackUseCaseImplTest {
     private lateinit var usecase: GetNextPlayerStackUseCaseImpl
-    private val prefRepository: PrefRepository = mockk()
+    private val firebaseAuthRepository: FirebaseAuthRepository = mockk()
 
     @Before
     fun setup() {
@@ -33,7 +34,7 @@ class GetNextPlayerStackUseCaseImplTest {
                 getMaxBetSize = GetMaxBetSizeUseCaseImpl()
             ),
             getNextPlayerStateList = GetNextGamePlayerStateListUseCaseImpl(
-                prefRepository = prefRepository
+                firebaseAuthRepository = firebaseAuthRepository
             )
         )
     }

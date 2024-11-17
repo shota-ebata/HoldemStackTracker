@@ -3,6 +3,7 @@ package com.ebata_shota.holdemstacktracker.domain.usecase
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
+import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextGamePlayerStateListUseCaseImpl
 import io.mockk.clearMocks
@@ -18,19 +19,19 @@ import org.junit.Test
 class GetNextGamePlayerStateListUseCaseImplTest {
     private lateinit var usecase: GetNextGamePlayerStateListUseCaseImpl
 
-    private val prefRepository: PrefRepository = mockk()
+    private val firebaseAuthRepository: FirebaseAuthRepository = mockk()
 
     @Before
     fun setup() {
         usecase = GetNextGamePlayerStateListUseCaseImpl(
-            prefRepository = prefRepository
+            firebaseAuthRepository = firebaseAuthRepository
         )
     }
 
 
     @After
     fun reset() {
-        clearMocks(prefRepository)
+        clearMocks(firebaseAuthRepository)
     }
 
     private fun executeAndAssert(
@@ -54,7 +55,7 @@ class GetNextGamePlayerStateListUseCaseImplTest {
     @Test
     fun action_Blind() {
         // prepare
-        every { prefRepository.myPlayerId } returns flowOf("0")
+        every { firebaseAuthRepository.uidFlow } returns flowOf("0")
         val players = listOf(
             GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
             GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
@@ -75,7 +76,7 @@ class GetNextGamePlayerStateListUseCaseImplTest {
     @Test
     fun action_Call() {
         // prepare
-        every { prefRepository.myPlayerId } returns flowOf("0")
+        every { firebaseAuthRepository.uidFlow } returns flowOf("0")
         val players = listOf(
             GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
             GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
@@ -96,7 +97,7 @@ class GetNextGamePlayerStateListUseCaseImplTest {
     @Test
     fun action_Raise() {
         // prepare
-        every { prefRepository.myPlayerId } returns flowOf("0")
+        every { firebaseAuthRepository.uidFlow } returns flowOf("0")
         val players = listOf(
             GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
             GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
@@ -117,7 +118,7 @@ class GetNextGamePlayerStateListUseCaseImplTest {
     @Test
     fun action_Bet() {
         // prepare
-        every { prefRepository.myPlayerId } returns flowOf("0")
+        every { firebaseAuthRepository.uidFlow } returns flowOf("0")
         val players = listOf(
             GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
             GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
@@ -138,7 +139,7 @@ class GetNextGamePlayerStateListUseCaseImplTest {
     @Test
     fun action_AllIn() {
         // prepare
-        every { prefRepository.myPlayerId } returns flowOf("0")
+        every { firebaseAuthRepository.uidFlow } returns flowOf("0")
         val players = listOf(
             GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
             GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
@@ -159,7 +160,7 @@ class GetNextGamePlayerStateListUseCaseImplTest {
     @Test
     fun action_Check() {
         // prepare
-        every { prefRepository.myPlayerId } returns flowOf("0")
+        every { firebaseAuthRepository.uidFlow } returns flowOf("0")
         val players = listOf(
             GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
             GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
@@ -180,7 +181,7 @@ class GetNextGamePlayerStateListUseCaseImplTest {
     @Test
     fun action_Fold() {
         // prepare
-        every { prefRepository.myPlayerId } returns flowOf("0")
+        every { firebaseAuthRepository.uidFlow } returns flowOf("0")
         val players = listOf(
             GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
             GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
@@ -201,7 +202,7 @@ class GetNextGamePlayerStateListUseCaseImplTest {
     @Test
     fun action_Skip() {
         // prepare
-        every { prefRepository.myPlayerId } returns flowOf("0")
+        every { firebaseAuthRepository.uidFlow } returns flowOf("0")
         val players = listOf(
             GamePlayerState(id = PlayerId("0"), stack = 1000.0, isLeaved = false),
             GamePlayerState(id = PlayerId("1"), stack = 1000.0, isLeaved = false),
@@ -222,7 +223,7 @@ class GetNextGamePlayerStateListUseCaseImplTest {
     @Test
     fun action_BTN_Call_And_SB_Call() {
         // prepare
-        every { prefRepository.myPlayerId } returns flowOf("0")
+        every { firebaseAuthRepository.uidFlow } returns flowOf("0")
         val pendingBetPerPlayer = mapOf(
             PlayerId("0") to 100.0,
             PlayerId("1") to 200.0,
@@ -249,7 +250,7 @@ class GetNextGamePlayerStateListUseCaseImplTest {
     @Test
     fun action_BTN_Call_And_SB_AllIn() {
         // prepare
-        every { prefRepository.myPlayerId } returns flowOf("0")
+        every { firebaseAuthRepository.uidFlow } returns flowOf("0")
         val pendingBetPerPlayer = mapOf(
             PlayerId("0") to 100.0,
             PlayerId("1") to 200.0,
@@ -276,7 +277,7 @@ class GetNextGamePlayerStateListUseCaseImplTest {
     @Test
     fun action_SB_Check_and_BB_Bet() {
         // prepare
-        every { prefRepository.myPlayerId } returns flowOf("1")
+        every { firebaseAuthRepository.uidFlow } returns flowOf("1")
         val pendingBetPerPlayer = emptyMap<PlayerId, Double>()
         val players = listOf(
             GamePlayerState(id = PlayerId("0"), stack = 800.0, isLeaved = false),
