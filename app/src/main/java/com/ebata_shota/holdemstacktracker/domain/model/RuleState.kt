@@ -4,7 +4,7 @@ sealed interface RuleState {
     val betViewMode: BetViewMode
     val defaultStack: Double
 
-    data class LingGame(
+    data class RingGame(
         val sbSize: Double,
         val bbSize: Double,
         override val betViewMode: BetViewMode,
