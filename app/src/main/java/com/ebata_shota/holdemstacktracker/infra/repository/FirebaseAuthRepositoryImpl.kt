@@ -8,6 +8,7 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -23,7 +24,7 @@ constructor(
 ) : FirebaseAuthRepository {
 
     private val _uidFlow = MutableSharedFlow<String>(replay = 1)
-    override val uidFlow: SharedFlow<String> = _uidFlow.asSharedFlow()
+    override val uidFlow: Flow<String> = _uidFlow.asSharedFlow()
 
     /**
      * 匿名ログイン

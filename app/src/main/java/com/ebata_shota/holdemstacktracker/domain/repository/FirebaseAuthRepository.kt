@@ -1,8 +1,8 @@
 package com.ebata_shota.holdemstacktracker.domain.repository
 
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
 
 interface FirebaseAuthRepository {
-    val uidFlow: SharedFlow<String>
+    val uidFlow: Flow<String>
     fun signInAnonymously()
 }
