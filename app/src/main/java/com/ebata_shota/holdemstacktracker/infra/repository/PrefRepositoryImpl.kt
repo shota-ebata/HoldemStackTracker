@@ -5,11 +5,11 @@ import androidx.datastore.preferences.core.Preferences
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
-import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultBetViewMode
-import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultSizeOfBB
-import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultSizeOfSB
-import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultStackSizeOfBBMode
+import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultSizeOfBbOfNumberMode
+import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultSizeOfSbOfBbMode
+import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultSizeOfSbOfNumberMode
+import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultStackSizeOfBbMode
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultStackSizeOfNumberMode
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.MyName
 import com.ebata_shota.holdemstacktracker.infra.extension.prefFlow
@@ -44,39 +44,48 @@ constructor(
         dataStore.setPrefValue(DefaultBetViewMode, betViewMode.ordinal)
     }
 
-    override val defaultSizeOfSB: Flow<Double> by dataStore.prefFlow(
-        key = DefaultSizeOfSB,
-        defaultValue = { 100.0 }
+    override val defaultSizeOfSbOfNumberMode: Flow<Int> by dataStore.prefFlow(
+        key = DefaultSizeOfSbOfNumberMode,
+        defaultValue = { 1 }
     )
 
-    override suspend fun saveDefaultSizeOfSB(value: Double) {
-        dataStore.setPrefValue(DefaultSizeOfSB, value)
+    override suspend fun saveDefaultSizeOfSbOfNumberMode(value: Int) {
+        dataStore.setPrefValue(DefaultSizeOfSbOfNumberMode, value)
     }
 
-    override val defaultSizeOfBB: Flow<Double> by dataStore.prefFlow(
-        key = DefaultSizeOfBB,
-        defaultValue = { 200.0 }
+    override val defaultSizeOfSbOfBbMode: Flow<Double> by dataStore.prefFlow(
+        key = DefaultSizeOfSbOfBbMode,
+        defaultValue = { 0.5 }
     )
 
-    override suspend fun saveDefaultSizeOfBB(value: Double) {
-        dataStore.setPrefValue(DefaultSizeOfBB, value)
+    override suspend fun saveDefaultSizeOfSbOfBbMode(value: Double) {
+        dataStore.setPrefValue(DefaultSizeOfSbOfBbMode, value)
     }
 
-    override val defaultStackSizeOfNumberMode: Flow<Double> by dataStore.prefFlow(
+    override val defaultSizeOfBbOfNumberMode: Flow<Int> by dataStore.prefFlow(
+        key = DefaultSizeOfBbOfNumberMode,
+        defaultValue = { 2 }
+    )
+
+    override suspend fun saveDefaultSizeOfBbOfNumberMode(value: Int) {
+        dataStore.setPrefValue(DefaultSizeOfBbOfNumberMode, value)
+    }
+
+    override val defaultStackSizeOfNumberMode: Flow<Int> by dataStore.prefFlow(
         key = DefaultStackSizeOfNumberMode,
-        defaultValue = { 10000.0 }
+        defaultValue = { 200 }
     )
 
-    override suspend fun saveDefaultStackSizeOfNumberMode(value: Double) {
+    override suspend fun saveDefaultStackSizeOfNumberMode(value: Int) {
         dataStore.setPrefValue(DefaultStackSizeOfNumberMode, value)
     }
 
-    override val defaultStackSizeOfBBMode: Flow<Double> by dataStore.prefFlow(
-        key = DefaultStackSizeOfBBMode,
+    override val defaultStackSizeOfBbMode: Flow<Double> by dataStore.prefFlow(
+        key = DefaultStackSizeOfBbMode,
         defaultValue = { 50.0 }
     )
 
     override suspend fun saveDefaultStackSizeOfBBMode(value: Double) {
-        dataStore.setPrefValue(DefaultStackSizeOfBBMode, value)
+        dataStore.setPrefValue(DefaultStackSizeOfBbMode, value)
     }
 }

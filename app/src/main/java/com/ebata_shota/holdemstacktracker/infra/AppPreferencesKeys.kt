@@ -9,8 +9,9 @@ object AppPreferencesKeys {
     val MyPlayerId = stringPreferencesKey("my_player_id")
     val MyName = stringPreferencesKey("my_name")
     val DefaultBetViewMode = intPreferencesKey("default_bet_view_mode")
-    val DefaultSizeOfSB = doublePreferencesKey("default_size_of_sb")
-    val DefaultSizeOfBB = doublePreferencesKey("default_size_of_bb")
-    val DefaultStackSizeOfNumberMode = doublePreferencesKey("default_stack_size_of_number_mode")
-    val DefaultStackSizeOfBBMode = doublePreferencesKey("default_stack_size_of_bb_mode")
+    val DefaultSizeOfSbOfNumberMode = intPreferencesKey("default_size_of_sb_of_number_mode")
+    val DefaultSizeOfSbOfBbMode = doublePreferencesKey("default_size_of_sb_of_bb_mode")
+    val DefaultSizeOfBbOfNumberMode = intPreferencesKey("default_size_of_bb")
+    val DefaultStackSizeOfNumberMode = intPreferencesKey("default_stack_size_of_number_mode")
+    val DefaultStackSizeOfBbMode = doublePreferencesKey("default_stack_size_of_bb_mode")
 }

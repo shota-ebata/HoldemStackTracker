@@ -15,26 +15,32 @@ interface PrefRepository {
     suspend fun saveDefaultBetViewMode(betViewMode: BetViewMode)
 
     /**
-     * デフォルトSBサイズ
+     * デフォルトSBサイズ（Numberモード）
      */
-    val defaultSizeOfSB: Flow<Double>
-    suspend fun saveDefaultSizeOfSB(value: Double)
+    val defaultSizeOfSbOfNumberMode: Flow<Int>
+    suspend fun saveDefaultSizeOfSbOfNumberMode(value: Int)
 
     /**
-     * デフォルトBBサイズ
+     * デフォルトSBサイズ（BBモード）
      */
-    val defaultSizeOfBB: Flow<Double>
-    suspend fun saveDefaultSizeOfBB(value: Double)
+    val defaultSizeOfSbOfBbMode: Flow<Double>
+    suspend fun saveDefaultSizeOfSbOfBbMode(value: Double)
+
+    /**
+     * デフォルトBBサイズ（Numberモードしかない）
+     */
+    val defaultSizeOfBbOfNumberMode: Flow<Int>
+    suspend fun saveDefaultSizeOfBbOfNumberMode(value: Int)
 
     /**
      * デフォルトスタックサイズ（Numberモード）
      */
-    val defaultStackSizeOfNumberMode: Flow<Double>
-    suspend fun saveDefaultStackSizeOfNumberMode(value: Double)
+    val defaultStackSizeOfNumberMode: Flow<Int>
+    suspend fun saveDefaultStackSizeOfNumberMode(value: Int)
 
     /**
      * デフォルトスタックサイズ（BBモード）
      */
-    val defaultStackSizeOfBBMode: Flow<Double>
+    val defaultStackSizeOfBbMode: Flow<Double>
     suspend fun saveDefaultStackSizeOfBBMode(value: Double)
 }
