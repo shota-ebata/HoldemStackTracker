@@ -1,3 +1,4 @@
 package com.ebata_shota.holdemstacktracker.domain.model
 
-data class TableId(val value: String)
+@JvmInline
+value class TableId(val value: String)
