@@ -32,7 +32,6 @@ class TableCreatorViewModel
 constructor(
     savedStateHandle: SavedStateHandle,
     private val tableStateRepository: TableStateRepository,
-    private val gameStateRepository: GameStateRepository,
     private val randomIdRepository: RandomIdRepository,
     private val defaultRuleStateOfRingGameRepository: DefaultRuleStateOfRingGameRepository
 ) : ViewModel() {

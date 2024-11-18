@@ -74,7 +74,8 @@ constructor(
                     )
                 ),
                 waitPlayers = emptyList(),
-                startTime = 0L
+                startTime = 0L,
+                tableCreateTime = System.currentTimeMillis()
             )
             sendTableState(tableState)
         }

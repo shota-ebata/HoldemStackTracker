@@ -29,7 +29,8 @@ constructor() {
             } ?: emptyList(),
             playerOrder = (tableMap["playerOrder"] as List<*>).map { PlayerId(it as String) },
             btnPlayerId = PlayerId(tableMap["btnPlayerId"] as String),
-            startTime = tableMap["startTime"] as Long
+            startTime = tableMap["startTime"] as Long,
+            tableCreateTime = tableMap["tableCreateTime"] as Long
         )
     }
 
