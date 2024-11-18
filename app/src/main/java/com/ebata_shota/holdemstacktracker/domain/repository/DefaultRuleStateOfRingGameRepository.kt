@@ -5,7 +5,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import kotlinx.coroutines.flow.Flow
 
 
-interface DefaultRingGameStateRepository {
+interface DefaultRuleStateOfRingGameRepository {
     val ringGameFlow: Flow<RuleState.RingGame>
 
     suspend fun setDefaultBetViewMode(value: BetViewMode)

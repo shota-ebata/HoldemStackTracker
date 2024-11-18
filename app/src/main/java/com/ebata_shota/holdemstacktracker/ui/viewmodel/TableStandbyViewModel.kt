@@ -42,16 +42,6 @@ constructor(
     private val tableIdString: String by savedStateHandle.param()
     private val tableId: TableId = TableId(tableIdString)
 
-    suspend fun setAction(
-        action: ActionState,
-    ) {
-//        val updatedTableState = getNextGameState.invoke(
-//            latestGameState = currentTableState.first(),
-//            action = action
-//        )
-//        tableStateRepo.setTableState(updatedTableState)
-    }
-
     init {
         viewModelScope.launch {
             combine(
@@ -72,46 +62,6 @@ constructor(
     }
 
     suspend fun test(tableId: TableId) {
-//        tableStateRepo.setTableState(
-//            newTableState = TableState(
-//                id = tableId,
-//                version = 0,
-//                appVersion = BuildConfig.VERSION_CODE.toLong(),
-//                name = "tableName",
-//                hostPlayerId = PlayerId("PlayerId0"),
-//                ruleState = RuleState.LingGame(
-//                    sbSize = 100.0,
-//                    bbSize = 200.0,
-//                    betViewMode = BetViewMode.Number,
-//                    defaultStack = 1000.0
-//                ),
-//                basePlayers = listOf(
-//                    PlayerBaseState(
-//                        id = PlayerId("PlayerId0"),
-//                        name = "PlayerName0",
-//                        stack = 1000.0
-//                    ),
-//                    PlayerBaseState(
-//                        id = PlayerId("PlayerId1"),
-//                        name = "PlayerName1",
-//                        stack = 1000.0
-//                    ),
-//                    PlayerBaseState(
-//                        id = PlayerId("PlayerId2"),
-//                        name = "PlayerName2",
-//                        stack = 1000.0
-//                    )
-//                ),
-//                waitPlayers = emptyList(),
-//                playerOrder = listOf(
-//                    PlayerId("PlayerId0"),
-//                    PlayerId("PlayerId1"),
-//                    PlayerId("PlayerId2")
-//                ),
-//                btnPlayerId = PlayerId("PlayerId0"),
-//                startTime = 0L
-//            )
-//        )
         gameStateRepository.sendGameState(
             tableId = tableId,
             newGameState = GameState(
@@ -139,10 +89,22 @@ constructor(
                     PhaseState.Standby,
                     PhaseState.PreFlop(
                         actionStateList = listOf(
-                            BetPhaseActionState.Blind(playerId = PlayerId("PlayerId0"), betSize = 100.0),
-                            BetPhaseActionState.Blind(playerId = PlayerId("PlayerId1"), betSize = 200.0),
-                            BetPhaseActionState.Call(playerId = PlayerId("PlayerId2"), betSize = 200.0),
-                            BetPhaseActionState.Call(playerId = PlayerId("PlayerId0"), betSize = 200.0)
+                            BetPhaseActionState.Blind(
+                                playerId = PlayerId("PlayerId0"),
+                                betSize = 100.0
+                            ),
+                            BetPhaseActionState.Blind(
+                                playerId = PlayerId("PlayerId1"),
+                                betSize = 200.0
+                            ),
+                            BetPhaseActionState.Call(
+                                playerId = PlayerId("PlayerId2"),
+                                betSize = 200.0
+                            ),
+                            BetPhaseActionState.Call(
+                                playerId = PlayerId("PlayerId0"),
+                                betSize = 200.0
+                            )
                         )
                     )
                 ),

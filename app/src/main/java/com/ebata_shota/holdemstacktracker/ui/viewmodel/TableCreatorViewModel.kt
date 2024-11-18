@@ -8,7 +8,7 @@ import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
-import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRingGameStateRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRuleStateOfRingGameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
@@ -34,7 +34,7 @@ constructor(
     private val tableStateRepository: TableStateRepository,
     private val gameStateRepository: GameStateRepository,
     private val randomIdRepository: RandomIdRepository,
-    private val defaultRingGameStateRepository: DefaultRingGameStateRepository
+    private val defaultRuleStateOfRingGameRepository: DefaultRuleStateOfRingGameRepository
 ) : ViewModel() {
 
     /**
@@ -47,7 +47,7 @@ constructor(
 
     init {
         viewModelScope.launch {
-            val ringGame = defaultRingGameStateRepository.ringGameFlow.first()
+            val ringGame = defaultRuleStateOfRingGameRepository.ringGameFlow.first()
 
             _uiState.update {
                 TableCreatorUiState.MainContent(
@@ -103,7 +103,7 @@ constructor(
                     var errorMessage: ErrorMessage? = null
                     if (intValue != null && intValue > 0) {
                         // デフォルトを更新しておく
-                        defaultRingGameStateRepository.setDefaultSizeOfSbOfNumberMode(intValue)
+                        defaultRuleStateOfRingGameRepository.setDefaultSizeOfSbOfNumberMode(intValue)
                     } else {
                         // エラーがある場合はエラーメッセージ
                         errorMessage =
@@ -124,7 +124,7 @@ constructor(
                     var errorMessage: ErrorMessage? = null
                     if (doubleValue != null && doubleValue > 0) {
                         // デフォルトを更新しておく
-                        defaultRingGameStateRepository.setDefaultSizeOfSbOfBbMode(doubleValue)
+                        defaultRuleStateOfRingGameRepository.setDefaultSizeOfSbOfBbMode(doubleValue)
                     } else {
                         // エラーがある場合はエラーメッセージ
                         errorMessage =
@@ -160,7 +160,7 @@ constructor(
             var errorMessage: ErrorMessage? = null
             if (intValue != null && intValue > 0) {
                 // デフォルトを更新しておく
-                defaultRingGameStateRepository.saveDefaultSizeOfBbOfNumberMode(intValue)
+                defaultRuleStateOfRingGameRepository.saveDefaultSizeOfBbOfNumberMode(intValue)
             } else {
                 // エラーがある場合はエラーメッセージ
                 errorMessage = ErrorMessage(errorMessageResId = R.string.input_error_message)
@@ -186,8 +186,8 @@ constructor(
                 return@launch
             }
             // デフォルトを更新しておく
-            defaultRingGameStateRepository.setDefaultBetViewMode(value)
-            val defaultRingGame = defaultRingGameStateRepository.ringGameFlow.first()
+            defaultRuleStateOfRingGameRepository.setDefaultBetViewMode(value)
+            val defaultRingGame = defaultRuleStateOfRingGameRepository.ringGameFlow.first()
             _uiState.update {
                 uiState.copy(
                     betViewMode = value,
@@ -230,7 +230,7 @@ constructor(
                     var errorMessage: ErrorMessage? = null
                     if (intValue != null && intValue > 0) {
                         // デフォルトを更新しておく
-                        defaultRingGameStateRepository.setDefaultStackSizeOfNumberMode(intValue)
+                        defaultRuleStateOfRingGameRepository.setDefaultStackSizeOfNumberMode(intValue)
                     } else {
                         // エラーがある場合はエラーメッセージ
                         errorMessage =
@@ -251,7 +251,7 @@ constructor(
                     var errorMessage: ErrorMessage? = null
                     if (doubleValue != null && doubleValue > 0) {
                         // デフォルトを更新しておく
-                        defaultRingGameStateRepository.setDefaultStackSizeOfBbMode(doubleValue)
+                        defaultRuleStateOfRingGameRepository.setDefaultStackSizeOfBbMode(doubleValue)
                     } else {
                         // エラーがある場合はエラーメッセージ
                         errorMessage =
