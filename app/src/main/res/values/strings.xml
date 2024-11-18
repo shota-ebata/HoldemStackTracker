@@ -10,5 +10,8 @@
     <string name="bet_view_type">スタック表示</string>
     <string name="bet_view_type_chip_number">チップ表示</string>
     <string name="bet_view_type_chip_bb">BB表示（BBを1.0とする）</string>
+    <string name="bet_view_type">スタック・チップ表示</string>
+    <string name="bet_view_type_chip_number">チップサイズ表示</string>
+    <string name="bet_view_type_chip_bb">BBサイズ表示（BBを1.0とする）</string>
     <string name="table_creator_submit">テーブル作成</string>
 </resources>
