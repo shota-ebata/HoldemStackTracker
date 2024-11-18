@@ -89,6 +89,7 @@ constructor() {
             it.value
         },
         "btnPlayerId" to tableState.btnPlayerId.value,
-        "startTime" to tableState.startTime
+        "startTime" to tableState.startTime,
+        "tableCreateTime" to tableState.tableCreateTime
     )
 }
