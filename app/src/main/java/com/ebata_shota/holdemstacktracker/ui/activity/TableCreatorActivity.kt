@@ -3,7 +3,6 @@ package com.ebata_shota.holdemstacktracker.ui.activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableCreatorScreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,6 +22,7 @@ class TableCreatorActivity : ComponentActivity() {
     }
 
     private fun navigateToGame(tableId: TableId) {
-        // TODO: ゲームActivityへ
+        val intent = TableStandbyActivity.intent(this, tableId)
+        startActivity(intent)
     }
 }

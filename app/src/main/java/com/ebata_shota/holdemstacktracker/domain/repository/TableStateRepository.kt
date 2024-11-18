@@ -10,7 +10,6 @@ interface TableStateRepository {
 
     suspend fun createNewTable(
         tableId: TableId,
-        tableName: String,
         ruleState: RuleState
     )
 

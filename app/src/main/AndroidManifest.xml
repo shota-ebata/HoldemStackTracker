@@ -14,11 +14,13 @@
         android:theme="@style/Theme.HoldemStackTracker"
         tools:targetApi="31">
         <activity
+            android:name=".ui.activity.TableStandbyActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activity.MainActivity"
             android:exported="false"
             android:label="@string/app_name"
-            android:theme="@style/Theme.HoldemStackTracker"></activity>
-
+            android:theme="@style/Theme.HoldemStackTracker" />
         <activity
             android:name=".ui.activity.TableCreatorActivity"
             android:exported="true"
@@ -29,7 +31,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

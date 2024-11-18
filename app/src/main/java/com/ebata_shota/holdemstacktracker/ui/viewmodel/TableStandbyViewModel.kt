@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TableViewModel
+class TableStandbyViewModel
 @Inject
 constructor(
     savedStateHandle: SavedStateHandle,
@@ -56,23 +56,17 @@ constructor(
         viewModelScope.launch {
             combine(
                 tableStateRepository.tableFlow,
-                gameStateRepository.gameFlow,
                 firebaseAuthRepository.uidFlow
-            ) { tableState, gameState, uid ->
-                val currentPlayerId = getCurrentPlayerId.invoke(
-                    btnPlayerId = tableState.btnPlayerId,
-                    gameState = gameState
-                )
-                currentPlayerId == PlayerId(uid)
+            ) { tableState, uid ->
+                tableState.hostPlayerId == PlayerId(uid)
             }.collect {
-                Log.d("hoge", "isCurrentPlayer $it")
+                Log.d("hoge", "isHostPlayer $it")
             }
         }
 
         viewModelScope.launch {
 //            val tableId = TableId("1fe43fe4-1660-4886-9980-a601b0a493c1")
             tableStateRepository.startCollectTableFlow(tableId)
-            gameStateRepository.startCollectGameFlow(tableId)
 //            test(tableId)
         }
     }
@@ -160,7 +154,7 @@ constructor(
 
     companion object {
         fun bundle(tableId: TableId) = Bundle().apply {
-            putString(TableViewModel::tableIdString.name, tableId.value)
+            putString(TableStandbyViewModel::tableIdString.name, tableId.value)
         }
     }
 }

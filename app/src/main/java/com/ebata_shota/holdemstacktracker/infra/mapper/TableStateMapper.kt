@@ -21,7 +21,6 @@ constructor() {
             id = tableId,
             version = tableMap["tableVersion"] as Long,
             appVersion = tableMap["appVersion"] as Long,
-            name = tableMap["name"] as String,
             hostPlayerId = PlayerId(tableMap["hostPlayerId"] as String),
             ruleState = mapToRuleState(tableMap["rule"] as Map<*, *>),
             basePlayers = mapToBasePlayers(tableMap["basePlayers"] as List<*>),
@@ -58,7 +57,6 @@ constructor() {
     fun toMap(tableState: TableState): Map<String, Any> = hashMapOf(
         "tableVersion" to tableState.version,
         "appVersion" to tableState.appVersion,
-        "name" to tableState.name,
         "hostPlayerId" to tableState.hostPlayerId.value,
         "btnPlayerId" to tableState.btnPlayerId.value,
         "rule" to when (val ruleState = tableState.ruleState) {

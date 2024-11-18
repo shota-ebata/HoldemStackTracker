@@ -28,7 +28,6 @@ fun createDummyTableState(
     id = TableId("0L"),
     version = 0L,
     appVersion = BuildConfig.VERSION_CODE.toLong(),
-    name = "dummy",
     hostPlayerId = PlayerId(""),
     ruleState = RuleState.RingGame(sbSize = 100.0, bbSize = 200.0, betViewMode = BetViewMode.Number, defaultStack = 1000.0),
     playerOrder = playerOrder,

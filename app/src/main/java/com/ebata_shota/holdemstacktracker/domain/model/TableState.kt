@@ -4,7 +4,6 @@ data class TableState(
     val id: TableId,
     val version: Long,
     val appVersion: Long,
-    val name: String,
     val hostPlayerId: PlayerId,
     val ruleState: RuleState,
     val basePlayers: List<PlayerBaseState>,

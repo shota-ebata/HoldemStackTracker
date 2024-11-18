@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
+import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRingGameStateRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
@@ -273,29 +274,30 @@ constructor(
      * Submit
      */
     fun onClickSubmit() {
-        // TODO:
+        viewModelScope.launch {
+            createTable()
+        }
     }
 
-    private fun createTable() {
-//        viewModelScope.launch {
-//            val tableId = TableId(randomIdRepository.generateRandomId())
-//            // TODO: いろいろ
-//            val betViewMode = mainContentUiState.betViewMode
-//            tableStateRepository.createNewTable(
-//                tableId = tableId,
-//                tableName = mainContentUiState.tableName,
-//                ruleState = RuleState.RingGame(
-//                    sbSize = mainContentUiState.sbSize,
-//                    bbSize = mainContentUiState.bbSize,
-//                    betViewMode = betViewMode,
-//                    defaultStack = mainContentUiState.defaultStack
-//                )
-//            )
-//
-//            // TODO: collectを開始?本当に？
-//            tableStateRepository.startCollectTableFlow(tableId)
-//            gameStateRepository.startCollectGameFlow(tableId)
-//        }
+    private suspend fun createTable() {
+        val tableId = TableId(randomIdRepository.generateRandomId())
+        // TODO: いろいろ
+        val uiState = uiState.value
+        if (uiState !is TableCreatorUiState.MainContent) {
+            return
+        }
+        val mainContentUiState = mainContentUiState ?: return
+        val betViewMode = uiState.betViewMode
+        tableStateRepository.createNewTable(
+            tableId = tableId,
+            ruleState = RuleState.RingGame(
+                sbSize = mainContentUiState.sbSize.value.toDouble(),
+                bbSize = mainContentUiState.bbSize.value.toDouble(),
+                betViewMode = betViewMode,
+                defaultStack = mainContentUiState.defaultStack.value.toDouble()
+            )
+        )
+        _navigateEvent.emit(NavigateEvent(tableId))
     }
 }
 
@@ -317,6 +319,10 @@ sealed interface TableCreatorUiState {
             value = "0.0"
         )
     ) : TableCreatorUiState {
+
+        val enableSubmitButton: Boolean
+            get() = sbSize.error == null && bbSize.error == null && defaultStack.error == null
+
         enum class GameType(
             @StringRes
             val labelResId: Int

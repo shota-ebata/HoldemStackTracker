@@ -93,9 +93,12 @@ fun TableCreatorContent(
 
 
             // Submit Button
-            Button(onClick = {
-                onClickSubmit()
-            }) {
+            Button(
+                onClick = {
+                    onClickSubmit()
+                },
+                enabled = uiState.enableSubmitButton
+            ) {
                 Text(text = "Submit")
             }
         }

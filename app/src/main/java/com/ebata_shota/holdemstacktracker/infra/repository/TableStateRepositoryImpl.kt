@@ -52,7 +52,6 @@ constructor(
 
     override suspend fun createNewTable(
         tableId: TableId,
-        tableName: String,
         ruleState: RuleState
     ) {
         withContext(ioDispatcher) {
@@ -63,7 +62,6 @@ constructor(
                 id = tableId,
                 version = 0L,
                 appVersion = BuildConfig.VERSION_CODE.toLong(),
-                name = tableName,
                 hostPlayerId = myPlayerId,
                 ruleState = ruleState,
                 playerOrder = listOf(myPlayerId),
