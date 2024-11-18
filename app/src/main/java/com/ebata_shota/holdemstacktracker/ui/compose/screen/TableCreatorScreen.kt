@@ -22,13 +22,17 @@ fun TableCreatorScreen(
     }
 
     val uiState: TableCreatorUiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    TableCreatorContent(
-        uiState = uiState,
-        onChangeSizeOfSB = viewModel::onChangeSizeOfSB,
-        onChangeSizeOfBB = viewModel::onChangeSizeOfBB,
-        onClickBetViewMode = viewModel::onClickBetViewMode,
-        onChangeStackSize = viewModel::onChangeStackSize,
-        onClickSubmit = viewModel::onClickSubmit
-    )
+    when (val uiStateCast = uiState) {
+        is TableCreatorUiState.Loading -> {}
+        is TableCreatorUiState.MainContent -> {
+            TableCreatorContent(
+                uiState = uiStateCast,
+                onChangeSizeOfSB = viewModel::onChangeSizeOfSB,
+                onChangeSizeOfBB = viewModel::onChangeSizeOfBB,
+                onClickBetViewMode = viewModel::onClickBetViewMode,
+                onChangeStackSize = viewModel::onChangeStackSize,
+                onClickSubmit = viewModel::onClickSubmit
+            )
+        }
+    }
 }

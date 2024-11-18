@@ -1,11 +1,14 @@
 <resources>
     <string name="app_name">HoldemStackTracker</string>
 
-    <string name="game_type_ring">リング</string>
+    <string name="game_type">ゲームモード</string>
+    <string name="game_type_ring">リングゲーム</string>
     <string name="sb_size_label">SBサイズ</string>
     <string name="bb_size_label">BBサイズ</string>
     <string name="default_stack_label">初期スタック</string>
     <string name="input_error_message">入力値に問題があります</string>
+    <string name="bet_view_type">スタック表示</string>
     <string name="bet_view_type_chip_number">チップ表示</string>
     <string name="bet_view_type_chip_bb">BB表示（BBを1.0とする）</string>
+    <string name="table_creator_submit">テーブル作成</string>
 </resources>
