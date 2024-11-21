@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -21,7 +22,7 @@ import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 @Composable
 fun OutlinedTextFieldWithError(
     uiState: TextFieldErrorUiState,
-    onValueChange: (String) -> Unit,
+    onValueChange: (TextFieldValue) -> Unit,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     modifier: Modifier = Modifier.fillMaxWidth()
 ) {
@@ -64,7 +65,7 @@ fun OutlinedTextFieldWithErrorPreview(
         OutlinedTextFieldWithError(
             uiState = TextFieldErrorUiState(
                 label = R.string.sb_size_label,
-                value = "100.0",
+                value = TextFieldValue("100.0"),
                 error = error
             ),
             onValueChange = {}
@@ -75,7 +76,7 @@ fun OutlinedTextFieldWithErrorPreview(
 data class TextFieldErrorUiState(
     @StringRes
     val label: Int,
-    val value: String,
+    val value: TextFieldValue,
     val isEnabled: Boolean = true,
     val error: ErrorMessage? = null
 )

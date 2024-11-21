@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -54,23 +55,23 @@ constructor(
                         sbSize = TextFieldErrorUiState(
                             label = R.string.sb_size_label,
                             value = when (ringGame.betViewMode) {
-                                BetViewMode.Number -> ringGame.sbSize.toInt().toString()
-                                BetViewMode.BB -> ringGame.sbSize.toString()
+                                BetViewMode.Number -> TextFieldValue(ringGame.sbSize.toInt().toString())
+                                BetViewMode.BB -> TextFieldValue(ringGame.sbSize.toString())
                             }
                         ),
                         bbSize = TextFieldErrorUiState(
                             label = R.string.bb_size_label,
                             value = when (ringGame.betViewMode) {
-                                BetViewMode.Number -> ringGame.bbSize.toInt().toString()
-                                BetViewMode.BB -> ringGame.bbSize.toString()
+                                BetViewMode.Number -> TextFieldValue(ringGame.bbSize.toInt().toString())
+                                BetViewMode.BB -> TextFieldValue(ringGame.bbSize.toString())
                             },
                             isEnabled = ringGame.betViewMode == BetViewMode.Number
                         ),
                         defaultStack = TextFieldErrorUiState(
                             label = R.string.default_stack_label,
                             value = when (ringGame.betViewMode) {
-                                BetViewMode.Number -> ringGame.defaultStack.toInt().toString()
-                                BetViewMode.BB -> ringGame.defaultStack.toString()
+                                BetViewMode.Number -> TextFieldValue(ringGame.defaultStack.toInt().toString())
+                                BetViewMode.BB -> TextFieldValue(ringGame.defaultStack.toString())
                             }
                         )
                     )
@@ -90,13 +91,13 @@ constructor(
     /**
      * SB
      */
-    fun onChangeSizeOfSB(value: String) {
+    fun onChangeSizeOfSB(value: TextFieldValue) {
         viewModelScope.launch {
             val contentUiState = tableCreatorContentUiState ?: return@launch
             var errorMessage: ErrorMessage? = null
             when (contentUiState.betViewMode) {
                 BetViewMode.Number -> {
-                    val intValue = value.toIntOrNull()
+                    val intValue = value.text.toIntOrNull()
                     if (intValue != null && intValue > 0) {
                         // デフォルトを更新しておく
                         defaultRuleStateOfRingGameRepository.setDefaultSizeOfSbOfNumberMode(intValue)
@@ -108,7 +109,7 @@ constructor(
                 }
 
                 BetViewMode.BB -> {
-                    val doubleValue: Double? = value.toDoubleOrNull()
+                    val doubleValue: Double? = value.text.toDoubleOrNull()
                     if (doubleValue != null && doubleValue > 0) {
                         // デフォルトを更新しておく
                         defaultRuleStateOfRingGameRepository.setDefaultSizeOfSbOfBbMode(doubleValue)
@@ -135,7 +136,7 @@ constructor(
     /**
      * BB
      */
-    fun onChangeSizeOfBB(value: String) {
+    fun onChangeSizeOfBB(value: TextFieldValue) {
         viewModelScope.launch {
             val contentUiState = tableCreatorContentUiState ?: return@launch
 
@@ -143,7 +144,7 @@ constructor(
                 // BBはBBモードでは1.0固定なので、編集できない
                 return@launch
             }
-            val intValue = value.toIntOrNull()
+            val intValue = value.text.toIntOrNull()
             var errorMessage: ErrorMessage? = null
             if (intValue != null && intValue > 0) {
                 // デフォルトを更新しておく
@@ -181,23 +182,22 @@ constructor(
                         betViewMode = value,
                         sbSize = contentUiState.sbSize.copy(
                             value = when (value) {
-                                BetViewMode.Number -> defaultRingGame.sbSize.toInt().toString()
-                                BetViewMode.BB -> defaultRingGame.sbSize.toString()
+                                BetViewMode.Number -> TextFieldValue(defaultRingGame.sbSize.toInt().toString())
+                                BetViewMode.BB -> TextFieldValue(defaultRingGame.sbSize.toString())
                             }
                         ),
                         bbSize = contentUiState.bbSize.copy(
                             value = when (value) {
-                                BetViewMode.Number -> defaultRingGame.bbSize.toInt().toString()
-                                BetViewMode.BB -> defaultRingGame.bbSize.toString()
+                                BetViewMode.Number -> TextFieldValue(defaultRingGame.bbSize.toInt().toString())
+                                BetViewMode.BB -> TextFieldValue(defaultRingGame.bbSize.toString())
                             },
                             isEnabled = value == BetViewMode.Number
                         ),
                         defaultStack = contentUiState.defaultStack.copy(
                             value = when (value) {
-                                BetViewMode.Number -> defaultRingGame.defaultStack.toInt()
-                                    .toString()
+                                BetViewMode.Number -> TextFieldValue(defaultRingGame.defaultStack.toInt().toString())
 
-                                BetViewMode.BB -> defaultRingGame.defaultStack.toString()
+                                BetViewMode.BB -> TextFieldValue(defaultRingGame.defaultStack.toString())
                             }
                         )
                     )
@@ -209,7 +209,7 @@ constructor(
     /**
      * Stack
      */
-    fun onChangeStackSize(value: String) {
+    fun onChangeStackSize(value: TextFieldValue) {
         viewModelScope.launch {
             val uiState = screenUiState.value
             if (uiState !is TableCreatorUiState.MainContent) {
@@ -217,7 +217,7 @@ constructor(
             }
             when (uiState.tableCreatorContentUiState.betViewMode) {
                 BetViewMode.Number -> {
-                    val intValue = value.toIntOrNull()
+                    val intValue = value.text.toIntOrNull()
                     var errorMessage: ErrorMessage? = null
                     if (intValue != null && intValue > 0) {
                         // デフォルトを更新しておく
@@ -242,7 +242,7 @@ constructor(
                 }
 
                 BetViewMode.BB -> {
-                    val doubleValue: Double? = value.toDoubleOrNull()
+                    val doubleValue: Double? = value.text.toDoubleOrNull()
                     var errorMessage: ErrorMessage? = null
                     if (doubleValue != null && doubleValue > 0) {
                         // デフォルトを更新しておく
@@ -273,7 +273,7 @@ constructor(
     fun onClickSubmit() {
 
         val contentUiState = tableCreatorContentUiState ?: return
-        if (contentUiState.sbSize.value.toDouble() > contentUiState.bbSize.value.toDouble()) {
+        if (contentUiState.sbSize.value.text.toDouble() > contentUiState.bbSize.value.text.toDouble()) {
             // SB > BB は弾く
             _screenUiState.update {
                 TableCreatorUiState.MainContent(
@@ -304,10 +304,10 @@ constructor(
         tableStateRepository.createNewTable(
             tableId = tableId,
             ruleState = RuleState.RingGame(
-                sbSize = contentUiState.sbSize.value.toDouble(),
-                bbSize = contentUiState.bbSize.value.toDouble(),
+                sbSize = contentUiState.sbSize.value.text.toDouble(),
+                bbSize = contentUiState.bbSize.value.text.toDouble(),
                 betViewMode = betViewMode,
-                defaultStack = contentUiState.defaultStack.value.toDouble()
+                defaultStack = contentUiState.defaultStack.value.text.toDouble()
             )
         )
 //        val tableId = TableId("83b543e1-e901-4115-b56b-d610cdd9267d")

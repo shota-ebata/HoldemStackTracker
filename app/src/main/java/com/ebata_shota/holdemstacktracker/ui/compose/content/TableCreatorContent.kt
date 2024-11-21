@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
@@ -34,10 +35,10 @@ import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 @Composable
 fun TableCreatorContent(
     uiState: TableCreatorContentUiState,
-    onChangeSizeOfSB: (String) -> Unit,
-    onChangeSizeOfBB: (String) -> Unit,
+    onChangeSizeOfSB: (TextFieldValue) -> Unit,
+    onChangeSizeOfBB: (TextFieldValue) -> Unit,
     onClickBetViewMode: (BetViewMode) -> Unit,
-    onChangeStackSize: (String) -> Unit,
+    onChangeStackSize: (TextFieldValue) -> Unit,
     onClickSubmit: () -> Unit
 ) {
     Column(
@@ -158,15 +159,15 @@ data class TableCreatorContentUiState(
     val betViewMode: BetViewMode = BetViewMode.Number,
     val sbSize: TextFieldErrorUiState = TextFieldErrorUiState(
         label = R.string.sb_size_label,
-        value = "0.0"
+        value = TextFieldValue("0.0")
     ),
     val bbSize: TextFieldErrorUiState = TextFieldErrorUiState(
         label = R.string.bb_size_label,
-        value = "0.0"
+        value = TextFieldValue("0.0")
     ),
     val defaultStack: TextFieldErrorUiState = TextFieldErrorUiState(
         label = R.string.default_stack_label,
-        value = "0.0"
+        value = TextFieldValue("0.0")
     ),
     val bottomErrorMessage: ErrorMessage? = null
 ) {
