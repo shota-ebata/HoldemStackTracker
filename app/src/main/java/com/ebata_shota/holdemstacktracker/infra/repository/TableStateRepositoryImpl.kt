@@ -58,6 +58,7 @@ constructor(
             val uid = firebaseAuthRepository.uidFlow.first()
             val myPlayerId = PlayerId(uid)
             val myName = prefRepository.myName.first()
+            val tableCreateTime = System.currentTimeMillis()
             val tableState = TableState(
                 id = tableId,
                 version = 0L,
@@ -75,7 +76,8 @@ constructor(
                 ),
                 waitPlayers = emptyList(),
                 startTime = 0L,
-                tableCreateTime = System.currentTimeMillis()
+                tableCreateTime = tableCreateTime,
+                updateTime = tableCreateTime
             )
             sendTableState(tableState)
         }
