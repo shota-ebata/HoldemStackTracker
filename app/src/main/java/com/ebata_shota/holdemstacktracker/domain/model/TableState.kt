@@ -11,5 +11,6 @@ data class TableState(
     val playerOrder: List<PlayerId>,
     val btnPlayerId: PlayerId,
     val startTime: Long,
-    val tableCreateTime: Long
+    val tableCreateTime: Long,
+    val updateTime: Long
 )
