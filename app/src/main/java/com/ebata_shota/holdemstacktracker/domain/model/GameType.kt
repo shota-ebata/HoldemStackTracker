@@ -1,5 +1,5 @@
 package com.ebata_shota.holdemstacktracker.domain.model
 
-class GameType {
-
+enum class GameType {
+    RingGame
 }

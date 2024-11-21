@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
+import com.ebata_shota.holdemstacktracker.domain.model.GameType
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRuleStateOfRingGameRepository
@@ -50,7 +51,7 @@ constructor(
             _screenUiState.update {
                 TableCreatorUiState.MainContent(
                     tableCreatorContentUiState = TableCreatorContentUiState(
-                        gameType = TableCreatorContentUiState.GameType.RingGame,
+                        gameType = GameType.RingGame,
                         betViewMode = ringGame.betViewMode,
                         sbSize = TextFieldErrorUiState(
                             label = R.string.sb_size_label,
@@ -73,7 +74,8 @@ constructor(
                                 BetViewMode.Number -> TextFieldValue(ringGame.defaultStack.toInt().toString())
                                 BetViewMode.BB -> TextFieldValue(ringGame.defaultStack.toString())
                             }
-                        )
+                        ),
+                        bottomErrorMessage = null
                     )
                 )
             }
