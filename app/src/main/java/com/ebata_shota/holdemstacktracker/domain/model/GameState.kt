@@ -9,7 +9,7 @@ data class GameState(
     val players: List<GamePlayerState>,
     val podStateList: List<PodState>,
     val phaseStateList: List<PhaseState>,
-    val timestamp: Long
+    val updateTime: Long
 ) {
     val playerOrder: List<PlayerId>
         get() = players.map { it.id }

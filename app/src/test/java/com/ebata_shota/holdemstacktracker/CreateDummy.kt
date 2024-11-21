@@ -18,7 +18,7 @@ fun createDummyGameState(
     players = players,
     podStateList = emptyList(),
     phaseStateList = phaseStateList,
-    timestamp = 0L
+    updateTime = 0L
 )
 
 fun createDummyTableState(
