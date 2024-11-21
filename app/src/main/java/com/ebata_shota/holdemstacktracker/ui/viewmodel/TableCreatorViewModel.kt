@@ -1,6 +1,5 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,12 +8,11 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRuleStateOfRingGameRepository
-import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
+import com.ebata_shota.holdemstacktracker.ui.compose.content.TableCreatorContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.TextFieldErrorUiState
-import com.ebata_shota.holdemstacktracker.ui.viewmodel.TableCreatorUiState.MainContent.GameType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,40 +37,42 @@ constructor(
     /**
      * UiState
      */
-    private val _uiState = MutableStateFlow<TableCreatorUiState>(TableCreatorUiState.Loading)
-    val uiState: StateFlow<TableCreatorUiState> = _uiState.asStateFlow()
-    private val mainContentUiState: TableCreatorUiState.MainContent?
-        get() = uiState.value as? TableCreatorUiState.MainContent
+    private val _screenUiState = MutableStateFlow<TableCreatorUiState>(TableCreatorUiState.Loading)
+    val screenUiState: StateFlow<TableCreatorUiState> = _screenUiState.asStateFlow()
+    private val tableCreatorContentUiState: TableCreatorContentUiState?
+        get() = (screenUiState.value as? TableCreatorUiState.MainContent)?.tableCreatorContentUiState
 
     init {
         viewModelScope.launch {
             val ringGame = defaultRuleStateOfRingGameRepository.ringGameFlow.first()
 
-            _uiState.update {
+            _screenUiState.update {
                 TableCreatorUiState.MainContent(
-                    gameType = GameType.RingGame,
-                    betViewMode = ringGame.betViewMode,
-                    sbSize = TextFieldErrorUiState(
-                        label = R.string.sb_size_label,
-                        value = when (ringGame.betViewMode) {
-                            BetViewMode.Number -> ringGame.sbSize.toInt().toString()
-                            BetViewMode.BB -> ringGame.sbSize.toString()
-                        }
-                    ),
-                    bbSize = TextFieldErrorUiState(
-                        label = R.string.bb_size_label,
-                        value = when (ringGame.betViewMode) {
-                            BetViewMode.Number -> ringGame.bbSize.toInt().toString()
-                            BetViewMode.BB -> ringGame.bbSize.toString()
-                        },
-                        isEnabled = ringGame.betViewMode == BetViewMode.Number
-                    ),
-                    defaultStack = TextFieldErrorUiState(
-                        label = R.string.default_stack_label,
-                        value = when (ringGame.betViewMode) {
-                            BetViewMode.Number -> ringGame.defaultStack.toInt().toString()
-                            BetViewMode.BB -> ringGame.defaultStack.toString()
-                        }
+                    tableCreatorContentUiState = TableCreatorContentUiState(
+                        gameType = TableCreatorContentUiState.GameType.RingGame,
+                        betViewMode = ringGame.betViewMode,
+                        sbSize = TextFieldErrorUiState(
+                            label = R.string.sb_size_label,
+                            value = when (ringGame.betViewMode) {
+                                BetViewMode.Number -> ringGame.sbSize.toInt().toString()
+                                BetViewMode.BB -> ringGame.sbSize.toString()
+                            }
+                        ),
+                        bbSize = TextFieldErrorUiState(
+                            label = R.string.bb_size_label,
+                            value = when (ringGame.betViewMode) {
+                                BetViewMode.Number -> ringGame.bbSize.toInt().toString()
+                                BetViewMode.BB -> ringGame.bbSize.toString()
+                            },
+                            isEnabled = ringGame.betViewMode == BetViewMode.Number
+                        ),
+                        defaultStack = TextFieldErrorUiState(
+                            label = R.string.default_stack_label,
+                            value = when (ringGame.betViewMode) {
+                                BetViewMode.Number -> ringGame.defaultStack.toInt().toString()
+                                BetViewMode.BB -> ringGame.defaultStack.toString()
+                            }
+                        )
                     )
                 )
             }
@@ -92,14 +92,11 @@ constructor(
      */
     fun onChangeSizeOfSB(value: String) {
         viewModelScope.launch {
-            val uiState = uiState.value
-            if (uiState !is TableCreatorUiState.MainContent) {
-                return@launch
-            }
-            when (uiState.betViewMode) {
+            val contentUiState = tableCreatorContentUiState ?: return@launch
+            var errorMessage: ErrorMessage? = null
+            when (contentUiState.betViewMode) {
                 BetViewMode.Number -> {
                     val intValue = value.toIntOrNull()
-                    var errorMessage: ErrorMessage? = null
                     if (intValue != null && intValue > 0) {
                         // デフォルトを更新しておく
                         defaultRuleStateOfRingGameRepository.setDefaultSizeOfSbOfNumberMode(intValue)
@@ -108,19 +105,10 @@ constructor(
                         errorMessage =
                             ErrorMessage(errorMessageResId = R.string.input_error_message)
                     }
-                    _uiState.update {
-                        uiState.copy(
-                            sbSize = uiState.sbSize.copy(
-                                value = value,
-                                error = errorMessage
-                            )
-                        )
-                    }
                 }
 
                 BetViewMode.BB -> {
                     val doubleValue: Double? = value.toDoubleOrNull()
-                    var errorMessage: ErrorMessage? = null
                     if (doubleValue != null && doubleValue > 0) {
                         // デフォルトを更新しておく
                         defaultRuleStateOfRingGameRepository.setDefaultSizeOfSbOfBbMode(doubleValue)
@@ -129,15 +117,17 @@ constructor(
                         errorMessage =
                             ErrorMessage(errorMessageResId = R.string.input_error_message)
                     }
-                    _uiState.update {
-                        uiState.copy(
-                            sbSize = uiState.defaultStack.copy(
-                                value = value,
-                                error = errorMessage
-                            )
-                        )
-                    }
                 }
+            }
+            _screenUiState.update {
+                TableCreatorUiState.MainContent(
+                    tableCreatorContentUiState = contentUiState.copy(
+                        sbSize = contentUiState.sbSize.copy(
+                            value = value,
+                            error = errorMessage
+                        )
+                    )
+                )
             }
         }
     }
@@ -147,11 +137,9 @@ constructor(
      */
     fun onChangeSizeOfBB(value: String) {
         viewModelScope.launch {
-            val uiState = uiState.value
-            if (uiState !is TableCreatorUiState.MainContent) {
-                return@launch
-            }
-            if (uiState.betViewMode == BetViewMode.BB) {
+            val contentUiState = tableCreatorContentUiState ?: return@launch
+
+            if (contentUiState.betViewMode == BetViewMode.BB) {
                 // BBはBBモードでは1.0固定なので、編集できない
                 return@launch
             }
@@ -164,12 +152,14 @@ constructor(
                 // エラーがある場合はエラーメッセージ
                 errorMessage = ErrorMessage(errorMessageResId = R.string.input_error_message)
             }
-            _uiState.update {
-                uiState.copy(
-                    bbSize = uiState.bbSize.copy(
-                        value = value,
-                        error = errorMessage,
-                    ),
+            _screenUiState.update {
+                TableCreatorUiState.MainContent(
+                    tableCreatorContentUiState = contentUiState.copy(
+                        bbSize = contentUiState.bbSize.copy(
+                            value = value,
+                            error = errorMessage,
+                        )
+                    )
                 )
             }
         }
@@ -180,34 +170,36 @@ constructor(
      */
     fun onClickBetViewMode(value: BetViewMode) {
         viewModelScope.launch {
-            val uiState = uiState.value
-            if (uiState !is TableCreatorUiState.MainContent) {
-                return@launch
-            }
+            val contentUiState = tableCreatorContentUiState ?: return@launch
+
             // デフォルトを更新しておく
             defaultRuleStateOfRingGameRepository.setDefaultBetViewMode(value)
             val defaultRingGame = defaultRuleStateOfRingGameRepository.ringGameFlow.first()
-            _uiState.update {
-                uiState.copy(
-                    betViewMode = value,
-                    sbSize = uiState.sbSize.copy(
-                        value = when (value) {
-                            BetViewMode.Number -> defaultRingGame.sbSize.toInt().toString()
-                            BetViewMode.BB -> defaultRingGame.sbSize.toString()
-                        }
-                    ),
-                    bbSize = uiState.bbSize.copy(
-                        value = when (value) {
-                            BetViewMode.Number -> defaultRingGame.bbSize.toInt().toString()
-                            BetViewMode.BB -> defaultRingGame.bbSize.toString()
-                        },
-                        isEnabled = value == BetViewMode.Number
-                    ),
-                    defaultStack = uiState.defaultStack.copy(
-                        value = when (value) {
-                            BetViewMode.Number -> defaultRingGame.defaultStack.toInt().toString()
-                            BetViewMode.BB -> defaultRingGame.defaultStack.toString()
-                        }
+            _screenUiState.update {
+                TableCreatorUiState.MainContent(
+                    tableCreatorContentUiState = contentUiState.copy(
+                        betViewMode = value,
+                        sbSize = contentUiState.sbSize.copy(
+                            value = when (value) {
+                                BetViewMode.Number -> defaultRingGame.sbSize.toInt().toString()
+                                BetViewMode.BB -> defaultRingGame.sbSize.toString()
+                            }
+                        ),
+                        bbSize = contentUiState.bbSize.copy(
+                            value = when (value) {
+                                BetViewMode.Number -> defaultRingGame.bbSize.toInt().toString()
+                                BetViewMode.BB -> defaultRingGame.bbSize.toString()
+                            },
+                            isEnabled = value == BetViewMode.Number
+                        ),
+                        defaultStack = contentUiState.defaultStack.copy(
+                            value = when (value) {
+                                BetViewMode.Number -> defaultRingGame.defaultStack.toInt()
+                                    .toString()
+
+                                BetViewMode.BB -> defaultRingGame.defaultStack.toString()
+                            }
+                        )
                     )
                 )
             }
@@ -219,27 +211,31 @@ constructor(
      */
     fun onChangeStackSize(value: String) {
         viewModelScope.launch {
-            val uiState = uiState.value
+            val uiState = screenUiState.value
             if (uiState !is TableCreatorUiState.MainContent) {
                 return@launch
             }
-            when (uiState.betViewMode) {
+            when (uiState.tableCreatorContentUiState.betViewMode) {
                 BetViewMode.Number -> {
                     val intValue = value.toIntOrNull()
                     var errorMessage: ErrorMessage? = null
                     if (intValue != null && intValue > 0) {
                         // デフォルトを更新しておく
-                        defaultRuleStateOfRingGameRepository.setDefaultStackSizeOfNumberMode(intValue)
+                        defaultRuleStateOfRingGameRepository.setDefaultStackSizeOfNumberMode(
+                            intValue
+                        )
                     } else {
                         // エラーがある場合はエラーメッセージ
                         errorMessage =
                             ErrorMessage(errorMessageResId = R.string.input_error_message)
                     }
-                    _uiState.update {
+                    _screenUiState.update {
                         uiState.copy(
-                            defaultStack = uiState.defaultStack.copy(
-                                value = value,
-                                error = errorMessage
+                            tableCreatorContentUiState = uiState.tableCreatorContentUiState.copy(
+                                defaultStack = uiState.tableCreatorContentUiState.defaultStack.copy(
+                                    value = value,
+                                    error = errorMessage
+                                )
                             )
                         )
                     }
@@ -256,11 +252,13 @@ constructor(
                         errorMessage =
                             ErrorMessage(errorMessageResId = R.string.input_error_message)
                     }
-                    _uiState.update {
+                    _screenUiState.update {
                         uiState.copy(
-                            defaultStack = uiState.defaultStack.copy(
-                                value = value,
-                                error = errorMessage
+                            tableCreatorContentUiState = uiState.tableCreatorContentUiState.copy(
+                                defaultStack = uiState.tableCreatorContentUiState.defaultStack.copy(
+                                    value = value,
+                                    error = errorMessage
+                                )
                             )
                         )
                     }
@@ -273,29 +271,46 @@ constructor(
      * Submit
      */
     fun onClickSubmit() {
-        viewModelScope.launch {
-            createTable()
+
+        val contentUiState = tableCreatorContentUiState ?: return
+        if (contentUiState.sbSize.value.toDouble() > contentUiState.bbSize.value.toDouble()) {
+            // SB > BB は弾く
+            _screenUiState.update {
+                TableCreatorUiState.MainContent(
+                    tableCreatorContentUiState = contentUiState.copy(
+                        bottomErrorMessage = ErrorMessage(errorMessageResId = R.string.input_error_message_sb_bb)
+                    )
+                )
+            }
+        } else {
+            _screenUiState.update {
+                TableCreatorUiState.MainContent(
+                    tableCreatorContentUiState = contentUiState.copy(
+                        bottomErrorMessage = null
+                    )
+                )
+            }
+            viewModelScope.launch {
+                createTable()
+            }
         }
     }
 
     private suspend fun createTable() {
         val tableId = TableId(randomIdRepository.generateRandomId())
         // TODO: いろいろ
-        val uiState = uiState.value
-        if (uiState !is TableCreatorUiState.MainContent) {
-            return
-        }
-        val mainContentUiState = mainContentUiState ?: return
-        val betViewMode = uiState.betViewMode
+        val contentUiState = tableCreatorContentUiState ?: return
+        val betViewMode = contentUiState.betViewMode
         tableStateRepository.createNewTable(
             tableId = tableId,
             ruleState = RuleState.RingGame(
-                sbSize = mainContentUiState.sbSize.value.toDouble(),
-                bbSize = mainContentUiState.bbSize.value.toDouble(),
+                sbSize = contentUiState.sbSize.value.toDouble(),
+                bbSize = contentUiState.bbSize.value.toDouble(),
                 betViewMode = betViewMode,
-                defaultStack = mainContentUiState.defaultStack.value.toDouble()
+                defaultStack = contentUiState.defaultStack.value.toDouble()
             )
         )
+//        val tableId = TableId("83b543e1-e901-4115-b56b-d610cdd9267d")
         _navigateEvent.emit(NavigateEvent(tableId))
     }
 }
@@ -303,30 +318,6 @@ constructor(
 sealed interface TableCreatorUiState {
     data object Loading : TableCreatorUiState
     data class MainContent(
-        val gameType: GameType = GameType.RingGame,
-        val betViewMode: BetViewMode = BetViewMode.Number,
-        val sbSize: TextFieldErrorUiState = TextFieldErrorUiState(
-            label = R.string.sb_size_label,
-            value = "0.0"
-        ),
-        val bbSize: TextFieldErrorUiState = TextFieldErrorUiState(
-            label = R.string.bb_size_label,
-            value = "0.0"
-        ),
-        val defaultStack: TextFieldErrorUiState = TextFieldErrorUiState(
-            label = R.string.default_stack_label,
-            value = "0.0"
-        )
-    ) : TableCreatorUiState {
-
-        val enableSubmitButton: Boolean
-            get() = sbSize.error == null && bbSize.error == null && defaultStack.error == null
-
-        enum class GameType(
-            @StringRes
-            val labelResId: Int
-        ) {
-            RingGame(labelResId = R.string.game_type_ring)
-        }
-    }
+        val tableCreatorContentUiState: TableCreatorContentUiState
+    ) : TableCreatorUiState
 }

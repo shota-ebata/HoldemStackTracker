@@ -19,12 +19,12 @@ fun TableCreatorScreen(
         navigateToGame(it.tableId)
     }
 
-    val uiState: TableCreatorUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState: TableCreatorUiState by viewModel.screenUiState.collectAsStateWithLifecycle()
     when (val uiStateCast = uiState) {
         is TableCreatorUiState.Loading -> {}
         is TableCreatorUiState.MainContent -> {
             TableCreatorContent(
-                uiState = uiStateCast,
+                uiState = uiStateCast.tableCreatorContentUiState,
                 onChangeSizeOfSB = viewModel::onChangeSizeOfSB,
                 onChangeSizeOfBB = viewModel::onChangeSizeOfBB,
                 onClickBetViewMode = viewModel::onClickBetViewMode,

@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
@@ -23,14 +25,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
+import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.OutlinedTextFieldWithError
+import com.ebata_shota.holdemstacktracker.ui.compose.parts.TextFieldErrorUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.labelResId
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
-import com.ebata_shota.holdemstacktracker.ui.viewmodel.TableCreatorUiState
 
 @Composable
 fun TableCreatorContent(
-    uiState: TableCreatorUiState.MainContent,
+    uiState: TableCreatorContentUiState,
     onChangeSizeOfSB: (String) -> Unit,
     onChangeSizeOfBB: (String) -> Unit,
     onClickBetViewMode: (BetViewMode) -> Unit,
@@ -47,7 +50,7 @@ fun TableCreatorContent(
             text = stringResource(R.string.game_type),
             modifier = Modifier.padding(top = 16.dp)
         )
-        TableCreatorUiState.MainContent.GameType.entries.forEach {
+        TableCreatorContentUiState.GameType.entries.forEach {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -121,7 +124,14 @@ fun TableCreatorContent(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
 
-
+        if (uiState.bottomErrorMessage != null) {
+            Text(
+                text = stringResource(uiState.bottomErrorMessage.errorMessageResId),
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Red,
+                modifier = Modifier.padding(start = 16.dp)
+            )
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -143,12 +153,40 @@ fun TableCreatorContent(
 
 }
 
+data class TableCreatorContentUiState(
+    val gameType: GameType = GameType.RingGame,
+    val betViewMode: BetViewMode = BetViewMode.Number,
+    val sbSize: TextFieldErrorUiState = TextFieldErrorUiState(
+        label = R.string.sb_size_label,
+        value = "0.0"
+    ),
+    val bbSize: TextFieldErrorUiState = TextFieldErrorUiState(
+        label = R.string.bb_size_label,
+        value = "0.0"
+    ),
+    val defaultStack: TextFieldErrorUiState = TextFieldErrorUiState(
+        label = R.string.default_stack_label,
+        value = "0.0"
+    ),
+    val bottomErrorMessage: ErrorMessage? = null
+) {
+    val enableSubmitButton: Boolean
+        get() = sbSize.error == null && bbSize.error == null && defaultStack.error == null
+
+    enum class GameType(
+        @StringRes
+        val labelResId: Int
+    ) {
+        RingGame(labelResId = R.string.game_type_ring)
+    }
+}
+
 @Composable
 @Preview(showBackground = true)
 fun TableCreatorContentPreview() {
     HoldemStackTrackerTheme {
         TableCreatorContent(
-            uiState = TableCreatorUiState.MainContent(),
+            uiState = TableCreatorContentUiState(),
             onChangeSizeOfSB = {},
             onChangeSizeOfBB = {},
             onClickBetViewMode = {},
