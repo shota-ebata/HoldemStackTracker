@@ -6,10 +6,13 @@
     <string name="sb_size_label">SBサイズ</string>
     <string name="bb_size_label">BBサイズ</string>
     <string name="default_stack_label">初期スタック</string>
+    <string name="stack_size_label">スタックサイズ</string>
     <string name="input_error_message">入力値に問題があります</string>
     <string name="input_error_message_sb_bb">SBサイズはBBサイズ以下である必要があります</string>
     <string name="bet_view_type">スタック・チップ表示</string>
     <string name="bet_view_type_chip_number">チップサイズ表示</string>
     <string name="bet_view_type_chip_bb">BBサイズ表示（BBを1.0とする）</string>
     <string name="table_creator_submit">テーブル作成</string>
+
+    <string name="player_name_label">プレイヤー名</string>
 </resources>
