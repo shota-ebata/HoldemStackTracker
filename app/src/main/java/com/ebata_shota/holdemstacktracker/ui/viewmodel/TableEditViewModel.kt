@@ -18,6 +18,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthReposito
 import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetDoubleToStringUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameStateUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState
@@ -46,6 +47,7 @@ constructor(
     private val getNextGameState: GetNextGameStateUseCase,
     private val isActionRequired: IsActionRequiredUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
+    private val getDoubleToString: GetDoubleToStringUseCase
 ) : ViewModel() {
 
     private val tableIdString: String by savedStateHandle.param()
@@ -73,10 +75,10 @@ constructor(
                             val player = tableState.basePlayers.find { it.id == playerId }
                                 ?: return@mapNotNull null
 
-                            val playerStackString = when (tableState.ruleState.betViewMode) {
-                                BetViewMode.Number -> player.stack.toInt().toString()
-                                BetViewMode.BB -> player.stack.toString()
-                            }
+                            val playerStackString = getDoubleToString.invoke(
+                                value = player.stack,
+                                betViewMode = tableState.ruleState.betViewMode
+                            )
                             PlayerEditRowUiState(
                                 playerId = playerId,
                                 playerName = player.name,

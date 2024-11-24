@@ -12,6 +12,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRuleStateOfRingGameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetDoubleToStringUseCase
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableCreatorContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.TextFieldErrorUiState
@@ -33,7 +34,8 @@ constructor(
     savedStateHandle: SavedStateHandle,
     private val tableStateRepository: TableStateRepository,
     private val randomIdRepository: RandomIdRepository,
-    private val defaultRuleStateOfRingGameRepository: DefaultRuleStateOfRingGameRepository
+    private val defaultRuleStateOfRingGameRepository: DefaultRuleStateOfRingGameRepository,
+    private val getDoubleToString: GetDoubleToStringUseCase
 ) : ViewModel() {
 
     /**
@@ -55,25 +57,31 @@ constructor(
                         betViewMode = ringGame.betViewMode,
                         sbSize = TextFieldErrorUiState(
                             label = R.string.sb_size_label,
-                            value = when (ringGame.betViewMode) {
-                                BetViewMode.Number -> TextFieldValue(ringGame.sbSize.toInt().toString())
-                                BetViewMode.BB -> TextFieldValue(ringGame.sbSize.toString())
-                            }
+                            value = TextFieldValue(
+                                getDoubleToString.invoke(
+                                    value = ringGame.sbSize,
+                                    betViewMode = ringGame.betViewMode
+                                )
+                            )
                         ),
                         bbSize = TextFieldErrorUiState(
                             label = R.string.bb_size_label,
-                            value = when (ringGame.betViewMode) {
-                                BetViewMode.Number -> TextFieldValue(ringGame.bbSize.toInt().toString())
-                                BetViewMode.BB -> TextFieldValue(ringGame.bbSize.toString())
-                            },
+                            value = TextFieldValue(
+                                getDoubleToString.invoke(
+                                    value = ringGame.bbSize,
+                                    betViewMode = ringGame.betViewMode
+                                )
+                            ),
                             isEnabled = ringGame.betViewMode == BetViewMode.Number
                         ),
                         defaultStack = TextFieldErrorUiState(
                             label = R.string.default_stack_label,
-                            value = when (ringGame.betViewMode) {
-                                BetViewMode.Number -> TextFieldValue(ringGame.defaultStack.toInt().toString())
-                                BetViewMode.BB -> TextFieldValue(ringGame.defaultStack.toString())
-                            }
+                            value = TextFieldValue(
+                                getDoubleToString.invoke(
+                                    value = ringGame.defaultStack,
+                                    betViewMode = ringGame.betViewMode
+                                )
+                            )
                         ),
                         bottomErrorMessage = null
                     )
@@ -183,24 +191,29 @@ constructor(
                     tableCreatorContentUiState = contentUiState.copy(
                         betViewMode = value,
                         sbSize = contentUiState.sbSize.copy(
-                            value = when (value) {
-                                BetViewMode.Number -> TextFieldValue(defaultRingGame.sbSize.toInt().toString())
-                                BetViewMode.BB -> TextFieldValue(defaultRingGame.sbSize.toString())
-                            }
+                            value = TextFieldValue(
+                                getDoubleToString.invoke(
+                                    value = defaultRingGame.sbSize,
+                                    betViewMode = value
+                                )
+                            )
                         ),
                         bbSize = contentUiState.bbSize.copy(
-                            value = when (value) {
-                                BetViewMode.Number -> TextFieldValue(defaultRingGame.bbSize.toInt().toString())
-                                BetViewMode.BB -> TextFieldValue(defaultRingGame.bbSize.toString())
-                            },
+                            value = TextFieldValue(
+                                getDoubleToString.invoke(
+                                    value = defaultRingGame.bbSize,
+                                    betViewMode = value
+                                )
+                            ),
                             isEnabled = value == BetViewMode.Number
                         ),
                         defaultStack = contentUiState.defaultStack.copy(
-                            value = when (value) {
-                                BetViewMode.Number -> TextFieldValue(defaultRingGame.defaultStack.toInt().toString())
-
-                                BetViewMode.BB -> TextFieldValue(defaultRingGame.defaultStack.toString())
-                            }
+                            value = TextFieldValue(
+                                getDoubleToString.invoke(
+                                    value = defaultRingGame.defaultStack,
+                                    betViewMode = value
+                                )
+                            )
                         )
                     )
                 )

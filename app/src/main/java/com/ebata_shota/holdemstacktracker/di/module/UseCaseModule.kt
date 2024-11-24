@@ -11,7 +11,9 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUse
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPodStateListUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetDoubleToStringUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetDoubleToStringUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextPhaseUseCaseImpl
@@ -62,4 +64,7 @@ interface UseCaseModule {
 
     @Binds
     fun bindGetCurrentPlayerIdUseCase(useCase: GetCurrentPlayerIdUseCaseImpl): GetCurrentPlayerIdUseCase
+
+    @Binds
+    fun bindGetDoubleToStringUseCase(useCase: GetDoubleToStringUseCaseImpl): GetDoubleToStringUseCase
 }
