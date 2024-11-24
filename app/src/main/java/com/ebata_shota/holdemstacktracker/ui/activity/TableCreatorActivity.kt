@@ -24,7 +24,7 @@ class TableCreatorActivity : ComponentActivity() {
     }
 
     private fun navigateToGame(tableId: TableId) {
-        val intent = TableStandbyActivity.intent(this, tableId)
+        val intent = TableEditActivity.intent(this, tableId)
         startActivity(intent)
     }
 

@@ -31,7 +31,7 @@
             android:theme="@style/Theme.HoldemStackTracker" />
 
         <activity
-            android:name=".ui.activity.TableStandbyActivity"
+            android:name=".ui.activity.TableEditActivity"
             android:exported="false"
             android:theme="@style/Theme.HoldemStackTracker" />
     </application>
