@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.ui.compose.screen.MainScreen
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -23,35 +24,20 @@ class MainActivity : ComponentActivity() {
 //        enableEdgeToEdge()
         setContent {
             HoldemStackTrackerTheme {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    Button(
-                        onClick = {
-                            navigateToTableCreator()
-                        }
-                    ) {
-                        Text(
-                            text = "TableCreator"
-                        )
+                MainScreen(
+                    navigateToNextScreen = {
+                        navigateToNextActivity()
                     }
-
-                    Button(
-                        onClick = {
-                            navigateToTableStandby()
-                        }
-                    ) {
-                        Text(
-                            text = "TableStandby"
-                        )
-                    }
-                }
+                )
             }
         }
     }
+
+    private fun navigateToNextActivity() {
+        // TODO: startActivity
+    }
+
+
 
     private fun navigateToTableCreator() {
         val intent = TableCreatorActivity.intent(context = this)
