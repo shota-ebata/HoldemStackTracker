@@ -9,7 +9,9 @@
 /.idea/assetWizardSettings.xml
 /.idea/misc.xml
 /.idea/gradle.xml
-/.idea/runConfigurations.xml.xml
+/.idea/runConfigurations.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/modules/app/HoldemStackTracker.app.iml
 .DS_Store
 /build
 /captures
