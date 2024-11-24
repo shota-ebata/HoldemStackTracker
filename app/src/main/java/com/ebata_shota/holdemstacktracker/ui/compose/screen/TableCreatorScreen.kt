@@ -6,8 +6,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableCreatorContent
+import com.ebata_shota.holdemstacktracker.ui.compose.content.TableCreatorContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
-import com.ebata_shota.holdemstacktracker.ui.viewmodel.TableCreatorUiState
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.TableCreatorViewModel
 
 @Composable
@@ -33,4 +33,11 @@ fun TableCreatorScreen(
             )
         }
     }
+}
+
+sealed interface TableCreatorUiState {
+    data object Loading : TableCreatorUiState
+    data class MainContent(
+        val tableCreatorContentUiState: TableCreatorContentUiState
+    ) : TableCreatorUiState
 }

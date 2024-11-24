@@ -15,6 +15,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableCreatorContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.TextFieldErrorUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableCreatorUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -315,11 +316,4 @@ constructor(
 //        val tableId = TableId("83b543e1-e901-4115-b56b-d610cdd9267d")
         _navigateEvent.emit(NavigateEvent(tableId))
     }
-}
-
-sealed interface TableCreatorUiState {
-    data object Loading : TableCreatorUiState
-    data class MainContent(
-        val tableCreatorContentUiState: TableCreatorContentUiState
-    ) : TableCreatorUiState
 }

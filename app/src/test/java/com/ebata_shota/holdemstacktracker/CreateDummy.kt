@@ -35,5 +35,6 @@ fun createDummyTableState(
     basePlayers = emptyList(),
     waitPlayers = emptyList(),
     startTime = 0L,
-    tableCreateTime = 0L
+    tableCreateTime = 0L,
+    updateTime = 0L
 )
