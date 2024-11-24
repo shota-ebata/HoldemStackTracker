@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 

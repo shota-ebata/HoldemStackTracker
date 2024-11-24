@@ -3,19 +3,17 @@ package com.ebata_shota.holdemstacktracker.ui.compose.parts
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 
@@ -24,10 +22,10 @@ fun OutlinedTextFieldWithError(
     uiState: TextFieldErrorUiState,
     onValueChange: (TextFieldValue) -> Unit,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    modifier: Modifier = Modifier.fillMaxWidth()
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.padding(bottom = 16.dp)
+        modifier = modifier
     ) {
         OutlinedTextField(
             value = uiState.value,
@@ -42,8 +40,8 @@ fun OutlinedTextFieldWithError(
         if (uiState.error != null) {
             Text(
                 text = stringResource(uiState.error.errorMessageResId),
-                color = Color.Red,
-                modifier = Modifier
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
             )
         }
     }

@@ -1,5 +1,7 @@
 package com.ebata_shota.holdemstacktracker.ui.activity
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,5 +26,9 @@ class TableCreatorActivity : ComponentActivity() {
     private fun navigateToGame(tableId: TableId) {
         val intent = TableStandbyActivity.intent(this, tableId)
         startActivity(intent)
+    }
+
+    companion object {
+        fun intent(context: Context) = Intent(context, TableCreatorActivity::class.java)
     }
 }

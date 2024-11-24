@@ -47,7 +47,6 @@ fun TableCreatorContent(
             .selectableGroup()
             .padding(16.dp)
     ) {
-
         Text(
             text = stringResource(R.string.game_type),
             modifier = Modifier.padding(top = 16.dp)
@@ -112,18 +111,27 @@ fun TableCreatorContent(
         OutlinedTextFieldWithError(
             uiState = uiState.sbSize,
             onValueChange = onChangeSizeOfSB,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
         )
         OutlinedTextFieldWithError(
             uiState = uiState.bbSize,
             onValueChange = onChangeSizeOfBB,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
         )
 
         OutlinedTextFieldWithError(
             uiState = uiState.defaultStack,
             onValueChange = onChangeStackSize,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
         )
 
         if (uiState.bottomErrorMessage != null) {

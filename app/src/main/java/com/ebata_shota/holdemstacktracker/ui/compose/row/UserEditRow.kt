@@ -1,4 +1,4 @@
-package com.ebata_shota.holdemstacktracker.ui.compose.content
+package com.ebata_shota.holdemstacktracker.ui.compose.row
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -24,8 +24,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
-import com.ebata_shota.holdemstacktracker.ui.compose.content.UserEditUiState.StackSize.EditableStackSize
-import com.ebata_shota.holdemstacktracker.ui.compose.content.UserEditUiState.StackSize.NonEditableStackSize
+import com.ebata_shota.holdemstacktracker.ui.compose.row.UserEditUiState.StackSize.EditableStackSize
+import com.ebata_shota.holdemstacktracker.ui.compose.row.UserEditUiState.StackSize.NonEditableStackSize
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.OutlinedTextFieldWithError
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.TextFieldErrorUiState
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
