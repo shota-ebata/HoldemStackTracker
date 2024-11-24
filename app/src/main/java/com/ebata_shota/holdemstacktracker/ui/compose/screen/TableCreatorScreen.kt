@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableCreatorContent
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.TableCreatorUiState
@@ -21,7 +22,9 @@ fun TableCreatorScreen(
 
     val uiState: TableCreatorUiState by viewModel.screenUiState.collectAsStateWithLifecycle()
     when (val uiStateCast = uiState) {
-        is TableCreatorUiState.Loading -> {}
+        is TableCreatorUiState.Loading -> {
+            LoadingContent()
+        }
         is TableCreatorUiState.MainContent -> {
             TableCreatorContent(
                 uiState = uiStateCast.tableCreatorContentUiState,
