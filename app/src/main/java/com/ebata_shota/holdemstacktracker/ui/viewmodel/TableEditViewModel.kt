@@ -1,19 +1,22 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
 import android.os.Bundle
+import android.util.Log
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.BuildConfig
+import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
+import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
-import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
 import com.ebata_shota.holdemstacktracker.domain.model.GameState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.PodState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.domain.model.TableState
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
@@ -21,17 +24,21 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCa
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetDoubleToStringUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameStateUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
+import com.ebata_shota.holdemstacktracker.ui.compose.content.StackEditDialogState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.parts.TextFieldErrorUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.PlayerEditRowUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableEditScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -55,16 +62,20 @@ constructor(
 
     private val _uiState = MutableStateFlow<TableEditScreenUiState>(TableEditScreenUiState.Loading)
     val uiState = _uiState.asStateFlow()
-    private val tableEditContentUiState: TableEditContentUiState?
-        get() = (uiState.value as? TableEditScreenUiState.Content)?.contentUiState
 
     private val _navigateEvent = MutableSharedFlow<TableId>()
     val navigateEvent = _navigateEvent.asSharedFlow()
 
+    private val tableStateFlow: StateFlow<TableState?> = tableStateRepository.tableFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = null
+    )
+
     init {
         viewModelScope.launch {
             combine(
-                tableStateRepository.tableFlow,
+                tableStateFlow.mapNotNull { it },
                 firebaseAuthRepository.uidFlow
             ) { tableState, uid ->
                 val isHost = tableState.hostPlayerId == PlayerId(uid)
@@ -82,58 +93,125 @@ constructor(
                             PlayerEditRowUiState(
                                 playerId = playerId,
                                 playerName = player.name,
-                                stackSize = if (isHost) {
-                                    PlayerEditRowUiState.StackSize.EditableStackSize(
-                                        stackSizeTextFieldUiState = TextFieldErrorUiState(
-                                            TextFieldValue(playerStackString)
-                                        ),
-                                    )
-                                } else {
-                                    PlayerEditRowUiState.StackSize.NonEditableStackSize(
-                                        value = playerStackString
-                                    )
-                                }, // TODO: tableStateRepository.tableFlowと直通させるとちょっときついかも
-                                reorderable = isHost
+                                stackSize = playerStackString,
+                                isEditable = isHost
                             )
                         },
                         isAddable = isHost
-                    )
+                    ),
+                    stackEditDialogState = null
                 )
             }.collect(_uiState)
         }
 
         viewModelScope.launch {
             tableStateRepository.startCollectTableFlow(tableId)
-//            test(tableId)
         }
     }
 
-    fun onChangeStackSize(
-        playerId: PlayerId,
-        value: TextFieldValue
-    ) {
+    fun onClickStackEditButton(playerId: PlayerId, stackText: String) {
         _uiState.update {
-            if (it !is TableEditScreenUiState.Content) {
-                return@update it
-            }
-            val playerEditRows = it.contentUiState.playerEditRows.map { playerEditRowUiState ->
-                if (playerEditRowUiState.playerId == playerId) {
-                    playerEditRowUiState.copy(
-                        stackSize = PlayerEditRowUiState.StackSize.EditableStackSize(
-                            stackSizeTextFieldUiState = TextFieldErrorUiState(
-                                value = value
-                            )
-                        )
-                    )
-                } else {
-                    playerEditRowUiState
-                }
-            }
-            it.copy(
-                contentUiState = it.contentUiState.copy(
-                    playerEditRows = playerEditRows
+            val contentUiState = (it as? TableEditScreenUiState.Content) ?: return@update it
+            contentUiState.copy(
+                stackEditDialogState = StackEditDialogState(
+                    playerId = playerId,
+                    stackValue = TextFieldValue(stackText)
                 )
             )
+        }
+    }
+
+    fun onChangeStackSize(value: TextFieldValue) {
+        _uiState.update {
+            val contentUiState = (it as? TableEditScreenUiState.Content) ?: return@update it
+            contentUiState.copy(
+                stackEditDialogState = contentUiState.stackEditDialogState?.copy(
+                    stackValue = value
+                )
+            )
+        }
+    }
+
+
+    fun onClickStackEditSubmit(playerId: PlayerId) {
+        viewModelScope.launch {
+            val contentUiState = (uiState.value as? TableEditScreenUiState.Content)
+                ?: return@launch
+            val stackValueText = contentUiState.stackEditDialogState?.stackValue?.text
+                ?: return@launch
+            val tableState = tableStateFlow.value ?: return@launch
+            val index = tableState.basePlayers.indexOfFirstOrNull { it.id == playerId }
+                ?: return@launch
+            tableStateRepository.sendTableState(
+                newTableState = tableState.copy(
+                    basePlayers = tableState.basePlayers.mapAtIndex(index = index) {
+                        it.copy(
+                            stack = stackValueText.toDouble() // TODO: バリデーションしたい
+                        )
+                    }
+                )
+            )
+        }
+    }
+
+    fun onClickUpButton(playerId: PlayerId) {
+        viewModelScope.launch {
+            val tableState = tableStateFlow.value ?: return@launch
+            val playerOrder = tableState.playerOrder
+            val currentIndex = playerOrder.indexOf(playerId)
+            val prevIndex = if (currentIndex - 1 in 0..playerOrder.lastIndex) {
+                currentIndex - 1
+            } else {
+                null
+            }
+            if (prevIndex != null) {
+                val newTableState = tableState.copy(
+                    playerOrder = moveItem(
+                        list = playerOrder.toMutableList(),
+                        fromIndex = currentIndex,
+                        toIndex = prevIndex
+                    )
+                )
+                tableStateRepository.sendTableState(newTableState)
+            }
+        }
+    }
+
+    fun onClickDownButton(playerId: PlayerId) {
+        viewModelScope.launch {
+            val tableState = tableStateFlow.value ?: return@launch
+            val playerOrder = tableState.playerOrder
+            val currentIndex = playerOrder.indexOf(playerId)
+            val nextIndex = if (currentIndex + 1 in 0..playerOrder.lastIndex) {
+                currentIndex + 1
+            } else {
+                null
+            }
+            if (nextIndex != null) {
+                val newTableState = tableState.copy(
+                    playerOrder = moveItem(
+                        list = playerOrder.toMutableList(),
+                        fromIndex = currentIndex,
+                        toIndex = nextIndex
+                    )
+                )
+                tableStateRepository.sendTableState(newTableState)
+            }
+        }
+    }
+
+    private fun <T> moveItem(list: MutableList<T>, fromIndex: Int, toIndex: Int): List<T> {
+        // アイテムを取り出してから削除
+        val item = list.removeAt(fromIndex)
+        // 指定されたインデックスに挿入
+        list.add(toIndex, item)
+        return list
+    }
+
+    fun onDismissRequestStackEditDialog() {
+        _uiState.update {
+            val contentUiState = (it as? TableEditScreenUiState.Content) ?: return@update it
+            contentUiState.copy(stackEditDialogState = null)
         }
     }
 

@@ -15,14 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.ui.compose.parts.TextFieldErrorUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.PlayerEditRowUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.UserEditRow
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
@@ -31,7 +29,9 @@ import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 @Composable
 fun TableEditContent(
     uiState: TableEditContentUiState,
-    onChangeStackSize: (PlayerId, TextFieldValue) -> Unit
+    onClickStackEditButton: (PlayerId, String) -> Unit,
+    onClickUpButton: (PlayerId) -> Unit,
+    onClickDownButton: (PlayerId) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -70,8 +70,17 @@ fun TableEditContent(
             itemsIndexed(uiState.playerEditRows) { index, playerEditRowUiState ->
                 UserEditRow(
                     uiState = playerEditRowUiState,
-                    onChangeStackSize = {
-                        onChangeStackSize.invoke(playerEditRowUiState.playerId, it)
+                    onClickStackEditButton = {
+                        onClickStackEditButton(
+                            playerEditRowUiState.playerId,
+                            playerEditRowUiState.stackSize
+                        )
+                    },
+                    onClickUpButton = {
+                        onClickUpButton(playerEditRowUiState.playerId)
+                    },
+                    onClickDownButton = {
+                        onClickDownButton(playerEditRowUiState.playerId)
                     },
                     modifier = Modifier
                         .padding(vertical = 4.dp)
@@ -97,8 +106,8 @@ private class PreviewParam : PreviewParameterProvider<TableEditContentUiState> {
                 PlayerEditRowUiState(
                     playerId = PlayerId("playerId$it"),
                     playerName = "PlayerName$it",
-                    stackSize = PlayerEditRowUiState.StackSize.NonEditableStackSize("10000"),
-                    reorderable = false
+                    stackSize = "10000",
+                    isEditable = false
                 )
             },
             isAddable = false
@@ -108,12 +117,8 @@ private class PreviewParam : PreviewParameterProvider<TableEditContentUiState> {
                 PlayerEditRowUiState(
                     playerId = PlayerId("playerId$it"),
                     playerName = "PlayerName$it",
-                    stackSize = PlayerEditRowUiState.StackSize.EditableStackSize(
-                        stackSizeTextFieldUiState = TextFieldErrorUiState(
-                            value = TextFieldValue("10000")
-                        )
-                    ),
-                    reorderable = true
+                    stackSize = "10000",
+                    isEditable = true
                 )
             },
             isAddable = true
@@ -129,7 +134,9 @@ fun TableEditContentPreview(
     HoldemStackTrackerTheme {
         TableEditContent(
             uiState = uiState,
-            onChangeStackSize = { _, _ -> }
+            onClickStackEditButton = { _, _ -> },
+            onClickUpButton = {},
+            onClickDownButton = {}
         )
     }
 }

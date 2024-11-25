@@ -6,6 +6,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
+import com.ebata_shota.holdemstacktracker.ui.compose.content.StackEditDialogContent
+import com.ebata_shota.holdemstacktracker.ui.compose.content.StackEditDialogState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
@@ -26,11 +28,23 @@ fun TableEditScreen(
         is TableEditScreenUiState.Loading -> {
             LoadingContent()
         }
+
         is TableEditScreenUiState.Content -> {
             TableEditContent(
                 uiState = uiState.contentUiState,
-                onChangeStackSize = viewModel::onChangeStackSize
+                onClickStackEditButton = viewModel::onClickStackEditButton,
+                onClickUpButton = viewModel::onClickUpButton,
+                onClickDownButton = viewModel::onClickDownButton
             )
+            val stackEditDialogState = uiState.stackEditDialogState
+            if (stackEditDialogState != null) {
+                StackEditDialogContent(
+                    uiState = stackEditDialogState,
+                    onDismissRequest = viewModel::onDismissRequestStackEditDialog,
+                    onChangeEditText = viewModel::onChangeStackSize,
+                    onClickSubmitButton = viewModel::onClickStackEditSubmit
+                )
+            }
         }
     }
 }
@@ -38,6 +52,7 @@ fun TableEditScreen(
 sealed interface TableEditScreenUiState {
     data object Loading : TableEditScreenUiState
     data class Content(
-        val contentUiState: TableEditContentUiState
+        val contentUiState: TableEditContentUiState,
+        val stackEditDialogState: StackEditDialogState?
     ) : TableEditScreenUiState
 }
