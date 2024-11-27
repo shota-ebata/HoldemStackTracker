@@ -6,6 +6,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableState
+import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -32,6 +33,7 @@ constructor() {
         private const val PLAYER_STACK = "stack"
         private const val PLAYER_ORDER = "playerOrder"
         private const val BTN_PLAYER_ID = "btnPlayerId"
+        private const val TABLE_STATUS = "tableStatus"
         private const val START_TIME = "startTime"
         private const val TABLE_CREATE_TIME = "tableCreateTime"
         private const val UPDATE_TIME = "updateTime"
@@ -52,6 +54,7 @@ constructor() {
             } ?: emptyList(),
             playerOrder = (tableMap[PLAYER_ORDER] as List<*>).map { PlayerId(it as String) },
             btnPlayerId = PlayerId(tableMap[BTN_PLAYER_ID] as String),
+            tableStatus = TableStatus.of(tableMap[TABLE_STATUS] as String),
             startTime = tableMap[START_TIME] as Long,
             tableCreateTime = tableMap[TABLE_CREATE_TIME] as Long,
             updateTime = tableMap[UPDATE_TIME] as Long
@@ -113,6 +116,7 @@ constructor() {
             it.value
         },
         BTN_PLAYER_ID to tableState.btnPlayerId.value,
+        TABLE_STATUS to tableState.tableStatus.name,
         START_TIME to tableState.startTime,
         TABLE_CREATE_TIME to tableState.tableCreateTime,
         UPDATE_TIME to tableState.updateTime

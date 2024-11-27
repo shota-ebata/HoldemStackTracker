@@ -8,6 +8,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableState
+import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
@@ -75,6 +76,7 @@ constructor(
                     )
                 ),
                 waitPlayers = emptyList(),
+                tableStatus = TableStatus.STANDBY,
                 startTime = 0L,
                 tableCreateTime = tableCreateTime,
                 updateTime = tableCreateTime
