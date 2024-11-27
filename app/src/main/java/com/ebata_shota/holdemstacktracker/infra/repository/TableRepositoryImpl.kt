@@ -7,11 +7,11 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
-import com.ebata_shota.holdemstacktracker.domain.model.TableState
+import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
-import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableStateMapper
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class TableStateRepositoryImpl
+class TableRepositoryImpl
 @Inject
 constructor(
     firebaseDatabase: FirebaseDatabase,
@@ -42,14 +42,14 @@ constructor(
     private val appCoroutineScope: CoroutineScope,
     @CoroutineDispatcherIO
     private val ioDispatcher: CoroutineDispatcher
-) : TableStateRepository {
+) : TableRepository {
 
     private val tablesRef: DatabaseReference = firebaseDatabase.getReference(
         "tables"
     )
 
-    private val _tableFlow = MutableSharedFlow<TableState>()
-    override val tableFlow: SharedFlow<TableState> = _tableFlow.asSharedFlow()
+    private val _tableFlow = MutableSharedFlow<Table>()
+    override val tableFlow: SharedFlow<Table> = _tableFlow.asSharedFlow()
 
     override suspend fun createNewTable(
         tableId: TableId,
@@ -60,7 +60,7 @@ constructor(
             val myPlayerId = PlayerId(uid)
             val myName = prefRepository.myName.first()
             val tableCreateTime = System.currentTimeMillis()
-            val tableState = TableState(
+            val table = Table(
                 id = tableId,
                 version = 0L,
                 appVersion = BuildConfig.VERSION_CODE.toLong(),
@@ -81,7 +81,7 @@ constructor(
                 tableCreateTime = tableCreateTime,
                 updateTime = tableCreateTime
             )
-            sendTableState(tableState)
+            sendTable(table)
         }
     }
 
@@ -118,11 +118,11 @@ constructor(
         collectTableJob?.cancel()
     }
 
-    override suspend fun sendTableState(
-        newTableState: TableState
+    override suspend fun sendTable(
+        newTable: Table
     ) {
-        val tableMap = tableMapper.toMap(newTableState)
-        val tableRef = tablesRef.child(newTableState.id.value)
+        val tableMap = tableMapper.toMap(newTable)
+        val tableRef = tablesRef.child(newTable.id.value)
         tableRef.setValue(tableMap)
     }
 }

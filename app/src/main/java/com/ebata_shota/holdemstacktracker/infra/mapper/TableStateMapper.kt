@@ -5,7 +5,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
-import com.ebata_shota.holdemstacktracker.domain.model.TableState
+import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -41,8 +41,8 @@ constructor() {
 
     private fun Any.getDouble() = (this as? Double) ?: (this as Long).toDouble()
 
-    fun mapToTableState(tableId: TableId, tableMap: Map<*, *>): TableState {
-        return TableState(
+    fun mapToTableState(tableId: TableId, tableMap: Map<*, *>): Table {
+        return Table(
             id = tableId,
             version = tableMap[TABLE_VERSION] as Long,
             appVersion = tableMap[APP_VERSION] as Long,
@@ -82,43 +82,43 @@ constructor() {
         else -> throw IllegalStateException("unsupported ruleType = $ruleType")
     }
 
-    fun toMap(tableState: TableState): Map<String, Any> = hashMapOf(
-        TABLE_VERSION to tableState.version,
-        APP_VERSION to tableState.appVersion,
-        HOST_PLAYER_ID to tableState.hostPlayerId.value,
-        BTN_PLAYER_ID to tableState.btnPlayerId.value,
-        RULE to when (val ruleState = tableState.ruleState) {
+    fun toMap(table: Table): Map<String, Any> = hashMapOf(
+        TABLE_VERSION to table.version,
+        APP_VERSION to table.appVersion,
+        HOST_PLAYER_ID to table.hostPlayerId.value,
+        BTN_PLAYER_ID to table.btnPlayerId.value,
+        RULE to when (val ruleState = table.ruleState) {
             is RuleState.RingGame -> {
                 mapOf(
                     RULE_TYPE to RULE_TYPE_RING_GAME,
-                    RULE_BET_VIEW_MODE to tableState.ruleState.betViewMode.name,
+                    RULE_BET_VIEW_MODE to table.ruleState.betViewMode.name,
                     RULE_SB_SIZE to ruleState.sbSize,
                     RULE_BB_SIZE to ruleState.bbSize,
                     RULE_DEFAULT_STACK to ruleState.defaultStack
                 )
             }
         },
-        BASE_PLAYERS to tableState.basePlayers.map {
+        BASE_PLAYERS to table.basePlayers.map {
             hashMapOf(
                 PLAYER_ID to it.id.value,
                 PLAYER_NAME to it.name,
                 PLAYER_STACK to it.stack
             )
         },
-        WAIT_PLAYERS to tableState.waitPlayers.map {
+        WAIT_PLAYERS to table.waitPlayers.map {
             hashMapOf(
                 PLAYER_ID to it.id.value,
                 PLAYER_NAME to it.name,
                 PLAYER_STACK to it.stack
             )
         },
-        PLAYER_ORDER to tableState.playerOrder.map {
+        PLAYER_ORDER to table.playerOrder.map {
             it.value
         },
-        BTN_PLAYER_ID to tableState.btnPlayerId.value,
-        TABLE_STATUS to tableState.tableStatus.name,
-        START_TIME to tableState.startTime,
-        TABLE_CREATE_TIME to tableState.tableCreateTime,
-        UPDATE_TIME to tableState.updateTime
+        BTN_PLAYER_ID to table.btnPlayerId.value,
+        TABLE_STATUS to table.tableStatus.name,
+        START_TIME to table.startTime,
+        TABLE_CREATE_TIME to table.tableCreateTime,
+        UPDATE_TIME to table.updateTime
     )
 }

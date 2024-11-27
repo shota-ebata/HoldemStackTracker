@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.model
 
-data class TableState(
+data class Table(
     val id: TableId,
     val version: Long,
     val appVersion: Long,

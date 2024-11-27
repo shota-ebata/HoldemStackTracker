@@ -1,7 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
 import android.os.Bundle
-import android.util.Log
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -16,10 +15,10 @@ import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.PodState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
-import com.ebata_shota.holdemstacktracker.domain.model.TableState
+import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
-import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetDoubleToStringUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameStateUseCase
@@ -48,7 +47,7 @@ class TableEditViewModel
 @Inject
 constructor(
     savedStateHandle: SavedStateHandle,
-    private val tableStateRepository: TableStateRepository,
+    private val tableRepository: TableRepository,
     private val gameStateRepository: GameStateRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val getNextGameState: GetNextGameStateUseCase,
@@ -66,7 +65,7 @@ constructor(
     private val _navigateEvent = MutableSharedFlow<TableId>()
     val navigateEvent = _navigateEvent.asSharedFlow()
 
-    private val tableStateFlow: StateFlow<TableState?> = tableStateRepository.tableFlow.stateIn(
+    private val tableFlow: StateFlow<Table?> = tableRepository.tableFlow.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
         initialValue = null
@@ -75,7 +74,7 @@ constructor(
     init {
         viewModelScope.launch {
             combine(
-                tableStateFlow.mapNotNull { it },
+                tableFlow.mapNotNull { it },
                 firebaseAuthRepository.uidFlow
             ) { tableState, uid ->
                 val isHost = tableState.hostPlayerId == PlayerId(uid)
@@ -105,7 +104,7 @@ constructor(
         }
 
         viewModelScope.launch {
-            tableStateRepository.startCollectTableFlow(tableId)
+            tableRepository.startCollectTableFlow(tableId)
         }
     }
 
@@ -139,11 +138,11 @@ constructor(
                 ?: return@launch
             val stackValueText = contentUiState.stackEditDialogState?.stackValue?.text
                 ?: return@launch
-            val tableState = tableStateFlow.value ?: return@launch
+            val tableState = tableFlow.value ?: return@launch
             val index = tableState.basePlayers.indexOfFirstOrNull { it.id == playerId }
                 ?: return@launch
-            tableStateRepository.sendTableState(
-                newTableState = tableState.copy(
+            tableRepository.sendTable(
+                newTable = tableState.copy(
                     basePlayers = tableState.basePlayers.mapAtIndex(index = index) {
                         it.copy(
                             stack = stackValueText.toDouble() // TODO: バリデーションしたい
@@ -156,7 +155,7 @@ constructor(
 
     fun onClickUpButton(playerId: PlayerId) {
         viewModelScope.launch {
-            val tableState = tableStateFlow.value ?: return@launch
+            val tableState = tableFlow.value ?: return@launch
             val playerOrder = tableState.playerOrder
             val currentIndex = playerOrder.indexOf(playerId)
             val prevIndex = if (currentIndex - 1 in 0..playerOrder.lastIndex) {
@@ -172,14 +171,14 @@ constructor(
                         toIndex = prevIndex
                     )
                 )
-                tableStateRepository.sendTableState(newTableState)
+                tableRepository.sendTable(newTableState)
             }
         }
     }
 
     fun onClickDownButton(playerId: PlayerId) {
         viewModelScope.launch {
-            val tableState = tableStateFlow.value ?: return@launch
+            val tableState = tableFlow.value ?: return@launch
             val playerOrder = tableState.playerOrder
             val currentIndex = playerOrder.indexOf(playerId)
             val nextIndex = if (currentIndex + 1 in 0..playerOrder.lastIndex) {
@@ -195,7 +194,7 @@ constructor(
                         toIndex = nextIndex
                     )
                 )
-                tableStateRepository.sendTableState(newTableState)
+                tableRepository.sendTable(newTableState)
             }
         }
     }

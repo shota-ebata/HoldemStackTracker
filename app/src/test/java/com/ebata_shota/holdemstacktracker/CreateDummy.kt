@@ -7,7 +7,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
-import com.ebata_shota.holdemstacktracker.domain.model.TableState
+import com.ebata_shota.holdemstacktracker.domain.model.Table
+import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 
 fun createDummyGameState(
     players: List<GamePlayerState> = emptyList(),
@@ -21,10 +22,10 @@ fun createDummyGameState(
     updateTime = 0L
 )
 
-fun createDummyTableState(
+fun createDummyTable(
     playerOrder: List<PlayerId> = emptyList(),
     phaseStateList: List<PhaseState> = emptyList()
-) = TableState(
+) = Table(
     id = TableId("0L"),
     version = 0L,
     appVersion = BuildConfig.VERSION_CODE.toLong(),
@@ -34,6 +35,8 @@ fun createDummyTableState(
     btnPlayerId = PlayerId(""),
     basePlayers = emptyList(),
     waitPlayers = emptyList(),
+    tableStatus = TableStatus.STANDBY,
     startTime = 0L,
-    tableCreateTime = 0L
+    tableCreateTime = 0L,
+    updateTime = 0L
 )

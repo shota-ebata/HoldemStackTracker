@@ -11,7 +11,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRuleStateOfRingGameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
-import com.ebata_shota.holdemstacktracker.domain.repository.TableStateRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetDoubleToStringUseCase
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableCreatorContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
@@ -32,7 +32,7 @@ class TableCreatorViewModel
 @Inject
 constructor(
     savedStateHandle: SavedStateHandle,
-    private val tableStateRepository: TableStateRepository,
+    private val tableRepository: TableRepository,
     private val randomIdRepository: RandomIdRepository,
     private val defaultRuleStateOfRingGameRepository: DefaultRuleStateOfRingGameRepository,
     private val getDoubleToString: GetDoubleToStringUseCase
@@ -316,7 +316,7 @@ constructor(
         // TODO: いろいろ
         val contentUiState = tableCreatorContentUiState ?: return
         val betViewMode = contentUiState.betViewMode
-        tableStateRepository.createNewTable(
+        tableRepository.createNewTable(
             tableId = tableId,
             ruleState = RuleState.RingGame(
                 sbSize = contentUiState.sbSize.value.text.toDouble(),
