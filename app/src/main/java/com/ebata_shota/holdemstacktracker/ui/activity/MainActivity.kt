@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
     private fun navigateToTableStandby() {
         val intent = TableEditActivity.intent(
             context = this,
-            tableId = TableId("625885eb-20f6-459f-a8a9-edfb4bbd2a3f")
+            tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e")
         )
         startActivity(intent)
     }
