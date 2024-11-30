@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,8 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 
@@ -25,16 +28,34 @@ fun MainContent(
     uiState: MainContentUiState,
     onClickFloatingButton: () -> Unit,
     onClickTableRow: (TableId) -> Unit,
-    onClickJoinTable: () -> Unit,
+    onClickQrScan: () -> Unit,
 ) {
+
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    onClickFloatingButton()
-                },
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Icon(Icons.Filled.Add, "Floating action button.")
+                FloatingActionButton(
+                    onClick = {
+                        onClickQrScan()
+                    },
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_qr_code_scanner_24),
+                        contentDescription = "QR Scanner"
+                    )
+                }
+                FloatingActionButton(
+                    onClick = {
+                        onClickFloatingButton()
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = "Add"
+                    )
+                }
             }
         },
         floatingActionButtonPosition = FabPosition.End,
@@ -58,16 +79,6 @@ fun MainContent(
                         text = "TableRow"
                     )
                 }
-
-                Button(
-                    onClick = {
-                        onClickJoinTable()
-                    }
-                ) {
-                    Text(
-                        text = "join"
-                    )
-                }
             }
         }
     }
@@ -77,15 +88,22 @@ data class MainContentUiState(
     val hoge: String
 )
 
+
+@Preview(showBackground = true, showSystemUi = true, name = "Light Mode")
+@Preview(
+    showBackground = true,
+    showSystemUi = true,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES,
+    name = "Dark Mode"
+)
 @Composable
-@Preview(showBackground = true)
 fun MainContentPreview() {
     HoldemStackTrackerTheme {
         MainContent(
             uiState = MainContentUiState("hoge"),
             onClickFloatingButton = {},
             onClickTableRow = {},
-            onClickJoinTable = {}
+            onClickQrScan = {}
         )
     }
 }

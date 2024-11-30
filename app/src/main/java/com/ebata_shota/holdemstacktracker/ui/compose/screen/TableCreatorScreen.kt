@@ -21,10 +21,12 @@ fun TableCreatorScreen(
     }
 
     val uiState: TableCreatorUiState by viewModel.screenUiState.collectAsStateWithLifecycle()
+
     when (val uiStateCast = uiState) {
         is TableCreatorUiState.Loading -> {
             LoadingContent()
         }
+
         is TableCreatorUiState.MainContent -> {
             TableCreatorContent(
                 uiState = uiStateCast.tableCreatorContentUiState,

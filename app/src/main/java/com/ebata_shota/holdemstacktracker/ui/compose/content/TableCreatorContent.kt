@@ -3,6 +3,7 @@ package com.ebata_shota.holdemstacktracker.ui.compose.content
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -12,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -40,122 +42,128 @@ fun TableCreatorContent(
     onChangeSizeOfBB: (TextFieldValue) -> Unit,
     onClickBetViewMode: (BetViewMode) -> Unit,
     onChangeStackSize: (TextFieldValue) -> Unit,
-    onClickSubmit: () -> Unit
+    onClickSubmit: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = Modifier
-            .selectableGroup()
-            .padding(16.dp)
+    Surface(
+        modifier = modifier
+            .fillMaxSize()
     ) {
-        Text(
-            text = stringResource(R.string.game_type),
-            modifier = Modifier.padding(top = 16.dp)
-        )
-        GameType.entries.forEach {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .selectable(
-                        selected = (it == uiState.gameType),
-                        onClick = { },
-                        role = Role.RadioButton
-                    )
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = (it == uiState.gameType),
-                    onClick = null
-                )
-                Text(
-                    text = stringResource(it.labelResId()),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
-            }
-        }
-
-        Text(
-            text = stringResource(R.string.bet_view_type),
-            modifier = Modifier.padding(top = 16.dp)
-        )
-
-        BetViewMode.entries.forEach {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .selectable(
-                        selected = (it == uiState.betViewMode),
-                        onClick = { onClickBetViewMode(it) },
-                        role = Role.RadioButton
-                    )
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = (it == uiState.betViewMode),
-                    onClick = null
-                )
-                Text(
-                    text = stringResource(it.labelResId()),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
-            }
-        }
-
-        OutlinedTextFieldWithError(
-            uiState = uiState.sbSize,
-            onValueChange = onChangeSizeOfSB,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        )
-        OutlinedTextFieldWithError(
-            uiState = uiState.bbSize,
-            onValueChange = onChangeSizeOfBB,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        )
-        OutlinedTextFieldWithError(
-            uiState = uiState.defaultStack,
-            onValueChange = onChangeStackSize,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        )
-
-        if (uiState.bottomErrorMessage != null) {
-            Text(
-                text = stringResource(uiState.bottomErrorMessage.errorMessageResId),
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Red,
-                modifier = Modifier.padding(start = 16.dp)
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
+                .selectableGroup()
+                .padding(16.dp)
         ) {
-            // Submit Button
-            Button(
-                onClick = {
-                    onClickSubmit()
-                },
-                enabled = uiState.enableSubmitButton,
-            ) {
+            Text(
+                text = stringResource(R.string.game_type),
+                modifier = Modifier.padding(top = 16.dp)
+            )
+            GameType.entries.forEach {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .selectable(
+                            selected = (it == uiState.gameType),
+                            onClick = { },
+                            role = Role.RadioButton
+                        )
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = (it == uiState.gameType),
+                        onClick = null
+                    )
+                    Text(
+                        text = stringResource(it.labelResId()),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+            }
+
+            Text(
+                text = stringResource(R.string.bet_view_type),
+                modifier = Modifier.padding(top = 16.dp)
+            )
+
+            BetViewMode.entries.forEach {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .selectable(
+                            selected = (it == uiState.betViewMode),
+                            onClick = { onClickBetViewMode(it) },
+                            role = Role.RadioButton
+                        )
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = (it == uiState.betViewMode),
+                        onClick = null
+                    )
+                    Text(
+                        text = stringResource(it.labelResId()),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+            }
+
+            OutlinedTextFieldWithError(
+                uiState = uiState.sbSize,
+                onValueChange = onChangeSizeOfSB,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            )
+            OutlinedTextFieldWithError(
+                uiState = uiState.bbSize,
+                onValueChange = onChangeSizeOfBB,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            )
+            OutlinedTextFieldWithError(
+                uiState = uiState.defaultStack,
+                onValueChange = onChangeStackSize,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            )
+
+            if (uiState.bottomErrorMessage != null) {
                 Text(
-                    text = stringResource(R.string.table_creator_submit)
+                    text = stringResource(uiState.bottomErrorMessage.errorMessageResId),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Red,
+                    modifier = Modifier.padding(start = 16.dp)
                 )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                // Submit Button
+                Button(
+                    onClick = {
+                        onClickSubmit()
+                    },
+                    enabled = uiState.enableSubmitButton,
+                ) {
+                    Text(
+                        text = stringResource(R.string.table_creator_submit)
+                    )
+                }
             }
         }
     }
@@ -174,8 +182,15 @@ data class TableCreatorContentUiState(
         get() = sbSize.error == null && bbSize.error == null && defaultStack.error == null
 }
 
+
+@Preview(showBackground = true, showSystemUi = true, name = "Light Mode")
+@Preview(
+    showBackground = true,
+    showSystemUi = true,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES,
+    name = "Dark Mode"
+)
 @Composable
-@Preview(showBackground = true)
 fun TableCreatorContentPreview() {
     HoldemStackTrackerTheme {
         TableCreatorContent(

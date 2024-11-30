@@ -49,7 +49,7 @@ constructor(
         }
     }
 
-    fun onClickJoinTable() {
+    fun onClickQrScan() {
         startQrScan()
     }
 

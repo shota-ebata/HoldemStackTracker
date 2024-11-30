@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
@@ -27,13 +28,13 @@ fun MainScreen(
     }
 
     when (val castUiState = uiState) {
-        is MainScreenUiState.Loading -> MainScreenUiState.Loading
+        is MainScreenUiState.Loading -> LoadingContent()
         is MainScreenUiState.Content -> {
             MainContent(
                 uiState = castUiState.mainContentUiState,
                 onClickFloatingButton = viewModel::onClickCreateNewTable,
                 onClickTableRow = viewModel::onClickTableRow,
-                onClickJoinTable = viewModel::onClickJoinTable
+                onClickQrScan = viewModel::onClickQrScan
             )
         }
     }

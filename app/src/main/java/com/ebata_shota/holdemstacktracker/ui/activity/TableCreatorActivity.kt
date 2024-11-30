@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableCreatorScreen
+import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -17,9 +18,11 @@ class TableCreatorActivity : ComponentActivity() {
 //        enableEdgeToEdge() // FIXME: 対応する
 
         setContent {
-            TableCreatorScreen(
-                navigateToGame = ::navigateToGame
-            )
+            HoldemStackTrackerTheme {
+                TableCreatorScreen(
+                    navigateToGame = ::navigateToGame
+                )
+            }
         }
     }
 

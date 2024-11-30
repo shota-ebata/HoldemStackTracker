@@ -1,18 +1,23 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 
@@ -30,7 +35,11 @@ fun StackEditDialogContent(
         modifier = modifier
     ) {
         Surface {
-            Column {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.End
+            ) {
                 OutlinedTextField(
                     value = uiState.stackValue,
                     onValueChange = { onChangeEditText(it) },
@@ -40,7 +49,7 @@ fun StackEditDialogContent(
                 Button(
                     onClick = { onClickSubmitButton(uiState.playerId) }
                 ) {
-                    Text("sametext")
+                    Icon(imageVector = Icons.Filled.Done, contentDescription = "done")
                 }
             }
         }
@@ -52,8 +61,15 @@ data class StackEditDialogState(
     val stackValue: TextFieldValue
 )
 
+
+@Preview(showBackground = true, showSystemUi = false, name = "Light Mode")
+@Preview(
+    showBackground = true,
+    showSystemUi = false,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES,
+    name = "Dark Mode"
+)
 @Composable
-@Preview(showBackground = false)
 fun StackEditDialogContentPreview() {
     HoldemStackTrackerTheme {
         StackEditDialogContent(
