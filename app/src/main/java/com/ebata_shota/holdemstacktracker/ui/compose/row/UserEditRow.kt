@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.row
 
-import androidx.compose.foundation.Image
+import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,17 +13,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 
@@ -51,32 +54,38 @@ fun UserEditRow(
                 .weight(1.0f)
         )
 
-        Text(
-            text = uiState.stackSize,
+        Row(
             modifier = Modifier
                 .weight(1.0f)
                 .wrapContentSize(Alignment.Center)
                 .padding(vertical = 4.dp),
-        )
-
-        if (uiState.isEditable) {
-            Box(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = uiState.stackSize,
                 modifier = Modifier
-                    .clickable {
-                        onClickStackEditButton()
-                    }
-                    .size(48.dp)
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.baseline_edit_24),
-                    contentDescription = "",
-                    modifier = Modifier.padding(16.dp)
+                    .wrapContentSize(Alignment.Center),
+            )
+
+            if (uiState.isEditable) {
+                Box(
+                    modifier = Modifier
+                        .clickable {
+                            onClickStackEditButton()
+                        }
+                        .size(48.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Edit,
+                        contentDescription = "edit",
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            } else {
+                Spacer(
+                    modifier = Modifier.width(48.dp)
                 )
             }
-        } else {
-            Spacer(
-                modifier = Modifier.width(48.dp)
-            )
         }
 
         Row(
@@ -88,18 +97,18 @@ fun UserEditRow(
 
                 Column(
                     modifier = Modifier
+                        .padding(end = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Box(
                         modifier = Modifier
                             .clickable { onClickUpButton() }
-                            .size(width = 48.dp, height = 30.dp)
-                            .padding(bottom = 4.dp),
+                            .size(width = 48.dp, height = 48.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Image(
-                            painter = painterResource(R.drawable.baseline_keyboard_arrow_up_24),
-                            contentDescription = "",
-                            modifier = Modifier
+                        Icon(
+                            imageVector = Icons.Filled.KeyboardArrowUp,
+                            contentDescription = "up"
                         )
                     }
                     HorizontalDivider(
@@ -110,14 +119,12 @@ fun UserEditRow(
                     Box(
                         modifier = Modifier
                             .clickable { onClickDownButton() }
-                            .size(width = 48.dp, height = 30.dp)
-                            .padding(top = 4.dp),
+                            .size(width = 48.dp, height = 48.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Image(
-                            painter = painterResource(R.drawable.baseline_keyboard_arrow_down_24),
-                            contentDescription = "",
-                            modifier = Modifier
+                        Icon(
+                            imageVector = Icons.Filled.KeyboardArrowDown,
+                            contentDescription = "down"
                         )
                     }
                 }
@@ -154,8 +161,15 @@ private class PreviewParam : PreviewParameterProvider<PlayerEditRowUiState> {
     )
 }
 
+
+@Preview(showBackground = true, showSystemUi = false, name = "Light Mode")
+@Preview(
+    showBackground = true,
+    showSystemUi = false,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "Dark Mode"
+)
 @Composable
-@Preview(showBackground = true)
 fun UserEditPreview(
     @PreviewParameter(PreviewParam::class)
     uiState: PlayerEditRowUiState

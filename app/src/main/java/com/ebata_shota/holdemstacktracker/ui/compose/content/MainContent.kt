@@ -72,7 +72,7 @@ fun MainContent(
             ) {
                 Button(
                     onClick = {
-                        onClickTableRow(TableId("33698e51-9cd4-4dac-a556-10455b43164e"))
+                        onClickTableRow(TableId("aa04a1a6-2da6-4462-9e8a-a679d8fa762f"))
                     }
                 ) {
                     Text(

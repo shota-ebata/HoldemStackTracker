@@ -64,7 +64,8 @@ constructor(
             val scanText = scannerRepository.startQrScan()
             // FIXME: バリデーションほしいかも
             scanText?.let {
-                _navigateEvent.emit(NavigateEvent.TableStandby(TableId(it)))
+                val tableId = TableId(it)
+                _navigateEvent.emit(NavigateEvent.TableStandby(tableId))
             }
         }
     }
