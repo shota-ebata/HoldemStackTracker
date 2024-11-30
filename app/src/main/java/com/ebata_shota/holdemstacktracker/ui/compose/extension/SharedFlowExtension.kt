@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.SharedFlow
 @SuppressLint("ComposableNaming")
 inline fun <reified T> SharedFlow<T>.collectWithLifecycle(
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-    minActiveState: Lifecycle.State = Lifecycle.State.STARTED,
+    minActiveState: Lifecycle.State = Lifecycle.State.CREATED,
     collector: FlowCollector<T>
 ) {
     LaunchedEffect(Unit) {
