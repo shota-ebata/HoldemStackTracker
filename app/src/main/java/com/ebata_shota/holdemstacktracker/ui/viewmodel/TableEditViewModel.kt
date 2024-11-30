@@ -18,6 +18,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetDoubleToStringUseCase
@@ -50,6 +51,7 @@ constructor(
     private val tableRepository: TableRepository,
     private val gameStateRepository: GameStateRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
+    private val qrBitmapRepository: QrBitmapRepository,
     private val getNextGameState: GetNextGameStateUseCase,
     private val isActionRequired: IsActionRequiredUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
@@ -62,8 +64,12 @@ constructor(
     private val _uiState = MutableStateFlow<TableEditScreenUiState>(TableEditScreenUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
-    private val _navigateEvent = MutableSharedFlow<TableId>()
+    private val _navigateEvent = MutableSharedFlow<Navigate>()
     val navigateEvent = _navigateEvent.asSharedFlow()
+
+    sealed interface Navigate {
+        data class Game(val tableId: TableId) : Navigate
+    }
 
     private val tableFlow: StateFlow<Table?> = tableRepository.tableFlow.stateIn(
         scope = viewModelScope,
@@ -77,35 +83,42 @@ constructor(
                 tableFlow.mapNotNull { it },
                 firebaseAuthRepository.uidFlow
             ) { tableState, uid ->
-                val isHost = tableState.hostPlayerId == PlayerId(uid)
-
-                TableEditScreenUiState.Content(
-                    contentUiState = TableEditContentUiState(
-                        playerEditRows = tableState.playerOrder.mapNotNull { playerId ->
-                            val player = tableState.basePlayers.find { it.id == playerId }
-                                ?: return@mapNotNull null
-
-                            val playerStackString = getDoubleToString.invoke(
-                                value = player.stack,
-                                betViewMode = tableState.ruleState.betViewMode
-                            )
-                            PlayerEditRowUiState(
-                                playerId = playerId,
-                                playerName = player.name,
-                                stackSize = playerStackString,
-                                isEditable = isHost
-                            )
-                        },
-                        isAddable = isHost
-                    ),
-                    stackEditDialogState = null
-                )
+                val myPlayerId = PlayerId(uid)
+                createUiState(tableState, myPlayerId)
             }.collect(_uiState)
         }
 
         viewModelScope.launch {
             tableRepository.startCollectTableFlow(tableId)
         }
+    }
+
+    private fun createUiState(
+        tableState: Table,
+        myPlayerId: PlayerId
+    ): TableEditScreenUiState.Content {
+        val isHost = tableState.hostPlayerId == myPlayerId
+        return TableEditScreenUiState.Content(
+            contentUiState = TableEditContentUiState(
+                playerEditRows = tableState.playerOrder.mapNotNull { playerId ->
+                    val player = tableState.basePlayers.find { it.id == playerId }
+                        ?: return@mapNotNull null
+
+                    val playerStackString = getDoubleToString.invoke(
+                        value = player.stack,
+                        betViewMode = tableState.ruleState.betViewMode
+                    )
+                    PlayerEditRowUiState(
+                        playerId = playerId,
+                        playerName = player.name,
+                        stackSize = playerStackString,
+                        isEditable = isHost
+                    )
+                },
+                isAddable = isHost
+            ),
+            stackEditDialogState = null
+        )
     }
 
     fun onClickStackEditButton(playerId: PlayerId, stackText: String) {

@@ -175,4 +175,6 @@ dependencies {
     // - config
     implementation(libs.firebase.config)
 
+    // ZXing Android Embedded
+    implementation(libs.zxing.android.embedded)
 }

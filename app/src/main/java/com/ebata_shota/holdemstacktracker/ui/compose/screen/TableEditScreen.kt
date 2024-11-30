@@ -21,7 +21,9 @@ fun TableEditScreen(
     val screenUiState: TableEditScreenUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     viewModel.navigateEvent.collectWithLifecycle {
-        navigateToGameScreen(it)
+        when (it) {
+            is TableEditViewModel.Navigate.Game -> navigateToGameScreen(it.tableId)
+        }
     }
 
     when (val uiState = screenUiState) {
