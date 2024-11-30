@@ -34,6 +34,7 @@ fun TableEditScreen(
         is TableEditScreenUiState.Content -> {
             TableEditContent(
                 uiState = uiState.contentUiState,
+                getTableQrBitmap = viewModel::getTableQrBitmap,
                 onClickStackEditButton = viewModel::onClickStackEditButton,
                 onClickUpButton = viewModel::onClickUpButton,
                 onClickDownButton = viewModel::onClickDownButton

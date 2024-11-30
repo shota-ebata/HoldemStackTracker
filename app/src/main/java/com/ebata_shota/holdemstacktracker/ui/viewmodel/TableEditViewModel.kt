@@ -1,6 +1,9 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
 import android.os.Bundle
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -14,8 +17,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.GameState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.PodState
-import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
+import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
@@ -100,6 +103,7 @@ constructor(
         val isHost = tableState.hostPlayerId == myPlayerId
         return TableEditScreenUiState.Content(
             contentUiState = TableEditContentUiState(
+                tableId = tableState.id,
                 playerEditRows = tableState.playerOrder.mapNotNull { playerId ->
                     val player = tableState.basePlayers.find { it.id == playerId }
                         ?: return@mapNotNull null
@@ -119,6 +123,12 @@ constructor(
             ),
             stackEditDialogState = null
         )
+    }
+
+    suspend fun getTableQrBitmap(
+        tableId: TableId
+    ): Painter {
+        return BitmapPainter(qrBitmapRepository.createQrBitmap(tableId.value).asImageBitmap())
     }
 
     fun onClickStackEditButton(playerId: PlayerId, stackText: String) {
