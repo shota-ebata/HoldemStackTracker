@@ -24,11 +24,7 @@ constructor(
     private val _uiState = MutableStateFlow<MainScreenUiState>(MainScreenUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
-    private val _navigateEvent = MutableSharedFlow<NavigateEvent>(
-        // scannerRepository.startQrScanからの戻りで
-        // replayしないと発火しない
-        replay = 1
-    )
+    private val _navigateEvent = MutableSharedFlow<NavigateEvent>()
     val navigateEvent = _navigateEvent.asSharedFlow()
 
     sealed interface NavigateEvent {
@@ -55,6 +51,12 @@ constructor(
 
     fun onClickJoinTable() {
         startQrScan()
+    }
+
+    fun onClickTableRow(tableId: TableId) {
+        viewModelScope.launch {
+            _navigateEvent.emit(NavigateEvent.TableStandby(tableId))
+        }
     }
 
     private fun startQrScan() {

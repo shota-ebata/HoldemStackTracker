@@ -4,27 +4,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.MainViewModel
+import com.ebata_shota.holdemstacktracker.ui.viewmodel.MainViewModel.NavigateEvent
 
 @Composable
 fun MainScreen(
     navigateToTableCreator: () -> Unit,
-    navigateToTableStandby: () -> Unit,
-    navigateToJoinTableByQrActivity: () -> Unit,
-    mainViewModel: MainViewModel = hiltViewModel()
+    navigateToTableStandby: (TableId) -> Unit,
+    viewModel: MainViewModel = hiltViewModel()
 ) {
-    val uiState: MainScreenUiState by mainViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState: MainScreenUiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    viewModel.navigateEvent.collectWithLifecycle {
+        when (it) {
+            is NavigateEvent.TableCreator -> navigateToTableCreator()
+            is NavigateEvent.TableStandby -> navigateToTableStandby(it.tableId)
+        }
+    }
 
     when (val castUiState = uiState) {
         is MainScreenUiState.Loading -> MainScreenUiState.Loading
         is MainScreenUiState.Content -> {
             MainContent(
                 uiState = castUiState.mainContentUiState,
-                navigateToTableCreator = navigateToTableCreator,
-                navigateToTableStandby = navigateToTableStandby,
-                navigateToJoinTableByQrActivity = navigateToJoinTableByQrActivity
+                onClickFloatingButton = viewModel::onClickCreateNewTable,
+                onClickTableRow = viewModel::onClickTableRow,
+                onClickJoinTable = viewModel::onClickJoinTable
             )
         }
     }
