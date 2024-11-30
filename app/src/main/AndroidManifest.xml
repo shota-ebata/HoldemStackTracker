@@ -14,6 +14,10 @@
         android:theme="@style/Theme.HoldemStackTracker"
         tools:targetApi="31">
 
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="barcode_ui" />
+
         <activity
             android:name=".ui.activity.MainActivity"
             android:exported="true"
@@ -24,12 +28,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.activity.TableCreatorActivity"
             android:exported="false"
             android:theme="@style/Theme.HoldemStackTracker" />
-
         <activity
             android:name=".ui.activity.TableEditActivity"
             android:exported="false"
