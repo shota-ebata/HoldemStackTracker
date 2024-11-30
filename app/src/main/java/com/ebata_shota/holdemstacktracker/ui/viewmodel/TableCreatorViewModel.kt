@@ -49,46 +49,48 @@ constructor(
     init {
         viewModelScope.launch {
             val ringGame = defaultRuleStateOfRingGameRepository.ringGameFlow.first()
-
             _screenUiState.update {
-                TableCreatorUiState.MainContent(
-                    tableCreatorContentUiState = TableCreatorContentUiState(
-                        gameType = GameType.RingGame,
-                        betViewMode = ringGame.betViewMode,
-                        sbSize = TextFieldErrorUiState(
-                            label = R.string.sb_size_label,
-                            value = TextFieldValue(
-                                getDoubleToString.invoke(
-                                    value = ringGame.sbSize,
-                                    betViewMode = ringGame.betViewMode
-                                )
-                            )
-                        ),
-                        bbSize = TextFieldErrorUiState(
-                            label = R.string.bb_size_label,
-                            value = TextFieldValue(
-                                getDoubleToString.invoke(
-                                    value = ringGame.bbSize,
-                                    betViewMode = ringGame.betViewMode
-                                )
-                            ),
-                            isEnabled = ringGame.betViewMode == BetViewMode.Number
-                        ),
-                        defaultStack = TextFieldErrorUiState(
-                            label = R.string.default_stack_label,
-                            value = TextFieldValue(
-                                getDoubleToString.invoke(
-                                    value = ringGame.defaultStack,
-                                    betViewMode = ringGame.betViewMode
-                                )
-                            )
-                        ),
-                        bottomErrorMessage = null
-                    )
-                )
+                createMainContent(ringGame)
             }
         }
     }
+
+    private fun createMainContent(ringGame: RuleState.RingGame) =
+        TableCreatorUiState.MainContent(
+            tableCreatorContentUiState = TableCreatorContentUiState(
+                gameType = GameType.RingGame,
+                betViewMode = ringGame.betViewMode,
+                sbSize = TextFieldErrorUiState(
+                    label = R.string.sb_size_label,
+                    value = TextFieldValue(
+                        getDoubleToString.invoke(
+                            value = ringGame.sbSize,
+                            betViewMode = ringGame.betViewMode
+                        )
+                    )
+                ),
+                bbSize = TextFieldErrorUiState(
+                    label = R.string.bb_size_label,
+                    value = TextFieldValue(
+                        getDoubleToString.invoke(
+                            value = ringGame.bbSize,
+                            betViewMode = ringGame.betViewMode
+                        )
+                    ),
+                    isEnabled = ringGame.betViewMode == BetViewMode.Number
+                ),
+                defaultStack = TextFieldErrorUiState(
+                    label = R.string.default_stack_label,
+                    value = TextFieldValue(
+                        getDoubleToString.invoke(
+                            value = ringGame.defaultStack,
+                            betViewMode = ringGame.betViewMode
+                        )
+                    )
+                ),
+                bottomErrorMessage = null
+            )
+        )
 
     /**
      * NavigateEvent

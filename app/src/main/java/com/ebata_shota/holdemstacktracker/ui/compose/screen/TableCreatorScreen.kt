@@ -13,8 +13,8 @@ import com.ebata_shota.holdemstacktracker.ui.viewmodel.TableCreatorViewModel
 
 @Composable
 fun TableCreatorScreen(
-    viewModel: TableCreatorViewModel = hiltViewModel(),
-    navigateToGame: (TableId) -> Unit
+    navigateToGame: (TableId) -> Unit,
+    viewModel: TableCreatorViewModel = hiltViewModel()
 ) {
     viewModel.navigateEvent.collectWithLifecycle {
         navigateToGame(it.tableId)
