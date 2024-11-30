@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
+    id("kotlin-parcelize")
     alias(libs.plugins.dagger.hilt.android)
     alias(libs.plugins.devtools.ksp)
     alias(libs.plugins.google.services)
@@ -177,4 +178,7 @@ dependencies {
 
     // ZXing Android Embedded
     implementation(libs.zxing.android.embedded)
+
+    // play-services-code-scanner
+    implementation(libs.play.services.code.scanner)
 }
