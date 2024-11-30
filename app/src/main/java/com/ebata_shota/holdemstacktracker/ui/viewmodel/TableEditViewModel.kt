@@ -87,9 +87,9 @@ constructor(
         viewModelScope.launch {
             combine(
                 tableFlow.mapNotNull { it },
-                qrPainterStateFlow.mapNotNull { it },
-                firebaseAuthRepository.uidFlow
-            ) { tableState, qrPainter, uid ->
+                firebaseAuthRepository.uidFlow,
+                qrPainterStateFlow.mapNotNull { it }
+            ) { tableState, uid, _ ->
                 val myPlayerId = PlayerId(uid)
                 createUiState(tableState, myPlayerId)
             }.collect(_uiState)
@@ -169,7 +169,8 @@ constructor(
                 ?: return@launch
             val stackValueText = contentUiState.stackEditDialogState?.stackValue?.text
                 ?: return@launch
-            val tableState = tableFlow.value ?: return@launch
+            val tableState = tableFlow.value
+                ?: return@launch
             val index = tableState.basePlayers.indexOfFirstOrNull { it.id == playerId }
                 ?: return@launch
             tableRepository.sendTable(
