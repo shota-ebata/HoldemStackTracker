@@ -39,16 +39,12 @@ import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 @Composable
 fun TableEditContent(
     uiState: TableEditContentUiState,
-    getTableQrBitmap: suspend (TableId) -> Painter,
+    getTableQrPainter: () -> Painter?,
     onClickStackEditButton: (PlayerId, String) -> Unit,
     onClickUpButton: (PlayerId) -> Unit,
     onClickDownButton: (PlayerId) -> Unit,
 ) {
-    var qrPainter: Painter? by remember { mutableStateOf(null) }
-    LaunchedEffect(Unit) {
-        qrPainter = getTableQrBitmap.invoke(uiState.tableId)
-    }
-
+    val qrPainter = getTableQrPainter()
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -169,7 +165,7 @@ fun TableEditContentPreview(
     HoldemStackTrackerTheme {
         TableEditContent(
             uiState = uiState,
-            getTableQrBitmap = { painter },
+            getTableQrPainter = { painter },
             onClickStackEditButton = { _, _ -> },
             onClickUpButton = {},
             onClickDownButton = {}

@@ -80,12 +80,16 @@ constructor(
         initialValue = null
     )
 
+    private val qrPainterStateFlow = MutableStateFlow<Painter?>(null)
+
+
     init {
         viewModelScope.launch {
             combine(
                 tableFlow.mapNotNull { it },
+                qrPainterStateFlow.mapNotNull { it },
                 firebaseAuthRepository.uidFlow
-            ) { tableState, uid ->
+            ) { tableState, qrPainter, uid ->
                 val myPlayerId = PlayerId(uid)
                 createUiState(tableState, myPlayerId)
             }.collect(_uiState)
@@ -93,6 +97,12 @@ constructor(
 
         viewModelScope.launch {
             tableRepository.startCollectTableFlow(tableId)
+        }
+
+        viewModelScope.launch {
+            val painter =
+                BitmapPainter(qrBitmapRepository.createQrBitmap(tableId.value).asImageBitmap())
+            qrPainterStateFlow.update { painter }
         }
     }
 
@@ -125,10 +135,8 @@ constructor(
         )
     }
 
-    suspend fun getTableQrBitmap(
-        tableId: TableId
-    ): Painter {
-        return BitmapPainter(qrBitmapRepository.createQrBitmap(tableId.value).asImageBitmap())
+    fun getTableQrPainter(): Painter? {
+        return qrPainterStateFlow.value
     }
 
     fun onClickStackEditButton(playerId: PlayerId, stackText: String) {
