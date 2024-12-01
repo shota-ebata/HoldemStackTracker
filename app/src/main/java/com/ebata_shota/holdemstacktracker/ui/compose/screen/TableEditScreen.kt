@@ -10,19 +10,25 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogConte
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogContent
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.TableEditViewModel
+import com.ebata_shota.holdemstacktracker.ui.viewmodel.TableEditViewModel.Navigate
 
 @Composable
 fun TableEditScreen(
     navigateToGameScreen: (TableId) -> Unit,
+    navigateToBack: () -> Unit,
     viewModel: TableEditViewModel = hiltViewModel()
 ) {
     val screenUiState: TableEditScreenUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val dialogUiState: TableEditScreenDialogUiState by viewModel.dialogUiState.collectAsStateWithLifecycle()
 
     viewModel.navigateEvent.collectWithLifecycle {
         when (it) {
-            is TableEditViewModel.Navigate.Game -> navigateToGameScreen(it.tableId)
+            is Navigate.Back -> navigateToBack()
+            is Navigate.Game -> navigateToGameScreen(it.tableId)
         }
     }
 
@@ -41,13 +47,22 @@ fun TableEditScreen(
                 onChangeBtnChosen = viewModel::onChangeBtnChosen,
                 onClickSubmitButton = viewModel::onClickSubmitButton
             )
-            val stackEditDialogState = uiState.stackEditDialogState
+            val stackEditDialogState = dialogUiState.stackEditDialogState
             if (stackEditDialogState != null) {
                 StackEditDialogContent(
                     uiState = stackEditDialogState,
-                    onDismissRequest = viewModel::onDismissRequestStackEditDialog,
+                    onDismissRequestStackEditDialog = viewModel::onDismissRequestStackEditDialog,
                     onChangeEditText = viewModel::onChangeStackSize,
                     onClickSubmitButton = viewModel::onClickStackEditSubmit
+                )
+            }
+            val myNameInputDialogUiState = dialogUiState.myNameInputDialogUiState
+            if (myNameInputDialogUiState != null) {
+                MyNameInputDialogContent(
+                    uiState = myNameInputDialogUiState,
+                    onChangeEditText = viewModel::onChangeEditTextMyNameInput,
+                    onDismissRequest = viewModel::onDismissRequestMyNameInputDialog,
+                    onClickSubmitButton = viewModel::onClickSubmitMyNameInput
                 )
             }
         }
@@ -57,7 +72,11 @@ fun TableEditScreen(
 sealed interface TableEditScreenUiState {
     data object Loading : TableEditScreenUiState
     data class Content(
-        val contentUiState: TableEditContentUiState,
-        val stackEditDialogState: StackEditDialogState?
+        val contentUiState: TableEditContentUiState
     ) : TableEditScreenUiState
 }
+
+data class TableEditScreenDialogUiState(
+    val stackEditDialogState: StackEditDialogState?,
+    val myNameInputDialogUiState: MyNameInputDialogUiState?
+)

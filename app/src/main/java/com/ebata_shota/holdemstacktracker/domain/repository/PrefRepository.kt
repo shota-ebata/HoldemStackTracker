@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 
 interface PrefRepository {
-    val myName: Flow<String>
+    val myName: Flow<String?>
     suspend fun saveMyName(myName: String)
 
     /**

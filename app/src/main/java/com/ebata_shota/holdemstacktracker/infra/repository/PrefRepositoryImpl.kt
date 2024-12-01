@@ -25,9 +25,10 @@ constructor(
     private val randomIdRepository: RandomIdRepository
 ) : PrefRepository {
 
-    override val myName: Flow<String> by dataStore.prefFlow(
+    override val myName: Flow<String?> by dataStore.prefFlow(
         key = MyName,
-        defaultValue = { "Player" + randomIdRepository.generateRandomId().take(6) }
+//        defaultValue = { "Player" + randomIdRepository.generateRandomId().take(6) }
+        defaultValue = { null }
     )
 
     override suspend fun saveMyName(myName: String) {

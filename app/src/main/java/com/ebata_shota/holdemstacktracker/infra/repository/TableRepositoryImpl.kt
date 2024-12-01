@@ -56,7 +56,7 @@ constructor(
     ) {
         withContext(ioDispatcher) {
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
-            val myName = prefRepository.myName.first()
+            val myName = prefRepository.myName.first()!!
             val tableCreateTime = System.currentTimeMillis()
             val table = Table(
                 id = tableId,
@@ -94,6 +94,7 @@ constructor(
                         if (snapshot.exists()) {
                             val tableMap: Map<*, *> = snapshot.value as Map<*, *>
                             val tableState = tableMapper.mapToTableState(tableId, tableMap)
+                            // TODO: JoinしたテーブルをDBに保存したい
                             trySend(tableState)
                         }
                     }

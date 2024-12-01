@@ -25,7 +25,9 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.ui.TableEditScreenUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
+import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableEditScreenDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableEditScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,7 +39,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -67,10 +70,19 @@ constructor(
     private val _uiState = MutableStateFlow<TableEditScreenUiState>(TableEditScreenUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
+    private val _dialogUiState = MutableStateFlow(
+        TableEditScreenDialogUiState(
+            stackEditDialogState = null,
+            myNameInputDialogUiState = null
+        )
+    )
+    val dialogUiState = _dialogUiState.asStateFlow()
+
     private val _navigateEvent = MutableSharedFlow<Navigate>()
     val navigateEvent = _navigateEvent.asSharedFlow()
 
     sealed interface Navigate {
+        data object Back : Navigate
         data class Game(val tableId: TableId) : Navigate
     }
 
@@ -91,10 +103,10 @@ constructor(
         // UiState生成の監視
         viewModelScope.launch {
             combine(
-                tableStateFlow.mapNotNull { it },
+                tableStateFlow.filterNotNull(),
                 firebaseAuthRepository.myPlayerIdFlow,
                 selectedBtnPlayerId,
-                qrPainterStateFlow.mapNotNull { it },
+                qrPainterStateFlow.filterNotNull(),
             ) { tableState, myPlayerId, selectedBtnPlayerId, _ ->
                 uiStateMapper.createUiState(tableState, myPlayerId, selectedBtnPlayerId)
             }.collect(_uiState)
@@ -103,11 +115,24 @@ constructor(
         // 参加プレイヤーに自分が入るための監視
         viewModelScope.launch {
             combine(
-                tableStateFlow.mapNotNull { it },
+                tableStateFlow.filterNotNull(),
                 firebaseAuthRepository.myPlayerIdFlow,
-                prefRepository.myName,
+                prefRepository.myName.filterNotNull(),
             ) { tableState, myPlayerId, myName ->
                 joinTable.invoke(tableState, myPlayerId, myName)
+            }.collect()
+        }
+
+        // 自分の名前未入力の人にダイアログ出したいので監視
+        viewModelScope.launch {
+            combine(
+                firebaseAuthRepository.myPlayerIdFlow,
+                prefRepository.myName
+            ) { myPlayerId, myName ->
+                if (myName == null) {
+                    // 名前未入力なら入力を促すダイアログを表示する
+                    showMyNameInputDialog(playerId = myPlayerId)
+                }
             }.collect()
         }
 
@@ -123,14 +148,24 @@ constructor(
         }
     }
 
+    private fun showMyNameInputDialog(playerId: PlayerId) {
+        val defaultPlayerName = "Player${playerId.value.take(6)}"
+        _dialogUiState.update {
+            it.copy(
+                myNameInputDialogUiState = MyNameInputDialogUiState(
+                    value = TextFieldValue(defaultPlayerName)
+                )
+            )
+        }
+    }
+
     fun getTableQrPainter(): Painter? {
         return qrPainterStateFlow.value
     }
 
     fun onClickStackEditButton(playerId: PlayerId, stackText: String) {
-        _uiState.update {
-            val contentUiState = (it as? TableEditScreenUiState.Content) ?: return@update it
-            contentUiState.copy(
+        _dialogUiState.update {
+            it.copy(
                 stackEditDialogState = StackEditDialogState(
                     playerId = playerId,
                     stackValue = TextFieldValue(stackText)
@@ -140,22 +175,18 @@ constructor(
     }
 
     fun onChangeStackSize(value: TextFieldValue) {
-        _uiState.update {
-            val contentUiState = (it as? TableEditScreenUiState.Content) ?: return@update it
-            contentUiState.copy(
-                stackEditDialogState = contentUiState.stackEditDialogState?.copy(
+        _dialogUiState.update {
+            it.copy(
+                stackEditDialogState = it.stackEditDialogState?.copy(
                     stackValue = value
                 )
             )
         }
     }
 
-
     fun onClickStackEditSubmit(playerId: PlayerId) {
         viewModelScope.launch {
-            val contentUiState = (uiState.value as? TableEditScreenUiState.Content)
-                ?: return@launch
-            val stackValueText = contentUiState.stackEditDialogState?.stackValue?.text
+            val stackValueText = dialogUiState.value.stackEditDialogState?.stackValue?.text
                 ?: return@launch
             val table = tableStateFlow.value
                 ?: return@launch
@@ -197,9 +228,36 @@ constructor(
     }
 
     fun onDismissRequestStackEditDialog() {
-        _uiState.update {
-            val contentUiState = (it as? TableEditScreenUiState.Content) ?: return@update it
-            contentUiState.copy(stackEditDialogState = null)
+        _dialogUiState.update {
+            it.copy(stackEditDialogState = null)
+        }
+    }
+
+    fun onChangeEditTextMyNameInput(value: TextFieldValue) {
+        _dialogUiState.update {
+            it.copy(
+                myNameInputDialogUiState = it.myNameInputDialogUiState?.copy(
+                    value = value
+                )
+            )
+        }
+    }
+
+    fun onClickSubmitMyNameInput(value: String) {
+        viewModelScope.launch {
+            prefRepository.saveMyName(value)
+            _dialogUiState.update {
+                it.copy(myNameInputDialogUiState = null)
+            }
+        }
+    }
+
+    fun onDismissRequestMyNameInputDialog() {
+        viewModelScope.launch {
+            if (prefRepository.myName.first() == null) {
+                // 画面を戻す FIXME: この動き微妙かなー
+                _navigateEvent.emit(Navigate.Back)
+            }
         }
     }
 

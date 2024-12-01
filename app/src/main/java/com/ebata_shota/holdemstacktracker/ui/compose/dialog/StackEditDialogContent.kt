@@ -29,13 +29,13 @@ import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 @Composable
 fun StackEditDialogContent(
     uiState: StackEditDialogState,
-    onDismissRequest: () -> Unit,
+    onDismissRequestStackEditDialog: () -> Unit,
     onChangeEditText: (TextFieldValue) -> Unit,
     onClickSubmitButton: (PlayerId) -> Unit,
     modifier: Modifier = Modifier
 ) {
     BasicAlertDialog(
-        onDismissRequest = onDismissRequest,
+        onDismissRequest = onDismissRequestStackEditDialog,
         modifier = modifier
     ) {
         Surface {
@@ -56,7 +56,7 @@ fun StackEditDialogContent(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     OutlinedButton(
-                        onClick = { onDismissRequest() }
+                        onClick = { onDismissRequestStackEditDialog() }
                     ) {
                         Text("Cancel")
                     }
@@ -93,7 +93,7 @@ fun StackEditDialogContentPreview() {
                 playerId = PlayerId("playerId"),
                 stackValue = TextFieldValue("10000")
             ),
-            onDismissRequest = {},
+            onDismissRequestStackEditDialog = {},
             onClickSubmitButton = {},
             onChangeEditText = {}
         )

@@ -3,6 +3,7 @@ package com.ebata_shota.holdemstacktracker.ui.activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -21,6 +22,7 @@ class TableEditActivity : ComponentActivity() {
         setContent {
             HoldemStackTrackerTheme {
                 TableEditScreen(
+                    navigateToBack = { finish() },
                     navigateToGameScreen = ::navigateToGameActivity
                 )
             }
@@ -28,8 +30,9 @@ class TableEditActivity : ComponentActivity() {
     }
 
     private fun navigateToGameActivity(tableId: TableId) {
-
+        Toast.makeText(this, "Gameに遷移します", Toast.LENGTH_SHORT).show()
     }
+
     companion object {
         fun intent(
             context: Context,

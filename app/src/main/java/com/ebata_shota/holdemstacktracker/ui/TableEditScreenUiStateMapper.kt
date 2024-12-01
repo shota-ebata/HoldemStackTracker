@@ -52,8 +52,7 @@ constructor(
                 },
                 enableSubmitButton = table.playerOrder.size >= 2,
                 isEditable = isHost
-            ),
-            stackEditDialogState = null
+            )
         )
     }
 }
