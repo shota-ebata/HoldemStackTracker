@@ -135,7 +135,10 @@ fun TableEditContent(
                                 .padding(vertical = 4.dp)
                         )
                         if (index < uiState.playerEditRows.lastIndex) {
-                            HorizontalDivider()
+                            HorizontalDivider(
+                                modifier = Modifier
+                                    .padding(horizontal = SideSpace)
+                            )
                         }
                     }
                 }
