@@ -12,18 +12,20 @@ import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
-import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
 import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.PodState
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
+import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
@@ -60,7 +62,8 @@ constructor(
     private val getNextGame: GetNextGameUseCase,
     private val isActionRequired: IsActionRequiredUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
-    private val joinTableUseCase: JoinTableUseCase,
+    private val joinTable: JoinTableUseCase,
+    private val createNewGame: CreateNewGameUseCase,
     private val uiStateMapper: TableEditScreenUiStateMapper
 ) : ViewModel() {
 
@@ -104,7 +107,7 @@ constructor(
                 firebaseAuthRepository.myPlayerIdFlow,
                 prefRepository.myName,
             ) { tableState, myPlayerId, myName ->
-                joinTableUseCase.invoke(tableState, myPlayerId, myName)
+                joinTable.invoke(tableState, myPlayerId, myName)
             }.collect()
         }
 
@@ -164,7 +167,8 @@ constructor(
                         it.copy(
                             stack = stackValueText.toDouble() // TODO: バリデーションしたい
                         )
-                    }
+                    },
+                    updateTime = System.currentTimeMillis()
                 )
             )
         }
@@ -186,7 +190,8 @@ constructor(
                         list = playerOrder.toMutableList(),
                         fromIndex = currentIndex,
                         toIndex = prevIndex
-                    )
+                    ),
+                    updateTime = System.currentTimeMillis()
                 )
                 tableRepository.sendTable(newTableState)
             }
@@ -209,7 +214,8 @@ constructor(
                         list = playerOrder.toMutableList(),
                         fromIndex = currentIndex,
                         toIndex = nextIndex
-                    )
+                    ),
+                    updateTime = System.currentTimeMillis()
                 )
                 tableRepository.sendTable(newTableState)
             }
@@ -229,6 +235,42 @@ constructor(
             val contentUiState = (it as? TableEditScreenUiState.Content) ?: return@update it
             contentUiState.copy(stackEditDialogState = null)
         }
+    }
+
+    fun onClickSubmit() {
+        viewModelScope.launch {
+            val table: Table = tableFlow.value ?: return@launch
+            newGame(table)
+            _navigateEvent.emit(Navigate.Game(table.id))
+        }
+    }
+
+    private suspend fun newGame(table: Table) {
+        val updateTime = System.currentTimeMillis()
+        createNewGame.invoke(
+            newTable = table.copy(
+                tableStatus = TableStatus.GAME,
+                startTime = updateTime,
+                updateTime = updateTime
+            ),
+            newGame = Game(
+                version = 0L,
+                appVersion = BuildConfig.VERSION_CODE.toLong(),
+                players = table.playerOrder.mapNotNull { playerId ->
+                    val player = table.basePlayers.find { it.id == playerId }
+                    player?.let {
+                        GamePlayerState(
+                            id = player.id,
+                            stack = player.stack,
+                            isLeaved = false
+                        )
+                    }
+                },
+                podStateList = emptyList(),
+                phaseStateList = listOf(PhaseState.Standby),
+                updateTime = updateTime
+            )
+        )
     }
 
     suspend fun test(tableId: TableId) {

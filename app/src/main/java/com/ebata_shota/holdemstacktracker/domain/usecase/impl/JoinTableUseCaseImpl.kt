@@ -38,7 +38,8 @@ constructor(
                         )
                         val newTable = tableState.copy(
                             waitPlayers = waitPlayers,
-                            playerOrder = addPlayerOrderIfNeed(tableState.playerOrder, myPlayerId)
+                            playerOrder = addPlayerOrderIfNeed(tableState.playerOrder, myPlayerId),
+                            updateTime = System.currentTimeMillis()
                         )
                         tableRepository.sendTable(newTable)
                     }
