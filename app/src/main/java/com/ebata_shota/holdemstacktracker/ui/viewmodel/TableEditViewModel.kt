@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
+import com.ebata_shota.holdemstacktracker.domain.model.MovePosition
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
@@ -23,6 +24,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCa
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.ui.TableEditScreenUiStateMapper
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState.BtnChosen
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
@@ -58,6 +60,7 @@ constructor(
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
     private val joinTable: JoinTableUseCase,
     private val createNewGame: CreateNewGameUseCase,
+    private val movePositionUseCase: MovePositionUseCase,
     private val uiStateMapper: TableEditScreenUiStateMapper
 ) : ViewModel() {
 
@@ -175,57 +178,25 @@ constructor(
     }
 
     fun onClickUpButton(playerId: PlayerId) {
-        viewModelScope.launch {
-            val table = tableStateFlow.value ?: return@launch
-            val playerOrder = table.playerOrder
-            val currentIndex = playerOrder.indexOf(playerId)
-            val prevIndex = if (currentIndex - 1 in 0..playerOrder.lastIndex) {
-                currentIndex - 1
-            } else {
-                table.playerOrder.lastIndex
-            }
-            val copiedTable = table.copy(
-                playerOrder = moveItem(
-                    list = playerOrder.toMutableList(),
-                    fromIndex = currentIndex,
-                    toIndex = prevIndex
-                ),
-                updateTime = System.currentTimeMillis(),
-                version = table.version + 1
-            )
-            tableRepository.sendTable(copiedTable)
-        }
+        movePosition(playerId, MovePosition.PREV)
     }
 
     fun onClickDownButton(playerId: PlayerId) {
-        viewModelScope.launch {
-            val table = tableStateFlow.value ?: return@launch
-            val playerOrder = table.playerOrder
-            val currentIndex = playerOrder.indexOf(playerId)
-            val nextIndex = if (currentIndex + 1 in 0..playerOrder.lastIndex) {
-                currentIndex + 1
-            } else {
-                0
-            }
-            val copiedTable = table.copy(
-                playerOrder = moveItem(
-                    list = playerOrder.toMutableList(),
-                    fromIndex = currentIndex,
-                    toIndex = nextIndex
-                ),
-                updateTime = System.currentTimeMillis(),
-                version = table.version + 1
-            )
-            tableRepository.sendTable(copiedTable)
-        }
+        movePosition(playerId, MovePosition.NEXT)
     }
 
-    private fun <T> moveItem(list: MutableList<T>, fromIndex: Int, toIndex: Int): List<T> {
-        // アイテムを取り出してから削除
-        val item = list.removeAt(fromIndex)
-        // 指定されたインデックスに挿入
-        list.add(toIndex, item)
-        return list
+    private fun movePosition(
+        playerId: PlayerId,
+        movePosition: MovePosition
+    ) {
+        viewModelScope.launch {
+            val table = tableStateFlow.value ?: return@launch
+            movePositionUseCase.invoke(
+                playerId = playerId,
+                table = table,
+                movePosition = movePosition
+            )
+        }
     }
 
     fun onDismissRequestStackEditDialog() {
