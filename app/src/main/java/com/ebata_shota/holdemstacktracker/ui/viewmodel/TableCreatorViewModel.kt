@@ -7,21 +7,30 @@ import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.GameType
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRuleStateOfRingRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetDoubleToStringUseCase
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableCreatorContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.TextFieldErrorUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableCreatorDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableCreatorUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -35,6 +44,8 @@ constructor(
     private val tableRepository: TableRepository,
     private val randomIdRepository: RandomIdRepository,
     private val defaultRuleStateOfRingRepository: DefaultRuleStateOfRingRepository,
+    private val firebaseAuthRepository: FirebaseAuthRepository,
+    private val prefRepository: PrefRepository,
     private val getDoubleToString: GetDoubleToStringUseCase
 ) : ViewModel() {
 
@@ -46,6 +57,13 @@ constructor(
     private val tableCreatorContentUiState: TableCreatorContentUiState?
         get() = (screenUiState.value as? TableCreatorUiState.MainContent)?.tableCreatorContentUiState
 
+    private val _dialogUiState = MutableStateFlow(
+        TableCreatorDialogUiState(
+            myNameInputDialogUiState = null
+        )
+    )
+    val dialogUiState = _dialogUiState.asStateFlow()
+
     init {
         viewModelScope.launch {
             val ringGame = defaultRuleStateOfRingRepository.ringGameFlow.first()
@@ -53,8 +71,22 @@ constructor(
                 createMainContent(ringGame)
             }
         }
+
+        // 自分の名前未入力の人にダイアログ出したいので監視
+        viewModelScope.launch {
+            combine(
+                firebaseAuthRepository.myPlayerIdFlow,
+                prefRepository.myName
+            ) { myPlayerId, myName ->
+                if (myName == null) {
+                    // 名前未入力なら入力を促すダイアログを表示する
+                    showMyNameInputDialog(playerId = myPlayerId)
+                }
+            }.collect()
+        }
     }
 
+    // TODO: UseCaseへ移動
     private fun createMainContent(ringGame: RuleState.RingGame) =
         TableCreatorUiState.MainContent(
             tableCreatorContentUiState = TableCreatorContentUiState(
@@ -92,10 +124,24 @@ constructor(
             )
         )
 
+    private fun showMyNameInputDialog(playerId: PlayerId) {
+        val defaultPlayerName = "Player${playerId.value.take(6)}"
+        _dialogUiState.update {
+            it.copy(
+                myNameInputDialogUiState = MyNameInputDialogUiState(
+                    value = TextFieldValue(defaultPlayerName)
+                )
+            )
+        }
+    }
+
     /**
      * NavigateEvent
      */
-    data class NavigateEvent(val tableId: TableId)
+    sealed interface NavigateEvent {
+        data object Back : NavigateEvent
+        data class TableEdit(val tableId: TableId) : NavigateEvent
+    }
 
     private val _navigateEvent = MutableSharedFlow<NavigateEvent>()
     val navigateEvent = _navigateEvent.asSharedFlow()
@@ -284,6 +330,34 @@ constructor(
         }
     }
 
+    fun onChangeEditTextMyNameInput(value: TextFieldValue) {
+        _dialogUiState.update {
+            it.copy(
+                myNameInputDialogUiState = it.myNameInputDialogUiState?.copy(
+                    value = value
+                )
+            )
+        }
+    }
+
+    fun onClickSubmitMyNameInput(value: String) {
+        viewModelScope.launch {
+            prefRepository.saveMyName(value)
+            _dialogUiState.update {
+                it.copy(myNameInputDialogUiState = null)
+            }
+        }
+    }
+
+    fun onDismissRequestMyNameInputDialog() {
+        viewModelScope.launch {
+            if (prefRepository.myName.first() == null) {
+                // 画面を戻す FIXME: この動き微妙かなー
+                _navigateEvent.emit(NavigateEvent.Back)
+            }
+        }
+    }
+
     /**
      * Submit
      */
@@ -328,13 +402,6 @@ constructor(
             )
         )
 //        val tableId = TableId("83b543e1-e901-4115-b56b-d610cdd9267d")
-        _navigateEvent.emit(NavigateEvent(tableId))
+        _navigateEvent.emit(NavigateEvent.TableEdit(tableId))
     }
-}
-
-sealed interface TableCreatorUiState {
-    data object Loading : TableCreatorUiState
-    data class MainContent(
-        val tableCreatorContentUiState: TableCreatorContentUiState
-    ) : TableCreatorUiState
 }

@@ -20,7 +20,8 @@ class TableCreatorActivity : ComponentActivity() {
         setContent {
             HoldemStackTrackerTheme {
                 TableCreatorScreen(
-                    navigateToGame = ::navigateToGame
+                    navigateToGame = ::navigateToGame,
+                    navigateToBack = { finish() }
                 )
             }
         }
