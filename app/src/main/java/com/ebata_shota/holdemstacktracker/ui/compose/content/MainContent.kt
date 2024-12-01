@@ -76,7 +76,17 @@ fun MainContent(
                     }
                 ) {
                     Text(
-                        text = "TableRow"
+                        text = "TableRow(MY)"
+                    )
+                }
+
+                Button(
+                    onClick = {
+                        onClickTableRow(TableId("33698e51-9cd4-4dac-a556-10455b43164e"))
+                    }
+                ) {
+                    Text(
+                        text = "TableRow(Other)"
                     )
                 }
             }
