@@ -37,7 +37,8 @@ fun TableEditScreen(
                 getTableQrPainter = viewModel::getTableQrPainter,
                 onClickStackEditButton = viewModel::onClickStackEditButton,
                 onClickUpButton = viewModel::onClickUpButton,
-                onClickDownButton = viewModel::onClickDownButton
+                onClickDownButton = viewModel::onClickDownButton,
+                onClickSubmitButton = viewModel::onClickSubmitButton
             )
             val stackEditDialogState = uiState.stackEditDialogState
             if (stackEditDialogState != null) {

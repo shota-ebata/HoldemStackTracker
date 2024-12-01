@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -40,6 +42,7 @@ fun TableEditContent(
     onClickStackEditButton: (PlayerId, String) -> Unit,
     onClickUpButton: (PlayerId) -> Unit,
     onClickDownButton: (PlayerId) -> Unit,
+    onClickSubmitButton: () -> Unit
 ) {
     val qrPainter = getTableQrPainter()
     Surface(
@@ -47,75 +50,99 @@ fun TableEditContent(
             .fillMaxSize()
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
+            Modifier
+                .fillMaxSize()
         ) {
-            qrPainter?.let {
+            // スクロール
+            val rememberScrollState = rememberScrollState()
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState)
+                    .weight(1.0f)
+            ) {
+                qrPainter?.let {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            painter = it,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .size(200.dp)
+                                .padding(16.dp)
+                        )
+                    }
+                }
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                        .fillMaxWidth()
+                        .defaultMinSize(56.dp)
+                        .padding(
+                            start = 16.dp
+                        ),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Image(
-                        painter = it,
-                        contentDescription = "",
+                    Text(
+                        text = "Player名",
+                        style = MaterialTheme.typography.labelLarge,
                         modifier = Modifier
-                            .size(200.dp)
-                            .padding(16.dp)
+                            .weight(1.0f)
                     )
+
+                    Text(
+                        text = stringResource(R.string.stack_size_label),
+                        style = MaterialTheme.typography.labelLarge,
+                        modifier = Modifier
+                            .weight(1.0f)
+                            .padding(end = 16.dp)
+                            .padding(vertical = 8.dp),
+                    )
+                }
+
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    uiState.playerEditRows.forEachIndexed { index, playerEditRowUiState ->
+                        UserEditRow(
+                            uiState = playerEditRowUiState,
+                            onClickStackEditButton = {
+                                onClickStackEditButton(
+                                    playerEditRowUiState.playerId,
+                                    playerEditRowUiState.stackSize
+                                )
+                            },
+                            onClickUpButton = {
+                                onClickUpButton(playerEditRowUiState.playerId)
+                            },
+                            onClickDownButton = {
+                                onClickDownButton(playerEditRowUiState.playerId)
+                            },
+                            modifier = Modifier
+                                .padding(vertical = 4.dp)
+                        )
+                        if (index < uiState.playerEditRows.lastIndex) {
+                            HorizontalDivider()
+                        }
+                    }
                 }
             }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .defaultMinSize(56.dp)
-                    .padding(
-                        start = 16.dp
-                    ),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = "Player名",
-                    style = MaterialTheme.typography.labelLarge,
+                Button(
+                    onClick = onClickSubmitButton,
                     modifier = Modifier
-                        .weight(1.0f)
-                )
-
-                Text(
-                    text = stringResource(R.string.stack_size_label),
-                    style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier
-                        .weight(1.0f)
-                        .padding(end = 16.dp)
-                        .padding(vertical = 8.dp),
-                )
-            }
-
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                itemsIndexed(uiState.playerEditRows) { index, playerEditRowUiState ->
-                    UserEditRow(
-                        uiState = playerEditRowUiState,
-                        onClickStackEditButton = {
-                            onClickStackEditButton(
-                                playerEditRowUiState.playerId,
-                                playerEditRowUiState.stackSize
-                            )
-                        },
-                        onClickUpButton = {
-                            onClickUpButton(playerEditRowUiState.playerId)
-                        },
-                        onClickDownButton = {
-                            onClickDownButton(playerEditRowUiState.playerId)
-                        },
-                        modifier = Modifier
-                            .padding(vertical = 4.dp)
-                    )
-                    if (index < uiState.playerEditRows.lastIndex) {
-                        HorizontalDivider()
-                    }
+                        .fillMaxWidth()
+                        .height(56.dp)
+                ) {
+                    Text("ゲーム開始")
                 }
             }
         }
@@ -176,7 +203,8 @@ fun TableEditContentPreview(
             getTableQrPainter = { painter },
             onClickStackEditButton = { _, _ -> },
             onClickUpButton = {},
-            onClickDownButton = {}
+            onClickDownButton = {},
+            onClickSubmitButton = {}
         )
     }
 }
