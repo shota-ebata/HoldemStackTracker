@@ -13,6 +13,7 @@
 /.idea/inspectionProfiles/Project_Default.xml
 /.idea/codeStyles/Project.xml
 /.idea/modules/app/HoldemStackTracker.app.iml
+/.idea/deploymentTargetSelector.xml
 .DS_Store
 /build
 /captures
