@@ -5,7 +5,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Table
 
 interface JoinTableUseCase {
     suspend fun invoke(
-        tableState: Table,
+        table: Table,
         myPlayerId: PlayerId,
         myName: String
     )

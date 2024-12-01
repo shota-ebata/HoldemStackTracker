@@ -1,7 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
 import android.os.Bundle
-import android.util.Log
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
@@ -158,64 +157,66 @@ constructor(
                 ?: return@launch
             val stackValueText = contentUiState.stackEditDialogState?.stackValue?.text
                 ?: return@launch
-            val tableState = tableStateFlow.value
+            val table = tableStateFlow.value
                 ?: return@launch
-            val index = tableState.basePlayers.indexOfFirstOrNull { it.id == playerId }
+            val index = table.basePlayers.indexOfFirstOrNull { it.id == playerId }
                 ?: return@launch
-            tableRepository.sendTable(
-                newTable = tableState.copy(
-                    basePlayers = tableState.basePlayers.mapAtIndex(index = index) {
-                        it.copy(
-                            stack = stackValueText.toDouble() // TODO: バリデーションしたい
-                        )
-                    },
-                    updateTime = System.currentTimeMillis()
-                )
+            val copiedTable = table.copy(
+                basePlayers = table.basePlayers.mapAtIndex(index = index) {
+                    it.copy(
+                        stack = stackValueText.toDouble() // TODO: バリデーションしたい
+                    )
+                },
+                updateTime = System.currentTimeMillis(),
+                version = table.version + 1
             )
+            tableRepository.sendTable(copiedTable)
         }
     }
 
     fun onClickUpButton(playerId: PlayerId) {
         viewModelScope.launch {
-            val tableState = tableStateFlow.value ?: return@launch
-            val playerOrder = tableState.playerOrder
+            val table = tableStateFlow.value ?: return@launch
+            val playerOrder = table.playerOrder
             val currentIndex = playerOrder.indexOf(playerId)
             val prevIndex = if (currentIndex - 1 in 0..playerOrder.lastIndex) {
                 currentIndex - 1
             } else {
-                tableState.playerOrder.lastIndex
+                table.playerOrder.lastIndex
             }
-            val newTableState = tableState.copy(
+            val copiedTable = table.copy(
                 playerOrder = moveItem(
                     list = playerOrder.toMutableList(),
                     fromIndex = currentIndex,
                     toIndex = prevIndex
                 ),
-                updateTime = System.currentTimeMillis()
+                updateTime = System.currentTimeMillis(),
+                version = table.version + 1
             )
-            tableRepository.sendTable(newTableState)
+            tableRepository.sendTable(copiedTable)
         }
     }
 
     fun onClickDownButton(playerId: PlayerId) {
         viewModelScope.launch {
-            val tableState = tableStateFlow.value ?: return@launch
-            val playerOrder = tableState.playerOrder
+            val table = tableStateFlow.value ?: return@launch
+            val playerOrder = table.playerOrder
             val currentIndex = playerOrder.indexOf(playerId)
             val nextIndex = if (currentIndex + 1 in 0..playerOrder.lastIndex) {
                 currentIndex + 1
             } else {
                 0
             }
-            val newTableState = tableState.copy(
+            val copiedTable = table.copy(
                 playerOrder = moveItem(
                     list = playerOrder.toMutableList(),
                     fromIndex = currentIndex,
                     toIndex = nextIndex
                 ),
-                updateTime = System.currentTimeMillis()
+                updateTime = System.currentTimeMillis(),
+                version = table.version + 1
             )
-            tableRepository.sendTable(newTableState)
+            tableRepository.sendTable(copiedTable)
         }
     }
 

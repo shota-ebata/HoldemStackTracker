@@ -15,5 +15,5 @@ interface TableRepository {
 
     fun startCollectTableFlow(tableId: TableId)
     fun stopCollectTableFlow()
-    suspend fun sendTable(newTable: Table)
+    suspend fun sendTable(table: Table)
 }

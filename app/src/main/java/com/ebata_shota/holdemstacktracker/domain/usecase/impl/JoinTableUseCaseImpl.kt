@@ -15,53 +15,54 @@ constructor(
     private val tableRepository: TableRepository
 ) : JoinTableUseCase {
     override suspend fun invoke(
-        tableState: Table,
+        table: Table,
         myPlayerId: PlayerId,
         myName: String
     ) {
-        val isHost = tableState.hostPlayerId == myPlayerId
+        val isHost = table.hostPlayerId == myPlayerId
         if (!isHost) {
             // ホストじゃないとき
-            when (tableState.tableStatus) {
+            when (table.tableStatus) {
                 TableStatus.GAME -> {
                     // ゲーム中のとき
                     if (
-                        tableState.basePlayers.none { it.id == myPlayerId }
-                        && tableState.waitPlayers.none { it.id == myPlayerId }
+                        table.basePlayers.none { it.id == myPlayerId }
+                        && table.waitPlayers.none { it.id == myPlayerId }
                     ) {
                         // baseにもwaitにも自分がいないなら
                         // waitに自分を追加
-                        val waitPlayers = tableState.waitPlayers + PlayerBaseState(
+                        val waitPlayers = table.waitPlayers + PlayerBaseState(
                             id = myPlayerId,
                             name = myName,
-                            stack = tableState.ruleState.defaultStack
+                            stack = table.ruleState.defaultStack
                         )
-                        val newTable = tableState.copy(
+                        val copiedTable = table.copy(
                             waitPlayers = waitPlayers,
-                            playerOrder = addPlayerOrderIfNeed(tableState.playerOrder, myPlayerId),
-                            updateTime = System.currentTimeMillis()
+                            playerOrder = addPlayerOrderIfNeed(table.playerOrder, myPlayerId),
+                            updateTime = System.currentTimeMillis(),
+                            version = table.version + 1
                         )
-                        tableRepository.sendTable(newTable)
+                        tableRepository.sendTable(copiedTable)
                     }
                 }
 
                 TableStatus.STANDBY, TableStatus.PAUSED -> {
                     // ゲーム中以外のとき
-                    if (tableState.basePlayers.none { it.id == myPlayerId }) {
+                    if (table.basePlayers.none { it.id == myPlayerId }) {
                         // baseに自分がいないなら
                         // waitから自分を消して
-                        val waitPlayers = tableState.waitPlayers.filterNot {
-                            tableState.basePlayers.none { it.id == myPlayerId }
+                        val waitPlayers = table.waitPlayers.filterNot {
+                            table.basePlayers.none { it.id == myPlayerId }
                         }
                         // baseに自分を追加
-                        val basePlayers = tableState.basePlayers + PlayerBaseState(
+                        val basePlayers = table.basePlayers + PlayerBaseState(
                             id = myPlayerId,
                             name = myName,
-                            stack = tableState.ruleState.defaultStack
+                            stack = table.ruleState.defaultStack
                         )
-                        val newTable = tableState.copy(
+                        val newTable = table.copy(
                             basePlayers = basePlayers,
-                            playerOrder = addPlayerOrderIfNeed(tableState.playerOrder, myPlayerId),
+                            playerOrder = addPlayerOrderIfNeed(table.playerOrder, myPlayerId),
                             waitPlayers = waitPlayers
                         )
                         tableRepository.sendTable(newTable)

@@ -4,7 +4,6 @@ import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherIO
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
-import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
@@ -118,10 +117,10 @@ constructor(
     }
 
     override suspend fun sendTable(
-        newTable: Table
+        table: Table
     ) {
-        val tableMap = tableMapper.toMap(newTable)
-        val tableRef = tablesRef.child(newTable.id.value)
+        val tableMap = tableMapper.toMap(table)
+        val tableRef = tablesRef.child(table.id.value)
         tableRef.setValue(tableMap)
     }
 }

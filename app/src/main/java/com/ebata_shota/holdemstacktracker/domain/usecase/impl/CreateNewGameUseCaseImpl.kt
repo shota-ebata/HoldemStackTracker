@@ -19,13 +19,14 @@ constructor(
 ) : CreateNewGameUseCase {
     override suspend fun invoke(table: Table) {
         val updateTime = System.currentTimeMillis()
-        val newTable = table.copy(
+        val copiedTable = table.copy(
             tableStatus = TableStatus.GAME,
             startTime = updateTime,
-            updateTime = updateTime
+            updateTime = updateTime,
+            version = table.version + 1
         )
         val newGame = Game(
-            version = 0L,
+            version = 0,
             appVersion = BuildConfig.VERSION_CODE.toLong(),
             players = table.playerOrder.mapNotNull { playerId ->
                 val player = table.basePlayers.find { it.id == playerId }
@@ -42,10 +43,10 @@ constructor(
             updateTime = updateTime
         )
         tableRepository.sendTable(
-            newTable = newTable
+            table = copiedTable
         )
         gameRepository.sendGame(
-            tableId = newTable.id,
+            tableId = copiedTable.id,
             newGame = newGame
         )
     }
