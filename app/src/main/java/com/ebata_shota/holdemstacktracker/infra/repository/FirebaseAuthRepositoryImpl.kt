@@ -2,6 +2,7 @@ package com.ebata_shota.holdemstacktracker.infra.repository
 
 import android.util.Log
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,7 +26,7 @@ constructor(
 ) : FirebaseAuthRepository {
 
     private val _uidFlow = MutableSharedFlow<String>(replay = 1)
-    override val uidFlow: Flow<String> = _uidFlow.asSharedFlow()
+    override val myPlayerIdFlow: Flow<PlayerId> = _uidFlow.asSharedFlow().map { PlayerId(it) }
 
     /**
      * 匿名ログイン

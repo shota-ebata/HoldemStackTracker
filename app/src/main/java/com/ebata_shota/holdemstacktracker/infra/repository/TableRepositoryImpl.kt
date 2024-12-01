@@ -56,8 +56,7 @@ constructor(
         ruleState: RuleState
     ) {
         withContext(ioDispatcher) {
-            val uid = firebaseAuthRepository.uidFlow.first()
-            val myPlayerId = PlayerId(uid)
+            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
             val myName = prefRepository.myName.first()
             val tableCreateTime = System.currentTimeMillis()
             val table = Table(

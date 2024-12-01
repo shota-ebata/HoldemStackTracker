@@ -87,11 +87,12 @@ constructor(
         viewModelScope.launch {
             combine(
                 tableFlow.mapNotNull { it },
-                firebaseAuthRepository.uidFlow,
+                firebaseAuthRepository.myPlayerIdFlow,
                 qrPainterStateFlow.mapNotNull { it }
             ) { tableState, uid, _ ->
                 val myPlayerId = PlayerId(uid)
                 createUiState(tableState, myPlayerId)
+            ) { tableState, myPlayerId, _ ->
             }.collect(_uiState)
         }
 

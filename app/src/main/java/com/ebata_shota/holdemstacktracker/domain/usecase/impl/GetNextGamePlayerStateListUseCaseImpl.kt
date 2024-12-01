@@ -28,7 +28,7 @@ constructor(
         players: List<GamePlayerState>,
         action: BetPhaseActionState
     ): List<GamePlayerState> {
-        val myPlayerId = PlayerId(firebaseAuthRepository.uidFlow.first())
+        val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
         val myPlayerStateIndex = players.indexOfFirstOrNull { it.id == myPlayerId }
             ?: throw IllegalStateException("Player not found")
         return when (action) {
