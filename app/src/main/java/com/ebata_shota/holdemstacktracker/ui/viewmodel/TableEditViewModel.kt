@@ -273,59 +273,6 @@ constructor(
         )
     }
 
-    suspend fun test(tableId: TableId) {
-        gameRepository.sendGame(
-            tableId = tableId,
-            newGame = Game(
-                version = 0L,
-                appVersion = BuildConfig.VERSION_CODE.toLong(),
-                players = listOf(
-                    GamePlayerState(id = PlayerId("PlayerId0"), stack = 1000.0, isLeaved = false),
-                    GamePlayerState(id = PlayerId("PlayerId1"), stack = 1000.0, isLeaved = false),
-                    GamePlayerState(id = PlayerId("PlayerId2"), stack = 1000.0, isLeaved = false),
-                ),
-                podStateList = listOf(
-                    PodState(
-                        id = 0L,
-                        podNumber = 0L,
-                        podSize = 600.0,
-                        involvedPlayerIds = listOf(
-                            PlayerId("PlayerId0"),
-                            PlayerId("PlayerId1"),
-                            PlayerId("PlayerId2")
-                        ),
-                        isClosed = false
-                    )
-                ),
-                phaseStateList = listOf(
-                    PhaseState.Standby,
-                    PhaseState.PreFlop(
-                        actionStateList = listOf(
-                            BetPhaseActionState.Blind(
-                                playerId = PlayerId("PlayerId0"),
-                                betSize = 100.0
-                            ),
-                            BetPhaseActionState.Blind(
-                                playerId = PlayerId("PlayerId1"),
-                                betSize = 200.0
-                            ),
-                            BetPhaseActionState.Call(
-                                playerId = PlayerId("PlayerId2"),
-                                betSize = 200.0
-                            ),
-                            BetPhaseActionState.Call(
-                                playerId = PlayerId("PlayerId0"),
-                                betSize = 200.0
-                            )
-                        )
-                    )
-                ),
-                updateTime = 0L
-            )
-        )
-
-    }
-
     companion object {
         fun bundle(tableId: TableId) = Bundle().apply {
             putString(TableEditViewModel::tableIdString.name, tableId.value)
