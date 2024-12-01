@@ -29,6 +29,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.ui.TableEditScreenUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableEditScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
@@ -84,6 +85,9 @@ constructor(
         initialValue = null
     )
 
+    // BTNの決め方の状態
+    private val btnChosenChosenUiState = MutableStateFlow(TableEditContentUiState.BtnChosen.RANDOM)
+
     private val qrPainterStateFlow = MutableStateFlow<Painter?>(null)
 
     init {
@@ -92,9 +96,10 @@ constructor(
             combine(
                 tableFlow.mapNotNull { it },
                 firebaseAuthRepository.myPlayerIdFlow,
-                qrPainterStateFlow.mapNotNull { it }
-            ) { tableState, myPlayerId, _ ->
-                uiStateMapper.createUiState(tableState, myPlayerId)
+                btnChosenChosenUiState,
+                qrPainterStateFlow.mapNotNull { it },
+            ) { tableState, myPlayerId, btnChosen, _ ->
+                uiStateMapper.createUiState(tableState, myPlayerId, btnChosen)
             }.collect(_uiState)
         }
 
@@ -233,6 +238,10 @@ constructor(
             val contentUiState = (it as? TableEditScreenUiState.Content) ?: return@update it
             contentUiState.copy(stackEditDialogState = null)
         }
+    }
+
+    fun onChangeBtnChosen(btnChosen: TableEditContentUiState.BtnChosen) {
+        btnChosenChosenUiState.update { btnChosen }
     }
 
     fun onClickSubmitButton() {

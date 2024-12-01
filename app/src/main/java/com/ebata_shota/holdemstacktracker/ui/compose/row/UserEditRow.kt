@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
+import com.ebata_shota.holdemstacktracker.ui.theme.SideSpace
 
 @Composable
 fun UserEditRow(
@@ -41,10 +42,7 @@ fun UserEditRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .defaultMinSize(56.dp)
-            .padding(
-                start = 16.dp
-            ),
+            .defaultMinSize(56.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -52,6 +50,7 @@ fun UserEditRow(
             text = uiState.playerName,
             modifier = Modifier
                 .weight(1.0f)
+                .padding(start = SideSpace)
         )
 
         Row(
@@ -97,7 +96,7 @@ fun UserEditRow(
 
                 Column(
                     modifier = Modifier
-                        .padding(end = 8.dp),
+                        .padding(end = SideSpace),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Box(

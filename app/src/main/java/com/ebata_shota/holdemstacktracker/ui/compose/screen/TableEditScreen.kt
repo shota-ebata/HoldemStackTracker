@@ -38,6 +38,7 @@ fun TableEditScreen(
                 onClickStackEditButton = viewModel::onClickStackEditButton,
                 onClickUpButton = viewModel::onClickUpButton,
                 onClickDownButton = viewModel::onClickDownButton,
+                onChangeBtnChosen = viewModel::onChangeBtnChosen,
                 onClickSubmitButton = viewModel::onClickSubmitButton
             )
             val stackEditDialogState = uiState.stackEditDialogState

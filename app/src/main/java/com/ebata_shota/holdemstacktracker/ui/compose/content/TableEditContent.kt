@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,8 +32,10 @@ import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.row.PlayerEditRowUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.row.RadioButtonRow
 import com.ebata_shota.holdemstacktracker.ui.compose.row.UserEditRow
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
+import com.ebata_shota.holdemstacktracker.ui.theme.SideSpace
 
 
 @Composable
@@ -42,6 +45,7 @@ fun TableEditContent(
     onClickStackEditButton: (PlayerId, String) -> Unit,
     onClickUpButton: (PlayerId) -> Unit,
     onClickDownButton: (PlayerId) -> Unit,
+    onChangeBtnChosen: (TableEditContentUiState.BtnChosen) -> Unit,
     onClickSubmitButton: () -> Unit
 ) {
     val qrPainter = getTableQrPainter()
@@ -76,13 +80,18 @@ fun TableEditContent(
                         )
                     }
                 }
+                Text(
+                    text = stringResource(R.string.member_title_label),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .padding(horizontal = SideSpace)
+                )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .defaultMinSize(56.dp)
-                        .padding(
-                            start = 16.dp
-                        ),
+                        .padding(horizontal = SideSpace),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -104,7 +113,8 @@ fun TableEditContent(
                 }
 
                 Column(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                 ) {
                     uiState.playerEditRows.forEachIndexed { index, playerEditRowUiState ->
                         UserEditRow(
@@ -129,20 +139,44 @@ fun TableEditContent(
                         }
                     }
                 }
+                // BTNの決め方
+                if (uiState.isEditable) {
+                    Text(
+                        text = stringResource(R.string.btn_chosen),
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier
+                            .padding(top = 16.dp)
+                            .padding(horizontal = SideSpace)
+                    )
+
+                    TableEditContentUiState.BtnChosen.entries.forEach { item ->
+                        RadioButtonRow(
+                            item = item,
+                            isSelected = item == uiState.btnChosen,
+                            label = { it.labelStrId },
+                            onClickBtnRadioButton = onChangeBtnChosen
+                        )
+                    }
+                }
             }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Button(
-                    onClick = onClickSubmitButton,
+
+            // ゲーム開始ボタン
+            if (uiState.isEditable) {
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp)
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Text(stringResource(R.string.start_game))
+                    Button(
+                        onClick = onClickSubmitButton,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        enabled = uiState.enableSubmitButton
+                    ) {
+                        Text(stringResource(R.string.start_game))
+                    }
                 }
             }
         }
@@ -152,8 +186,22 @@ fun TableEditContent(
 data class TableEditContentUiState(
     val tableId: TableId,
     val playerEditRows: List<PlayerEditRowUiState>,
-    val isAddable: Boolean
-)
+    val btnChosen: BtnChosen,
+    val enableSubmitButton: Boolean,
+    val isEditable: Boolean
+) {
+    enum class BtnChosen {
+        RANDOM,
+        SELECT;
+
+        @get:StringRes
+        val labelStrId: Int
+            get() = when (this@BtnChosen) {
+                RANDOM -> R.string.btn_random
+                SELECT -> R.string.btn_select
+            }
+    }
+}
 
 
 private class PreviewParam : PreviewParameterProvider<TableEditContentUiState> {
@@ -168,11 +216,13 @@ private class PreviewParam : PreviewParameterProvider<TableEditContentUiState> {
                     isEditable = false
                 )
             },
-            isAddable = false
+            btnChosen = TableEditContentUiState.BtnChosen.RANDOM,
+            enableSubmitButton = true,
+            isEditable = false
         ),
         TableEditContentUiState(
             tableId = TableId("tableId"),
-            playerEditRows = (0..4).map {
+            playerEditRows = (0..1).map {
                 PlayerEditRowUiState(
                     playerId = PlayerId("playerId$it"),
                     playerName = "PlayerName$it",
@@ -180,7 +230,9 @@ private class PreviewParam : PreviewParameterProvider<TableEditContentUiState> {
                     isEditable = true
                 )
             },
-            isAddable = true
+            btnChosen = TableEditContentUiState.BtnChosen.SELECT,
+            enableSubmitButton = true,
+            isEditable = true
         )
     )
 }
@@ -204,6 +256,7 @@ fun TableEditContentPreview(
             onClickStackEditButton = { _, _ -> },
             onClickUpButton = {},
             onClickDownButton = {},
+            onChangeBtnChosen = {},
             onClickSubmitButton = {}
         )
     }

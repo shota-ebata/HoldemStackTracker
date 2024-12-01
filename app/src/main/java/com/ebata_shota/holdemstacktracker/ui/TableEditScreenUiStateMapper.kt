@@ -17,7 +17,8 @@ constructor(
 ) {
     fun createUiState(
         tableState: Table,
-        myPlayerId: PlayerId
+        myPlayerId: PlayerId,
+        btnChosen: TableEditContentUiState.BtnChosen
     ): TableEditScreenUiState.Content {
         val isHost = tableState.hostPlayerId == myPlayerId
         return TableEditScreenUiState.Content(
@@ -38,7 +39,9 @@ constructor(
                         isEditable = isHost
                     )
                 },
-                isAddable = isHost
+                btnChosen = btnChosen,
+                enableSubmitButton = tableState.playerOrder.size >= 2,
+                isEditable = isHost
             ),
             stackEditDialogState = null
         )
