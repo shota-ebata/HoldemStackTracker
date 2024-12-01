@@ -15,4 +15,5 @@
     <string name="table_creator_submit">テーブル作成</string>
 
     <string name="player_name_label">プレイヤー名</string>
+    <string name="start_game">ゲーム開始</string>
 </resources>

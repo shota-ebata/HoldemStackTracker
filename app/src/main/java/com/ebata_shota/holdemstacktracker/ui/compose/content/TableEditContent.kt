@@ -142,7 +142,7 @@ fun TableEditContent(
                         .fillMaxWidth()
                         .height(56.dp)
                 ) {
-                    Text("ゲーム開始")
+                    Text(stringResource(R.string.start_game))
                 }
             }
         }
