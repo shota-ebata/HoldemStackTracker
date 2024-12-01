@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
 import android.os.Bundle
+import android.util.Log
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
@@ -8,16 +9,11 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
-import com.ebata_shota.holdemstacktracker.domain.model.Game
-import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
-import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
@@ -29,7 +25,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.ui.TableEditScreenUiStateMapper
-import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState.BtnChosen
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableEditScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
@@ -87,7 +83,7 @@ constructor(
     )
 
     // BTNの決め方の状態を保持
-    private val btnChosenChosenUiStateFlow = MutableStateFlow(TableEditContentUiState.BtnChosen.RANDOM)
+    private val btnChosenChosenUiStateFlow = MutableStateFlow(BtnChosen.RANDOM)
 
     // QR画像を保持
     private val qrPainterStateFlow = MutableStateFlow<Painter?>(null)
@@ -238,44 +234,29 @@ constructor(
         }
     }
 
-    fun onChangeBtnChosen(btnChosen: TableEditContentUiState.BtnChosen) {
+    fun onChangeBtnChosen(btnChosen: BtnChosen) {
         btnChosenChosenUiStateFlow.update { btnChosen }
     }
 
     fun onClickSubmitButton() {
-        viewModelScope.launch {
-            val table: Table = tableStateFlow.value ?: return@launch
-            newGame(table)
-            _navigateEvent.emit(Navigate.Game(table.id))
-        }
+        startNewGame()
     }
 
-    private suspend fun newGame(table: Table) {
-        val updateTime = System.currentTimeMillis()
-        createNewGame.invoke(
-            newTable = table.copy(
-                tableStatus = TableStatus.GAME,
-                startTime = updateTime,
-                updateTime = updateTime
-            ),
-            newGame = Game(
-                version = 0L,
-                appVersion = BuildConfig.VERSION_CODE.toLong(),
-                players = table.playerOrder.mapNotNull { playerId ->
-                    val player = table.basePlayers.find { it.id == playerId }
-                    player?.let {
-                        GamePlayerState(
-                            id = player.id,
-                            stack = player.stack,
-                            isLeaved = false
-                        )
-                    }
-                },
-                podStateList = emptyList(),
-                phaseStateList = listOf(PhaseState.Standby),
-                updateTime = updateTime
-            )
-        )
+    private fun startNewGame() {
+        viewModelScope.launch {
+            val table: Table = tableStateFlow.value ?: return@launch
+            val btnPlayerId = when (btnChosenChosenUiStateFlow.value) {
+                BtnChosen.RANDOM -> {
+                    val index = (0..table.playerOrder.lastIndex).random()
+                    table.playerOrder[index]
+                }
+
+                BtnChosen.SELECT -> table.btnPlayerId
+            }
+            val newTable = table.copy(btnPlayerId = btnPlayerId)
+            createNewGame.invoke(newTable)
+            _navigateEvent.emit(Navigate.Game(table.id))
+        }
     }
 
     companion object {
