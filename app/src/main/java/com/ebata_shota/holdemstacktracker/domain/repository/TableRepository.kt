@@ -15,5 +15,6 @@ interface TableRepository {
 
     fun startCollectTableFlow(tableId: TableId)
     fun stopCollectTableFlow()
+    // FIXME: updateTimeとかversionの更新処理を行うUseCaseを用意したほうがいいね
     suspend fun sendTable(table: Table)
 }
