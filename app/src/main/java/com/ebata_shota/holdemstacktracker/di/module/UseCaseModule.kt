@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.di.module
 
+import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetDoubleToStringUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
@@ -13,6 +14,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUse
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPodStateListUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.CreateNewGameUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetDoubleToStringUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
@@ -29,10 +31,11 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.JoinTableUseCaseIm
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 interface UseCaseModule {
     @Binds
     fun bindGetLatestBetPhaseUseCase(useCase: GetLatestBetPhaseUseCaseImpl): GetLatestBetPhaseUseCase
@@ -72,4 +75,7 @@ interface UseCaseModule {
 
     @Binds
     fun bindJoinTableUseCase(useCase: JoinTableUseCaseImpl): JoinTableUseCase
+
+    @Binds
+    fun bindCreateNewGame(useCase: CreateNewGameUseCaseImpl): CreateNewGameUseCase
 }

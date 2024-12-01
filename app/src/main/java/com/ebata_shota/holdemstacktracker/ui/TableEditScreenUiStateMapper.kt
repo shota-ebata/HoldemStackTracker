@@ -6,10 +6,10 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetDoubleToStringUseCas
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.PlayerEditRowUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableEditScreenUiState
+import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
+@ViewModelScoped
 class TableEditScreenUiStateMapper
 @Inject
 constructor(
