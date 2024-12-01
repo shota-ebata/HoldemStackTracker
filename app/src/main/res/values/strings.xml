@@ -18,6 +18,5 @@
     <string name="member_title_label">参加プレイヤー</string>
     <string name="btn_chosen">BTNプレイヤー</string>
     <string name="btn_random">ランダム</string>
-    <string name="btn_select">選択</string>
     <string name="start_game">ゲーム開始</string>
 </resources>

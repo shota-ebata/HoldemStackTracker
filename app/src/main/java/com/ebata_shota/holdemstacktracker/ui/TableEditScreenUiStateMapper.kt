@@ -16,21 +16,21 @@ constructor(
     private val getDoubleToString: GetDoubleToStringUseCase
 ) {
     fun createUiState(
-        tableState: Table,
+        table: Table,
         myPlayerId: PlayerId,
-        btnChosen: TableEditContentUiState.BtnChosen
+        btnPlayerId: PlayerId?
     ): TableEditScreenUiState.Content {
-        val isHost = tableState.hostPlayerId == myPlayerId
+        val isHost = table.hostPlayerId == myPlayerId
         return TableEditScreenUiState.Content(
             contentUiState = TableEditContentUiState(
-                tableId = tableState.id,
-                playerEditRows = tableState.playerOrder.mapNotNull { playerId ->
-                    val player = tableState.basePlayers.find { it.id == playerId }
+                tableId = table.id,
+                playerEditRows = table.playerOrder.mapNotNull { playerId ->
+                    val player = table.basePlayers.find { it.id == playerId }
                         ?: return@mapNotNull null
 
                     val playerStackString = getDoubleToString.invoke(
                         value = player.stack,
-                        betViewMode = tableState.ruleState.betViewMode
+                        betViewMode = table.ruleState.betViewMode
                     )
                     PlayerEditRowUiState(
                         playerId = playerId,
@@ -39,8 +39,18 @@ constructor(
                         isEditable = isHost
                     )
                 },
-                btnChosen = btnChosen,
-                enableSubmitButton = tableState.playerOrder.size >= 2,
+                btnChosenUiStateList = listOf(
+                    TableEditContentUiState.BtnChosenUiState.BtnChosenRandom(
+                        isSelected = btnPlayerId == null
+                    )
+                ) + table.playerOrder.map { playerId ->
+                    TableEditContentUiState.BtnChosenUiState.Player(
+                        id = playerId,
+                        name = table.basePlayers.find { it.id == playerId }!!.name,
+                        isSelected = btnPlayerId == playerId
+                    )
+                },
+                enableSubmitButton = table.playerOrder.size >= 2,
                 isEditable = isHost
             ),
             stackEditDialogState = null

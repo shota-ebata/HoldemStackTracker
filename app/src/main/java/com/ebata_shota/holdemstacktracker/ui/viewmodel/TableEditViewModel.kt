@@ -25,7 +25,6 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.ui.TableEditScreenUiStateMapper
-import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState.BtnChosen
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableEditScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
@@ -82,8 +81,8 @@ constructor(
         initialValue = null
     )
 
-    // BTNの決め方の状態を保持
-    private val btnChosenChosenUiStateFlow = MutableStateFlow(BtnChosen.RANDOM)
+    // BTNのプレイヤーID
+    private val selectedBtnPlayerId = MutableStateFlow<PlayerId?>(null)
 
     // QR画像を保持
     private val qrPainterStateFlow = MutableStateFlow<Painter?>(null)
@@ -94,10 +93,10 @@ constructor(
             combine(
                 tableStateFlow.mapNotNull { it },
                 firebaseAuthRepository.myPlayerIdFlow,
-                btnChosenChosenUiStateFlow,
+                selectedBtnPlayerId,
                 qrPainterStateFlow.mapNotNull { it },
-            ) { tableState, myPlayerId, btnChosen, _ ->
-                uiStateMapper.createUiState(tableState, myPlayerId, btnChosen)
+            ) { tableState, myPlayerId, selectedBtnPlayerId, _ ->
+                uiStateMapper.createUiState(tableState, myPlayerId, selectedBtnPlayerId)
             }.collect(_uiState)
         }
 
@@ -204,8 +203,8 @@ constructor(
         }
     }
 
-    fun onChangeBtnChosen(btnChosen: BtnChosen) {
-        btnChosenChosenUiStateFlow.update { btnChosen }
+    fun onChangeBtnChosen(btnPlayerId: PlayerId?) {
+        selectedBtnPlayerId.update { btnPlayerId }
     }
 
     fun onClickSubmitButton() {
@@ -215,13 +214,9 @@ constructor(
     private fun startNewGame() {
         viewModelScope.launch {
             val table: Table = tableStateFlow.value ?: return@launch
-            val btnPlayerId = when (btnChosenChosenUiStateFlow.value) {
-                BtnChosen.RANDOM -> {
-                    val index = (0..table.playerOrder.lastIndex).random()
-                    table.playerOrder[index]
-                }
-
-                BtnChosen.SELECT -> table.btnPlayerId
+            val btnPlayerId = selectedBtnPlayerId.value ?: run {
+                val index = (0..table.playerOrder.lastIndex).random()
+                table.playerOrder[index]
             }
             val newTable = table.copy(btnPlayerId = btnPlayerId)
             createNewGame.invoke(newTable)

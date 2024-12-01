@@ -25,7 +25,7 @@ import com.ebata_shota.holdemstacktracker.ui.theme.SideSpace
 fun <T> RadioButtonRow(
     item: T,
     isSelected: Boolean,
-    label: (T) -> Int,
+    labelString: @Composable (T) -> String,
     onClickBtnRadioButton: (T) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -48,9 +48,10 @@ fun <T> RadioButtonRow(
                 .padding(start = SideSpace)
         )
         Text(
-            text = stringResource(label(item)),
+            text = labelString(item),
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(start = 16.dp)
+            modifier = Modifier
+                .padding(start = 16.dp)
                 .padding(end = SideSpace)
         )
     }
@@ -69,7 +70,7 @@ private fun RadiobuttonRowPreview() {
         RadioButtonRow(
             item = "hoge",
             isSelected = true,
-            label = { R.string.btn_select },
+            labelString = { stringResource(R.string.btn_random) },
             onClickBtnRadioButton = {}
         )
     }

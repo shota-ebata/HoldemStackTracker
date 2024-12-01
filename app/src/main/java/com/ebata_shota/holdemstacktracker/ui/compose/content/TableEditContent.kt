@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
-import androidx.annotation.StringRes
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState.BtnChosenUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.PlayerEditRowUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.RadioButtonRow
 import com.ebata_shota.holdemstacktracker.ui.compose.row.UserEditRow
@@ -45,7 +46,7 @@ fun TableEditContent(
     onClickStackEditButton: (PlayerId, String) -> Unit,
     onClickUpButton: (PlayerId) -> Unit,
     onClickDownButton: (PlayerId) -> Unit,
-    onChangeBtnChosen: (TableEditContentUiState.BtnChosen) -> Unit,
+    onChangeBtnChosen: (PlayerId?) -> Unit,
     onClickSubmitButton: () -> Unit
 ) {
     val qrPainter = getTableQrPainter()
@@ -152,13 +153,30 @@ fun TableEditContent(
                             .padding(horizontal = SideSpace)
                     )
 
-                    TableEditContentUiState.BtnChosen.entries.forEach { item ->
-                        RadioButtonRow(
-                            item = item,
-                            isSelected = item == uiState.btnChosen,
-                            label = { it.labelStrId },
-                            onClickBtnRadioButton = onChangeBtnChosen
-                        )
+                    uiState.btnChosenUiStateList.forEach { item ->
+                        when (item) {
+                            is BtnChosenUiState.BtnChosenRandom -> {
+                                RadioButtonRow(
+                                    item = item,
+                                    isSelected = item.isSelected, // TODO
+                                    labelString = { stringResource(R.string.btn_random) },
+                                    onClickBtnRadioButton = {
+                                        onChangeBtnChosen(null)
+                                    }
+                                )
+                            }
+
+                            is BtnChosenUiState.Player -> {
+                                RadioButtonRow(
+                                    item = item,
+                                    isSelected = item.isSelected,
+                                    labelString = { it.name },
+                                    onClickBtnRadioButton = {
+                                        onChangeBtnChosen(it.id)
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -189,20 +207,22 @@ fun TableEditContent(
 data class TableEditContentUiState(
     val tableId: TableId,
     val playerEditRows: List<PlayerEditRowUiState>,
-    val btnChosen: BtnChosen,
+    val btnChosenUiStateList: List<BtnChosenUiState>,
     val enableSubmitButton: Boolean,
     val isEditable: Boolean
 ) {
-    enum class BtnChosen {
-        RANDOM,
-        SELECT;
+    sealed interface BtnChosenUiState {
+        val isSelected: Boolean
 
-        @get:StringRes
-        val labelStrId: Int
-            get() = when (this@BtnChosen) {
-                RANDOM -> R.string.btn_random
-                SELECT -> R.string.btn_select
-            }
+        data class BtnChosenRandom(
+            override val isSelected: Boolean = false
+        ) : BtnChosenUiState
+
+        data class Player(
+            val id: PlayerId,
+            val name: String,
+            override val isSelected: Boolean = false
+        ) : BtnChosenUiState
     }
 }
 
@@ -219,7 +239,7 @@ private class PreviewParam : PreviewParameterProvider<TableEditContentUiState> {
                     isEditable = false
                 )
             },
-            btnChosen = TableEditContentUiState.BtnChosen.RANDOM,
+            btnChosenUiStateList = emptyList(),
             enableSubmitButton = true,
             isEditable = false
         ),
@@ -233,7 +253,15 @@ private class PreviewParam : PreviewParameterProvider<TableEditContentUiState> {
                     isEditable = true
                 )
             },
-            btnChosen = TableEditContentUiState.BtnChosen.SELECT,
+            btnChosenUiStateList = listOf(
+                BtnChosenUiState.BtnChosenRandom(isSelected = false)
+            ) + (0..4).map {
+                BtnChosenUiState.Player(
+                    id = PlayerId("playerId$it"),
+                    name = "PlayerName$it",
+                    isSelected = it == 0
+                )
+            },
             enableSubmitButton = true,
             isEditable = true
         )
@@ -244,7 +272,7 @@ private class PreviewParam : PreviewParameterProvider<TableEditContentUiState> {
 @Preview(
     showBackground = true,
     showSystemUi = true,
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
     name = "Dark Mode"
 )
 @Composable
