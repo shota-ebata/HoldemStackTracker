@@ -79,24 +79,26 @@ constructor(
         data class Game(val tableId: TableId) : Navigate
     }
 
-    private val tableFlow: StateFlow<Table?> = tableRepository.tableFlow.stateIn(
+    // Tableの状態を保持
+    private val tableStateFlow: StateFlow<Table?> = tableRepository.tableFlow.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
         initialValue = null
     )
 
-    // BTNの決め方の状態
-    private val btnChosenChosenUiState = MutableStateFlow(TableEditContentUiState.BtnChosen.RANDOM)
+    // BTNの決め方の状態を保持
+    private val btnChosenChosenUiStateFlow = MutableStateFlow(TableEditContentUiState.BtnChosen.RANDOM)
 
+    // QR画像を保持
     private val qrPainterStateFlow = MutableStateFlow<Painter?>(null)
 
     init {
         // UiState生成の監視
         viewModelScope.launch {
             combine(
-                tableFlow.mapNotNull { it },
+                tableStateFlow.mapNotNull { it },
                 firebaseAuthRepository.myPlayerIdFlow,
-                btnChosenChosenUiState,
+                btnChosenChosenUiStateFlow,
                 qrPainterStateFlow.mapNotNull { it },
             ) { tableState, myPlayerId, btnChosen, _ ->
                 uiStateMapper.createUiState(tableState, myPlayerId, btnChosen)
@@ -106,7 +108,7 @@ constructor(
         // 参加プレイヤーに自分が入るための監視
         viewModelScope.launch {
             combine(
-                tableFlow.mapNotNull { it },
+                tableStateFlow.mapNotNull { it },
                 firebaseAuthRepository.myPlayerIdFlow,
                 prefRepository.myName,
             ) { tableState, myPlayerId, myName ->
@@ -160,7 +162,7 @@ constructor(
                 ?: return@launch
             val stackValueText = contentUiState.stackEditDialogState?.stackValue?.text
                 ?: return@launch
-            val tableState = tableFlow.value
+            val tableState = tableStateFlow.value
                 ?: return@launch
             val index = tableState.basePlayers.indexOfFirstOrNull { it.id == playerId }
                 ?: return@launch
@@ -179,49 +181,45 @@ constructor(
 
     fun onClickUpButton(playerId: PlayerId) {
         viewModelScope.launch {
-            val tableState = tableFlow.value ?: return@launch
+            val tableState = tableStateFlow.value ?: return@launch
             val playerOrder = tableState.playerOrder
             val currentIndex = playerOrder.indexOf(playerId)
             val prevIndex = if (currentIndex - 1 in 0..playerOrder.lastIndex) {
                 currentIndex - 1
             } else {
-                null
+                tableState.playerOrder.lastIndex
             }
-            if (prevIndex != null) {
-                val newTableState = tableState.copy(
-                    playerOrder = moveItem(
-                        list = playerOrder.toMutableList(),
-                        fromIndex = currentIndex,
-                        toIndex = prevIndex
-                    ),
-                    updateTime = System.currentTimeMillis()
-                )
-                tableRepository.sendTable(newTableState)
-            }
+            val newTableState = tableState.copy(
+                playerOrder = moveItem(
+                    list = playerOrder.toMutableList(),
+                    fromIndex = currentIndex,
+                    toIndex = prevIndex
+                ),
+                updateTime = System.currentTimeMillis()
+            )
+            tableRepository.sendTable(newTableState)
         }
     }
 
     fun onClickDownButton(playerId: PlayerId) {
         viewModelScope.launch {
-            val tableState = tableFlow.value ?: return@launch
+            val tableState = tableStateFlow.value ?: return@launch
             val playerOrder = tableState.playerOrder
             val currentIndex = playerOrder.indexOf(playerId)
             val nextIndex = if (currentIndex + 1 in 0..playerOrder.lastIndex) {
                 currentIndex + 1
             } else {
-                null
+                0
             }
-            if (nextIndex != null) {
-                val newTableState = tableState.copy(
-                    playerOrder = moveItem(
-                        list = playerOrder.toMutableList(),
-                        fromIndex = currentIndex,
-                        toIndex = nextIndex
-                    ),
-                    updateTime = System.currentTimeMillis()
-                )
-                tableRepository.sendTable(newTableState)
-            }
+            val newTableState = tableState.copy(
+                playerOrder = moveItem(
+                    list = playerOrder.toMutableList(),
+                    fromIndex = currentIndex,
+                    toIndex = nextIndex
+                ),
+                updateTime = System.currentTimeMillis()
+            )
+            tableRepository.sendTable(newTableState)
         }
     }
 
@@ -241,12 +239,12 @@ constructor(
     }
 
     fun onChangeBtnChosen(btnChosen: TableEditContentUiState.BtnChosen) {
-        btnChosenChosenUiState.update { btnChosen }
+        btnChosenChosenUiStateFlow.update { btnChosen }
     }
 
     fun onClickSubmitButton() {
         viewModelScope.launch {
-            val table: Table = tableFlow.value ?: return@launch
+            val table: Table = tableStateFlow.value ?: return@launch
             newGame(table)
             _navigateEvent.emit(Navigate.Game(table.id))
         }
