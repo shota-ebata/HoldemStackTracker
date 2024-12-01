@@ -1,9 +1,9 @@
 package com.ebata_shota.holdemstacktracker.infra.repository
 
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
-import com.ebata_shota.holdemstacktracker.domain.model.GameState
+import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
-import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.infra.mapper.GameMapper
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -20,21 +20,21 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class GameStateRepositoryImpl
+class GameRepositoryImpl
 @Inject
 constructor(
     firebaseDatabase: FirebaseDatabase,
     private val gameMapper: GameMapper,
     @ApplicationScope
     private val appCoroutineScope: CoroutineScope,
-) : GameStateRepository {
+) : GameRepository {
 
     private val gamesRef: DatabaseReference = firebaseDatabase.getReference(
         "games"
     )
 
-    private val _gameFlow = MutableSharedFlow<GameState>()
-    override val gameFlow: Flow<GameState> = _gameFlow.asSharedFlow()
+    private val _gameFlow = MutableSharedFlow<Game>()
+    override val gameFlow: Flow<Game> = _gameFlow.asSharedFlow()
 
     private var collectGameJob: Job? = null
 
@@ -46,8 +46,8 @@ constructor(
                     override fun onDataChange(snapshot: DataSnapshot) {
                         if (snapshot.exists()) {
                             val gameMap: Map<*, *> = snapshot.value as Map<*, *>
-                            val gameState = gameMapper.mapToGameState(gameMap)
-                            trySend(gameState)
+                            val game = gameMapper.mapToGame(gameMap)
+                            trySend(game)
                         }
                     }
 
@@ -70,15 +70,15 @@ constructor(
     }
 
     /**
-     * GameStateを更新してFirebaseRealtimeDatabaseに送る
+     * Gameを更新してFirebaseRealtimeDatabaseに送る
      *
-     * @param newGameState 新しいGameState
+     * @param newGame 新しいGame
      */
-    override suspend fun sendGameState(
+    override suspend fun sendGame(
         tableId: TableId,
-        newGameState: GameState
+        newGame: Game
     ) {
-        val gameHashMap = gameMapper.mapToHashMap(newGameState)
+        val gameHashMap = gameMapper.mapToHashMap(newGame)
         val gameRef = gamesRef.child(tableId.value)
         gameRef.setValue(gameHashMap)
     }

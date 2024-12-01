@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
-import com.ebata_shota.holdemstacktracker.createDummyGameState
+import com.ebata_shota.holdemstacktracker.createDummyGame
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState.Blind
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState.Call
@@ -34,7 +34,7 @@ class GetCurrentPlayerIdUseCaseImplTest {
         usecase = GetCurrentPlayerIdUseCaseImpl(
             getLatestBetPhase = getLatestBetPhaseMock
         )
-        val gameState = createDummyGameState(
+        val game = createDummyGame(
             players = listOf(
                 GamePlayerState(
                     id = PlayerId("PlayerId0"),
@@ -56,14 +56,14 @@ class GetCurrentPlayerIdUseCaseImplTest {
         runTest {
             usecase.invoke(
                 btnPlayerId = PlayerId("PlayerId0"),
-                gameState = gameState
+                game = game
             )
         }
-        verify(exactly = 1) { getLatestBetPhaseMock.invoke(gameState) }
+        verify(exactly = 1) { getLatestBetPhaseMock.invoke(game) }
     }
 
     private fun executeAndAssert(actionStateList: List<BetPhaseActionState>, btnPlayerId: PlayerId, expected: PlayerId) {
-        val gameState = createDummyGameState(
+        val game = createDummyGame(
             players = listOf(
                 GamePlayerState(
                     id = PlayerId("PlayerId0"),
@@ -91,7 +91,7 @@ class GetCurrentPlayerIdUseCaseImplTest {
         runTest {
             val actual = usecase.invoke(
                 btnPlayerId = btnPlayerId,
-                gameState = gameState
+                game = game
             )
 
             assertEquals(expected, actual)

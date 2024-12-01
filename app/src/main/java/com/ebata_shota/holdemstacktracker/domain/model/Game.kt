@@ -3,7 +3,7 @@ package com.ebata_shota.holdemstacktracker.domain.model
 /**
  * ゲーム中に頻繁更新が入る情報
  */
-data class GameState(
+data class Game(
     val version: Long,
     val appVersion: Long,
     val players: List<GamePlayerState>,

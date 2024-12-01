@@ -1,16 +1,16 @@
 package com.ebata_shota.holdemstacktracker.di.module
 
-import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRuleStateOfRingGameRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRuleStateOfRingRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
-import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GmsBarcodeScannerRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
-import com.ebata_shota.holdemstacktracker.infra.repository.DefaultRuleStateOfRingGameRepositoryImpl
+import com.ebata_shota.holdemstacktracker.infra.repository.DefaultRuleStateOfRingRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.FirebaseAuthRepositoryImpl
-import com.ebata_shota.holdemstacktracker.infra.repository.GameStateRepositoryImpl
+import com.ebata_shota.holdemstacktracker.infra.repository.GameRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.GmsBarcodeScannerRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.PrefRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.QrBitmapRepositoryImpl
@@ -36,7 +36,7 @@ interface RepositoryModule {
 
     @Singleton
     @Binds
-    fun bindGameStateRepository(repo: GameStateRepositoryImpl): GameStateRepository
+    fun bindGameStateRepository(repo: GameRepositoryImpl): GameRepository
 
     @Singleton
     @Binds
@@ -48,7 +48,7 @@ interface RepositoryModule {
 
     @Singleton
     @Binds
-    fun bindDefaultRingGameStateRepository(repo: DefaultRuleStateOfRingGameRepositoryImpl): DefaultRuleStateOfRingGameRepository
+    fun bindDefaultRingGameStateRepository(repo: DefaultRuleStateOfRingRepositoryImpl): DefaultRuleStateOfRingRepository
 
     @Singleton
     @Binds

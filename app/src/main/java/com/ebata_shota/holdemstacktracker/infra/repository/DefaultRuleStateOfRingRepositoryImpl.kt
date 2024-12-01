@@ -2,17 +2,17 @@ package com.ebata_shota.holdemstacktracker.infra.repository
 
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
-import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRuleStateOfRingGameRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRuleStateOfRingRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
-class DefaultRuleStateOfRingGameRepositoryImpl
+class DefaultRuleStateOfRingRepositoryImpl
 @Inject
 constructor(
     private val prefRepository: PrefRepository
-) : DefaultRuleStateOfRingGameRepository {
+) : DefaultRuleStateOfRingRepository {
     override val ringGameFlow: Flow<RuleState.RingGame> = combine(
         prefRepository.defaultBetViewMode,
         prefRepository.defaultSizeOfSbOfNumberMode,

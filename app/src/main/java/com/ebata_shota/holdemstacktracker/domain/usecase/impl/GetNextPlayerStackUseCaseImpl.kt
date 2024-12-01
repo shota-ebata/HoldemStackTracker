@@ -4,7 +4,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
-import com.ebata_shota.holdemstacktracker.domain.model.GameState
+import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPlayerStackUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGamePlayerStateListUseCase
@@ -19,20 +19,20 @@ constructor(
     private val getNextPlayerStateList: GetNextGamePlayerStateListUseCase,
 ) : GetNextPlayerStackUseCase {
     override suspend fun invoke(
-        latestGameState: GameState,
+        latestGame: Game,
         action: BetPhaseActionState
     ): List<GamePlayerState> {
         // BetPhaseでしかActionはできないので
-        val latestPhase: BetPhase = getLatestBetPhase.invoke(latestGameState)
+        val latestPhase: BetPhase = getLatestBetPhase.invoke(latestGame)
         // プレイヤーごとの、まだポッドに入っていないベット額
         val pendingBetPerPlayer: Map<PlayerId, Double> = getPendingBetPerPlayer.invoke(
-            playerOrder = latestGameState.playerOrder,
+            playerOrder = latestGame.playerOrder,
             actionStateList = latestPhase.actionStateList
         )
         // プレイヤーのスタック更新
         val updatedPlayers: List<GamePlayerState> = getNextPlayerStateList.invoke(
             pendingBetPerPlayer = pendingBetPerPlayer,
-            players = latestGameState.players,
+            players = latestGame.players,
             action = action
         )
         return updatedPlayers

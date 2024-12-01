@@ -1,8 +1,8 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.BetPhase
-import com.ebata_shota.holdemstacktracker.domain.model.GameState
+import com.ebata_shota.holdemstacktracker.domain.model.Game
 
 interface GetLatestBetPhaseUseCase {
-    fun invoke(latestGameState: GameState): BetPhase
+    fun invoke(latestGame: Game): BetPhase
 }

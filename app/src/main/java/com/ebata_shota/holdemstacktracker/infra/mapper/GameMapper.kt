@@ -3,7 +3,7 @@ package com.ebata_shota.holdemstacktracker.infra.mapper
 import com.ebata_shota.holdemstacktracker.domain.model.ActionState
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
-import com.ebata_shota.holdemstacktracker.domain.model.GameState
+import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.PodState
@@ -37,9 +37,9 @@ constructor() {
         private const val UPDATE_TIME = "updateTime"
     }
 
-    fun mapToGameState(gameMap: Map<*, *>): GameState {
+    fun mapToGame(gameMap: Map<*, *>): Game {
 
-        return GameState(
+        return Game(
             version = gameMap[GAME_VERSION] as Long,
             appVersion = gameMap[APP_VERSION] as Long,
             players = mapToGamePlayerStateList(gameMap[PLAYERS] as List<*>),
@@ -120,14 +120,14 @@ constructor() {
     private fun Any.getDouble() = (this as? Double) ?: (this as Long).toDouble()
 
     fun mapToHashMap(
-        newGameState: GameState
+        newGame: Game
     ): HashMap<String, Any> = hashMapOf(
-        GAME_VERSION to newGameState.version,
-        APP_VERSION to newGameState.appVersion,
-        UPDATE_TIME to newGameState.updateTime,
-        PLAYERS to mapPlayers(newGameState.players),
-        PODS to mapPods(newGameState.podStateList),
-        PHASES to mapPhases(newGameState.phaseStateList)
+        GAME_VERSION to newGame.version,
+        APP_VERSION to newGame.appVersion,
+        UPDATE_TIME to newGame.updateTime,
+        PLAYERS to mapPlayers(newGame.players),
+        PODS to mapPods(newGame.podStateList),
+        PHASES to mapPhases(newGame.phaseStateList)
     )
 
     private fun mapPhases(phaseStateList: List<PhaseState>) = phaseStateList.mapIndexed { phaseIndex, phaseState ->

@@ -13,19 +13,19 @@ import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
-import com.ebata_shota.holdemstacktracker.domain.model.GameState
+import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.PodState
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
-import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameStateUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.ui.TableEditScreenUiStateMapper
@@ -53,11 +53,11 @@ class TableEditViewModel
 constructor(
     savedStateHandle: SavedStateHandle,
     private val tableRepository: TableRepository,
-    private val gameStateRepository: GameStateRepository,
+    private val gameRepository: GameRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val qrBitmapRepository: QrBitmapRepository,
     private val prefRepository: PrefRepository,
-    private val getNextGameState: GetNextGameStateUseCase,
+    private val getNextGame: GetNextGameUseCase,
     private val isActionRequired: IsActionRequiredUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
     private val joinTableUseCase: JoinTableUseCase,
@@ -232,9 +232,9 @@ constructor(
     }
 
     suspend fun test(tableId: TableId) {
-        gameStateRepository.sendGameState(
+        gameRepository.sendGame(
             tableId = tableId,
-            newGameState = GameState(
+            newGame = Game(
                 version = 0L,
                 appVersion = BuildConfig.VERSION_CODE.toLong(),
                 players = listOf(

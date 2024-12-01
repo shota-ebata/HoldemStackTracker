@@ -1,12 +1,11 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
-import com.ebata_shota.holdemstacktracker.createDummyGameState
+import com.ebata_shota.holdemstacktracker.createDummyGame
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
-import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextPlayerStackUseCaseImpl
@@ -74,7 +73,7 @@ class GetNextPlayerStackUseCaseImplTest {
         )
         every { getPendingBetPerPlayerUseCase.invoke(any(), any()) } returns mockPendingBetPerPlayerResult
 
-        val latestGameState = createDummyGameState(
+        val latestGame = createDummyGame(
             phaseStateList = listOf(
                 PhaseState.PreFlop(actionStateList = emptyList())
             )
@@ -84,24 +83,24 @@ class GetNextPlayerStackUseCaseImplTest {
         runTest {
             // execute
             val actual =  usecase.invoke(
-                latestGameState = latestGameState,
+                latestGame = latestGame,
                 action = action
             )
 
             // assert
             verify(exactly = 1) {
-                getLatestBetPhaseUseCase.invoke(latestGameState)
+                getLatestBetPhaseUseCase.invoke(latestGame)
             }
             verify(exactly = 1) {
                 getPendingBetPerPlayerUseCase.invoke(
-                    playerOrder = latestGameState.playerOrder,
+                    playerOrder = latestGame.playerOrder,
                     actionStateList = mockLatestBetPhaseResult.actionStateList
                 )
             }
             coVerify(exactly = 1) {
                 getNextGamePlayerStateListUseCase.invoke(
                     pendingBetPerPlayer = mockPendingBetPerPlayerResult,
-                    players = latestGameState.players,
+                    players = latestGame.players,
                     action = action,
                 )
             }

@@ -5,7 +5,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetDoubleToStringUseCas
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGamePlayerStateListUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameStateUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPlayerStackUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
@@ -18,7 +18,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetDoubleToStringU
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextGamePlayerStateListUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextGameStateUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextGameUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextPlayerStackUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetPerPlayerUseCaseImpl
@@ -47,7 +47,7 @@ interface UseCaseModule {
     fun bindGetNextGamePlayerStateListUseCase(useCase: GetNextGamePlayerStateListUseCaseImpl): GetNextGamePlayerStateListUseCase
 
     @Binds
-    fun bindGetNextTableStateUseCase(useCase: GetNextGameStateUseCaseImpl): GetNextGameStateUseCase
+    fun bindGetNextTableStateUseCase(useCase: GetNextGameUseCaseImpl): GetNextGameUseCase
 
     @Binds
     fun bindGetPendingBetPerPlayerUseCase(useCase: GetPendingBetPerPlayerUseCaseImpl): GetPendingBetPerPlayerUseCase

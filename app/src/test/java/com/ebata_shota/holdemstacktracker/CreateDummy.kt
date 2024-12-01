@@ -2,7 +2,7 @@ package com.ebata_shota.holdemstacktracker
 
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
-import com.ebata_shota.holdemstacktracker.domain.model.GameState
+import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
@@ -10,10 +10,10 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 
-fun createDummyGameState(
+fun createDummyGame(
     players: List<GamePlayerState> = emptyList(),
     phaseStateList: List<PhaseState> = emptyList()
-) = GameState(
+) = Game(
     version = 0,
     appVersion = BuildConfig.VERSION_CODE.toLong(),
     players = players,
