@@ -15,7 +15,6 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
-import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
@@ -51,7 +50,6 @@ class TableEditViewModel
 constructor(
     savedStateHandle: SavedStateHandle,
     private val tableRepository: TableRepository,
-    private val gameRepository: GameRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val qrBitmapRepository: QrBitmapRepository,
     private val prefRepository: PrefRepository,
