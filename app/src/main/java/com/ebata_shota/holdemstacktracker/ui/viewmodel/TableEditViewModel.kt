@@ -21,11 +21,13 @@ import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameStateRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameStateUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.ui.TableEditScreenUiStateMapper
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableEditScreenUiState
@@ -37,6 +39,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
@@ -53,10 +56,12 @@ constructor(
     private val gameStateRepository: GameStateRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val qrBitmapRepository: QrBitmapRepository,
+    private val prefRepository: PrefRepository,
     private val getNextGameState: GetNextGameStateUseCase,
     private val isActionRequired: IsActionRequiredUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
-    private val getDoubleToString: GetDoubleToStringUseCase
+    private val joinTableUseCase: JoinTableUseCase,
+    private val uiStateMapper: TableEditScreenUiStateMapper
 ) : ViewModel() {
 
     private val tableIdString: String by savedStateHandle.param()
@@ -80,8 +85,8 @@ constructor(
 
     private val qrPainterStateFlow = MutableStateFlow<Painter?>(null)
 
-
     init {
+        // UiState生成の監視
         viewModelScope.launch {
             combine(
                 tableFlow.mapNotNull { it },
@@ -92,13 +97,25 @@ constructor(
             }.collect(_uiState)
         }
 
+        // 参加プレイヤーに自分が入るための監視
         viewModelScope.launch {
-            tableRepository.startCollectTableFlow(tableId)
+            combine(
+                tableFlow.mapNotNull { it },
+                firebaseAuthRepository.myPlayerIdFlow,
+                prefRepository.myName,
+            ) { tableState, myPlayerId, myName ->
+                joinTableUseCase.invoke(tableState, myPlayerId, myName)
+            }.collect()
         }
 
         viewModelScope.launch {
-            val painter =
-                BitmapPainter(qrBitmapRepository.createQrBitmap(tableId.value).asImageBitmap())
+            // テーブル情報の監視をスタートする
+            tableRepository.startCollectTableFlow(tableId)
+
+            // QRコードを生成する
+            val painter = BitmapPainter(
+                image = qrBitmapRepository.createQrBitmap(tableId.value).asImageBitmap()
+            )
             qrPainterStateFlow.update { painter }
         }
     }
