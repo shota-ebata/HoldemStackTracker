@@ -11,6 +11,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
+import com.ebata_shota.holdemstacktracker.infra.db.dao.TableDao
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableStateMapper
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -36,6 +37,7 @@ constructor(
     firebaseDatabase: FirebaseDatabase,
     private val prefRepository: PrefRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
+    private val tableDao: TableDao,
     private val tableMapper: TableStateMapper,
     @ApplicationScope
     private val appCoroutineScope: CoroutineScope,

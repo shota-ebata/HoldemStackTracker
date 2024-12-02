@@ -5,9 +5,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import androidx.room.Room
 import androidx.work.WorkManager
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherIO
+import com.ebata_shota.holdemstacktracker.infra.db.AppDatabase
 import com.google.firebase.BuildConfig
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -98,6 +100,16 @@ class AppModule {
             ).enableAutoZoom()
             .build()
         return GmsBarcodeScanning.getClient(appContext, options)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppDatabase(
+        @ApplicationContext
+        appContext: Context
+    ): AppDatabase {
+        return Room.databaseBuilder(appContext, AppDatabase::class.java, "app-database")
+            .build()
     }
 
 //    @Provides

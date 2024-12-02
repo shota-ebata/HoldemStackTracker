@@ -84,7 +84,7 @@ android {
         getByName("debug") {
             isShrinkResources = false
             isMinifyEnabled = false
-            isDebuggable =  true
+            isDebuggable = true
             applicationIdSuffix = ".debug"
             signingConfig = signingConfigs.getByName("debug")
         }
@@ -92,7 +92,10 @@ android {
             isShrinkResources = true
             isMinifyEnabled = true // TODO: trueかどうか確認する
             isDebuggable = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             signingConfig = signingConfigs.getByName("release")
         }
     }
@@ -181,4 +184,10 @@ dependencies {
 
     // play-services-code-scanner
     implementation(libs.play.services.code.scanner)
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+    testImplementation(libs.androidx.room.testing)
 }
