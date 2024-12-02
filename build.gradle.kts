@@ -6,4 +6,5 @@ plugins {
     alias(libs.plugins.devtools.ksp) apply false
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.crashlytics.plugin) apply false
+    alias(libs.plugins.androidx.room.plugin) apply false
 }

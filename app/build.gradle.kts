@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.devtools.ksp)
     alias(libs.plugins.google.services)
     alias(libs.plugins.crashlytics.plugin)
+    alias(libs.plugins.androidx.room.plugin)
 }
 
 android {
@@ -114,6 +115,9 @@ android {
     composeOptions {
         // https://developer.android.com/jetpack/androidx/releases/compose-kotlin?hl=ja#pre-release_kotlin_compatibility
         kotlinCompilerExtensionVersion = "1.5.13"
+    }
+    room {
+        schemaDirectory("$projectDir/schemas")
     }
     packaging {
         resources {
