@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -29,9 +30,10 @@ fun MainContent(
     onClickFloatingButton: () -> Unit,
     onClickTableRow: (TableId) -> Unit,
     onClickQrScan: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-
     Scaffold(
+        modifier = modifier,
         floatingActionButton = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp)

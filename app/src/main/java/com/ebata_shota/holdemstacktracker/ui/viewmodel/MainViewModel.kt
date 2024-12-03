@@ -1,16 +1,23 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GmsBarcodeScannerRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.screen.MainScreenDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.MainScreenUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,10 +26,15 @@ import javax.inject.Inject
 class MainViewModel
 @Inject
 constructor(
-    private val scannerRepository: GmsBarcodeScannerRepository
+    private val scannerRepository: GmsBarcodeScannerRepository,
+    private val prefRepository: PrefRepository,
+    private val firebaseAuthRepository: FirebaseAuthRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<MainScreenUiState>(MainScreenUiState.Loading)
     val uiState = _uiState.asStateFlow()
+
+    private val _dialogUiState = MutableStateFlow(MainScreenDialogUiState())
+    val dialogUiState = _dialogUiState.asStateFlow()
 
     private val _navigateEvent = MutableSharedFlow<NavigateEvent>()
     val navigateEvent = _navigateEvent.asSharedFlow()
@@ -51,6 +63,47 @@ constructor(
 
     fun onClickQrScan() {
         startQrScan()
+    }
+
+    fun onClickSettingRename() {
+        viewModelScope.launch {
+            val myPlayerId: PlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+            val myName: String =
+                prefRepository.myName.first() ?: "Player${myPlayerId.value.take(6)}"
+            _dialogUiState.update {
+                it.copy(
+                    myNameInputDialogUiState = MyNameInputDialogUiState(
+                        value = TextFieldValue(myName)
+                    )
+                )
+            }
+        }
+
+    }
+
+    fun onChangeEditTextMyNameInput(value: TextFieldValue) {
+        _dialogUiState.update {
+            it.copy(
+                myNameInputDialogUiState = it.myNameInputDialogUiState?.copy(
+                    value = value
+                )
+            )
+        }
+    }
+
+    fun onClickSubmitMyNameInput(value: String) {
+        viewModelScope.launch {
+            prefRepository.saveMyName(value)
+            _dialogUiState.update {
+                it.copy(myNameInputDialogUiState = null)
+            }
+        }
+    }
+
+    fun onDismissRequestMyNameInputDialog() {
+        _dialogUiState.update {
+            it.copy(myNameInputDialogUiState = null)
+        }
     }
 
     fun onClickTableRow(tableId: TableId) {
