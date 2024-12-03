@@ -6,12 +6,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogContent
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogContent
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.TableEditViewModel
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.TableEditViewModel.Navigate
@@ -60,9 +60,7 @@ fun TableEditScreen(
             if (myNameInputDialogUiState != null) {
                 MyNameInputDialogContent(
                     uiState = myNameInputDialogUiState,
-                    onChangeEditText = viewModel::onChangeEditTextMyNameInput,
-                    onDismissRequest = viewModel::onDismissRequestMyNameInputDialog,
-                    onClickSubmitButton = viewModel::onClickSubmitMyNameInput
+                    event = viewModel
                 )
             }
         }

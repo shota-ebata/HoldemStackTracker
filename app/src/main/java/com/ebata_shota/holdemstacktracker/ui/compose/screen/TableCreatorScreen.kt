@@ -48,9 +48,7 @@ fun TableCreatorScreen(
             if (myNameInputDialogUiState != null) {
                 MyNameInputDialogContent(
                     uiState = myNameInputDialogUiState,
-                    onChangeEditText = viewModel::onChangeEditTextMyNameInput,
-                    onDismissRequest = viewModel::onDismissRequestMyNameInputDialog,
-                    onClickSubmitButton = viewModel::onClickSubmitMyNameInput
+                    event = viewModel
                 )
             }
         }

@@ -9,6 +9,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthReposito
 import com.ebata_shota.holdemstacktracker.domain.repository.GmsBarcodeScannerRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.MainScreenDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.MainScreenUiState
@@ -29,7 +30,7 @@ constructor(
     private val scannerRepository: GmsBarcodeScannerRepository,
     private val prefRepository: PrefRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository
-) : ViewModel() {
+) : ViewModel(), MyNameInputDialogEvent {
     private val _uiState = MutableStateFlow<MainScreenUiState>(MainScreenUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
@@ -81,7 +82,7 @@ constructor(
 
     }
 
-    fun onChangeEditTextMyNameInput(value: TextFieldValue) {
+    override fun onChangeEditTextMyNameInputDialog(value: TextFieldValue) {
         _dialogUiState.update {
             it.copy(
                 myNameInputDialogUiState = it.myNameInputDialogUiState?.copy(
@@ -91,16 +92,17 @@ constructor(
         }
     }
 
-    fun onClickSubmitMyNameInput(value: String) {
+    override fun onClickSubmitMyNameInputDialog() {
         viewModelScope.launch {
-            prefRepository.saveMyName(value)
+            val value = dialogUiState.value.myNameInputDialogUiState?.value ?: return@launch
+            prefRepository.saveMyName(value.text)
             _dialogUiState.update {
                 it.copy(myNameInputDialogUiState = null)
             }
         }
     }
 
-    fun onDismissRequestMyNameInputDialog() {
+    override fun onDismissRequestMyNameInputDialog() {
         _dialogUiState.update {
             it.copy(myNameInputDialogUiState = null)
         }

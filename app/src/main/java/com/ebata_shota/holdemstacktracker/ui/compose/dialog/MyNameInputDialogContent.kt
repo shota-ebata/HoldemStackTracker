@@ -34,16 +34,14 @@ import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 @Composable
 fun MyNameInputDialogContent(
     uiState: MyNameInputDialogUiState,
-    onChangeEditText: (TextFieldValue) -> Unit,
-    onClickSubmitButton: (String) -> Unit,
-    onDismissRequest: () -> Unit,
+    event: MyNameInputDialogEvent,
     modifier: Modifier = Modifier
 ) {
     LaunchedEffect(Unit) {
 
     }
     BasicAlertDialog(
-        onDismissRequest = onDismissRequest,
+        onDismissRequest = { event.onDismissRequestMyNameInputDialog() },
         modifier = modifier
     ) {
         Surface {
@@ -61,12 +59,12 @@ fun MyNameInputDialogContent(
                 )
                 OutlinedTextField(
                     value = uiState.value,
-                    onValueChange = { onChangeEditText(it) },
+                    onValueChange = { event.onChangeEditTextMyNameInputDialog(it) },
                     trailingIcon = {
                         if (uiState.value.text.isNotEmpty()) {
                             IconButton(
                                 onClick = {
-                                    onChangeEditText(TextFieldValue(""))
+                                    event.onChangeEditTextMyNameInputDialog(uiState.value.copy(""))
                                 }
                             ) {
                                 Icon(
@@ -90,13 +88,18 @@ fun MyNameInputDialogContent(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         OutlinedButton(
-                            onClick = { onDismissRequest() }
+                            onClick = {
+                                event.onDismissRequestMyNameInputDialog()
+                            }
                         ) {
                             Text("Cancel")
                         }
 
                         Button(
-                            onClick = { onClickSubmitButton(uiState.value.text) },
+                            onClick = {
+                                event.onClickSubmitMyNameInputDialog()
+                            },
+                            enabled = uiState.isEnableSubmitButton
                         ) {
                             Icon(imageVector = Icons.Filled.Done, contentDescription = "done")
                         }
@@ -109,7 +112,16 @@ fun MyNameInputDialogContent(
 
 data class MyNameInputDialogUiState(
     val value: TextFieldValue
-)
+) {
+    val isEnableSubmitButton: Boolean
+        get() = value.text.isNotEmpty()
+}
+
+interface MyNameInputDialogEvent {
+    fun onDismissRequestMyNameInputDialog()
+    fun onClickSubmitMyNameInputDialog()
+    fun onChangeEditTextMyNameInputDialog(value: TextFieldValue)
+}
 
 @Preview(showBackground = true, name = "Light Mode")
 @Preview(
@@ -124,9 +136,13 @@ private fun MyNameInputDialogContentPreview() {
             uiState = MyNameInputDialogUiState(
                 value = TextFieldValue("PlayerName")
             ),
-            onDismissRequest = {},
-            onClickSubmitButton = {},
-            onChangeEditText = {}
+            event = object : MyNameInputDialogEvent {
+                override fun onDismissRequestMyNameInputDialog() {}
+
+                override fun onClickSubmitMyNameInputDialog() {}
+
+                override fun onChangeEditTextMyNameInputDialog(value: TextFieldValue) {}
+            }
         )
     }
 }

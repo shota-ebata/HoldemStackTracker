@@ -95,9 +95,7 @@ fun MainScreen(
             if (myNameInputDialogUiState != null) {
                 MyNameInputDialogContent(
                     uiState = myNameInputDialogUiState,
-                    onDismissRequest = viewModel::onDismissRequestMyNameInputDialog,
-                    onClickSubmitButton = viewModel::onClickSubmitMyNameInput,
-                    onChangeEditText = viewModel::onChangeEditTextMyNameInput
+                    event = viewModel
                 )
             }
         }

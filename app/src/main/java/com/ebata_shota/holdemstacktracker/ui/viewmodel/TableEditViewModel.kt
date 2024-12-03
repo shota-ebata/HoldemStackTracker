@@ -25,6 +25,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.ui.TableEditScreenUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableEditScreenDialogUiState
@@ -62,7 +63,7 @@ constructor(
     private val createNewGame: CreateNewGameUseCase,
     private val movePositionUseCase: MovePositionUseCase,
     private val uiStateMapper: TableEditScreenUiStateMapper
-) : ViewModel() {
+) : ViewModel(), MyNameInputDialogEvent {
 
     private val tableIdString: String by savedStateHandle.param()
     private val tableId: TableId = TableId(tableIdString)
@@ -233,7 +234,7 @@ constructor(
         }
     }
 
-    fun onChangeEditTextMyNameInput(value: TextFieldValue) {
+    override fun onChangeEditTextMyNameInputDialog(value: TextFieldValue) {
         _dialogUiState.update {
             it.copy(
                 myNameInputDialogUiState = it.myNameInputDialogUiState?.copy(
@@ -243,16 +244,17 @@ constructor(
         }
     }
 
-    fun onClickSubmitMyNameInput(value: String) {
+    override fun onClickSubmitMyNameInputDialog() {
         viewModelScope.launch {
-            prefRepository.saveMyName(value)
+            val value = dialogUiState.value.myNameInputDialogUiState?.value ?: return@launch
+            prefRepository.saveMyName(value.text)
             _dialogUiState.update {
                 it.copy(myNameInputDialogUiState = null)
             }
         }
     }
 
-    fun onDismissRequestMyNameInputDialog() {
+    override fun onDismissRequestMyNameInputDialog() {
         viewModelScope.launch {
             if (prefRepository.myName.first() == null) {
                 // 画面を戻す FIXME: この動き微妙かなー

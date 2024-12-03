@@ -17,6 +17,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetDoubleToStringUseCase
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableCreatorContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.TextFieldErrorUiState
@@ -47,7 +48,7 @@ constructor(
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val prefRepository: PrefRepository,
     private val getDoubleToString: GetDoubleToStringUseCase
-) : ViewModel() {
+) : ViewModel(), MyNameInputDialogEvent {
 
     /**
      * UiState
@@ -330,7 +331,7 @@ constructor(
         }
     }
 
-    fun onChangeEditTextMyNameInput(value: TextFieldValue) {
+    override fun onChangeEditTextMyNameInputDialog(value: TextFieldValue) {
         _dialogUiState.update {
             it.copy(
                 myNameInputDialogUiState = it.myNameInputDialogUiState?.copy(
@@ -340,16 +341,17 @@ constructor(
         }
     }
 
-    fun onClickSubmitMyNameInput(value: String) {
+    override fun onClickSubmitMyNameInputDialog() {
         viewModelScope.launch {
-            prefRepository.saveMyName(value)
+            val value = dialogUiState.value.myNameInputDialogUiState?.value ?: return@launch
+            prefRepository.saveMyName(value.text)
             _dialogUiState.update {
                 it.copy(myNameInputDialogUiState = null)
             }
         }
     }
 
-    fun onDismissRequestMyNameInputDialog() {
+    override fun onDismissRequestMyNameInputDialog() {
         viewModelScope.launch {
             if (prefRepository.myName.first() == null) {
                 // 画面を戻す FIXME: この動き微妙かなー
