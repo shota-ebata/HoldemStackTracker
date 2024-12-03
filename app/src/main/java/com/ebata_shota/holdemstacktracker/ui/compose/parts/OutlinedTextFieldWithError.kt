@@ -4,6 +4,10 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -32,6 +36,20 @@ fun OutlinedTextFieldWithError(
             onValueChange = onValueChange,
             label = uiState.label?.let {
                 { Text(text = stringResource(it)) }
+            },
+            trailingIcon = {
+                if (uiState.value.text.isNotEmpty()) {
+                    IconButton(
+                        onClick = {
+                            onValueChange(uiState.value.copy(""))
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Close,
+                            contentDescription = "delete"
+                        )
+                    }
+                }
             },
             isError = uiState.error != null,
             enabled = uiState.isEnabled,
@@ -78,6 +96,7 @@ data class TextFieldErrorUiState(
     @StringRes
     val label: Int? = null,
     val isEnabled: Boolean = true,
+    val showRemoveTextButton: Boolean = true,
     val error: ErrorMessage? = null
 )
 

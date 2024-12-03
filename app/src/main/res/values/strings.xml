@@ -19,4 +19,5 @@
     <string name="btn_chosen">BTNプレイヤー</string>
     <string name="btn_random">ランダム</string>
     <string name="start_game">ゲーム開始</string>
+    <string name="error_name_limit">15文字以内で入力してください</string>
 </resources>

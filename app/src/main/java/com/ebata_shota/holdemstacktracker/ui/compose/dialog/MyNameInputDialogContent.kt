@@ -8,15 +8,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +25,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
+import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
+import com.ebata_shota.holdemstacktracker.ui.compose.parts.OutlinedTextFieldWithError
+import com.ebata_shota.holdemstacktracker.ui.compose.parts.TextFieldErrorUiState
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,24 +57,9 @@ fun MyNameInputDialogContent(
                             bottom = 8.dp
                         )
                 )
-                OutlinedTextField(
-                    value = uiState.value,
-                    onValueChange = { event.onChangeEditTextMyNameInputDialog(it) },
-                    trailingIcon = {
-                        if (uiState.value.text.isNotEmpty()) {
-                            IconButton(
-                                onClick = {
-                                    event.onChangeEditTextMyNameInputDialog(uiState.value.copy(""))
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Close,
-                                    contentDescription = "delete"
-                                )
-                            }
-                        }
-                    },
-                    label = null
+                OutlinedTextFieldWithError(
+                    uiState = uiState.textFieldErrorUiState,
+                    onValueChange = { event.onChangeEditTextMyNameInputDialog(it) }
                 )
 
                 Column(
@@ -111,10 +96,18 @@ fun MyNameInputDialogContent(
 }
 
 data class MyNameInputDialogUiState(
-    val value: TextFieldValue
+    val value: TextFieldValue,
+    val errorMessage: ErrorMessage? = null
 ) {
-    val isEnableSubmitButton: Boolean
-        get() = value.text.isNotEmpty()
+    val isEnableSubmitButton: Boolean =
+        value.text.isNotEmpty() && errorMessage == null
+
+    val textFieldErrorUiState: TextFieldErrorUiState
+        get() = TextFieldErrorUiState(
+            value = value,
+            showRemoveTextButton = true,
+            error = errorMessage
+        )
 }
 
 interface MyNameInputDialogEvent {

@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -332,10 +331,16 @@ constructor(
     }
 
     override fun onChangeEditTextMyNameInputDialog(value: TextFieldValue) {
+        val errorMessage = if (value.text.length > 20) {
+            ErrorMessage(R.string.error_name_limit)
+        } else {
+            null
+        }
         _dialogUiState.update {
             it.copy(
                 myNameInputDialogUiState = it.myNameInputDialogUiState?.copy(
-                    value = value
+                    value = value,
+                    errorMessage = errorMessage
                 )
             )
         }
@@ -343,7 +348,8 @@ constructor(
 
     override fun onClickSubmitMyNameInputDialog() {
         viewModelScope.launch {
-            val value = dialogUiState.value.myNameInputDialogUiState?.value ?: return@launch
+            val value = dialogUiState.value.myNameInputDialogUiState?.textFieldErrorUiState?.value
+                ?: return@launch
             prefRepository.saveMyName(value.text)
             _dialogUiState.update {
                 it.copy(myNameInputDialogUiState = null)

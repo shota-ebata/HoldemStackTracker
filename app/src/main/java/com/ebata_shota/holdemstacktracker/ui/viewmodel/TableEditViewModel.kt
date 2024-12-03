@@ -8,6 +8,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.MovePosition
@@ -28,6 +29,7 @@ import com.ebata_shota.holdemstacktracker.ui.TableEditScreenUiStateMapper
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
+import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableEditScreenDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableEditScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
@@ -235,10 +237,16 @@ constructor(
     }
 
     override fun onChangeEditTextMyNameInputDialog(value: TextFieldValue) {
+        val errorMessage = if (value.text.length > 20) {
+            ErrorMessage(R.string.error_name_limit)
+        } else {
+            null
+        }
         _dialogUiState.update {
             it.copy(
                 myNameInputDialogUiState = it.myNameInputDialogUiState?.copy(
-                    value = value
+                    value = value,
+                    errorMessage = errorMessage
                 )
             )
         }
@@ -246,7 +254,8 @@ constructor(
 
     override fun onClickSubmitMyNameInputDialog() {
         viewModelScope.launch {
-            val value = dialogUiState.value.myNameInputDialogUiState?.value ?: return@launch
+            val value = dialogUiState.value.myNameInputDialogUiState?.textFieldErrorUiState?.value
+                ?: return@launch
             prefRepository.saveMyName(value.text)
             _dialogUiState.update {
                 it.copy(myNameInputDialogUiState = null)
