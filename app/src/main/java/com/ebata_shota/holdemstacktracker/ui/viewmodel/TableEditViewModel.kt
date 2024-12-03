@@ -205,6 +205,9 @@ constructor(
                 version = table.version + 1
             )
             tableRepository.sendTable(copiedTable)
+            _dialogUiState.update {
+                it.copy(stackEditDialogState = null)
+            }
         }
     }
 
