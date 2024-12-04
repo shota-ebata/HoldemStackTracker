@@ -24,6 +24,7 @@ constructor(
         return TableEditScreenUiState.Content(
             contentUiState = TableEditContentUiState(
                 tableId = table.id,
+                // プレイヤー一覧
                 playerEditRows = table.playerOrder.mapNotNull { playerId ->
                     val player = table.basePlayers.find { it.id == playerId }
                         ?: return@mapNotNull null
@@ -39,6 +40,7 @@ constructor(
                         isEditable = isHost
                     )
                 },
+                // BTNプレイヤーの選択肢
                 btnChosenUiStateList = listOf(
                     TableEditContentUiState.BtnChosenUiState.BtnChosenRandom(
                         isSelected = btnPlayerId == null

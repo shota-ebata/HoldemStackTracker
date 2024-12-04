@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
+import com.ebata_shota.holdemstacktracker.domain.extension.mapAtFind
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.MovePosition
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -25,9 +26,12 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.ui.TableEditScreenUiStateMapper
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialogEvent
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableEditScreenDialogUiState
@@ -64,8 +68,11 @@ constructor(
     private val joinTable: JoinTableUseCase,
     private val createNewGame: CreateNewGameUseCase,
     private val movePositionUseCase: MovePositionUseCase,
+    private val removePlayers: RemovePlayersUseCase,
     private val uiStateMapper: TableEditScreenUiStateMapper
-) : ViewModel(), MyNameInputDialogEvent {
+) : ViewModel(),
+    MyNameInputDialogEvent,
+    PlayerRemoveDialogEvent {
 
     private val tableIdString: String by savedStateHandle.param()
     private val tableId: TableId = TableId(tableIdString)
@@ -73,12 +80,7 @@ constructor(
     private val _uiState = MutableStateFlow<TableEditScreenUiState>(TableEditScreenUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
-    private val _dialogUiState = MutableStateFlow(
-        TableEditScreenDialogUiState(
-            stackEditDialogState = null,
-            myNameInputDialogUiState = null
-        )
-    )
+    private val _dialogUiState = MutableStateFlow(TableEditScreenDialogUiState())
     val dialogUiState = _dialogUiState.asStateFlow()
 
     private val _navigateEvent = MutableSharedFlow<Navigate>()
@@ -177,6 +179,100 @@ constructor(
         }
     }
 
+    /**
+     * 参加プレイヤー退出ボタン
+     */
+    fun onClickDeletePlayerButton() {
+        viewModelScope.launch {
+            val table: Table = tableStateFlow.value ?: return@launch
+            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+            showDeletePlayerDialog(table, myPlayerId)
+        }
+    }
+
+    private fun showDeletePlayerDialog(
+        table: Table,
+        myPlayerId: PlayerId
+    ) {
+        _dialogUiState.update {
+            it.copy(
+                playerRemoveDialogUiState = PlayerRemoveDialogUiState(
+                    players = table.playerOrder.mapNotNull { playerId ->
+                        val player = table.basePlayers
+                            .find { basePlayer -> basePlayer.id == playerId }
+                            ?: return@mapNotNull null
+                        val isEnable = player.id == myPlayerId
+                        PlayerRemoveDialogUiState.PlayerItemUiState(
+                            playerId = player.id,
+                            name = player.name,
+                            isSelected = false,
+                            isHost = isEnable
+                        )
+                    }
+                )
+            )
+        }
+    }
+
+    /**
+     * PlayerRemoveDialog
+     * チェック押下
+     */
+    override fun onClickPlayerRemoveDialogPlayer(
+        playerId: PlayerId,
+        checked: Boolean
+    ) {
+        _dialogUiState.update { dialogUiState ->
+            val playerRemoveDialogUiState = dialogUiState.playerRemoveDialogUiState
+            dialogUiState.copy(
+                playerRemoveDialogUiState = playerRemoveDialogUiState?.copy(
+                    players = playerRemoveDialogUiState.players.mapAtFind(
+                        predicate = { item -> item.playerId == playerId },
+                        transform = { item -> item.copy(isSelected = checked) }
+                    )
+                )
+            )
+        }
+    }
+
+    /**
+     * PlayerRemoveDialog
+     * Submit
+     */
+    override fun onClickPlayerRemoveDialogSubmit() {
+        viewModelScope.launch {
+            val playerRemoveDialogUiState = dialogUiState.value.playerRemoveDialogUiState
+                ?: return@launch
+            val table = tableStateFlow.value
+                ?: return@launch
+            // Checkされているプレイヤー
+            val removePlayerIds = playerRemoveDialogUiState.players
+                .filter { it.isSelected }
+                .map { it.playerId }
+            removePlayers.invoke(
+                currentTable = table,
+                removePlayerIds = removePlayerIds
+            )
+            dismissPlayerRemoveDialog()
+        }
+    }
+
+    /**
+     * PlayerRemoveDialog
+     * dismiss
+     */
+    override fun onDismissRequestPlayerRemoveDialog() {
+        dismissPlayerRemoveDialog()
+    }
+
+    private fun dismissPlayerRemoveDialog() {
+        _dialogUiState.update {
+            it.copy(
+                playerRemoveDialogUiState = null
+            )
+        }
+    }
+
     fun onChangeStackSize(value: TextFieldValue) {
         _dialogUiState.update {
             it.copy(
@@ -239,6 +335,10 @@ constructor(
         }
     }
 
+    /**
+     * MyNameInputDialog
+     * EditText
+     */
     override fun onChangeEditTextMyNameInputDialog(value: TextFieldValue) {
         val errorMessage = if (value.text.length > 20) {
             ErrorMessage(R.string.error_name_limit)
@@ -255,9 +355,14 @@ constructor(
         }
     }
 
+    /**
+     * MyNameInputDialog
+     * Submit
+     */
     override fun onClickSubmitMyNameInputDialog() {
         viewModelScope.launch {
-            val value = dialogUiState.value.myNameInputDialogUiState?.textFieldErrorUiState?.value
+            val value = dialogUiState.value.myNameInputDialogUiState
+                ?.textFieldErrorUiState?.value
                 ?: return@launch
             prefRepository.saveMyName(value.text)
             _dialogUiState.update {
@@ -266,6 +371,10 @@ constructor(
         }
     }
 
+    /**
+     * MyNameInputDialog
+     * dismiss
+     */
     override fun onDismissRequestMyNameInputDialog() {
         viewModelScope.launch {
             if (prefRepository.myName.first() == null) {

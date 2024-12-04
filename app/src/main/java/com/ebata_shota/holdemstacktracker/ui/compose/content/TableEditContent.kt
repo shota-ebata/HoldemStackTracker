@@ -13,8 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -43,6 +47,7 @@ import com.ebata_shota.holdemstacktracker.ui.theme.SideSpace
 fun TableEditContent(
     uiState: TableEditContentUiState,
     getTableQrPainter: () -> Painter?,
+    onClickDeletePlayerButton: () -> Unit,
     onClickStackEditButton: (PlayerId, String) -> Unit,
     onClickUpButton: (PlayerId) -> Unit,
     onClickDownButton: (PlayerId) -> Unit,
@@ -108,9 +113,21 @@ fun TableEditContent(
                         style = MaterialTheme.typography.labelLarge,
                         modifier = Modifier
                             .weight(1.0f)
-                            .padding(end = 16.dp)
                             .padding(vertical = 8.dp),
                     )
+
+                    if (uiState.isEditable) {
+                        IconButton(
+                            modifier = Modifier
+                                .size(48.dp),
+                            onClick = onClickDeletePlayerButton
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "edit"
+                            )
+                        }
+                    }
                 }
 
                 Column(
@@ -284,6 +301,7 @@ fun TableEditContentPreview(
         TableEditContent(
             uiState = uiState,
             getTableQrPainter = { painter },
+            onClickDeletePlayerButton = {},
             onClickStackEditButton = { _, _ -> },
             onClickUpButton = {},
             onClickDownButton = {},

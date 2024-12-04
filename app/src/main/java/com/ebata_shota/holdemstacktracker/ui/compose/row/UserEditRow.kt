@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -67,17 +68,16 @@ fun UserEditRow(
             )
 
             if (uiState.isEditable) {
-                Box(
+                IconButton(
                     modifier = Modifier
-                        .clickable {
-                            onClickStackEditButton()
-                        }
-                        .size(48.dp)
+                        .size(48.dp),
+                    onClick = {
+                        onClickStackEditButton()
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Edit,
-                        contentDescription = "edit",
-                        modifier = Modifier.padding(16.dp)
+                        contentDescription = "edit"
                     )
                 }
             } else {
@@ -93,7 +93,6 @@ fun UserEditRow(
         ) {
 
             if (uiState.isEditable) {
-
                 Column(
                     modifier = Modifier
                         .padding(end = SideSpace),

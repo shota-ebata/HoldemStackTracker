@@ -9,3 +9,10 @@ inline fun <T> Iterable<T>.mapAtIndex(index: Int, transform: (T) -> T): List<T> 
     updatedMutableList[index] = transform(updatedMutableList[index])
     return updatedMutableList
 }
+
+inline fun <T> Iterable<T>.mapAtFind(predicate: (T) -> Boolean, transform: (T) -> T): List<T> {
+    val updatedMutableList = toMutableList()
+    val index = indexOfFirst(predicate)
+    updatedMutableList[index] = transform(updatedMutableList[index])
+    return updatedMutableList
+}
