@@ -1,8 +1,8 @@
 package com.ebata_shota.holdemstacktracker.domain.repository
 
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
-import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
+import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import kotlinx.coroutines.flow.SharedFlow
 
 interface TableRepository {

@@ -5,13 +5,13 @@ import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherIO
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
-import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
+import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
-import com.ebata_shota.holdemstacktracker.infra.db.dao.TableDao
+import com.ebata_shota.holdemstacktracker.domain.repository.TableSummaryRepository
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableStateMapper
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -22,6 +22,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -37,7 +38,7 @@ constructor(
     firebaseDatabase: FirebaseDatabase,
     private val prefRepository: PrefRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
-    private val tableDao: TableDao,
+    private val tableSummaryRepository: TableSummaryRepository,
     private val tableMapper: TableStateMapper,
     @ApplicationScope
     private val appCoroutineScope: CoroutineScope,
@@ -90,28 +91,11 @@ constructor(
     override fun startCollectTableFlow(tableId: TableId) {
         stopCollectTableFlow()
         collectTableJob = appCoroutineScope.launch {
-            val flow = callbackFlow {
-                val listener = object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.exists()) {
-                            val tableMap: Map<*, *> = snapshot.value as Map<*, *>
-                            val tableState = tableMapper.mapToTableState(tableId, tableMap)
-                            // TODO: JoinしたテーブルをDBに保存したい
-                            trySend(tableState)
-                        }
-                    }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        println("Failed to read game data: ${error.message}")
-                    }
+            firebaseDatabaseTableFlow(tableId)
+                .collect { table ->
+                    tableSummaryRepository.saveTable(table)
+                    _tableFlow.emit(table)
                 }
-                tablesRef.child(tableId.value).addValueEventListener(listener)
-
-                awaitClose {
-                    tablesRef.child(tableId.value).removeEventListener(listener)
-                }
-            }
-            flow.collect(_tableFlow)
         }
     }
 
@@ -125,5 +109,26 @@ constructor(
         val tableMap = tableMapper.toMap(table)
         val tableRef = tablesRef.child(table.id.value)
         tableRef.setValue(tableMap)
+    }
+
+    private fun firebaseDatabaseTableFlow(tableId: TableId): Flow<Table> = callbackFlow {
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val tableMap: Map<*, *> = snapshot.value as Map<*, *>
+                    val tableState = tableMapper.mapToTableState(tableId, tableMap)
+                    trySend(tableState)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                println("Failed to read game data: ${error.message}")
+            }
+        }
+        tablesRef.child(tableId.value).addValueEventListener(listener)
+
+        awaitClose {
+            tablesRef.child(tableId.value).removeEventListener(listener)
+        }
     }
 }

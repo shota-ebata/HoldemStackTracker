@@ -9,6 +9,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GmsBarcodeScannerRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.TableSummaryRepository
 import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
@@ -29,6 +30,7 @@ import javax.inject.Inject
 class MainViewModel
 @Inject
 constructor(
+    private val tableSummaryRepository: TableSummaryRepository,
     private val scannerRepository: GmsBarcodeScannerRepository,
     private val prefRepository: PrefRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository
@@ -51,10 +53,17 @@ constructor(
     }
 
     init {
-        _uiState.update {
-            MainScreenUiState.Content(
-                mainContentUiState = MainContentUiState(hoge = "")
-            )
+        viewModelScope.launch {
+            tableSummaryRepository.getTableSummaryListFlow()
+                .collect { tableSummaryList ->
+                    _uiState.update {
+                        MainScreenUiState.Content(
+                            mainContentUiState = MainContentUiState(
+                                tableSummaryList = tableSummaryList
+                            )
+                        )
+                    }
+                }
         }
     }
 

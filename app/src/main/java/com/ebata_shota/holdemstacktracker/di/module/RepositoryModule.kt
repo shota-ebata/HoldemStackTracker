@@ -8,6 +8,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.TableSummaryRepository
 import com.ebata_shota.holdemstacktracker.infra.repository.DefaultRuleStateOfRingRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.FirebaseAuthRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.GameRepositoryImpl
@@ -16,6 +17,7 @@ import com.ebata_shota.holdemstacktracker.infra.repository.PrefRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.QrBitmapRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.RandomIdRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.TableRepositoryImpl
+import com.ebata_shota.holdemstacktracker.infra.repository.TableSummaryRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -33,6 +35,10 @@ interface RepositoryModule {
     @Singleton
     @Binds
     fun bindTableStateRepository(repo: TableRepositoryImpl): TableRepository
+
+    @Singleton
+    @Binds
+    fun bindTableSummaryRepository(repo: TableSummaryRepositoryImpl): TableSummaryRepository
 
     @Singleton
     @Binds
