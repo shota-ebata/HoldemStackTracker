@@ -2,14 +2,26 @@ package com.ebata_shota.holdemstacktracker.ui.compose.row
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.theme.CardSideSpace
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
@@ -25,14 +37,34 @@ fun TableSummaryCardRow(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = CardSideSpace),
+        colors = CardDefaults.cardColors(
+            containerColor = if (uiState.isJoined) {
+                MaterialTheme.colorScheme.inversePrimary
+            } else {
+                Color.Unspecified
+            }
+        ),
         onClick = {
             onClickTableRow(uiState.tableId)
-        }
+        },
     ) {
         Column(
             modifier = Modifier
                 .padding(16.dp)
         ) {
+            if (uiState.isJoined) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        modifier = Modifier
+                            .size(36.dp),
+                        painter = painterResource(R.drawable.baseline_person_pin_24),
+                        contentDescription = "person_pin"
+                    )
+                    Text(text = stringResource(R.string.label_joined))
+                }
+            }
             Text(
                 text = uiState.tableId.value
             )
@@ -49,9 +81,30 @@ fun TableSummaryCardRow(
 data class TableSummaryCardRowUiState(
     val tableId: TableId,
     val hostName: String,
+    val isJoined: Boolean,
     val updateTime: LocalDateTime,
     val createTime: LocalDateTime
 )
+
+private class TableSummaryCardRowPreviewParam :
+    PreviewParameterProvider<TableSummaryCardRowUiState> {
+    override val values: Sequence<TableSummaryCardRowUiState> = sequenceOf(
+        TableSummaryCardRowUiState(
+            tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
+            hostName = "ホスト名",
+            isJoined = false,
+            updateTime = LocalDateTime.now(),
+            createTime = LocalDateTime.now()
+        ),
+        TableSummaryCardRowUiState(
+            tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
+            hostName = "ホスト名",
+            isJoined = true,
+            updateTime = LocalDateTime.now(),
+            createTime = LocalDateTime.now()
+        ),
+    )
+}
 
 @Preview(showBackground = true, name = "Light Mode")
 @Preview(
@@ -60,16 +113,13 @@ data class TableSummaryCardRowUiState(
     name = "Dark Mode"
 )
 @Composable
-private fun TableSummaryCardRowPreview() {
+private fun TableSummaryCardRowPreview(
+    @PreviewParameter(TableSummaryCardRowPreviewParam::class)
+    uiState: TableSummaryCardRowUiState
+) {
     HoldemStackTrackerTheme {
         TableSummaryCardRow(
-            uiState =
-            TableSummaryCardRowUiState(
-                tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
-                hostName = "ホスト名",
-                updateTime = LocalDateTime.now(),
-                createTime = LocalDateTime.now()
-            ),
+            uiState = uiState,
             onClickTableRow = {}
         )
     }

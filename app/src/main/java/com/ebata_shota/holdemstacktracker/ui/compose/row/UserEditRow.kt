@@ -142,7 +142,7 @@ data class PlayerEditRowUiState(
     val isEditable: Boolean
 )
 
-private class PreviewParam : PreviewParameterProvider<PlayerEditRowUiState> {
+private class UserEditPreviewParam : PreviewParameterProvider<PlayerEditRowUiState> {
     override val values: Sequence<PlayerEditRowUiState> = sequenceOf(
         PlayerEditRowUiState(
             playerId = PlayerId("playerId1"),
@@ -169,7 +169,7 @@ private class PreviewParam : PreviewParameterProvider<PlayerEditRowUiState> {
 )
 @Composable
 fun UserEditPreview(
-    @PreviewParameter(PreviewParam::class)
+    @PreviewParameter(UserEditPreviewParam::class)
     uiState: PlayerEditRowUiState
 ) {
     HoldemStackTrackerTheme {

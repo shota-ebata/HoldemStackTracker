@@ -9,6 +9,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GmsBarcodeScannerRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableSummaryRepository
 import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEvent
@@ -34,6 +35,7 @@ class MainViewModel
 @Inject
 constructor(
     private val tableSummaryRepository: TableSummaryRepository,
+    private val tableRepository: TableRepository,
     private val scannerRepository: GmsBarcodeScannerRepository,
     private val prefRepository: PrefRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository
@@ -57,24 +59,24 @@ constructor(
 
     init {
         viewModelScope.launch {
-            tableSummaryRepository.getTableSummaryListFlow()
-                .collect { tableSummaryList ->
-                    _uiState.update {
-                        MainScreenUiState.Content(
-                            mainContentUiState = MainContentUiState(
-                                tableSummaryList = tableSummaryList.map {
-                                    val zoneId = ZoneId.systemDefault()
-                                    TableSummaryCardRowUiState(
-                                        tableId = it.tableId,
-                                        hostName = it.hostName,
-                                        updateTime = LocalDateTime.ofInstant(it.updateTime, zoneId),
-                                        createTime = LocalDateTime.ofInstant(it.updateTime, zoneId)
-                                    )
-                                }
-                            )
+            tableSummaryRepository.getTableSummaryListFlow().collect { tableSummaryList ->
+                _uiState.update {
+                    MainScreenUiState.Content(
+                        mainContentUiState = MainContentUiState(
+                            tableSummaryList = tableSummaryList.map {
+                                val zoneId = ZoneId.systemDefault()
+                                TableSummaryCardRowUiState(
+                                    tableId = it.tableId,
+                                    hostName = it.hostName,
+                                    isJoined = tableRepository.currentTableId == it.tableId,
+                                    updateTime = LocalDateTime.ofInstant(it.updateTime, zoneId),
+                                    createTime = LocalDateTime.ofInstant(it.updateTime, zoneId)
+                                )
+                            }
                         )
-                    }
+                    )
                 }
+            }
         }
     }
 

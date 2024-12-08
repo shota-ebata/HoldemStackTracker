@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.SharedFlow
 interface TableRepository {
     val tableFlow: SharedFlow<Result<Table>>
 
+    val currentTableId: TableId?
+
     suspend fun createNewTable(
         tableId: TableId,
         ruleState: RuleState

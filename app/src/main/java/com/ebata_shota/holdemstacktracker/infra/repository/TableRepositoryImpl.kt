@@ -89,9 +89,12 @@ constructor(
     }
 
     private var collectTableJob: Job? = null
+    override var currentTableId: TableId? = null
+        private set
 
     override fun startCollectTableFlow(tableId: TableId) {
         stopCollectTableFlow()
+        currentTableId = tableId
         collectTableJob = appCoroutineScope.launch {
             firebaseDatabaseTableFlow(tableId)
                 .collect { tableResult ->
@@ -113,6 +116,8 @@ constructor(
 
     override fun stopCollectTableFlow() {
         collectTableJob?.cancel()
+        collectTableJob = null
+        currentTableId = null
     }
 
     override suspend fun sendTable(

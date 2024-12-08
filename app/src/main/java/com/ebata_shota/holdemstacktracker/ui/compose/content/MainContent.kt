@@ -109,18 +109,21 @@ fun MainContentPreview() {
                     TableSummaryCardRowUiState(
                         tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
                         hostName = "ホスト名",
+                        isJoined = true,
                         updateTime = LocalDateTime.now(),
                         createTime = LocalDateTime.now()
                     ),
                     TableSummaryCardRowUiState(
                         tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
                         hostName = "ホスト名",
+                        isJoined = false,
                         updateTime = LocalDateTime.now(),
                         createTime = LocalDateTime.now()
                     ),
                     TableSummaryCardRowUiState(
                         tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
                         hostName = "ホスト名",
+                        isJoined = false,
                         updateTime = LocalDateTime.now(),
                         createTime = LocalDateTime.now()
                     )
