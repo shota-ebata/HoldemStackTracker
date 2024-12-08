@@ -36,5 +36,6 @@
 
     <string name="label_joined">参加中</string>
     <string name="label_host">ホスト：</string>
+    <string name="label_blind">BLIND：</string>
     <string name="label_update_datetime">更新日時：</string>
 </resources>

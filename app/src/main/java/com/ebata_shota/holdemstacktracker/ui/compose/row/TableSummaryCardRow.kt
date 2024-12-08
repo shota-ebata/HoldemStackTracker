@@ -51,7 +51,8 @@ fun TableSummaryCardRow(
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp),
+                .padding(16.dp)
+                .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             if (uiState.isJoined) {
@@ -75,6 +76,18 @@ fun TableSummaryCardRow(
             ) {
                 Text(
                     style = MaterialTheme.typography.bodyMedium,
+                    text = stringResource(R.string.label_blind)
+                )
+                Text(
+                    style = MaterialTheme.typography.bodyMedium,
+                    text = uiState.blindText
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    style = MaterialTheme.typography.bodyMedium,
                     text = stringResource(R.string.label_host)
                 )
                 Text(
@@ -83,7 +96,9 @@ fun TableSummaryCardRow(
                 )
             }
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
             ) {
                 Text(
                     style = MaterialTheme.typography.bodySmall,
@@ -100,6 +115,7 @@ fun TableSummaryCardRow(
 
 data class TableSummaryCardRowUiState(
     val tableId: TableId,
+    val blindText: String,
     val hostName: String,
     val isJoined: Boolean,
     val updateTime: String,
@@ -111,6 +127,7 @@ private class TableSummaryCardRowPreviewParam :
     override val values: Sequence<TableSummaryCardRowUiState> = sequenceOf(
         TableSummaryCardRowUiState(
             tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
+            blindText = "1/2",
             hostName = "ホスト名",
             isJoined = false,
             updateTime = "2024/12/08 22:54:01",
@@ -118,7 +135,9 @@ private class TableSummaryCardRowPreviewParam :
         ),
         TableSummaryCardRowUiState(
             tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
+
             hostName = "ホスト名",
+            blindText = "1/2",
             isJoined = true,
             updateTime = "2024/12/08 22:54:01",
             createTime = LocalDateTime.now()

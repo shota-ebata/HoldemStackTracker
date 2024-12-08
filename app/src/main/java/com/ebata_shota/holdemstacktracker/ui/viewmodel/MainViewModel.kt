@@ -74,6 +74,7 @@ constructor(
                                     .withLocale(Locale.getDefault())
                                 TableSummaryCardRowUiState(
                                     tableId = it.tableId,
+                                    blindText = it.blindText,
                                     hostName = it.hostName,
                                     isJoined = tableRepository.currentTableId == it.tableId,
                                     updateTime = updateLocalDateTime.format(formatterDefault),
