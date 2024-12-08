@@ -40,7 +40,7 @@ constructor(
                         val waitPlayers = table.waitPlayers + PlayerBaseState(
                             id = myPlayerId,
                             name = myName,
-                            stack = table.ruleState.defaultStack
+                            stack = table.rule.defaultStack
                         )
                         newTable = table.copy(
                             waitPlayers = waitPlayers,
@@ -62,7 +62,7 @@ constructor(
                         val basePlayers = table.basePlayers + PlayerBaseState(
                             id = myPlayerId,
                             name = myName,
-                            stack = table.ruleState.defaultStack
+                            stack = table.rule.defaultStack
                         )
                         newTable = table.copy(
                             basePlayers = basePlayers,

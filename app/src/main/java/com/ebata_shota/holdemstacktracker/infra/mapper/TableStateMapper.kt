@@ -3,7 +3,7 @@ package com.ebata_shota.holdemstacktracker.infra.mapper
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.RuleState
+import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
@@ -48,7 +48,7 @@ constructor() {
             version = tableMap[TABLE_VERSION] as Long,
             appVersion = tableMap[APP_VERSION] as Long,
             hostPlayerId = PlayerId(tableMap[HOST_PLAYER_ID] as String),
-            ruleState = mapToRuleState(tableMap[RULE] as Map<*, *>),
+            rule = mapToRuleState(tableMap[RULE] as Map<*, *>),
             basePlayers = mapToBasePlayers(tableMap[BASE_PLAYERS] as List<*>),
             waitPlayers = (tableMap[WAIT_PLAYERS] as? List<*>)?.let {
                 mapToBasePlayers(it)
@@ -74,7 +74,7 @@ constructor() {
 
     private fun mapToRuleState(rule: Map<*, *>) = when (val ruleType = rule[RULE_TYPE] as String) {
         RULE_TYPE_RING_GAME -> {
-            RuleState.RingGame(
+            Rule.RingGame(
                 sbSize = rule[RULE_SB_SIZE]!!.getDouble(),
                 bbSize = rule[RULE_BB_SIZE]!!.getDouble(),
                 betViewMode = BetViewMode.of(rule[RULE_BET_VIEW_MODE] as String),
@@ -90,11 +90,11 @@ constructor() {
         APP_VERSION to table.appVersion,
         HOST_PLAYER_ID to table.hostPlayerId.value,
         BTN_PLAYER_ID to table.btnPlayerId.value,
-        RULE to when (val ruleState = table.ruleState) {
-            is RuleState.RingGame -> {
+        RULE to when (val ruleState = table.rule) {
+            is Rule.RingGame -> {
                 mapOf(
                     RULE_TYPE to RULE_TYPE_RING_GAME,
-                    RULE_BET_VIEW_MODE to table.ruleState.betViewMode.name,
+                    RULE_BET_VIEW_MODE to table.rule.betViewMode.name,
                     RULE_SB_SIZE to ruleState.sbSize,
                     RULE_BB_SIZE to ruleState.bbSize,
                     RULE_DEFAULT_STACK to ruleState.defaultStack

@@ -7,7 +7,7 @@ data class Table(
     val version: Long,
     val appVersion: Long,
     val hostPlayerId: PlayerId,
-    val ruleState: RuleState,
+    val rule: Rule,
     val basePlayers: List<PlayerBaseState>,
     val waitPlayers: List<PlayerBaseState>,
     val playerOrder: List<PlayerId>,

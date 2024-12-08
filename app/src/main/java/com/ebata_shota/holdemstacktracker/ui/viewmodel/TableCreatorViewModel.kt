@@ -8,7 +8,7 @@ import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.GameType
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.RuleState
+import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRuleStateOfRingRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
@@ -87,7 +87,7 @@ constructor(
     }
 
     // TODO: UseCaseへ移動
-    private fun createMainContent(ringGame: RuleState.RingGame) =
+    private fun createMainContent(ringGame: Rule.RingGame) =
         TableCreatorUiState.MainContent(
             tableCreatorContentUiState = TableCreatorContentUiState(
                 gameType = GameType.RingGame,
@@ -402,7 +402,7 @@ constructor(
         val betViewMode = contentUiState.betViewMode
         tableRepository.createNewTable(
             tableId = tableId,
-            ruleState = RuleState.RingGame(
+            rule = Rule.RingGame(
                 sbSize = contentUiState.sbSize.value.text.toDouble(),
                 bbSize = contentUiState.bbSize.value.text.toDouble(),
                 betViewMode = betViewMode,

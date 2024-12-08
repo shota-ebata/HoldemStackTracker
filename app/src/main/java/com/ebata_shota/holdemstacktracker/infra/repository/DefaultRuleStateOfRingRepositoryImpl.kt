@@ -1,7 +1,7 @@
 package com.ebata_shota.holdemstacktracker.infra.repository
 
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
-import com.ebata_shota.holdemstacktracker.domain.model.RuleState
+import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRuleStateOfRingRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import kotlinx.coroutines.flow.Flow
@@ -13,7 +13,7 @@ class DefaultRuleStateOfRingRepositoryImpl
 constructor(
     private val prefRepository: PrefRepository
 ) : DefaultRuleStateOfRingRepository {
-    override val ringGameFlow: Flow<RuleState.RingGame> = combine(
+    override val ringGameFlow: Flow<Rule.RingGame> = combine(
         prefRepository.defaultBetViewMode,
         prefRepository.defaultSizeOfSbOfNumberMode,
         prefRepository.defaultSizeOfSbOfBbMode,
@@ -27,7 +27,7 @@ constructor(
         val defaultSizeOfBbOfNumberMode = it[3] as Int
         val defaultStackSizeOfNumberMode = it[4] as Int
         val defaultStackSizeOfBBMode = it[5] as Double
-        RuleState.RingGame(
+        Rule.RingGame(
             sbSize = when (defaultBetViewMode) {
                 BetViewMode.Number -> defaultSizeOfSbOfNumberMode.toDouble()
                 BetViewMode.BB -> defaultSizeOfSbOfBbMode

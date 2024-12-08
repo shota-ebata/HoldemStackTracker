@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.model
 
-sealed interface RuleState {
+sealed interface Rule {
     val betViewMode: BetViewMode
     val defaultStack: Double
 
@@ -9,5 +9,5 @@ sealed interface RuleState {
         val bbSize: Double,
         override val betViewMode: BetViewMode,
         override val defaultStack: Double
-    ) : RuleState
+    ) : Rule
 }

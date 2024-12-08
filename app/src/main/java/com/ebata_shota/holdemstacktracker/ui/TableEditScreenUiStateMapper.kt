@@ -32,7 +32,7 @@ constructor(
 
                     val playerStackString = getDoubleToString.invoke(
                         value = player.stack,
-                        betViewMode = table.ruleState.betViewMode
+                        betViewMode = table.rule.betViewMode
                     )
                     PlayerEditRowUiState(
                         playerId = playerId,

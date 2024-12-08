@@ -1,12 +1,12 @@
 package com.ebata_shota.holdemstacktracker.domain.repository
 
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
-import com.ebata_shota.holdemstacktracker.domain.model.RuleState
+import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import kotlinx.coroutines.flow.Flow
 
 
 interface DefaultRuleStateOfRingRepository {
-    val ringGameFlow: Flow<RuleState.RingGame>
+    val ringGameFlow: Flow<Rule.RingGame>
 
     suspend fun setDefaultBetViewMode(value: BetViewMode)
     suspend fun setDefaultSizeOfSbOfNumberMode(value: Int)

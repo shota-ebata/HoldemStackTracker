@@ -5,7 +5,7 @@ import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherIO
 import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundTableException
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
-import com.ebata_shota.holdemstacktracker.domain.model.RuleState
+import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
@@ -57,7 +57,7 @@ constructor(
 
     override suspend fun createNewTable(
         tableId: TableId,
-        ruleState: RuleState
+        rule: Rule
     ) {
         withContext(ioDispatcher) {
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
@@ -68,14 +68,14 @@ constructor(
                 version = 0L,
                 appVersion = BuildConfig.VERSION_CODE.toLong(),
                 hostPlayerId = myPlayerId,
-                ruleState = ruleState,
+                rule = rule,
                 playerOrder = listOf(myPlayerId),
                 btnPlayerId = myPlayerId,
                 basePlayers = listOf(
                     PlayerBaseState(
                         id = myPlayerId,
                         name = myName,
-                        stack = ruleState.defaultStack
+                        stack = rule.defaultStack
                     )
                 ),
                 waitPlayers = emptyList(),
