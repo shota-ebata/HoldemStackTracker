@@ -108,16 +108,19 @@ fun MainContentPreview() {
                 tableSummaryList = listOf(
                     TableSummaryCardRowUiState(
                         tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
+                        hostName = "ホスト名",
                         updateTime = LocalDateTime.now(),
                         createTime = LocalDateTime.now()
                     ),
                     TableSummaryCardRowUiState(
                         tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
+                        hostName = "ホスト名",
                         updateTime = LocalDateTime.now(),
                         createTime = LocalDateTime.now()
                     ),
                     TableSummaryCardRowUiState(
                         tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
+                        hostName = "ホスト名",
                         updateTime = LocalDateTime.now(),
                         createTime = LocalDateTime.now()
                     )

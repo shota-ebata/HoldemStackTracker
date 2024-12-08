@@ -10,6 +10,8 @@ data class TableSummaryEntity(
     @PrimaryKey
     @ColumnInfo("table_id")
     val tableId: String,
+    @ColumnInfo("host_name")
+    val hostName: String,
     @ColumnInfo("update_time")
     val updateTime: Instant,
     @ColumnInfo("create_time")

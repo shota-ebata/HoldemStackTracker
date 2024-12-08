@@ -4,6 +4,7 @@ import java.time.Instant
 
 data class TableSummary(
     val tableId: TableId,
+    val hostName: String,
     val updateTime: Instant,
     val createTime: Instant
 )

@@ -8,7 +8,6 @@ import com.ebata_shota.holdemstacktracker.infra.db.dao.TableSummaryDao
 import com.ebata_shota.holdemstacktracker.infra.db.entity.TableSummaryEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import java.time.Instant
 import javax.inject.Inject
 
 class TableSummaryRepositoryImpl
@@ -22,6 +21,7 @@ constructor(
             entityList.map { entity ->
                 TableSummary(
                     tableId = TableId(entity.tableId),
+                    hostName = entity.hostName,
                     updateTime = entity.updateTime,
                     createTime = entity.createTime
                 )
@@ -32,6 +32,9 @@ constructor(
     override suspend fun saveTable(table: Table) {
         val entity = TableSummaryEntity(
             tableId = table.id.value,
+            hostName = table.hostPlayerId.let { hostPlayerId ->
+                table.basePlayers.find { it.id == hostPlayerId }?.name.orEmpty()
+            },
             updateTime = table.updateTime,
             createTime = table.tableCreateTime
         )

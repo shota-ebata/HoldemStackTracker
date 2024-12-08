@@ -37,6 +37,9 @@ fun TableSummaryCardRow(
                 text = uiState.tableId.value
             )
             Text(
+                text = uiState.hostName
+            )
+            Text(
                 text = uiState.updateTime.toString()
             )
         }
@@ -45,6 +48,7 @@ fun TableSummaryCardRow(
 
 data class TableSummaryCardRowUiState(
     val tableId: TableId,
+    val hostName: String,
     val updateTime: LocalDateTime,
     val createTime: LocalDateTime
 )
@@ -62,6 +66,7 @@ private fun TableSummaryCardRowPreview() {
             uiState =
             TableSummaryCardRowUiState(
                 tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
+                hostName = "ホスト名",
                 updateTime = LocalDateTime.now(),
                 createTime = LocalDateTime.now()
             ),

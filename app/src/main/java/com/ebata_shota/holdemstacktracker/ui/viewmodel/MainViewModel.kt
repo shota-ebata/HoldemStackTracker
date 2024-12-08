@@ -66,6 +66,7 @@ constructor(
                                     val zoneId = ZoneId.systemDefault()
                                     TableSummaryCardRowUiState(
                                         tableId = it.tableId,
+                                        hostName = it.hostName,
                                         updateTime = LocalDateTime.ofInstant(it.updateTime, zoneId),
                                         createTime = LocalDateTime.ofInstant(it.updateTime, zoneId)
                                     )
