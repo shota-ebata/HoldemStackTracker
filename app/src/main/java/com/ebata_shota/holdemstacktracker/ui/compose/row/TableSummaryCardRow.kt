@@ -1,7 +1,7 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.row
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
@@ -29,12 +29,15 @@ fun TableSummaryCardRow(
             onClickTableRow(uiState.tableId)
         }
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .padding(16.dp)
         ) {
             Text(
                 text = uiState.tableId.value
+            )
+            Text(
+                text = LocalDateTime.now().toString()
             )
         }
     }

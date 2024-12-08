@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.inject.Inject
 
 @HiltViewModel
@@ -62,11 +63,11 @@ constructor(
                         MainScreenUiState.Content(
                             mainContentUiState = MainContentUiState(
                                 tableSummaryList = tableSummaryList.map {
+                                    val zoneId = ZoneId.systemDefault()
                                     TableSummaryCardRowUiState(
                                         tableId = it.tableId,
-                                        // TODO
-                                        updateTime = LocalDateTime.now(),
-                                        createTime = LocalDateTime.now()
+                                        updateTime = LocalDateTime.ofInstant(it.updateTime, zoneId),
+                                        createTime = LocalDateTime.ofInstant(it.updateTime, zoneId)
                                     )
                                 }
                             )
