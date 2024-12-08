@@ -24,6 +24,7 @@ constructor(
         return TableEditScreenUiState.Content(
             contentUiState = TableEditContentUiState(
                 tableId = table.id,
+                tableStatus = table.tableStatus,
                 // プレイヤー一覧
                 playerEditRows = table.playerOrder.mapNotNull { playerId ->
                     val player = table.basePlayers.find { it.id == playerId }

@@ -78,7 +78,7 @@ constructor(
                     )
                 ),
                 waitPlayers = emptyList(),
-                tableStatus = TableStatus.STANDBY,
+                tableStatus = TableStatus.PREPARING,
                 startTime = null,
                 tableCreateTime = tableCreateTime,
                 updateTime = tableCreateTime

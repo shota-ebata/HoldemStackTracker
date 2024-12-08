@@ -4,9 +4,9 @@ import androidx.annotation.Keep
 
 @Keep
 enum class TableStatus {
-    STANDBY,
+    PREPARING,
     PAUSED,
-    GAME;
+    PLAYING;
 
     companion object  {
         fun of(label: String): TableStatus {

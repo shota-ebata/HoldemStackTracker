@@ -21,7 +21,7 @@ constructor(
     override suspend fun invoke(table: Table) {
         val updateTime = Instant.now()
         val copiedTable = table.copy(
-            tableStatus = TableStatus.GAME,
+            tableStatus = TableStatus.PLAYING,
             startTime = updateTime,
             updateTime = updateTime,
             version = table.version + 1

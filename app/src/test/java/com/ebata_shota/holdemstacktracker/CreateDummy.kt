@@ -36,7 +36,7 @@ fun createDummyTable(
     btnPlayerId = PlayerId(""),
     basePlayers = emptyList(),
     waitPlayers = emptyList(),
-    tableStatus = TableStatus.STANDBY,
+    tableStatus = TableStatus.PREPARING,
     startTime = null,
     tableCreateTime = Instant.now(),
     updateTime = Instant.now()

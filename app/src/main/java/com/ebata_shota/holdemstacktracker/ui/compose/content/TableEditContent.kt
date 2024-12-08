@@ -2,7 +2,9 @@ package com.ebata_shota.holdemstacktracker.ui.compose.content
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -35,7 +38,9 @@ import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState.BtnChosenUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.extension.labelResId
 import com.ebata_shota.holdemstacktracker.ui.compose.row.PlayerEditRowUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.RadioButtonRow
 import com.ebata_shota.holdemstacktracker.ui.compose.row.UserEditRow
@@ -86,6 +91,28 @@ fun TableEditContent(
                         )
                     }
                 }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+
+                    Box(
+                        modifier = Modifier
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .background(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = RoundedCornerShape(16.dp),
+                                )
+                                .padding(vertical = 2.dp, horizontal = 8.dp),
+                            text = stringResource(uiState.tableStatus.labelResId()),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                }
+
                 Text(
                     text = stringResource(R.string.member_title_label),
                     style = MaterialTheme.typography.titleLarge,
@@ -223,6 +250,7 @@ fun TableEditContent(
 
 data class TableEditContentUiState(
     val tableId: TableId,
+    val tableStatus: TableStatus,
     val playerEditRows: List<PlayerEditRowUiState>,
     val btnChosenUiStateList: List<BtnChosenUiState>,
     val enableSubmitButton: Boolean,
@@ -248,6 +276,7 @@ private class PreviewParam : PreviewParameterProvider<TableEditContentUiState> {
     override val values: Sequence<TableEditContentUiState> = sequenceOf(
         TableEditContentUiState(
             tableId = TableId("tableId"),
+            tableStatus = TableStatus.PLAYING,
             playerEditRows = (0..4).map {
                 PlayerEditRowUiState(
                     playerId = PlayerId("playerId$it"),
@@ -262,6 +291,7 @@ private class PreviewParam : PreviewParameterProvider<TableEditContentUiState> {
         ),
         TableEditContentUiState(
             tableId = TableId("tableId"),
+            tableStatus = TableStatus.PREPARING,
             playerEditRows = (0..1).map {
                 PlayerEditRowUiState(
                     playerId = PlayerId("playerId$it"),

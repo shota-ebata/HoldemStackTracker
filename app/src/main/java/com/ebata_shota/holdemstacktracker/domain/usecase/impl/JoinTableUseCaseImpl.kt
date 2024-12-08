@@ -29,7 +29,7 @@ constructor(
         if (!isHost) { // FIXME: ホスト以外という縛りはいらない気もする（ホストが変更される可能性があるならなおさら）
             // ホストじゃないとき
             when (table.tableStatus) {
-                TableStatus.GAME -> {
+                TableStatus.PLAYING -> {
                     // ゲーム中のとき
                     if (
                         table.basePlayers.none { it.id == myPlayerId }
@@ -50,7 +50,7 @@ constructor(
                     }
                 }
 
-                TableStatus.STANDBY, TableStatus.PAUSED -> {
+                TableStatus.PREPARING, TableStatus.PAUSED -> {
                     // ゲーム中以外のとき
                     if (table.basePlayers.none { it.id == myPlayerId }) {
                         // baseに自分がいないなら
