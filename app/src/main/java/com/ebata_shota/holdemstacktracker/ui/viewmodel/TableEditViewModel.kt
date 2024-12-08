@@ -310,10 +310,18 @@ constructor(
                 ?: return@launch
             val index = table.basePlayers.indexOfFirstOrNull { it.id == playerId }
                 ?: return@launch
+            val stack = stackValueText.toDouble() // TODO: バリデーションしたい
+            if (table.basePlayers[index].stack == stack) {
+                // スタックに変化がないので更新しない
+                _dialogUiState.update {
+                    it.copy(stackEditDialogState = null)
+                }
+                return@launch
+            }
             val copiedTable = table.copy(
                 basePlayers = table.basePlayers.mapAtIndex(index = index) {
                     it.copy(
-                        stack = stackValueText.toDouble() // TODO: バリデーションしたい
+                        stack = stack
                     )
                 },
                 updateTime = Instant.now(),

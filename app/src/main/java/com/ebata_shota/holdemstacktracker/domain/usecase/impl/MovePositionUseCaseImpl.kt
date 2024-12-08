@@ -37,6 +37,10 @@ constructor(
                 }
             }
         }
+        if (currentIndex == index) {
+            // 変化ないので更新しない
+            return
+        }
         val movedPlayerOrder = moveItem(
             list = playerOrder.toMutableList(),
             fromIndex = currentIndex,
