@@ -8,6 +8,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
+import java.time.Instant
 import javax.inject.Inject
 
 
@@ -88,7 +89,7 @@ constructor(
             }
         }
         if (isUpdated) {
-            val updateTime = System.currentTimeMillis()
+            val updateTime = Instant.now()
             newTable = newTable.copy(
                 updateTime = updateTime,
                 version = table.version + 1

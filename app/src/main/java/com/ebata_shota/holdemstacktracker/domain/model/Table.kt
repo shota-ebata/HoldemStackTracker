@@ -1,5 +1,7 @@
 package com.ebata_shota.holdemstacktracker.domain.model
 
+import java.time.Instant
+
 data class Table(
     val id: TableId,
     val version: Long,
@@ -11,7 +13,7 @@ data class Table(
     val playerOrder: List<PlayerId>,
     val btnPlayerId: PlayerId,
     val tableStatus: TableStatus,
-    val startTime: Long,
-    val tableCreateTime: Long,
-    val updateTime: Long
+    val startTime: Instant?,
+    val tableCreateTime: Instant,
+    val updateTime: Instant
 )

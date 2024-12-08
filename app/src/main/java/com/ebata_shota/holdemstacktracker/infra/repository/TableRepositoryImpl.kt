@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.Instant
 import javax.inject.Inject
 
 class TableRepositoryImpl
@@ -60,7 +61,7 @@ constructor(
         withContext(ioDispatcher) {
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
             val myName = prefRepository.myName.first()!!
-            val tableCreateTime = System.currentTimeMillis()
+            val tableCreateTime = Instant.now()
             val table = Table(
                 id = tableId,
                 version = 0L,
@@ -78,7 +79,7 @@ constructor(
                 ),
                 waitPlayers = emptyList(),
                 tableStatus = TableStatus.STANDBY,
-                startTime = 0L,
+                startTime = null,
                 tableCreateTime = tableCreateTime,
                 updateTime = tableCreateTime
             )

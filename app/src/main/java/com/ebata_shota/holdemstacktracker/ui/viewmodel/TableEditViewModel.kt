@@ -51,6 +51,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
 import javax.inject.Inject
 
 @HiltViewModel
@@ -297,7 +298,7 @@ constructor(
                         stack = stackValueText.toDouble() // TODO: バリデーションしたい
                     )
                 },
-                updateTime = System.currentTimeMillis(),
+                updateTime = Instant.now(),
                 version = table.version + 1
             )
             tableRepository.sendTable(copiedTable)

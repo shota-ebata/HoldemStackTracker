@@ -4,6 +4,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
+import java.time.Instant
 import javax.inject.Inject
 
 class RemovePlayersUseCaseImpl
@@ -24,7 +25,7 @@ constructor(
         val copiedTable = currentTable.copy(
             playerOrder = removedPlayerOrder,
             basePlayers = copiedBasePlayers,
-            updateTime = System.currentTimeMillis(),
+            updateTime = Instant.now(),
             version = currentTable.version + 1
         )
         tableRepository.sendTable(copiedTable)

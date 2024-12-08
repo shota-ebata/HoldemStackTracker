@@ -9,6 +9,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
+import java.time.Instant
 
 fun createDummyGame(
     players: List<GamePlayerState> = emptyList(),
@@ -19,7 +20,7 @@ fun createDummyGame(
     players = players,
     podStateList = emptyList(),
     phaseStateList = phaseStateList,
-    updateTime = 0L
+    updateTime = Instant.now()
 )
 
 fun createDummyTable(
@@ -36,7 +37,7 @@ fun createDummyTable(
     basePlayers = emptyList(),
     waitPlayers = emptyList(),
     tableStatus = TableStatus.STANDBY,
-    startTime = 0L,
-    tableCreateTime = 0L,
-    updateTime = 0L
+    startTime = null,
+    tableCreateTime = Instant.now(),
+    updateTime = Instant.now()
 )

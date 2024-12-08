@@ -5,6 +5,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
+import java.time.Instant
 import javax.inject.Inject
 
 class MovePositionUseCaseImpl
@@ -44,7 +45,7 @@ constructor(
 
         val copiedTable = table.copy(
             playerOrder = movedPlayerOrder,
-            updateTime = System.currentTimeMillis(),
+            updateTime = Instant.now(),
             version = table.version + 1
         )
         tableRepository.sendTable(copiedTable)

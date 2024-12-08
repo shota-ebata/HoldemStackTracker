@@ -8,6 +8,7 @@ import com.ebata_shota.holdemstacktracker.infra.db.dao.TableSummaryDao
 import com.ebata_shota.holdemstacktracker.infra.db.entity.TableSummaryEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.time.Instant
 import javax.inject.Inject
 
 class TableSummaryRepositoryImpl

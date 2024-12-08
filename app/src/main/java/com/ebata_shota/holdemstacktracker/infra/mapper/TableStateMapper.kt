@@ -4,9 +4,10 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
-import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
+import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -55,9 +56,11 @@ constructor() {
             playerOrder = (tableMap[PLAYER_ORDER] as List<*>).map { PlayerId(it as String) },
             btnPlayerId = PlayerId(tableMap[BTN_PLAYER_ID] as String),
             tableStatus = TableStatus.of(tableMap[TABLE_STATUS] as String),
-            startTime = tableMap[START_TIME] as Long,
-            tableCreateTime = tableMap[TABLE_CREATE_TIME] as Long,
-            updateTime = tableMap[UPDATE_TIME] as Long
+            startTime = tableMap.getOrDefault(START_TIME, null)?.let {
+                Instant.ofEpochMilli(it as Long)
+            },
+            tableCreateTime = Instant.ofEpochMilli(tableMap[TABLE_CREATE_TIME] as Long),
+            updateTime = Instant.ofEpochMilli(tableMap[UPDATE_TIME] as Long)
         )
     }
 
@@ -82,7 +85,7 @@ constructor() {
         else -> throw IllegalStateException("unsupported ruleType = $ruleType")
     }
 
-    fun toMap(table: Table): Map<String, Any> = hashMapOf(
+    fun toMap(table: Table): Map<String, Any> = listOfNotNull(
         TABLE_VERSION to table.version,
         APP_VERSION to table.appVersion,
         HOST_PLAYER_ID to table.hostPlayerId.value,
@@ -117,8 +120,10 @@ constructor() {
         },
         BTN_PLAYER_ID to table.btnPlayerId.value,
         TABLE_STATUS to table.tableStatus.name,
-        START_TIME to table.startTime,
-        TABLE_CREATE_TIME to table.tableCreateTime,
-        UPDATE_TIME to table.updateTime
-    )
+        table.startTime?.let {
+            START_TIME to it.toEpochMilli()
+        },
+        TABLE_CREATE_TIME to table.tableCreateTime.toEpochMilli(),
+        UPDATE_TIME to table.updateTime.toEpochMilli()
+    ).toMap()
 }

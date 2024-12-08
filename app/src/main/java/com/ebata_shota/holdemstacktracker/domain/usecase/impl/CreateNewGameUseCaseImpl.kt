@@ -9,6 +9,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
+import java.time.Instant
 import javax.inject.Inject
 
 class CreateNewGameUseCaseImpl
@@ -18,7 +19,7 @@ constructor(
     private val gameRepository: GameRepository
 ) : CreateNewGameUseCase {
     override suspend fun invoke(table: Table) {
-        val updateTime = System.currentTimeMillis()
+        val updateTime = Instant.now()
         val copiedTable = table.copy(
             tableStatus = TableStatus.GAME,
             startTime = updateTime,

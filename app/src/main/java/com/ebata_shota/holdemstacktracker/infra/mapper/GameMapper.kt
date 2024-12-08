@@ -9,6 +9,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.PodState
 import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.infra.model.Phase
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -45,7 +46,7 @@ constructor() {
             players = mapToGamePlayerStateList(gameMap[PLAYERS] as List<*>),
             podStateList = mapToPodStateList(gameMap[PODS] as List<*>),
             phaseStateList = mapToPhaseStateList(gameMap[PHASES] as List<*>),
-            updateTime = gameMap[UPDATE_TIME] as Long
+            updateTime = Instant.ofEpochMilli(gameMap[UPDATE_TIME] as Long)
         )
     }
 
