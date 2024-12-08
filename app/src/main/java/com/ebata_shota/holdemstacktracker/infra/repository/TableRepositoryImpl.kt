@@ -1,6 +1,5 @@
 package com.ebata_shota.holdemstacktracker.infra.repository
 
-import android.util.Log
 import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherIO
@@ -97,13 +96,16 @@ constructor(
             firebaseDatabaseTableFlow(tableId)
                 .collect { tableResult ->
                     val table = tableResult.getOrNull()
-                    if (table != null) {
-                        tableSummaryRepository.saveTable(table)
-                        _tableFlow.emit(Result.success(table))
-                    }
                     val exception = tableResult.exceptionOrNull()
-                    if (exception != null) {
-                        _tableFlow.emit(Result.failure(exception))
+                    when {
+                        table != null -> {
+                            tableSummaryRepository.saveTable(table)
+                            _tableFlow.emit(Result.success(table))
+                        }
+
+                        exception != null -> {
+                            _tableFlow.emit(Result.failure(exception))
+                        }
                     }
                 }
         }

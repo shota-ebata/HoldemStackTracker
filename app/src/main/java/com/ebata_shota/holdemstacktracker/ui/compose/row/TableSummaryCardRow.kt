@@ -37,7 +37,7 @@ fun TableSummaryCardRow(
                 text = uiState.tableId.value
             )
             Text(
-                text = LocalDateTime.now().toString()
+                text = uiState.updateTime.toString()
             )
         }
     }

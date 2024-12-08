@@ -23,7 +23,7 @@
     <string name="error_title">エラー</string>
     <string name="error_name_limit">15文字以内で入力してください</string>
     <string name="error_not_found_table">テーブルが見つかりません</string>
-    <string name="error_message_in_table">テーブルが見つかりません</string>
+    <string name="error_message_in_table">テーブルに問題が発生しました</string>
 
     <string name="ok_label">OK</string>
 

@@ -103,12 +103,12 @@ fun TableEditContent(
                         Text(
                             modifier = Modifier
                                 .background(
-                                    color = MaterialTheme.colorScheme.primary,
+                                    color = MaterialTheme.colorScheme.secondary,
                                     shape = RoundedCornerShape(16.dp),
                                 )
                                 .padding(vertical = 2.dp, horizontal = 8.dp),
                             text = stringResource(uiState.tableStatus.labelResId()),
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onSecondary
                         )
                     }
                 }

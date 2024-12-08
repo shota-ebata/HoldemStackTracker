@@ -153,7 +153,9 @@ constructor(
         viewModelScope.launch {
             tableRepository.tableFlow.collect { result ->
                 val throwable = result.exceptionOrNull()
-                showErrorDialog(throwable)
+                throwable?.let {
+                    showErrorDialog(it)
+                }
             }
         }
 
@@ -425,7 +427,7 @@ constructor(
         startNewGame()
     }
 
-    private fun showErrorDialog(throwable: Throwable?) {
+    private fun showErrorDialog(throwable: Throwable) {
         when (throwable) {
             is NotFoundTableException -> {
                 _dialogUiState.update {
