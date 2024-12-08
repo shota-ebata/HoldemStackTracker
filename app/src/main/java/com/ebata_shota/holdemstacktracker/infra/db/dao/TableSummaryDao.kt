@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TableSummaryDao {
-    @Query("SELECT * FROM table_summary_entities")
+    @Query("SELECT * FROM table_summary_entities ORDER BY update_time DESC")
     fun getAllFlow(): Flow<List<TableSummaryEntity>>
 
     @Query("SELECT * FROM table_summary_entities WHERE table_id LIKE :tableIdString LIMIT 1")

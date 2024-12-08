@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.row
 
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -50,7 +51,8 @@ fun TableSummaryCardRow(
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             if (uiState.isJoined) {
                 Row(
@@ -62,18 +64,36 @@ fun TableSummaryCardRow(
                         painter = painterResource(R.drawable.baseline_person_pin_24),
                         contentDescription = "person_pin"
                     )
-                    Text(text = stringResource(R.string.label_joined))
+                    Text(
+                        style = MaterialTheme.typography.bodyLarge,
+                        text = stringResource(R.string.label_joined)
+                    )
                 }
             }
-            Text(
-                text = uiState.tableId.value
-            )
-            Text(
-                text = uiState.hostName
-            )
-            Text(
-                text = uiState.updateTime
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    style = MaterialTheme.typography.bodyMedium,
+                    text = stringResource(R.string.label_host)
+                )
+                Text(
+                    style = MaterialTheme.typography.bodyMedium,
+                    text = uiState.hostName
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    style = MaterialTheme.typography.bodySmall,
+                    text = stringResource(R.string.label_update_datetime)
+                )
+                Text(
+                    style = MaterialTheme.typography.bodySmall,
+                    text = uiState.updateTime
+                )
+            }
         }
     }
 }
@@ -93,14 +113,14 @@ private class TableSummaryCardRowPreviewParam :
             tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
             hostName = "ホスト名",
             isJoined = false,
-            updateTime = "更新日時",
+            updateTime = "2024/12/08 22:54:01",
             createTime = LocalDateTime.now()
         ),
         TableSummaryCardRowUiState(
             tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
             hostName = "ホスト名",
             isJoined = true,
-            updateTime = "更新日時",
+            updateTime = "2024/12/08 22:54:01",
             createTime = LocalDateTime.now()
         ),
     )
