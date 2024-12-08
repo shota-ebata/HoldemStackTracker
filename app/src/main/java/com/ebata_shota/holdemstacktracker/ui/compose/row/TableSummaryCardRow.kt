@@ -72,7 +72,7 @@ fun TableSummaryCardRow(
                 text = uiState.hostName
             )
             Text(
-                text = uiState.updateTime.toString()
+                text = uiState.updateTime
             )
         }
     }
@@ -82,7 +82,7 @@ data class TableSummaryCardRowUiState(
     val tableId: TableId,
     val hostName: String,
     val isJoined: Boolean,
-    val updateTime: LocalDateTime,
+    val updateTime: String,
     val createTime: LocalDateTime
 )
 
@@ -93,14 +93,14 @@ private class TableSummaryCardRowPreviewParam :
             tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
             hostName = "ホスト名",
             isJoined = false,
-            updateTime = LocalDateTime.now(),
+            updateTime = "更新日時",
             createTime = LocalDateTime.now()
         ),
         TableSummaryCardRowUiState(
             tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
             hostName = "ホスト名",
             isJoined = true,
-            updateTime = LocalDateTime.now(),
+            updateTime = "更新日時",
             createTime = LocalDateTime.now()
         ),
     )

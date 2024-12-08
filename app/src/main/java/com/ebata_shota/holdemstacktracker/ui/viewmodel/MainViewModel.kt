@@ -28,6 +28,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.time.format.FormatStyle
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -65,11 +69,14 @@ constructor(
                         mainContentUiState = MainContentUiState(
                             tableSummaryList = tableSummaryList.map {
                                 val zoneId = ZoneId.systemDefault()
+                                val updateLocalDateTime = LocalDateTime.ofInstant(it.updateTime, zoneId)
+                                val formatterDefault = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+                                    .withLocale(Locale.getDefault())
                                 TableSummaryCardRowUiState(
                                     tableId = it.tableId,
                                     hostName = it.hostName,
                                     isJoined = tableRepository.currentTableId == it.tableId,
-                                    updateTime = LocalDateTime.ofInstant(it.updateTime, zoneId),
+                                    updateTime = updateLocalDateTime.format(formatterDefault),
                                     createTime = LocalDateTime.ofInstant(it.updateTime, zoneId)
                                 )
                             }
