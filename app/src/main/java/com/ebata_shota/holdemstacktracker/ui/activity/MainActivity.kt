@@ -13,9 +13,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var gmsBarcodeScannerRepository: GmsBarcodeScannerRepository
-
 //    private val resultJoinTableByQrActivity = registerForActivityResult(
 //        ActivityResultContracts.StartActivityForResult()
 //    ) { result ->

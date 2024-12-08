@@ -24,8 +24,11 @@ import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableSummary
+import com.ebata_shota.holdemstacktracker.ui.compose.row.TableSummaryCardRow
+import com.ebata_shota.holdemstacktracker.ui.compose.row.TableSummaryCardRowUiState
 import com.ebata_shota.holdemstacktracker.ui.theme.CardSideSpace
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
+import java.time.LocalDateTime
 
 @Composable
 fun MainContent(
@@ -79,28 +82,14 @@ fun MainContent(
             items(
                 items = uiState.tableSummaryList
             ) { item ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = CardSideSpace),
-                    onClick = {
-                        onClickTableRow(item.tableId)
-                    }
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(16.dp)
-                    ) {
-                        Text(text = item.tableId.value)
-                    }
-                }
+                TableSummaryCardRow(item, onClickTableRow)
             }
         }
     }
 }
 
 data class MainContentUiState(
-    val tableSummaryList: List<TableSummary>
+    val tableSummaryList: List<TableSummaryCardRowUiState>
 )
 
 
@@ -117,20 +106,20 @@ fun MainContentPreview() {
         MainContent(
             uiState = MainContentUiState(
                 tableSummaryList = listOf(
-                    TableSummary(
+                    TableSummaryCardRowUiState(
                         tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
-                        updateTime = 100L,
-                        createTime = 100L
+                        updateTime = LocalDateTime.now(),
+                        createTime = LocalDateTime.now()
                     ),
-                    TableSummary(
+                    TableSummaryCardRowUiState(
                         tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
-                        updateTime = 100L,
-                        createTime = 100L
+                        updateTime = LocalDateTime.now(),
+                        createTime = LocalDateTime.now()
                     ),
-                    TableSummary(
+                    TableSummaryCardRowUiState(
                         tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
-                        updateTime = 100L,
-                        createTime = 100L
+                        updateTime = LocalDateTime.now(),
+                        createTime = LocalDateTime.now()
                     )
                 )
             ),

@@ -14,6 +14,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
+import com.ebata_shota.holdemstacktracker.ui.compose.row.TableSummaryCardRowUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.MainScreenDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.MainScreenUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -59,7 +61,14 @@ constructor(
                     _uiState.update {
                         MainScreenUiState.Content(
                             mainContentUiState = MainContentUiState(
-                                tableSummaryList = tableSummaryList
+                                tableSummaryList = tableSummaryList.map {
+                                    TableSummaryCardRowUiState(
+                                        tableId = it.tableId,
+                                        // TODO
+                                        updateTime = LocalDateTime.now(),
+                                        createTime = LocalDateTime.now()
+                                    )
+                                }
                             )
                         )
                     }

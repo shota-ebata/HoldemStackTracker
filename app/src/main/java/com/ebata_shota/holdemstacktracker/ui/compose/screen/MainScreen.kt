@@ -82,14 +82,12 @@ fun MainScreen(
                         }
                     }
                 )
-                Box {
-                    MainContent(
-                        uiState = castUiState.mainContentUiState,
-                        onClickFloatingButton = viewModel::onClickCreateNewTable,
-                        onClickTableRow = viewModel::onClickTableRow,
-                        onClickQrScan = viewModel::onClickQrScan
-                    )
-                }
+                MainContent(
+                    uiState = castUiState.mainContentUiState,
+                    onClickFloatingButton = viewModel::onClickCreateNewTable,
+                    onClickTableRow = viewModel::onClickTableRow,
+                    onClickQrScan = viewModel::onClickQrScan
+                )
             }
             val myNameInputDialogUiState = dialogUiState.myNameInputDialogUiState
             if (myNameInputDialogUiState != null) {
