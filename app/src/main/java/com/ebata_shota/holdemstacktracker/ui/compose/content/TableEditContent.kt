@@ -104,7 +104,7 @@ fun TableEditContent(
                             modifier = Modifier
                                 .background(
                                     color = MaterialTheme.colorScheme.secondary,
-                                    shape = RoundedCornerShape(16.dp),
+                                    shape = RoundedCornerShape(8.dp),
                                 )
                                 .padding(vertical = 2.dp, horizontal = 8.dp),
                             text = stringResource(uiState.tableStatus.labelResId()),
