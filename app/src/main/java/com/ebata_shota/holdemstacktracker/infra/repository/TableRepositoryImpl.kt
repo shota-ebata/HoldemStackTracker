@@ -1,8 +1,10 @@
 package com.ebata_shota.holdemstacktracker.infra.repository
 
+import android.util.Log
 import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherIO
+import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundTableException
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
 import com.ebata_shota.holdemstacktracker.domain.model.RuleState
 import com.ebata_shota.holdemstacktracker.domain.model.Table
@@ -51,8 +53,8 @@ constructor(
         "tables"
     )
 
-    private val _tableFlow = MutableSharedFlow<Table>()
-    override val tableFlow: SharedFlow<Table> = _tableFlow.asSharedFlow()
+    private val _tableFlow = MutableSharedFlow<Result<Table>>()
+    override val tableFlow: SharedFlow<Result<Table>> = _tableFlow.asSharedFlow()
 
     override suspend fun createNewTable(
         tableId: TableId,
@@ -93,9 +95,16 @@ constructor(
         stopCollectTableFlow()
         collectTableJob = appCoroutineScope.launch {
             firebaseDatabaseTableFlow(tableId)
-                .collect { table ->
-                    tableSummaryRepository.saveTable(table)
-                    _tableFlow.emit(table)
+                .collect { tableResult ->
+                    val table = tableResult.getOrNull()
+                    if (table != null) {
+                        tableSummaryRepository.saveTable(table)
+                        _tableFlow.emit(Result.success(table))
+                    }
+                    val exception = tableResult.exceptionOrNull()
+                    if (exception != null) {
+                        _tableFlow.emit(Result.failure(exception))
+                    }
                 }
         }
     }
@@ -112,13 +121,15 @@ constructor(
         tableRef.setValue(tableMap)
     }
 
-    private fun firebaseDatabaseTableFlow(tableId: TableId): Flow<Table> = callbackFlow {
+    private fun firebaseDatabaseTableFlow(tableId: TableId): Flow<Result<Table>> = callbackFlow {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     val tableMap: Map<*, *> = snapshot.value as Map<*, *>
                     val tableState = tableMapper.mapToTableState(tableId, tableMap)
-                    trySend(tableState)
+                    trySend(Result.success(tableState))
+                } else {
+                    trySend(Result.failure(NotFoundTableException()))
                 }
             }
 

@@ -9,6 +9,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.R
+import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundTableException
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtFind
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
@@ -28,6 +29,8 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.ui.TableEditScreenUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogEvent
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialogEvent
@@ -48,6 +51,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -73,7 +77,8 @@ constructor(
     private val uiStateMapper: TableEditScreenUiStateMapper
 ) : ViewModel(),
     MyNameInputDialogEvent,
-    PlayerRemoveDialogEvent {
+    PlayerRemoveDialogEvent,
+    ErrorDialogEvent {
 
     private val tableIdString: String by savedStateHandle.param()
     private val tableId: TableId = TableId(tableIdString)
@@ -93,11 +98,13 @@ constructor(
     }
 
     // Tableの状態を保持
-    private val tableStateFlow: StateFlow<Table?> = tableRepository.tableFlow.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Lazily,
-        initialValue = null
-    )
+    private val tableStateFlow: StateFlow<Table?> = tableRepository.tableFlow
+        .map { it.getOrNull() }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = null
+        )
 
     // BTNのプレイヤーID
     private val selectedBtnPlayerId = MutableStateFlow<PlayerId?>(null)
@@ -142,6 +149,14 @@ constructor(
             }.collect()
         }
 
+        // Table取得の例外を監視する
+        viewModelScope.launch {
+            tableRepository.tableFlow.collect { result ->
+                val throwable = result.exceptionOrNull()
+                showErrorDialog(throwable)
+            }
+        }
+
         viewModelScope.launch {
             // テーブル情報の監視をスタートする
             tableRepository.startCollectTableFlow(tableId)
@@ -153,6 +168,7 @@ constructor(
             qrPainterStateFlow.update { painter }
         }
     }
+
 
     private fun showMyNameInputDialog(playerId: PlayerId) {
         val defaultPlayerName = "Player${playerId.value.take(6)}"
@@ -380,9 +396,25 @@ constructor(
         viewModelScope.launch {
             if (prefRepository.myName.first() == null) {
                 // 画面を戻す FIXME: この動き微妙かなー
-                _navigateEvent.emit(Navigate.Back)
+                navigateToBack()
             }
         }
+    }
+
+    override fun onClickErrorDialogOk() {
+        viewModelScope.launch {
+            navigateToBack()
+        }
+    }
+
+    override fun onDismissErrorDialogRequest() {
+        viewModelScope.launch {
+            navigateToBack()
+        }
+    }
+
+    private suspend fun navigateToBack() {
+        _navigateEvent.emit(Navigate.Back)
     }
 
     fun onChangeBtnChosen(btnPlayerId: PlayerId?) {
@@ -391,6 +423,32 @@ constructor(
 
     fun onClickSubmitButton() {
         startNewGame()
+    }
+
+    private fun showErrorDialog(throwable: Throwable?) {
+        when (throwable) {
+            is NotFoundTableException -> {
+                _dialogUiState.update {
+                    it.copy(
+                        errorDialog = ErrorDialogUiState(
+                            messageResId = R.string.error_not_found_table,
+                            throwable = throwable
+                        )
+                    )
+                }
+            }
+
+            else -> {
+                _dialogUiState.update {
+                    it.copy(
+                        errorDialog = ErrorDialogUiState(
+                            messageResId = R.string.error_message_in_table,
+                            throwable = throwable
+                        )
+                    )
+                }
+            }
+        }
     }
 
     private fun startNewGame() {

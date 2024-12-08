@@ -6,7 +6,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import kotlinx.coroutines.flow.SharedFlow
 
 interface TableRepository {
-    val tableFlow: SharedFlow<Table>
+    val tableFlow: SharedFlow<Result<Table>>
 
     suspend fun createNewTable(
         tableId: TableId,

@@ -8,6 +8,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogContent
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialog
@@ -75,6 +77,13 @@ fun TableEditScreen(
             }
         }
     }
+    val errorDialogUiState = dialogUiState.errorDialog
+    if (errorDialogUiState != null) {
+        ErrorDialogContent(
+            uiState = errorDialogUiState,
+            event = viewModel
+        )
+    }
 }
 
 sealed interface TableEditScreenUiState {
@@ -87,5 +96,6 @@ sealed interface TableEditScreenUiState {
 data class TableEditScreenDialogUiState(
     val stackEditDialogState: StackEditDialogState? = null,
     val myNameInputDialogUiState: MyNameInputDialogUiState? = null,
-    val playerRemoveDialogUiState: PlayerRemoveDialogUiState? = null
+    val playerRemoveDialogUiState: PlayerRemoveDialogUiState? = null,
+    val errorDialog: ErrorDialogUiState? = null
 )

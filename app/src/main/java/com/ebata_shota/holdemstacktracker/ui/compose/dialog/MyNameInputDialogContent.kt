@@ -37,9 +37,6 @@ fun MyNameInputDialogContent(
     event: MyNameInputDialogEvent,
     modifier: Modifier = Modifier
 ) {
-    LaunchedEffect(Unit) {
-
-    }
     BasicAlertDialog(
         onDismissRequest = { event.onDismissRequestMyNameInputDialog() },
         modifier = modifier
