@@ -35,14 +35,20 @@ constructor(
                     // ゲーム中以外のとき
                     val newBasePlayers = table.basePlayers.toMutableList()
                     val newPlayerOrder = table.playerOrder.toMutableList()
+                    val newWaitPlayers = table.waitPlayers.toMutableList()
                     table.waitPlayers.forEach { waitPlayer ->
                         if (table.playerOrder.none { it == waitPlayer.id }) {
                             // waitのプレイヤーがnewPlayerOrderにいない場合
-                            // orderに追加
-                            newPlayerOrder.add(waitPlayer.id)
-                            // baseに追加(必要なら）
-                            if (table.basePlayers.none { it.id == waitPlayer.id }) {
-                                newBasePlayers.add(waitPlayer)
+                            if (newPlayerOrder.size < MAX_PLAYER_SIZE) {
+                                // 10人未満なら
+                                // orderに追加
+                                newPlayerOrder.add(waitPlayer.id)
+                                // baseに追加（必要なら）
+                                if (table.basePlayers.none { it.id == waitPlayer.id }) {
+                                    newBasePlayers.add(waitPlayer)
+                                }
+                                // waitから削除
+                                newWaitPlayers.removeIf { it.id == waitPlayer.id }
                             }
                         }
                     }
@@ -50,7 +56,7 @@ constructor(
                         basePlayers = newBasePlayers,
                         playerOrder = newPlayerOrder,
                         // FIXME: 参加を制限する場合はすべて参加になるわけじゃなくなるので要調整
-                        waitPlayers = emptyList(), // 追加終えたので、waitPlayersを削除
+                        waitPlayers = newWaitPlayers,
                     )
                 }
             }
@@ -93,5 +99,9 @@ constructor(
         playerOrder + myPlayerId
     } else {
         playerOrder
+    }
+
+    companion object {
+        private const val MAX_PLAYER_SIZE = 10
     }
 }
