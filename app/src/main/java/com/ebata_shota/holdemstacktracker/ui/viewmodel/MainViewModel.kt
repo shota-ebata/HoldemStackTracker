@@ -77,6 +77,7 @@ constructor(
                                     blindText = it.blindText,
                                     hostName = it.hostName,
                                     isJoined = tableRepository.currentTableId == it.tableId,
+                                    playerSize = it.playerSize,
                                     updateTime = updateLocalDateTime.format(formatterDefault),
                                     createTime = LocalDateTime.ofInstant(it.updateTime, zoneId)
                                 )

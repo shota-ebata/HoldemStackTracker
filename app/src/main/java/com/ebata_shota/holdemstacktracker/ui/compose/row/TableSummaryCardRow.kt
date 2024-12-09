@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -100,6 +102,20 @@ fun TableSummaryCardRow(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {
+                Icon(
+                    imageVector = Icons.Filled.Person,
+                    contentDescription = "person_pin"
+                )
+                Text(
+                    style = MaterialTheme.typography.bodyMedium,
+                    text = uiState.playerSize
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
+            ) {
                 Text(
                     style = MaterialTheme.typography.bodySmall,
                     text = stringResource(R.string.label_update_datetime)
@@ -118,6 +134,7 @@ data class TableSummaryCardRowUiState(
     val blindText: String,
     val hostName: String,
     val isJoined: Boolean,
+    val playerSize: String,
     val updateTime: String,
     val createTime: LocalDateTime
 )
@@ -130,6 +147,7 @@ private class TableSummaryCardRowPreviewParam :
             blindText = "1/2",
             hostName = "ホスト名",
             isJoined = false,
+            playerSize = "1/10",
             updateTime = "2024/12/08 22:54:01",
             createTime = LocalDateTime.now()
         ),
@@ -139,6 +157,7 @@ private class TableSummaryCardRowPreviewParam :
             hostName = "ホスト名",
             blindText = "1/2",
             isJoined = true,
+            playerSize = "1/10",
             updateTime = "2024/12/08 22:54:01",
             createTime = LocalDateTime.now()
         ),

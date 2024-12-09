@@ -14,6 +14,8 @@ data class TableSummaryEntity(
     val blindText: String,
     @ColumnInfo("host_name")
     val hostName: String,
+    @ColumnInfo("player_size")
+    val playerSize: String,
     @ColumnInfo("update_time")
     val updateTime: Instant,
     @ColumnInfo("create_time")

@@ -24,6 +24,7 @@ constructor(
                     tableId = TableId(entity.tableId),
                     blindText = entity.blindText,
                     hostName = entity.hostName,
+                    playerSize = entity.playerSize,
                     updateTime = entity.updateTime,
                     createTime = entity.createTime
                 )
@@ -38,6 +39,7 @@ constructor(
             hostName = table.hostPlayerId.let { hostPlayerId ->
                 table.basePlayers.find { it.id == hostPlayerId }?.name.orEmpty()
             },
+            playerSize = "${table.playerOrder.size}/10", // FIXME: 10人上限がハードコーディングされている
             updateTime = table.updateTime,
             createTime = table.tableCreateTime
         )

@@ -6,6 +6,7 @@ data class TableSummary(
     val tableId: TableId,
     val blindText: String,
     val hostName: String,
+    val playerSize: String,
     val updateTime: Instant,
     val createTime: Instant
 )

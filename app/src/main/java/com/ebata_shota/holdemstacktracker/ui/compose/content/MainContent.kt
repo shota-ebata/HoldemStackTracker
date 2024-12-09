@@ -105,16 +105,7 @@ fun MainContentPreview() {
     HoldemStackTrackerTheme {
         MainContent(
             uiState = MainContentUiState(
-                tableSummaryList = listOf(
-                    TableSummaryCardRowUiState(
-                        tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
-                        blindText = "1/2",
-                        hostName = "ホスト名",
-                        isJoined = true,
-                        updateTime = "更新日時",
-                        createTime = LocalDateTime.now()
-                    )
-                )
+                tableSummaryList = emptyList()
             ),
             onClickFloatingButton = {},
             onClickTableRow = {},
