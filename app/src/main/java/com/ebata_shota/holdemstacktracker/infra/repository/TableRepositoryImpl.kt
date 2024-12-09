@@ -1,10 +1,12 @@
 package com.ebata_shota.holdemstacktracker.infra.repository
 
+import android.util.Log
 import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherIO
 import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundTableException
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
@@ -37,7 +39,7 @@ import javax.inject.Inject
 class TableRepositoryImpl
 @Inject
 constructor(
-    firebaseDatabase: FirebaseDatabase,
+    private val firebaseDatabase: FirebaseDatabase,
     private val prefRepository: PrefRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val tableSummaryRepository: TableSummaryRepository,
@@ -149,5 +151,31 @@ constructor(
         awaitClose {
             tablesRef.child(tableId.value).removeEventListener(listener)
         }
+    }
+
+    override suspend fun renameTableBasePlayer(
+        tableId: TableId,
+        indexOfBasePlayers: Long,
+        playerId: PlayerId,
+        name: String
+    ) {
+        // FIXME: pathは定数を使いたい
+        val nameRef = firebaseDatabase.getReference(
+            "tables/${tableId.value}/basePlayers/${indexOfBasePlayers}/name"
+        )
+        nameRef.setValue(name)
+    }
+
+    override suspend fun renameTableWaitPlayer(
+        tableId: TableId,
+        indexOfWaitPlayers: Long,
+        playerId: PlayerId,
+        name: String
+    ) {
+        // FIXME: pathは定数を使いたい
+        val nameRef = firebaseDatabase.getReference(
+            "tables/${tableId.value}/waitPlayers/${indexOfWaitPlayers}/name"
+        )
+        nameRef.setValue(name)
     }
 }

@@ -28,6 +28,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.ui.TableEditScreenUiStateMapper
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogUiState
@@ -74,6 +75,7 @@ constructor(
     private val createNewGame: CreateNewGameUseCase,
     private val movePositionUseCase: MovePositionUseCase,
     private val removePlayers: RemovePlayersUseCase,
+    private val renameTablePlayer: RenameTablePlayerUseCase,
     private val uiStateMapper: TableEditScreenUiStateMapper
 ) : ViewModel(),
     MyNameInputDialogEvent,
@@ -131,8 +133,19 @@ constructor(
                 tableStateFlow.filterNotNull(),
                 firebaseAuthRepository.myPlayerIdFlow,
                 prefRepository.myName.filterNotNull(),
-            ) { tableState, myPlayerId, myName ->
-                joinTable.invoke(tableState, myPlayerId, myName)
+            ) { table, myPlayerId, myName ->
+                joinTable.invoke(table, myPlayerId, myName)
+            }.collect()
+        }
+
+        // 自分の名前の変更をテーブルに反映するために監視
+        viewModelScope.launch {
+            combine(
+                tableStateFlow.filterNotNull(),
+                firebaseAuthRepository.myPlayerIdFlow,
+                prefRepository.myName.filterNotNull()
+            ) { table, myPlayerId, myName ->
+                renameTablePlayer.invoke(table, myPlayerId, myName)
             }.collect()
         }
 

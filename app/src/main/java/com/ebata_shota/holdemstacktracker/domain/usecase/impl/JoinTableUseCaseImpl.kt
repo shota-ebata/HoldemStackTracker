@@ -1,7 +1,5 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
-import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
-import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
@@ -24,71 +22,60 @@ constructor(
         myName: String
     ) {
         var newTable: Table = table
-        var isUpdated = false
         val isHost = table.hostPlayerId == myPlayerId
-        if (!isHost) { // FIXME: ホスト以外という縛りはいらない気もする（ホストが変更される可能性があるならなおさら）
-            // ホストじゃないとき
+        if (isHost) {
+            // ホストのときに
             when (table.tableStatus) {
                 TableStatus.PLAYING -> {
-                    // ゲーム中のとき
-                    if (
-                        table.basePlayers.none { it.id == myPlayerId }
-                        && table.waitPlayers.none { it.id == myPlayerId }
-                    ) {
-                        // baseにもwaitにも自分がいないなら
-                        // waitに自分を追加
-                        val waitPlayers = table.waitPlayers + PlayerBaseState(
-                            id = myPlayerId,
-                            name = myName,
-                            stack = table.rule.defaultStack
-                        )
-                        newTable = table.copy(
-                            waitPlayers = waitPlayers,
-                            playerOrder = addPlayerOrderIfNeed(table.playerOrder, myPlayerId)
-                        )
-                        isUpdated = true
-                    }
+                    // ゲーム中のときは何もしない？
                 }
 
-                TableStatus.PREPARING, TableStatus.PAUSED -> {
+                TableStatus.PREPARING,
+                TableStatus.PAUSED -> { // FIXME: PAUSEDでは table.rule is Rule.RingGame じゃないとまずいか？
                     // ゲーム中以外のとき
-                    if (table.basePlayers.none { it.id == myPlayerId }) {
-                        // baseに自分がいないなら
-                        // waitから自分を消して
-                        val waitPlayers = table.waitPlayers.filterNot {
-                            table.basePlayers.none { it.id == myPlayerId }
+                    val newBasePlayers = table.basePlayers.toMutableList()
+                    val newPlayerOrder = table.playerOrder.toMutableList()
+                    table.waitPlayers.forEach { waitPlayer ->
+                        if (table.playerOrder.none { it == waitPlayer.id }) {
+                            // waitのプレイヤーがnewPlayerOrderにいない場合
+                            // orderに追加
+                            newPlayerOrder.add(waitPlayer.id)
+                            // baseに追加(必要なら）
+                            if (table.basePlayers.none { it.id == waitPlayer.id }) {
+                                newBasePlayers.add(waitPlayer)
+                            }
                         }
-                        // baseに自分を追加
-                        val basePlayers = table.basePlayers + PlayerBaseState(
-                            id = myPlayerId,
-                            name = myName,
-                            stack = table.rule.defaultStack
-                        )
-                        newTable = table.copy(
-                            basePlayers = basePlayers,
-                            playerOrder = addPlayerOrderIfNeed(table.playerOrder, myPlayerId),
-                            waitPlayers = waitPlayers,
-                        )
-                        isUpdated = true
                     }
+                    newTable = table.copy(
+                        basePlayers = newBasePlayers,
+                        playerOrder = newPlayerOrder,
+                        // FIXME: 参加を制限する場合はすべて参加になるわけじゃなくなるので要調整
+                        waitPlayers = emptyList(), // 追加終えたので、waitPlayersを削除
+                    )
                 }
             }
-        }
-        val index = table.basePlayers.indexOfFirstOrNull { it.id == myPlayerId }
-        if (index != null) {
-            val myPlayer = table.basePlayers[index]
-            // プレイヤー名が異なるときの処理
-            if (myPlayer.name != myName) {
-                // プレイヤ名が異なるなら更新する
-                newTable = newTable.copy(
-                    basePlayers = newTable.basePlayers.mapAtIndex(index) {
-                        it.copy(name = myName)
-                    }
+        } else {
+            // ホストじゃないとき
+            if (
+                table.basePlayers.none { it.id == myPlayerId }
+                && table.waitPlayers.none { it.id == myPlayerId }
+            ) {
+                // baseにもwaitにも自分がいないなら
+                // waitに自分を追加
+                // baseへの追加はホストにやってもらう
+                val waitPlayers = table.waitPlayers + PlayerBaseState(
+                    id = myPlayerId,
+                    name = myName,
+                    stack = table.rule.defaultStack
                 )
-                isUpdated = true
+                newTable = table.copy(
+                    waitPlayers = waitPlayers,
+                    playerOrder = addPlayerOrderIfNeed(table.playerOrder, myPlayerId)
+                )
             }
         }
-        if (isUpdated) {
+
+        if (newTable != table) {
             val updateTime = Instant.now()
             newTable = newTable.copy(
                 updateTime = updateTime,

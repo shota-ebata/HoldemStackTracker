@@ -16,6 +16,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.CreateNewGameUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetDoubleToStringUseCaseImpl
@@ -32,11 +33,11 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsActionRequiredUs
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.JoinTableUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.MovePositionUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.RemovePlayersUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.RenameTablePlayerUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -87,5 +88,8 @@ interface UseCaseModule {
     fun bindMovePositionUseCase(useCase: MovePositionUseCaseImpl): MovePositionUseCase
 
     @Binds
-    fun bindMRemovePlayersUseCase(useCase: RemovePlayersUseCaseImpl): RemovePlayersUseCase
+    fun bindRemovePlayersUseCase(useCase: RemovePlayersUseCaseImpl): RemovePlayersUseCase
+
+    @Binds
+    fun bindRenameTableBasePlayerUseCase(useCase: RenameTablePlayerUseCaseImpl): RenameTablePlayerUseCase
 }
