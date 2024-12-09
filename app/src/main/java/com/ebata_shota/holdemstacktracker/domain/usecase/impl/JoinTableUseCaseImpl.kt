@@ -75,8 +75,7 @@ constructor(
                     stack = table.rule.defaultStack
                 )
                 newTable = table.copy(
-                    waitPlayers = waitPlayers,
-                    playerOrder = addPlayerOrderIfNeed(table.playerOrder, myPlayerId)
+                    waitPlayers = waitPlayers
                 )
             }
         }
