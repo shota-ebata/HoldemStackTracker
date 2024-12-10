@@ -10,6 +10,8 @@ data class TableSummaryEntity(
     @PrimaryKey
     @ColumnInfo("table_id")
     val tableId: String,
+    @ColumnInfo("game_type_text_res_id")
+    val gameTypeTextResId: Int,
     @ColumnInfo("blind_text")
     val blindText: String,
     @ColumnInfo("host_name")

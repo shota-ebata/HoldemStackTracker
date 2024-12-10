@@ -1,12 +1,15 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.row
 
 import android.content.res.Configuration
+import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
@@ -26,6 +29,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.ui.compose.parts.BlindTextLabel
 import com.ebata_shota.holdemstacktracker.ui.theme.CardSideSpace
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import java.time.LocalDateTime
@@ -77,12 +81,18 @@ fun TableSummaryCardRow(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    style = MaterialTheme.typography.bodyMedium,
-                    text = stringResource(R.string.label_blind)
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.secondary,
+                            shape = RoundedCornerShape(8.dp),
+                        )
+                        .padding(vertical = 2.dp, horizontal = 8.dp),
+                    text = stringResource(uiState.gameTypeTextResId),
+                    color = MaterialTheme.colorScheme.onSecondary
                 )
-                Text(
-                    style = MaterialTheme.typography.bodyMedium,
-                    text = uiState.blindText
+                BlindTextLabel(
+                    blindText = uiState.blindText,
+                    modifier.padding(start = 4.dp)
                 )
             }
             Row(
@@ -131,6 +141,8 @@ fun TableSummaryCardRow(
 
 data class TableSummaryCardRowUiState(
     val tableId: TableId,
+    @StringRes
+    val gameTypeTextResId: Int,
     val blindText: String,
     val hostName: String,
     val isJoined: Boolean,
@@ -144,6 +156,7 @@ private class TableSummaryCardRowPreviewParam :
     override val values: Sequence<TableSummaryCardRowUiState> = sequenceOf(
         TableSummaryCardRowUiState(
             tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
+            gameTypeTextResId = R.string.game_type_ring,
             blindText = "1/2",
             hostName = "ホスト名",
             isJoined = false,
@@ -153,8 +166,8 @@ private class TableSummaryCardRowPreviewParam :
         ),
         TableSummaryCardRowUiState(
             tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
-
             hostName = "ホスト名",
+            gameTypeTextResId = R.string.game_type_ring,
             blindText = "1/2",
             isJoined = true,
             playerSize = "1/10",

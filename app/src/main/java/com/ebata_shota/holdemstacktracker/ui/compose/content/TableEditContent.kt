@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
 import android.content.res.Configuration
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -42,6 +43,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState.BtnChosenUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.labelResId
+import com.ebata_shota.holdemstacktracker.ui.compose.parts.BlindTextLabel
 import com.ebata_shota.holdemstacktracker.ui.compose.row.PlayerEditRowUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.RadioButtonRow
 import com.ebata_shota.holdemstacktracker.ui.compose.row.UserEditRow
@@ -112,6 +114,28 @@ fun TableEditContent(
                             color = MaterialTheme.colorScheme.onSecondary
                         )
                     }
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.secondary,
+                                shape = RoundedCornerShape(8.dp),
+                            )
+                            .padding(vertical = 2.dp, horizontal = 8.dp),
+                        text = stringResource(uiState.gameTypeTextResId),
+                        color = MaterialTheme.colorScheme.onSecondary
+                    )
+
+                    BlindTextLabel(
+                        blindText = uiState.blindText,
+                        modifier = Modifier.padding(start = 4.dp)
+                    )
                 }
 
                 Row(
@@ -269,9 +293,13 @@ fun TableEditContent(
     }
 }
 
+
 data class TableEditContentUiState(
     val tableId: TableId,
     val tableStatus: TableStatus,
+    @StringRes
+    val gameTypeTextResId: Int,
+    val blindText: String,
     val playerSizeText: String,
     val playerEditRows: List<PlayerEditRowUiState>,
     val btnChosenUiStateList: List<BtnChosenUiState>,
@@ -299,6 +327,8 @@ private class PreviewParam : PreviewParameterProvider<TableEditContentUiState> {
         TableEditContentUiState(
             tableId = TableId("tableId"),
             tableStatus = TableStatus.PLAYING,
+            gameTypeTextResId = R.string.game_type_ring,
+            blindText = "100/200",
             playerSizeText = "5/10",
             playerEditRows = (0..4).map {
                 PlayerEditRowUiState(
@@ -315,6 +345,8 @@ private class PreviewParam : PreviewParameterProvider<TableEditContentUiState> {
         TableEditContentUiState(
             tableId = TableId("tableId"),
             tableStatus = TableStatus.PREPARING,
+            gameTypeTextResId = R.string.game_type_ring,
+            blindText = "1/2",
             playerSizeText = "2/10",
             playerEditRows = (0..1).map {
                 PlayerEditRowUiState(

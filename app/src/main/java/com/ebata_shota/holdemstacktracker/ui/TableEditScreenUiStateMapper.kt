@@ -3,6 +3,8 @@ package com.ebata_shota.holdemstacktracker.ui
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetDoubleToStringUseCase
+import com.ebata_shota.holdemstacktracker.infra.extension.blindText
+import com.ebata_shota.holdemstacktracker.infra.extension.gameTextResId
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.PlayerEditRowUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableEditScreenUiState
@@ -25,6 +27,8 @@ constructor(
             contentUiState = TableEditContentUiState(
                 tableId = table.id,
                 tableStatus = table.tableStatus,
+                gameTypeTextResId = table.rule.gameTextResId(),
+                blindText = table.rule.blindText(),
                 playerSizeText = "${table.playerOrder.size}/10", // FIXME: ハードコーディングしている
                 // プレイヤー一覧
                 playerEditRows = table.playerOrder.mapNotNull { playerId ->
