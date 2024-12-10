@@ -25,6 +25,7 @@ constructor(
             contentUiState = TableEditContentUiState(
                 tableId = table.id,
                 tableStatus = table.tableStatus,
+                playerSizeText = "${table.playerOrder.size}/10", // FIXME: ハードコーディングしている
                 // プレイヤー一覧
                 playerEditRows = table.playerOrder.mapNotNull { playerId ->
                     val player = table.basePlayers.find { it.id == playerId }

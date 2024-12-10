@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -113,13 +114,46 @@ fun TableEditContent(
                     }
                 }
 
-                Text(
-                    text = stringResource(R.string.member_title_label),
-                    style = MaterialTheme.typography.titleLarge,
+                Row(
                     modifier = Modifier
                         .padding(top = 16.dp)
-                        .padding(horizontal = SideSpace)
-                )
+                        .padding(horizontal = SideSpace),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.member_title_label),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+
+                    if (uiState.isEditable) {
+                        IconButton(
+                            modifier = Modifier
+                                .size(48.dp),
+                            onClick = onClickDeletePlayerButton
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "edit"
+                            )
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .weight(1.0f),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Person,
+                            contentDescription = "person_pin"
+                        )
+                        Text(
+                            style = MaterialTheme.typography.bodyMedium,
+                            text = uiState.playerSizeText
+                        )
+                    }
+                }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -142,19 +176,6 @@ fun TableEditContent(
                             .weight(1.0f)
                             .padding(vertical = 8.dp),
                     )
-
-                    if (uiState.isEditable) {
-                        IconButton(
-                            modifier = Modifier
-                                .size(48.dp),
-                            onClick = onClickDeletePlayerButton
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = "edit"
-                            )
-                        }
-                    }
                 }
 
                 Column(
@@ -251,6 +272,7 @@ fun TableEditContent(
 data class TableEditContentUiState(
     val tableId: TableId,
     val tableStatus: TableStatus,
+    val playerSizeText: String,
     val playerEditRows: List<PlayerEditRowUiState>,
     val btnChosenUiStateList: List<BtnChosenUiState>,
     val enableSubmitButton: Boolean,
@@ -277,6 +299,7 @@ private class PreviewParam : PreviewParameterProvider<TableEditContentUiState> {
         TableEditContentUiState(
             tableId = TableId("tableId"),
             tableStatus = TableStatus.PLAYING,
+            playerSizeText = "5/10",
             playerEditRows = (0..4).map {
                 PlayerEditRowUiState(
                     playerId = PlayerId("playerId$it"),
@@ -292,6 +315,7 @@ private class PreviewParam : PreviewParameterProvider<TableEditContentUiState> {
         TableEditContentUiState(
             tableId = TableId("tableId"),
             tableStatus = TableStatus.PREPARING,
+            playerSizeText = "2/10",
             playerEditRows = (0..1).map {
                 PlayerEditRowUiState(
                     playerId = PlayerId("playerId$it"),
