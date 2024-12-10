@@ -30,6 +30,7 @@ class TableCreatorActivity : ComponentActivity() {
     private fun navigateToGame(tableId: TableId) {
         val intent = TableEditActivity.intent(this, tableId)
         startActivity(intent)
+        finish()
     }
 
     companion object {
