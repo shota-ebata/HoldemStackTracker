@@ -17,9 +17,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.produceState
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,12 +37,13 @@ fun MainContent(
     modifier: Modifier = Modifier
 ) {
     val listState: LazyListState = rememberLazyListState()
+    val isScrollingUp: Boolean = listState.isScrollingUp().value
 
     Scaffold(
         modifier = modifier,
         floatingActionButton = {
             AnimatedVisibility(
-                visible = listState.isScrollingUp().value
+                visible = isScrollingUp
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
