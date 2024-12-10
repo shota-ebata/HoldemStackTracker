@@ -80,7 +80,7 @@ constructor(
                         stack = rule.defaultStack
                     )
                 ),
-                waitPlayers = emptyList(),
+                waitPlayerIds = emptyList(),
                 tableStatus = TableStatus.PREPARING,
                 startTime = null,
                 tableCreateTime = tableCreateTime,

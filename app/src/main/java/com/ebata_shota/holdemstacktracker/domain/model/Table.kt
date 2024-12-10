@@ -9,7 +9,7 @@ data class Table(
     val hostPlayerId: PlayerId,
     val rule: Rule,
     val basePlayers: List<PlayerBaseState>,
-    val waitPlayers: List<PlayerBaseState>,
+    val waitPlayerIds: List<PlayerId>,
     val playerOrder: List<PlayerId>,
     val btnPlayerId: PlayerId,
     val tableStatus: TableStatus,

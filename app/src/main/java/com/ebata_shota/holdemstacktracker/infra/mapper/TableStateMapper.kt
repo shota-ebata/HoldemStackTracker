@@ -28,7 +28,7 @@ constructor() {
         private const val RULE_BET_VIEW_MODE = "betViewMode"
         private const val RULE_DEFAULT_STACK = "defaultStack"
         private const val BASE_PLAYERS = "basePlayers"
-        private const val WAIT_PLAYERS = "waitPlayers"
+        private const val WAIT_PLAYER_IDS = "waitPlayerIds"
         private const val PLAYER_ID = "playerId"
         private const val PLAYER_NAME = "name"
         private const val PLAYER_STACK = "stack"
@@ -50,9 +50,7 @@ constructor() {
             hostPlayerId = PlayerId(tableMap[HOST_PLAYER_ID] as String),
             rule = mapToRuleState(tableMap[RULE] as Map<*, *>),
             basePlayers = mapToBasePlayers(tableMap[BASE_PLAYERS] as List<*>),
-            waitPlayers = (tableMap[WAIT_PLAYERS] as? List<*>)?.let {
-                mapToBasePlayers(it)
-            } ?: emptyList(),
+            waitPlayerIds = (tableMap[WAIT_PLAYER_IDS] as? List<*>)?.map { PlayerId(it as String) } ?: emptyList(),
             playerOrder = (tableMap[PLAYER_ORDER] as List<*>).map { PlayerId(it as String) },
             btnPlayerId = PlayerId(tableMap[BTN_PLAYER_ID] as String),
             tableStatus = TableStatus.of(tableMap[TABLE_STATUS] as String),
@@ -108,12 +106,8 @@ constructor() {
                 PLAYER_STACK to it.stack
             )
         },
-        WAIT_PLAYERS to table.waitPlayers.map {
-            hashMapOf(
-                PLAYER_ID to it.id.value,
-                PLAYER_NAME to it.name,
-                PLAYER_STACK to it.stack
-            )
+        WAIT_PLAYER_IDS to table.waitPlayerIds.map {
+            it.value
         },
         PLAYER_ORDER to table.playerOrder.map {
             it.value

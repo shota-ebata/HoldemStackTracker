@@ -35,20 +35,16 @@ constructor(
                     // ゲーム中以外のとき
                     val newBasePlayers = table.basePlayers.toMutableList()
                     val newPlayerOrder = table.playerOrder.toMutableList()
-                    val newWaitPlayers = table.waitPlayers.toMutableList()
-                    table.waitPlayers.forEach { waitPlayer ->
-                        if (table.playerOrder.none { it == waitPlayer.id }) {
-                            // waitのプレイヤーがnewPlayerOrderにいない場合
+                    val newWaitPlayerIds = table.waitPlayerIds.toMutableList()
+                    table.waitPlayerIds.forEach { waitPlayerId ->
+                        if (table.playerOrder.none { it == waitPlayerId }) {
+                            // waitのプレイヤーがplayerOrderにいない場合
                             if (newPlayerOrder.size < MAX_PLAYER_SIZE) {
                                 // 10人未満なら
                                 // orderに追加
-                                newPlayerOrder.add(waitPlayer.id)
-                                // baseに追加（必要なら）
-                                if (table.basePlayers.none { it.id == waitPlayer.id }) {
-                                    newBasePlayers.add(waitPlayer)
-                                }
+                                newPlayerOrder.add(waitPlayerId)
                                 // waitから削除
-                                newWaitPlayers.removeIf { it.id == waitPlayer.id }
+                                newWaitPlayerIds.removeIf { it == waitPlayerId }
                             }
                         }
                     }
@@ -56,26 +52,28 @@ constructor(
                         basePlayers = newBasePlayers,
                         playerOrder = newPlayerOrder,
                         // FIXME: 参加を制限する場合はすべて参加になるわけじゃなくなるので要調整
-                        waitPlayers = newWaitPlayers,
+                        waitPlayerIds = newWaitPlayerIds,
                     )
                 }
             }
         } else {
             // ホストじゃないとき
             if (
-                table.basePlayers.none { it.id == myPlayerId }
-                && table.waitPlayers.none { it.id == myPlayerId }
+                table.playerOrder.none { it == myPlayerId }
+                && table.waitPlayerIds.none { it == myPlayerId }
             ) {
-                // baseにもwaitにも自分がいないなら
+                // playerOrderにもwaitにも自分がいないなら
                 // waitに自分を追加
-                // baseへの追加はホストにやってもらう
-                val waitPlayers = table.waitPlayers + PlayerBaseState(
+                // playerOrderへの追加はホストにやってもらう
+                val newWaitPlayerIds = table.waitPlayerIds + myPlayerId
+                val newBasePlayers = table.basePlayers + PlayerBaseState(
                     id = myPlayerId,
                     name = myName,
                     stack = table.rule.defaultStack
                 )
                 newTable = table.copy(
-                    waitPlayers = waitPlayers
+                    basePlayers = newBasePlayers,
+                    waitPlayerIds = newWaitPlayerIds
                 )
             }
         }
