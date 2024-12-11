@@ -9,7 +9,7 @@ data class Game(
     val version: Long,
     val appVersion: Long,
     val players: List<GamePlayerState>,
-    val podStateList: List<PodState>,
+    val podList: List<Pod>,
     val phaseStateList: List<PhaseState>,
     val updateTime: Instant
 ) {

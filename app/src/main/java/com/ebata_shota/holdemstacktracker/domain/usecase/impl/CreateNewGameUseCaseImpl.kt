@@ -39,7 +39,7 @@ constructor(
                     )
                 }
             },
-            podStateList = emptyList(),
+            podList = emptyList(),
             phaseStateList = listOf(PhaseState.Standby),
             updateTime = updateTime
         )

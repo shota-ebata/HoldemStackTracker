@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.model
 
-data class PodState(
+data class Pod(
     val id: Long,
     val podNumber: Long,
     val podSize: Double,

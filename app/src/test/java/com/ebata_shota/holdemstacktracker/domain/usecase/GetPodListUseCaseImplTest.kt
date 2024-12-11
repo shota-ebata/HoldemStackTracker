@@ -1,13 +1,13 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.PodState
+import com.ebata_shota.holdemstacktracker.domain.model.Pod
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPodStateListUseCaseImpl
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class GetPodStateListUseCaseImplTest {
+class GetPodListUseCaseImplTest {
     private lateinit var usecase: GetPodStateListUseCaseImpl
 
     @Before
@@ -17,15 +17,15 @@ class GetPodStateListUseCaseImplTest {
 
     private fun executeAndAssert(
         pendingBetPerPlayer: Map<PlayerId, Double>,
-        expectedList: List<PodState>
+        expectedList: List<Pod>
     ) {
         // execute
-        val updatedPodStateList: List<PodState> = usecase.invoke(
-            podStateList = emptyList(),
+        val updatedPodList: List<Pod> = usecase.invoke(
+            podList = emptyList(),
             pendingBetPerPlayer = pendingBetPerPlayer
         )
         // テスト用にIDを0に上書き
-        val actualList = updatedPodStateList.map { it.copy(id = 0L) }
+        val actualList = updatedPodList.map { it.copy(id = 0L) }
         // assert
         actualList.zip(expectedList) { actual, expected ->
             assertEquals(expected, actual)
@@ -40,7 +40,7 @@ class GetPodStateListUseCaseImplTest {
             PlayerId("2") to 200.0,
         )
         val expectedList = listOf(
-            PodState(
+            Pod(
                 id = 0L,
                 podNumber = 0L,
                 podSize = 600.0,
@@ -63,7 +63,7 @@ class GetPodStateListUseCaseImplTest {
             PlayerId("2") to 100.0,
         )
         val expectedList = listOf(
-            PodState(
+            Pod(
                 id = 0L,
                 podNumber = 0L,
                 podSize = 300.0,
@@ -74,7 +74,7 @@ class GetPodStateListUseCaseImplTest {
                 ),
                 isClosed = true
             ),
-            PodState(
+            Pod(
                 id = 0L,
                 podNumber = 1L,
                 podSize = 200.0,
@@ -96,7 +96,7 @@ class GetPodStateListUseCaseImplTest {
             PlayerId("2") to 300.0,
         )
         val expectedList = listOf(
-            PodState(
+            Pod(
                 id = 0L,
                 podNumber = 0L,
                 podSize = 300.0,
@@ -107,7 +107,7 @@ class GetPodStateListUseCaseImplTest {
                 ),
                 isClosed = true
             ),
-            PodState(
+            Pod(
                 id = 0L,
                 podNumber = 1L,
                 podSize = 200.0,
@@ -117,7 +117,7 @@ class GetPodStateListUseCaseImplTest {
                 ),
                 isClosed = true
             ),
-            PodState(
+            Pod(
                 id = 0L,
                 podNumber = 2L,
                 podSize = 100.0,

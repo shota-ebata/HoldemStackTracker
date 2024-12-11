@@ -8,7 +8,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.PodState
+import com.ebata_shota.holdemstacktracker.domain.model.Pod
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
@@ -85,8 +85,8 @@ constructor(
                 actionStateList = latestPhase.actionStateList
             )
             // ベット状況をポッドに反映
-            val updatedPodStateList: List<PodState> = getPodStateList.invoke(
-                podStateList = latestGame.podStateList,
+            val updatedPodList: List<Pod> = getPodStateList.invoke(
+                podList = latestGame.podList,
                 pendingBetPerPlayer = pendingBetPerPlayer
             )
             // フェーズを進める
@@ -100,7 +100,7 @@ constructor(
                 version = latestGame.version + 1L,
                 players = updatedPlayers,
                 phaseStateList = updatedPhaseStateList,
-                podStateList = updatedPodStateList,
+                podList = updatedPodList,
             )
         }
     }
