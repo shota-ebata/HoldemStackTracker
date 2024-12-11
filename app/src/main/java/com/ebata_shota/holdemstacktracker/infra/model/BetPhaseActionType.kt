@@ -5,7 +5,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.ActionState
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 
 @Keep
-enum class BetPhaseAction {
+enum class BetPhaseActionType {
     Blind,
     Fold,
     Check,
@@ -18,12 +18,12 @@ enum class BetPhaseAction {
 
     companion object {
 
-        fun of(label: String): BetPhaseAction {
+        fun of(label: String): BetPhaseActionType {
             return entries.find { it.name == label }
                 ?: throw IllegalArgumentException("Unsupported label= $label")
         }
 
-        fun of(actionState: ActionState): BetPhaseAction {
+        fun of(actionState: ActionState): BetPhaseActionType {
             return when (actionState) {
                 is BetPhaseActionState.Blind -> Blind
                 is BetPhaseActionState.Fold -> Fold

@@ -7,7 +7,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pod
-import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseAction
+import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType
 import com.ebata_shota.holdemstacktracker.infra.model.PhaseType
 import java.time.Instant
 import javax.inject.Inject
@@ -76,16 +76,16 @@ constructor() {
             val playerId = PlayerId(it[PHASE_ACTION_PLAYER_ID] as String)
             val actionType = it[PHASE_ACTION_ACTION_TYPE] as String
             val betSize = it[PHASE_ACTION_BET_SIZE]?.getDouble()
-            when(BetPhaseAction.of(actionType)) {
-                BetPhaseAction.Blind -> BetPhaseActionState.Blind(playerId = playerId, betSize = betSize!!)
-                BetPhaseAction.Fold -> BetPhaseActionState.Fold(playerId = playerId)
-                BetPhaseAction.Check -> BetPhaseActionState.Check(playerId = playerId)
-                BetPhaseAction.Call -> BetPhaseActionState.Call(playerId = playerId, betSize = betSize!!)
-                BetPhaseAction.Bet -> BetPhaseActionState.Bet(playerId = playerId, betSize = betSize!!)
-                BetPhaseAction.Raise -> BetPhaseActionState.Raise(playerId = playerId, betSize = betSize!!)
-                BetPhaseAction.AllIn -> BetPhaseActionState.AllIn(playerId = playerId, betSize = betSize!!)
-                BetPhaseAction.AllInSkip -> BetPhaseActionState.AllInSkip(playerId = playerId)
-                BetPhaseAction.FoldSkip -> BetPhaseActionState.FoldSkip(playerId = playerId)
+            when(BetPhaseActionType.of(actionType)) {
+                BetPhaseActionType.Blind -> BetPhaseActionState.Blind(playerId = playerId, betSize = betSize!!)
+                BetPhaseActionType.Fold -> BetPhaseActionState.Fold(playerId = playerId)
+                BetPhaseActionType.Check -> BetPhaseActionState.Check(playerId = playerId)
+                BetPhaseActionType.Call -> BetPhaseActionState.Call(playerId = playerId, betSize = betSize!!)
+                BetPhaseActionType.Bet -> BetPhaseActionState.Bet(playerId = playerId, betSize = betSize!!)
+                BetPhaseActionType.Raise -> BetPhaseActionState.Raise(playerId = playerId, betSize = betSize!!)
+                BetPhaseActionType.AllIn -> BetPhaseActionState.AllIn(playerId = playerId, betSize = betSize!!)
+                BetPhaseActionType.AllInSkip -> BetPhaseActionState.AllInSkip(playerId = playerId)
+                BetPhaseActionType.FoldSkip -> BetPhaseActionState.FoldSkip(playerId = playerId)
             }
         }
     }
@@ -152,7 +152,7 @@ constructor() {
 
     private fun mapAction(betPhaseActionState: ActionState) = listOfNotNull(
         PHASE_ACTION_PLAYER_ID to betPhaseActionState.playerId.value,
-        PHASE_ACTION_ACTION_TYPE to BetPhaseAction.of(betPhaseActionState).name,
+        PHASE_ACTION_ACTION_TYPE to BetPhaseActionType.of(betPhaseActionState).name,
         if (betPhaseActionState is BetPhaseActionState.BetAction) {
             PHASE_ACTION_BET_SIZE to betPhaseActionState.betSize
         } else {
