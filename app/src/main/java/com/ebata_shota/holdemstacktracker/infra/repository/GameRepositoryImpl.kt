@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.infra.repository
 
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
+import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundGameException
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
@@ -14,9 +15,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,40 +36,54 @@ constructor(
         "games"
     )
 
-    private val _gameFlow = MutableSharedFlow<Game>()
-    override val gameFlow: Flow<Game> = _gameFlow.asSharedFlow()
+    private val _gameStateFlow = MutableStateFlow<Result<Game>?>(null)
+    override val gameStateFlow: StateFlow<Result<Game>?> = _gameStateFlow.asStateFlow()
 
     private var collectGameJob: Job? = null
+    var currentTableId: TableId? = null
 
     override fun startCollectGameFlow(tableId: TableId) {
+        if (currentTableId == tableId) {
+            // 同じテーブルだった場合はすでに監視中なので無視
+            return
+        }
         stopCollectGameFlow()
+        currentTableId = tableId
         collectGameJob = appCoroutineScope.launch {
-            val flow = callbackFlow {
-                val listener = object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.exists()) {
-                            val gameMap: Map<*, *> = snapshot.value as Map<*, *>
-                            val game = gameMapper.mapToGame(gameMap)
-                            trySend(game)
-                        }
-                    }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        println("Failed to read game data: ${error.message}")
-                    }
+            firebaseDatabaseGameFlow(tableId)
+                .collect { gameResult ->
+                    _gameStateFlow.update { gameResult }
                 }
-                gamesRef.child(tableId.value).addValueEventListener(listener)
+        }
+    }
 
-                awaitClose {
-                    gamesRef.child(tableId.value).removeEventListener(listener)
+    private fun firebaseDatabaseGameFlow(tableId: TableId): Flow<Result<Game>> = callbackFlow {
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val gameMap: Map<*, *> = snapshot.value as Map<*, *>
+                    val game = gameMapper.mapToGame(gameMap)
+                    trySend(Result.success(game))
+                } else {
+                    trySend(Result.failure(NotFoundGameException()))
                 }
             }
-            flow.collect(_gameFlow)
+
+            override fun onCancelled(error: DatabaseError) {
+                println("Failed to read game data: ${error.message}")
+            }
+        }
+        gamesRef.child(tableId.value).addValueEventListener(listener)
+
+        awaitClose {
+            gamesRef.child(tableId.value).removeEventListener(listener)
         }
     }
 
     override fun stopCollectGameFlow() {
         collectGameJob?.cancel()
+        collectGameJob = null
+        currentTableId = null
     }
 
     /**

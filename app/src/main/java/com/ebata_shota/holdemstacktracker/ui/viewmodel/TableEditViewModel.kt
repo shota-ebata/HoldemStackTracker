@@ -17,14 +17,12 @@ import com.ebata_shota.holdemstacktracker.domain.model.MovePosition
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
@@ -68,9 +66,6 @@ constructor(
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val qrBitmapRepository: QrBitmapRepository,
     private val prefRepository: PrefRepository,
-    private val getNextGame: GetNextGameUseCase,
-    private val isActionRequired: IsActionRequiredUseCase,
-    private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
     private val joinTable: JoinTableUseCase,
     private val createNewGame: CreateNewGameUseCase,
     private val movePositionUseCase: MovePositionUseCase,
@@ -100,8 +95,9 @@ constructor(
     }
 
     // Tableの状態を保持
-    private val tableStateFlow: StateFlow<Table?> = tableRepository.tableFlow
-        .map { it.getOrNull() }
+    private val tableStateFlow: StateFlow<Table?> = tableRepository.tableStateFlow
+        .map { it?.getOrNull() }
+        .filterNotNull()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Lazily,
@@ -122,9 +118,20 @@ constructor(
                 firebaseAuthRepository.myPlayerIdFlow,
                 selectedBtnPlayerId,
                 qrPainterStateFlow.filterNotNull(),
-            ) { tableState, myPlayerId, selectedBtnPlayerId, _ ->
-                uiStateMapper.createUiState(tableState, myPlayerId, selectedBtnPlayerId)
-            }.collect(_uiState)
+            ) { table, myPlayerId, selectedBtnPlayerId, _ ->
+                if (
+                    table.tableStatus == TableStatus.PLAYING
+                    && table.playerOrder.any { it == myPlayerId }
+                ) {
+                    // ゲーム中かつplayerOrderに自分が含まれているなら
+                    // ゲーム画面に遷移
+                    navigateToGame(table.id)
+                } else {
+                    _uiState.update {
+                        uiStateMapper.createUiState(table, myPlayerId, selectedBtnPlayerId)
+                    }
+                }
+            }.collect()
         }
 
         // 参加プレイヤーに自分が入るための監視
@@ -164,8 +171,8 @@ constructor(
 
         // Table取得の例外を監視する
         viewModelScope.launch {
-            tableRepository.tableFlow.collect { result ->
-                val throwable = result.exceptionOrNull()
+            tableRepository.tableStateFlow.collect { result ->
+                val throwable = result?.exceptionOrNull()
                 throwable?.let {
                     showErrorDialog(it)
                 }
@@ -483,8 +490,11 @@ constructor(
             }
             val newTable = table.copy(btnPlayerId = btnPlayerId)
             createNewGame.invoke(newTable)
-            _navigateEvent.emit(Navigate.Game(table.id))
         }
+    }
+
+    private suspend fun navigateToGame(tableId: TableId) {
+        _navigateEvent.emit(Navigate.Game(tableId))
     }
 
     companion object {

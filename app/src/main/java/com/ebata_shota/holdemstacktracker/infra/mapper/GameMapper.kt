@@ -2,8 +2,8 @@ package com.ebata_shota.holdemstacktracker.infra.mapper
 
 import com.ebata_shota.holdemstacktracker.domain.model.ActionState
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
-import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
 import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.PodState
@@ -44,7 +44,9 @@ constructor() {
             version = gameMap[GAME_VERSION] as Long,
             appVersion = gameMap[APP_VERSION] as Long,
             players = mapToGamePlayerStateList(gameMap[PLAYERS] as List<*>),
-            podStateList = mapToPodStateList(gameMap[PODS] as List<*>),
+            podStateList = (gameMap[PODS] as? List<*>)?.let {
+                mapToPodStateList(it)
+            } ?: emptyList(),
             phaseStateList = mapToPhaseStateList(gameMap[PHASES] as List<*>),
             updateTime = Instant.ofEpochMilli(gameMap[UPDATE_TIME] as Long)
         )
@@ -125,7 +127,7 @@ constructor() {
     ): HashMap<String, Any> = hashMapOf(
         GAME_VERSION to newGame.version,
         APP_VERSION to newGame.appVersion,
-        UPDATE_TIME to newGame.updateTime,
+        UPDATE_TIME to newGame.updateTime.toEpochMilli(),
         PLAYERS to mapPlayers(newGame.players),
         PODS to mapPods(newGame.podStateList),
         PHASES to mapPhases(newGame.phaseStateList)

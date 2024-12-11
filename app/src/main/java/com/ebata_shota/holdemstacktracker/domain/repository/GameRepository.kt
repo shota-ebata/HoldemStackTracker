@@ -2,10 +2,10 @@ package com.ebata_shota.holdemstacktracker.domain.repository
 
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface GameRepository {
-    val gameFlow: Flow<Game>
+    val gameStateFlow: StateFlow<Result<Game>?>
 
     suspend fun sendGame(
         tableId: TableId,

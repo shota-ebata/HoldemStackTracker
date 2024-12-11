@@ -4,10 +4,10 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 
 interface TableRepository {
-    val tableFlow: SharedFlow<Result<Table>>
+    val tableStateFlow: StateFlow<Result<Table>?>
 
     val currentTableId: TableId?
 

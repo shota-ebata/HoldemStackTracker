@@ -1,6 +1,5 @@
 package com.ebata_shota.holdemstacktracker.infra.repository
 
-import android.util.Log
 import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherIO
@@ -26,9 +25,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -54,8 +53,8 @@ constructor(
         "tables"
     )
 
-    private val _tableFlow = MutableSharedFlow<Result<Table>>()
-    override val tableFlow: SharedFlow<Result<Table>> = _tableFlow.asSharedFlow()
+    private val _tableStateFlow = MutableStateFlow<Result<Table>?>(null)
+    override val tableStateFlow: StateFlow<Result<Table>?> = _tableStateFlow.asStateFlow()
 
     override suspend fun createNewTable(
         tableId: TableId,
@@ -95,6 +94,10 @@ constructor(
         private set
 
     override fun startCollectTableFlow(tableId: TableId) {
+        if (currentTableId == tableId) {
+            // 同じテーブルだった場合はすでに監視中なので無視
+            return
+        }
         stopCollectTableFlow()
         currentTableId = tableId
         collectTableJob = appCoroutineScope.launch {
@@ -105,11 +108,13 @@ constructor(
                     when {
                         table != null -> {
                             tableSummaryRepository.saveTable(table)
-                            _tableFlow.emit(Result.success(table))
+                            // FIXME: 無駄にResultに再ラップしているので修正したい
+                            _tableStateFlow.emit(Result.success(table))
                         }
 
                         exception != null -> {
-                            _tableFlow.emit(Result.failure(exception))
+                            // FIXME: 無駄にResultに再ラップしているので修正したい
+                            _tableStateFlow.emit(Result.failure(exception))
                         }
                     }
                 }
