@@ -19,12 +19,8 @@ constructor(
         val removedPlayerOrder = currentTable.playerOrder.filterNot { playerId ->
             removePlayerIds.any { it == playerId }
         }
-        val copiedBasePlayers = currentTable.basePlayers.filterNot { player ->
-            removePlayerIds.any { it == player.id }
-        }
         val copiedTable = currentTable.copy(
             playerOrder = removedPlayerOrder,
-            basePlayers = copiedBasePlayers,
             updateTime = Instant.now(),
             version = currentTable.version + 1
         )

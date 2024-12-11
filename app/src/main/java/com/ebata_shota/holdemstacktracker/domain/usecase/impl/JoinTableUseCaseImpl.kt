@@ -66,11 +66,15 @@ constructor(
                 // waitに自分を追加
                 // playerOrderへの追加はホストにやってもらう
                 val newWaitPlayerIds = table.waitPlayerIds + myPlayerId
-                val newBasePlayers = table.basePlayers + PlayerBaseState(
-                    id = myPlayerId,
-                    name = myName,
-                    stack = table.rule.defaultStack
-                )
+                var newBasePlayers = table.basePlayers
+                if (table.basePlayers.none { it.id == myPlayerId }) {
+                    // basePlayersに自分がいないなら追加
+                    newBasePlayers = table.basePlayers + PlayerBaseState(
+                        id = myPlayerId,
+                        name = myName,
+                        stack = table.rule.defaultStack
+                    )
+                }
                 newTable = table.copy(
                     basePlayers = newBasePlayers,
                     waitPlayerIds = newWaitPlayerIds
