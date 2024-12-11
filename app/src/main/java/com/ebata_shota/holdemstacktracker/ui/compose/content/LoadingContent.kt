@@ -40,7 +40,7 @@ fun LoadingContent(
     name = "Dark Mode"
 )
 @Composable
-fun LoadingContentPreview() {
+private fun LoadingContentPreview() {
     HoldemStackTrackerTheme {
         LoadingContent()
     }
