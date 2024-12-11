@@ -8,7 +8,7 @@ import org.junit.Before
 import org.junit.Test
 
 
-class GetLatestBetPhaseUseCaseImplTest {
+class GetLatestBetPhaseTypeUseCaseImplTest {
     private lateinit var usecase: GetLatestBetPhaseUseCaseImpl
 
     @Before

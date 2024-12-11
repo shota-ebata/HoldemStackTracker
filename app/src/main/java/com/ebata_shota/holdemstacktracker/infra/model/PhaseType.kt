@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 
 @Keep
-enum class Phase {
+enum class PhaseType {
     Standby,
     PreFlop,
     Flop,
@@ -17,12 +17,12 @@ enum class Phase {
 
     companion object {
 
-        fun of(label: String): Phase {
+        fun of(label: String): PhaseType {
             return entries.find { it.name == label }
                 ?: throw IllegalArgumentException("Unsupported label= $label")
         }
 
-        fun of(phaseState: PhaseState): Phase{
+        fun of(phaseState: PhaseState): PhaseType{
             return when (phaseState) {
                 is PhaseState.Standby -> Standby
                 is PhaseState.PreFlop -> PreFlop

@@ -8,7 +8,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pod
 import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseAction
-import com.ebata_shota.holdemstacktracker.infra.model.Phase
+import com.ebata_shota.holdemstacktracker.infra.model.PhaseType
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -56,16 +56,16 @@ constructor() {
         return phases.map { it as Map<*, *> }.map {
             val phaseType = it[PHASE_TYPE] as String
             val actions = it[PHASE_ACTIONS] as? List<*>
-            when (Phase.of(phaseType)) {
-                Phase.Standby -> PhaseState.Standby
-                Phase.PreFlop -> PhaseState.PreFlop(actionStateList = mapToActionStateList(actions!!))
-                Phase.Flop -> PhaseState.Flop(actionStateList = mapToActionStateList(actions!!))
-                Phase.Turn -> PhaseState.Turn(actionStateList = mapToActionStateList(actions!!))
-                Phase.River ->  PhaseState.River(actionStateList = mapToActionStateList(actions!!))
-                Phase.ShowDown -> PhaseState.ShowDown
-                Phase.AllInOpen -> PhaseState.AllInOpen
-                Phase.PotSettlement -> PhaseState.PotSettlement
-                Phase.End -> PhaseState.End
+            when (PhaseType.of(phaseType)) {
+                PhaseType.Standby -> PhaseState.Standby
+                PhaseType.PreFlop -> PhaseState.PreFlop(actionStateList = mapToActionStateList(actions!!))
+                PhaseType.Flop -> PhaseState.Flop(actionStateList = mapToActionStateList(actions!!))
+                PhaseType.Turn -> PhaseState.Turn(actionStateList = mapToActionStateList(actions!!))
+                PhaseType.River ->  PhaseState.River(actionStateList = mapToActionStateList(actions!!))
+                PhaseType.ShowDown -> PhaseState.ShowDown
+                PhaseType.AllInOpen -> PhaseState.AllInOpen
+                PhaseType.PotSettlement -> PhaseState.PotSettlement
+                PhaseType.End -> PhaseState.End
             }
 
         }
@@ -138,7 +138,7 @@ constructor() {
     }.toMap()
 
     private fun mapPhase(phaseState: PhaseState) = listOfNotNull(
-        PHASE_TYPE to Phase.of(phaseState).name,
+        PHASE_TYPE to PhaseType.of(phaseState).name,
         if (phaseState is PhaseState.BetPhase) {
             PHASE_ACTIONS to mapActions(phaseState.actionStateList)
         } else {

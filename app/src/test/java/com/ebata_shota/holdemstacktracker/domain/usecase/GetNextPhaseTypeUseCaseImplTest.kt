@@ -16,7 +16,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActio
 import org.junit.Before
 import org.junit.Test
 
-class GetNextPhaseUseCaseImplTest {
+class GetNextPhaseTypeUseCaseImplTest {
     private lateinit var usecase: GetNextPhaseUseCaseImpl
 
     @Before
