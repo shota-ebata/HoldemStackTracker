@@ -5,8 +5,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.ActionState
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
 import com.ebata_shota.holdemstacktracker.domain.model.Game
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.BetPhase
+import com.ebata_shota.holdemstacktracker.domain.model.Phase
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pod
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
@@ -48,15 +48,15 @@ constructor(
         val latestPhase: BetPhase = getLatestBetPhase.invoke(latestGame)
         // まずはActionを追加
         val updatedActionStateList = latestPhase.actionStateList + action
-        val latestPhaseStateList: List<PhaseState> = latestGame.phaseStateList
+        val latestPhaseList: List<Phase> = latestGame.phaseList
         // PhaseListの最後の要素を置き換える
-        val updatedPhaseStateList: MutableList<PhaseState> = latestPhaseStateList.mapAtIndex(latestPhaseStateList.lastIndex) {
+        val updatedPhaseLists: MutableList<Phase> = latestPhaseList.mapAtIndex(latestPhaseList.lastIndex) {
             // Phaseに反映
             when (latestPhase) {
-                is PhaseState.PreFlop -> latestPhase.copy(actionStateList = updatedActionStateList)
-                is PhaseState.Flop -> latestPhase.copy(actionStateList = updatedActionStateList)
-                is PhaseState.Turn -> latestPhase.copy(actionStateList = updatedActionStateList)
-                is PhaseState.River -> latestPhase.copy(actionStateList = updatedActionStateList)
+                is Phase.PreFlop -> latestPhase.copy(actionStateList = updatedActionStateList)
+                is Phase.Flop -> latestPhase.copy(actionStateList = updatedActionStateList)
+                is Phase.Turn -> latestPhase.copy(actionStateList = updatedActionStateList)
+                is Phase.River -> latestPhase.copy(actionStateList = updatedActionStateList)
             }
         }.toMutableList()
         // プレイヤーのスタック更新
@@ -75,7 +75,7 @@ constructor(
             latestGame.copy(
                 version = latestGame.version + 1L,
                 players = updatedPlayers,
-                phaseStateList = updatedPhaseStateList
+                phaseList = updatedPhaseLists
             )
         } else {
             // もし全員のベットが揃った場合、ポッド更新してフェーズを進める
@@ -92,14 +92,14 @@ constructor(
             // フェーズを進める
             val nextPhase = getNextPhase.invoke(
                 playerOrder = latestGame.playerOrder,
-                phaseStateList = updatedPhaseStateList
+                phaseList = updatedPhaseLists
             )
-            updatedPhaseStateList += nextPhase
+            updatedPhaseLists += nextPhase
             // TableState更新
             latestGame.copy(
                 version = latestGame.version + 1L,
                 players = updatedPlayers,
-                phaseStateList = updatedPhaseStateList,
+                phaseList = updatedPhaseLists,
                 podList = updatedPodList,
             )
         }

@@ -2,7 +2,7 @@ package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState.*
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
+import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionsUseCaseImpl
 import org.junit.Assert.assertEquals
@@ -18,7 +18,7 @@ class GetPlayerLastActionsUseCaseImplTest {
     }
 
     private fun executeAndAssert(
-        phaseStateList: List<PhaseState>,
+        phaseList: List<Phase>,
         expected: Map<PlayerId, BetPhaseActionState?>
     ) {
         // execute
@@ -28,7 +28,7 @@ class GetPlayerLastActionsUseCaseImplTest {
                 PlayerId("1"),
                 PlayerId("2"),
             ),
-            phaseStateList = phaseStateList
+            phaseList = phaseList
         )
         // assert
         assertEquals(expected, actual)
@@ -37,23 +37,23 @@ class GetPlayerLastActionsUseCaseImplTest {
     @Test
     fun standby() {
         // prepare
-        val phaseStateList = listOf(
-            PhaseState.Standby,
+        val phaseList = listOf(
+            Phase.Standby,
         )
         val expected = mapOf<PlayerId, BetPhaseActionState?>(
             PlayerId("0") to null,
             PlayerId("1") to null,
             PlayerId("2") to null
         )
-        executeAndAssert(phaseStateList, expected)
+        executeAndAssert(phaseList, expected)
     }
 
     @Test
     fun preFlop_allCall() {
         // prepare
-        val phaseStateList = listOf(
-            PhaseState.Standby,
-            PhaseState.PreFlop(
+        val phaseLists = listOf(
+            Phase.Standby,
+            Phase.PreFlop(
                 actionStateList = listOf<BetPhaseActionState>(
                     Blind(playerId = PlayerId("0"), betSize = 100.0),
                     Blind(playerId = PlayerId("1"), betSize = 200.0),
@@ -67,15 +67,15 @@ class GetPlayerLastActionsUseCaseImplTest {
             PlayerId("1") to Blind(playerId = PlayerId("1"), betSize = 200.0),
             PlayerId("2") to Call(playerId = PlayerId("2"), betSize = 200.0),
         )
-        executeAndAssert(phaseStateList, expected)
+        executeAndAssert(phaseLists, expected)
     }
 
     @Test
     fun preFlop_allFold() {
         // prepare
-        val phaseStateList = listOf(
-            PhaseState.Standby,
-            PhaseState.PreFlop(
+        val phaseLists = listOf(
+            Phase.Standby,
+            Phase.PreFlop(
                 actionStateList = listOf(
                     Blind(playerId = PlayerId("0"), betSize = 100.0),
                     Blind(playerId = PlayerId("1"), betSize = 200.0),
@@ -89,15 +89,15 @@ class GetPlayerLastActionsUseCaseImplTest {
             PlayerId("1") to Blind(playerId = PlayerId("1"), betSize = 200.0),
             PlayerId("2") to Fold(playerId = PlayerId("2")),
         )
-        executeAndAssert(phaseStateList, expected)
+        executeAndAssert(phaseLists, expected)
     }
 
     @Test
     fun preFlop_2AllIn_1Fold() {
         // prepare
-        val phaseStateList = listOf(
-            PhaseState.Standby,
-            PhaseState.PreFlop(
+        val phaseLists = listOf(
+            Phase.Standby,
+            Phase.PreFlop(
                 actionStateList = listOf(
                     Blind(playerId = PlayerId("0"), betSize = 100.0),
                     Blind(playerId = PlayerId("1"), betSize = 200.0),
@@ -112,6 +112,6 @@ class GetPlayerLastActionsUseCaseImplTest {
             PlayerId("1") to Fold(playerId = PlayerId("1")),
             PlayerId("2") to AllIn(playerId = PlayerId("2"), betSize = 1000.0),
         )
-        executeAndAssert(phaseStateList, expected)
+        executeAndAssert(phaseLists, expected)
     }
 }

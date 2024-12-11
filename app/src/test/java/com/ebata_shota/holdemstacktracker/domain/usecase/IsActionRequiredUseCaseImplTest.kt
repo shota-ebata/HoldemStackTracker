@@ -2,7 +2,7 @@ package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.createDummyGame
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
+import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsActionRequiredUseCaseImpl
@@ -39,7 +39,7 @@ class IsActionRequiredUseCaseImplTest {
         )
         val latestGame = createDummyGame()
         val actionStateList = listOf<BetPhaseActionState>()
-        every { getLatestBetPhaseUseCase.invoke(latestGame) } returns PhaseState.PreFlop(
+        every { getLatestBetPhaseUseCase.invoke(latestGame) } returns Phase.PreFlop(
             actionStateList = actionStateList
         )
         every { getMaxBetSizeUseCase.invoke(any()) } returns 0.0

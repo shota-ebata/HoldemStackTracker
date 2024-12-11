@@ -1,7 +1,7 @@
 package com.ebata_shota.holdemstacktracker.infra.model
 
 import androidx.annotation.Keep
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
+import com.ebata_shota.holdemstacktracker.domain.model.Phase
 
 @Keep
 enum class PhaseType {
@@ -22,17 +22,17 @@ enum class PhaseType {
                 ?: throw IllegalArgumentException("Unsupported label= $label")
         }
 
-        fun of(phaseState: PhaseState): PhaseType{
-            return when (phaseState) {
-                is PhaseState.Standby -> Standby
-                is PhaseState.PreFlop -> PreFlop
-                is PhaseState.Flop -> Flop
-                is PhaseState.Turn -> Turn
-                is PhaseState.River -> River
-                is PhaseState.ShowDown -> ShowDown
-                is PhaseState.AllInOpen -> AllInOpen
-                is PhaseState.PotSettlement -> PotSettlement
-                is PhaseState.End -> End
+        fun of(phase: Phase): PhaseType{
+            return when (phase) {
+                is Phase.Standby -> Standby
+                is Phase.PreFlop -> PreFlop
+                is Phase.Flop -> Flop
+                is Phase.Turn -> Turn
+                is Phase.River -> River
+                is Phase.ShowDown -> ShowDown
+                is Phase.AllInOpen -> AllInOpen
+                is Phase.PotSettlement -> PotSettlement
+                is Phase.End -> End
             }
         }
     }

@@ -1,7 +1,7 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.BetPhase
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
 import com.ebata_shota.holdemstacktracker.domain.model.Game

@@ -3,7 +3,7 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
+import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
@@ -40,7 +40,7 @@ constructor(
                 }
             },
             podList = emptyList(),
-            phaseStateList = listOf(PhaseState.Standby),
+            phaseList = listOf(Phase.Standby),
             updateTime = updateTime
         )
         tableRepository.sendTable(

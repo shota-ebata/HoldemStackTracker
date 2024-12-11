@@ -2,7 +2,7 @@ package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.createDummyGame
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
+import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
@@ -63,7 +63,7 @@ class GetNextPlayerStackUseCaseImplTest {
         )
         coEvery { getNextGamePlayerStateListUseCase.invoke(any(), any(), any()) } returns mockNextPlayerStateListResult
 
-        val mockLatestBetPhaseResult = PhaseState.PreFlop(
+        val mockLatestBetPhaseResult = Phase.PreFlop(
             actionStateList = listOf<BetPhaseActionState>()
         )
         every { getLatestBetPhaseUseCase.invoke(any()) } returns mockLatestBetPhaseResult
@@ -74,8 +74,8 @@ class GetNextPlayerStackUseCaseImplTest {
         every { getPendingBetPerPlayerUseCase.invoke(any(), any()) } returns mockPendingBetPerPlayerResult
 
         val latestGame = createDummyGame(
-            phaseStateList = listOf(
-                PhaseState.PreFlop(actionStateList = emptyList())
+            phaseList = listOf(
+                Phase.PreFlop(actionStateList = emptyList())
             )
         )
         val action = BetPhaseActionState.Blind(playerId = PlayerId("0"), betSize = 100.0)

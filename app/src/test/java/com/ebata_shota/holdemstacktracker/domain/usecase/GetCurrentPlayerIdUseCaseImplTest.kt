@@ -5,7 +5,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState.Blind
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState.Call
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
+import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
@@ -30,7 +30,7 @@ class GetCurrentPlayerIdUseCaseImplTest {
     @Test
     fun getCurrentPlayerId_call_getLatestBetPhase() {
         val getLatestBetPhaseMock = mockk<GetLatestBetPhaseUseCaseImpl>()
-        every { getLatestBetPhaseMock.invoke(any()) } returns (PhaseState.PreFlop(actionStateList = emptyList()))
+        every { getLatestBetPhaseMock.invoke(any()) } returns (Phase.PreFlop(actionStateList = emptyList()))
         usecase = GetCurrentPlayerIdUseCaseImpl(
             getLatestBetPhase = getLatestBetPhaseMock
         )
@@ -81,9 +81,9 @@ class GetCurrentPlayerIdUseCaseImplTest {
                     isLeaved = false
                 )
             ),
-            phaseStateList = listOf(
-                PhaseState.Standby,
-                PhaseState.PreFlop(
+            phaseList = listOf(
+                Phase.Standby,
+                Phase.PreFlop(
                     actionStateList = actionStateList
                 )
             )

@@ -1,17 +1,17 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.AllInOpen
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.BetPhase
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.End
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.Flop
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.PotSettlement
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.PreFlop
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.River
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.ShowDown
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.Standby
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseState.Turn
+import com.ebata_shota.holdemstacktracker.domain.model.Phase
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.AllInOpen
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.End
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.Flop
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.PotSettlement
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.PreFlop
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.River
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.ShowDown
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.Standby
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.Turn
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
@@ -24,11 +24,11 @@ constructor(
 ) : GetNextPhaseUseCase {
     override fun invoke(
         playerOrder: List<PlayerId>,
-        phaseStateList: List<PhaseState>
-    ): PhaseState {
-        return when (val latestPhase: PhaseState? = phaseStateList.lastOrNull()) {
+        phaseList: List<Phase>
+    ): Phase {
+        return when (val latestPhase: Phase? = phaseList.lastOrNull()) {
             is Standby -> PreFlop(actionStateList = emptyList())
-            is BetPhase -> getNextPhaseStateFromBetPhase(playerOrder, phaseStateList, latestPhase)
+            is BetPhase -> getNextPhaseStateFromBetPhase(playerOrder, phaseList, latestPhase)
             is AllInOpen -> PotSettlement
             is ShowDown -> PotSettlement
             is PotSettlement -> End
@@ -42,11 +42,11 @@ constructor(
 
     private fun getNextPhaseStateFromBetPhase(
         playerOrder: List<PlayerId>,
-        phaseStateList: List<PhaseState>,
+        phaseList: List<Phase>,
         latestPhase: BetPhase
-    ): PhaseState {
+    ): Phase {
         // プレイヤーそれぞれの最後のAction
-        val lastActions: Map<PlayerId, BetPhaseActionState?> = getPlayerLastActions.invoke(playerOrder, phaseStateList)
+        val lastActions: Map<PlayerId, BetPhaseActionState?> = getPlayerLastActions.invoke(playerOrder, phaseList)
         // 降りてないプレイヤー人数
         val activePlayerCount = lastActions.count { (_, lastAction) ->
             lastAction !is BetPhaseActionState.FoldSkip && lastAction !is BetPhaseActionState.Fold
