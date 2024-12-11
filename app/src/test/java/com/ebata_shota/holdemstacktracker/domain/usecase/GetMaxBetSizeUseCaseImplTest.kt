@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
-import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import org.junit.Assert.assertEquals
@@ -29,10 +29,10 @@ class GetMaxBetSizeUseCaseImplTest {
     fun getMaxBetSize_all_check() {
         val actual = usecase.invoke(
             actionStateList = listOf(
-                BetPhaseActionState.Check(
+                BetPhaseAction.Check(
                     playerId = PlayerId("")
                 ),
-                BetPhaseActionState.Check(
+                BetPhaseAction.Check(
                     playerId = PlayerId("")
                 )
             )
@@ -42,33 +42,33 @@ class GetMaxBetSizeUseCaseImplTest {
     }
 
     private fun createFullActions() = listOf(
-        BetPhaseActionState.Blind(
+        BetPhaseAction.Blind(
             playerId = PlayerId(""),
             betSize = 100.0
         ),
-        BetPhaseActionState.Blind(
+        BetPhaseAction.Blind(
             playerId = PlayerId(""),
             betSize = 200.0
         ),
-        BetPhaseActionState.Call(
+        BetPhaseAction.Call(
             playerId = PlayerId(""),
             betSize = 200.0
         ),
-        BetPhaseActionState.Raise(
+        BetPhaseAction.Raise(
             playerId = PlayerId(""),
             betSize = 400.0
         ),
-        BetPhaseActionState.Fold(
+        BetPhaseAction.Fold(
             playerId = PlayerId("")
         ),
-        BetPhaseActionState.FoldSkip(
+        BetPhaseAction.FoldSkip(
             playerId = PlayerId("")
         ),
-        BetPhaseActionState.AllIn(
+        BetPhaseAction.AllIn(
             playerId = PlayerId(""),
             betSize = 1000.0
         ),
-        BetPhaseActionState.AllIn(
+        BetPhaseAction.AllIn(
             playerId = PlayerId(""),
             betSize = 900.0
         )

@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
-import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.AllInOpen
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
@@ -46,10 +46,10 @@ constructor(
         latestPhase: BetPhase
     ): Phase {
         // プレイヤーそれぞれの最後のAction
-        val lastActions: Map<PlayerId, BetPhaseActionState?> = getPlayerLastActions.invoke(playerOrder, phaseList)
+        val lastActions: Map<PlayerId, BetPhaseAction?> = getPlayerLastActions.invoke(playerOrder, phaseList)
         // 降りてないプレイヤー人数
         val activePlayerCount = lastActions.count { (_, lastAction) ->
-            lastAction !is BetPhaseActionState.FoldSkip && lastAction !is BetPhaseActionState.Fold
+            lastAction !is BetPhaseAction.FoldSkip && lastAction !is BetPhaseAction.Fold
         }
         // 降りてないプレイヤーが2人未満（基本的には、1人を除いてFoldしている状態）
         // の場合は決済フェーズへ
@@ -58,7 +58,7 @@ constructor(
         }
         // AllInプレイヤー人数
         val allInPlayerCount = lastActions.count { (_, lastAction) ->
-            lastAction is BetPhaseActionState.AllIn || lastAction is BetPhaseActionState.AllInSkip
+            lastAction is BetPhaseAction.AllIn || lastAction is BetPhaseAction.AllInSkip
         }
         // AllInプレイヤーだけが残っている場合は
         if (allInPlayerCount == activePlayerCount) {

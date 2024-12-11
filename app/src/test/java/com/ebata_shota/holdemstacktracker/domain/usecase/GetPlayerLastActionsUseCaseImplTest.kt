@@ -1,7 +1,7 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
-import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
-import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState.*
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction.*
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionsUseCaseImpl
@@ -19,7 +19,7 @@ class GetPlayerLastActionsUseCaseImplTest {
 
     private fun executeAndAssert(
         phaseList: List<Phase>,
-        expected: Map<PlayerId, BetPhaseActionState?>
+        expected: Map<PlayerId, BetPhaseAction?>
     ) {
         // execute
         val actual = usecase.invoke(
@@ -40,7 +40,7 @@ class GetPlayerLastActionsUseCaseImplTest {
         val phaseList = listOf(
             Phase.Standby,
         )
-        val expected = mapOf<PlayerId, BetPhaseActionState?>(
+        val expected = mapOf<PlayerId, BetPhaseAction?>(
             PlayerId("0") to null,
             PlayerId("1") to null,
             PlayerId("2") to null
@@ -54,7 +54,7 @@ class GetPlayerLastActionsUseCaseImplTest {
         val phaseLists = listOf(
             Phase.Standby,
             Phase.PreFlop(
-                actionStateList = listOf<BetPhaseActionState>(
+                actionStateList = listOf<BetPhaseAction>(
                     Blind(playerId = PlayerId("0"), betSize = 100.0),
                     Blind(playerId = PlayerId("1"), betSize = 200.0),
                     Call(playerId = PlayerId("2"), betSize = 200.0),
@@ -62,7 +62,7 @@ class GetPlayerLastActionsUseCaseImplTest {
                 )
             )
         )
-        val expected = mapOf<PlayerId, BetPhaseActionState?>(
+        val expected = mapOf<PlayerId, BetPhaseAction?>(
             PlayerId("0") to Call(playerId = PlayerId("0"), betSize = 200.0),
             PlayerId("1") to Blind(playerId = PlayerId("1"), betSize = 200.0),
             PlayerId("2") to Call(playerId = PlayerId("2"), betSize = 200.0),
@@ -84,7 +84,7 @@ class GetPlayerLastActionsUseCaseImplTest {
                 )
             )
         )
-        val expected = mapOf<PlayerId, BetPhaseActionState?>(
+        val expected = mapOf<PlayerId, BetPhaseAction?>(
             PlayerId("0") to Fold(playerId = PlayerId("0")),
             PlayerId("1") to Blind(playerId = PlayerId("1"), betSize = 200.0),
             PlayerId("2") to Fold(playerId = PlayerId("2")),
@@ -107,7 +107,7 @@ class GetPlayerLastActionsUseCaseImplTest {
                 )
             )
         )
-        val expected = mapOf<PlayerId, BetPhaseActionState?>(
+        val expected = mapOf<PlayerId, BetPhaseAction?>(
             PlayerId("0") to AllIn(playerId = PlayerId("0"), betSize = 1500.0),
             PlayerId("1") to Fold(playerId = PlayerId("1")),
             PlayerId("2") to AllIn(playerId = PlayerId("2"), betSize = 1000.0),

@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
-import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
@@ -13,7 +13,7 @@ constructor(
 ) : GetPendingBetPerPlayerUseCase {
     override fun invoke(
         playerOrder: List<PlayerId>,
-        actionStateList: List<BetPhaseActionState>
+        actionStateList: List<BetPhaseAction>
     ): Map<PlayerId, Double> {
         return playerOrder.associateWith { playerId ->
             // このフェーズでの、特定プレイヤーのアクション一覧を取得

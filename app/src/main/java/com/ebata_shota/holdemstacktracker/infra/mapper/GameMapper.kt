@@ -1,7 +1,7 @@
 package com.ebata_shota.holdemstacktracker.infra.mapper
 
-import com.ebata_shota.holdemstacktracker.domain.model.ActionState
-import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
+import com.ebata_shota.holdemstacktracker.domain.model.Action
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
@@ -71,21 +71,21 @@ constructor() {
         }
     }
 
-    private fun mapToActionStateList(actions: List<*>): List<BetPhaseActionState> {
+    private fun mapToActionStateList(actions: List<*>): List<BetPhaseAction> {
         return actions.map { it as Map<*, *> }.map {
             val playerId = PlayerId(it[PHASE_ACTION_PLAYER_ID] as String)
             val actionType = it[PHASE_ACTION_ACTION_TYPE] as String
             val betSize = it[PHASE_ACTION_BET_SIZE]?.getDouble()
             when(BetPhaseActionType.of(actionType)) {
-                BetPhaseActionType.Blind -> BetPhaseActionState.Blind(playerId = playerId, betSize = betSize!!)
-                BetPhaseActionType.Fold -> BetPhaseActionState.Fold(playerId = playerId)
-                BetPhaseActionType.Check -> BetPhaseActionState.Check(playerId = playerId)
-                BetPhaseActionType.Call -> BetPhaseActionState.Call(playerId = playerId, betSize = betSize!!)
-                BetPhaseActionType.Bet -> BetPhaseActionState.Bet(playerId = playerId, betSize = betSize!!)
-                BetPhaseActionType.Raise -> BetPhaseActionState.Raise(playerId = playerId, betSize = betSize!!)
-                BetPhaseActionType.AllIn -> BetPhaseActionState.AllIn(playerId = playerId, betSize = betSize!!)
-                BetPhaseActionType.AllInSkip -> BetPhaseActionState.AllInSkip(playerId = playerId)
-                BetPhaseActionType.FoldSkip -> BetPhaseActionState.FoldSkip(playerId = playerId)
+                BetPhaseActionType.Blind -> BetPhaseAction.Blind(playerId = playerId, betSize = betSize!!)
+                BetPhaseActionType.Fold -> BetPhaseAction.Fold(playerId = playerId)
+                BetPhaseActionType.Check -> BetPhaseAction.Check(playerId = playerId)
+                BetPhaseActionType.Call -> BetPhaseAction.Call(playerId = playerId, betSize = betSize!!)
+                BetPhaseActionType.Bet -> BetPhaseAction.Bet(playerId = playerId, betSize = betSize!!)
+                BetPhaseActionType.Raise -> BetPhaseAction.Raise(playerId = playerId, betSize = betSize!!)
+                BetPhaseActionType.AllIn -> BetPhaseAction.AllIn(playerId = playerId, betSize = betSize!!)
+                BetPhaseActionType.AllInSkip -> BetPhaseAction.AllInSkip(playerId = playerId)
+                BetPhaseActionType.FoldSkip -> BetPhaseAction.FoldSkip(playerId = playerId)
             }
         }
     }
@@ -146,15 +146,15 @@ constructor() {
         }
     ).toMap()
 
-    private fun mapActions(actionStateList: List<ActionState>) = actionStateList.mapIndexed { actionIndex, betPhaseActionState ->
+    private fun mapActions(actionList: List<Action>) = actionList.mapIndexed { actionIndex, betPhaseActionState ->
         actionIndex.toString() to mapAction(betPhaseActionState)
     }.toMap()
 
-    private fun mapAction(betPhaseActionState: ActionState) = listOfNotNull(
-        PHASE_ACTION_PLAYER_ID to betPhaseActionState.playerId.value,
-        PHASE_ACTION_ACTION_TYPE to BetPhaseActionType.of(betPhaseActionState).name,
-        if (betPhaseActionState is BetPhaseActionState.BetAction) {
-            PHASE_ACTION_BET_SIZE to betPhaseActionState.betSize
+    private fun mapAction(betPhaseAction: Action) = listOfNotNull(
+        PHASE_ACTION_PLAYER_ID to betPhaseAction.playerId.value,
+        PHASE_ACTION_ACTION_TYPE to BetPhaseActionType.of(betPhaseAction).name,
+        if (betPhaseAction is BetPhaseAction.BetAction) {
+            PHASE_ACTION_BET_SIZE to betPhaseAction.betSize
         } else {
             null
         }

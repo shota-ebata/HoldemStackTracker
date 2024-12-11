@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
-import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
@@ -20,7 +20,7 @@ constructor(
 ) : GetNextPlayerStackUseCase {
     override suspend fun invoke(
         latestGame: Game,
-        action: BetPhaseActionState
+        action: BetPhaseAction
     ): List<GamePlayerState> {
         // BetPhaseでしかActionはできないので
         val latestPhase: BetPhase = getLatestBetPhase.invoke(latestGame)

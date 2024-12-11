@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
-import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.AllInOpen
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.End
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.Flop
@@ -88,10 +88,10 @@ class GetNextPhaseTypeUseCaseImplTest {
             phaseList = listOf(
                 PreFlop(
                     actionStateList = listOf(
-                        BetPhaseActionState.Blind(playerId = PlayerId("0"), betSize = 100.0),
-                        BetPhaseActionState.Blind(playerId = PlayerId("1"), betSize = 100.0),
-                        BetPhaseActionState.Fold(playerId = PlayerId("2")),
-                        BetPhaseActionState.Fold(playerId = PlayerId("0")),
+                        BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100.0),
+                        BetPhaseAction.Blind(playerId = PlayerId("1"), betSize = 100.0),
+                        BetPhaseAction.Fold(playerId = PlayerId("2")),
+                        BetPhaseAction.Fold(playerId = PlayerId("0")),
                     )
                 )
             )
@@ -106,11 +106,11 @@ class GetNextPhaseTypeUseCaseImplTest {
             phaseList = listOf(
                 PreFlop(
                     actionStateList = listOf(
-                        BetPhaseActionState.Blind(playerId = PlayerId("0"), betSize = 100.0),
-                        BetPhaseActionState.Blind(playerId = PlayerId("1"), betSize = 100.0),
-                        BetPhaseActionState.Fold(playerId = PlayerId("2")),
-                        BetPhaseActionState.AllIn(playerId = PlayerId("0"), betSize = 1000.0),
-                        BetPhaseActionState.AllIn(playerId = PlayerId("1"), betSize = 1500.0),
+                        BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100.0),
+                        BetPhaseAction.Blind(playerId = PlayerId("1"), betSize = 100.0),
+                        BetPhaseAction.Fold(playerId = PlayerId("2")),
+                        BetPhaseAction.AllIn(playerId = PlayerId("0"), betSize = 1000.0),
+                        BetPhaseAction.AllIn(playerId = PlayerId("1"), betSize = 1500.0),
                     )
                 )
             )

@@ -1,8 +1,8 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
-import com.ebata_shota.holdemstacktracker.domain.model.ActionState
-import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
+import com.ebata_shota.holdemstacktracker.domain.model.Action
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
@@ -31,10 +31,10 @@ constructor(
 
     override suspend fun invoke(
         latestGame: Game,
-        action: ActionState
+        action: Action
     ): Game {
         when (action) {
-            is BetPhaseActionState -> {
+            is BetPhaseAction -> {
                 return getNextGameFromBetPhaseAction(latestGame, action)
             }
         }
@@ -42,7 +42,7 @@ constructor(
 
     private suspend fun getNextGameFromBetPhaseAction(
         latestGame: Game,
-        action: BetPhaseActionState
+        action: BetPhaseAction
     ): Game {
         // BetPhaseでしかActionはできないので
         val latestPhase: BetPhase = getLatestBetPhase.invoke(latestGame)

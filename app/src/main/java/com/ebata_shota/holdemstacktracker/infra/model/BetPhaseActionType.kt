@@ -1,8 +1,8 @@
 package com.ebata_shota.holdemstacktracker.infra.model
 
 import androidx.annotation.Keep
-import com.ebata_shota.holdemstacktracker.domain.model.ActionState
-import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
+import com.ebata_shota.holdemstacktracker.domain.model.Action
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 
 @Keep
 enum class BetPhaseActionType {
@@ -23,17 +23,17 @@ enum class BetPhaseActionType {
                 ?: throw IllegalArgumentException("Unsupported label= $label")
         }
 
-        fun of(actionState: ActionState): BetPhaseActionType {
-            return when (actionState) {
-                is BetPhaseActionState.Blind -> Blind
-                is BetPhaseActionState.Fold -> Fold
-                is BetPhaseActionState.Check -> Check
-                is BetPhaseActionState.Call -> Call
-                is BetPhaseActionState.Bet -> Bet
-                is BetPhaseActionState.Raise -> Raise
-                is BetPhaseActionState.AllIn -> AllIn
-                is BetPhaseActionState.AllInSkip -> AllInSkip
-                is BetPhaseActionState.FoldSkip -> FoldSkip
+        fun of(action: Action): BetPhaseActionType {
+            return when (action) {
+                is BetPhaseAction.Blind -> Blind
+                is BetPhaseAction.Fold -> Fold
+                is BetPhaseAction.Check -> Check
+                is BetPhaseAction.Call -> Call
+                is BetPhaseAction.Bet -> Bet
+                is BetPhaseAction.Raise -> Raise
+                is BetPhaseAction.AllIn -> AllIn
+                is BetPhaseAction.AllInSkip -> AllInSkip
+                is BetPhaseAction.FoldSkip -> FoldSkip
             }
         }
     }

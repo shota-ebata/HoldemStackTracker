@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
-import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseActionState
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
@@ -17,7 +17,7 @@ constructor(
      */
     override fun invoke(
         playerOrder: List<PlayerId>,
-        actionStateList: List<BetPhaseActionState>
+        actionStateList: List<BetPhaseAction>
     ): Boolean {
         // 全員の最後のアクションを一つづつ取得
         val playerOrderSize = playerOrder.size
@@ -32,14 +32,14 @@ constructor(
         return lastActionList.any { action ->
             when (action) {
                 // オールインはこれ以上アクションできない判断
-                is BetPhaseActionState.AllIn -> false
+                is BetPhaseAction.AllIn -> false
                 // AllIn以外のベットアクションでコールに必要なベットサイズと異なる場合は、アクションが必要
-                is BetPhaseActionState.BetAction -> action.betSize != callBetSize
+                is BetPhaseAction.BetAction -> action.betSize != callBetSize
                 // コールに必要なベットサイズが0.0より大きい場合checkでは不足している
-                is BetPhaseActionState.Check -> callBetSize > 0.0
-                is BetPhaseActionState.Fold -> false
-                is BetPhaseActionState.FoldSkip -> false
-                is BetPhaseActionState.AllInSkip -> false
+                is BetPhaseAction.Check -> callBetSize > 0.0
+                is BetPhaseAction.Fold -> false
+                is BetPhaseAction.FoldSkip -> false
+                is BetPhaseAction.AllInSkip -> false
             }
         }
     }
