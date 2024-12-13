@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.Instant
@@ -122,6 +123,7 @@ constructor(
     }
 
     override fun stopCollectTableFlow() {
+        _tableStateFlow.update { null }
         collectTableJob?.cancel()
         collectTableJob = null
         currentTableId = null
