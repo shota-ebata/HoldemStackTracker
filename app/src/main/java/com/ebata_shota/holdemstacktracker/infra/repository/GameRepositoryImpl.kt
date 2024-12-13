@@ -81,6 +81,7 @@ constructor(
     }
 
     override fun stopCollectGameFlow() {
+        _gameStateFlow.update { null }
         collectGameJob?.cancel()
         collectGameJob = null
         currentTableId = null
