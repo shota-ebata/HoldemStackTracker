@@ -11,7 +11,6 @@ import com.ebata_shota.holdemstacktracker.ui.viewmodel.GameViewModel
 
 @Composable
 fun GameScreen(
-    viewModel: GameViewModel = viewModel()
     viewModel: GameViewModel = hiltViewModel()
 ) {
     val screenUiState: GameScreenUiState by viewModel.screenUiState.collectAsStateWithLifecycle()
