@@ -6,19 +6,19 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
-import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableEditScreen
+import com.ebata_shota.holdemstacktracker.ui.compose.screen.TablePrepareScreen
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
-import com.ebata_shota.holdemstacktracker.ui.viewmodel.TableEditViewModel
+import com.ebata_shota.holdemstacktracker.ui.viewmodel.TablePrepareViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class TableEditActivity : ComponentActivity() {
+class TablePrepareActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             HoldemStackTrackerTheme {
-                TableEditScreen(
+                TablePrepareScreen(
                     navigateToBack = { finish() },
                     navigateToGameScreen = ::navigateToGameActivity
                 )
@@ -36,8 +36,8 @@ class TableEditActivity : ComponentActivity() {
         fun intent(
             context: Context,
             tableId: TableId
-        ) = Intent(context, TableEditActivity::class.java).apply {
-            putExtras(TableEditViewModel.bundle(tableId))
+        ) = Intent(context, TablePrepareActivity::class.java).apply {
+            putExtras(TablePrepareViewModel.bundle(tableId))
         }
     }
 }

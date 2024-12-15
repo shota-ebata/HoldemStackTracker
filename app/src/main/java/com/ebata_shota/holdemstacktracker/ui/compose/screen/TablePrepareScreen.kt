@@ -6,8 +6,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
-import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContent
-import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.content.TablePrepareContent
+import com.ebata_shota.holdemstacktracker.ui.compose.content.TablePrepareContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogContent
@@ -17,17 +17,17 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialogUi
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
-import com.ebata_shota.holdemstacktracker.ui.viewmodel.TableEditViewModel
-import com.ebata_shota.holdemstacktracker.ui.viewmodel.TableEditViewModel.Navigate
+import com.ebata_shota.holdemstacktracker.ui.viewmodel.TablePrepareViewModel
+import com.ebata_shota.holdemstacktracker.ui.viewmodel.TablePrepareViewModel.Navigate
 
 @Composable
-fun TableEditScreen(
+fun TablePrepareScreen(
     navigateToGameScreen: (TableId) -> Unit,
     navigateToBack: () -> Unit,
-    viewModel: TableEditViewModel = hiltViewModel()
+    viewModel: TablePrepareViewModel = hiltViewModel()
 ) {
-    val screenUiState: TableEditScreenUiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val dialogUiState: TableEditScreenDialogUiState by viewModel.dialogUiState.collectAsStateWithLifecycle()
+    val screenUiState: TablePrepareScreenUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val dialogUiState: TablePrepareScreenDialogUiState by viewModel.dialogUiState.collectAsStateWithLifecycle()
 
     viewModel.navigateEvent.collectWithLifecycle {
         when (it) {
@@ -37,12 +37,12 @@ fun TableEditScreen(
     }
 
     when (val uiState = screenUiState) {
-        is TableEditScreenUiState.Loading -> {
+        is TablePrepareScreenUiState.Loading -> {
             LoadingContent()
         }
 
-        is TableEditScreenUiState.Content -> {
-            TableEditContent(
+        is TablePrepareScreenUiState.Content -> {
+            TablePrepareContent(
                 uiState = uiState.contentUiState,
                 getTableQrPainter = viewModel::getTableQrPainter,
                 onClickDeletePlayerButton = viewModel::onClickDeletePlayerButton,
@@ -86,14 +86,14 @@ fun TableEditScreen(
     }
 }
 
-sealed interface TableEditScreenUiState {
-    data object Loading : TableEditScreenUiState
+sealed interface TablePrepareScreenUiState {
+    data object Loading : TablePrepareScreenUiState
     data class Content(
-        val contentUiState: TableEditContentUiState
-    ) : TableEditScreenUiState
+        val contentUiState: TablePrepareContentUiState
+    ) : TablePrepareScreenUiState
 }
 
-data class TableEditScreenDialogUiState(
+data class TablePrepareScreenDialogUiState(
     val stackEditDialogState: StackEditDialogState? = null,
     val myNameInputDialogUiState: MyNameInputDialogUiState? = null,
     val playerRemoveDialogUiState: PlayerRemoveDialogUiState? = null,

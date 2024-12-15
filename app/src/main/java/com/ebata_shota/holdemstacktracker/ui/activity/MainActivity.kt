@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun navigateToTableStandby(tableId: TableId) {
-        val intent = TableEditActivity.intent(
+        val intent = TablePrepareActivity.intent(
             context = this,
             tableId = tableId
         )

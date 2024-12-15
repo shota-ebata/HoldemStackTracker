@@ -23,7 +23,7 @@ fun TableCreatorScreen(
     viewModel.navigateEvent.collectWithLifecycle {
         when (it) {
             is TableCreatorViewModel.NavigateEvent.Back -> navigateToBack()
-            is TableCreatorViewModel.NavigateEvent.TableEdit -> navigateToGame(it.tableId)
+            is TableCreatorViewModel.NavigateEvent.TablePrepare -> navigateToGame(it.tableId)
         }
     }
 

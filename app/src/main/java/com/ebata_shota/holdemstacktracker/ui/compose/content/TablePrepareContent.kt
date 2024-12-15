@@ -41,7 +41,7 @@ import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
-import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState.BtnChosenUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.content.TablePrepareContentUiState.BtnChosenUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.labelResId
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.BlindTextLabel
 import com.ebata_shota.holdemstacktracker.ui.compose.row.PlayerEditRowUiState
@@ -52,8 +52,8 @@ import com.ebata_shota.holdemstacktracker.ui.theme.SideSpace
 
 
 @Composable
-fun TableEditContent(
-    uiState: TableEditContentUiState,
+fun TablePrepareContent(
+    uiState: TablePrepareContentUiState,
     getTableQrPainter: () -> Painter?,
     onClickDeletePlayerButton: () -> Unit,
     onClickStackEditButton: (PlayerId, String) -> Unit,
@@ -294,7 +294,7 @@ fun TableEditContent(
 }
 
 
-data class TableEditContentUiState(
+data class TablePrepareContentUiState(
     val tableId: TableId,
     val tableStatus: TableStatus,
     @StringRes
@@ -322,9 +322,9 @@ data class TableEditContentUiState(
 }
 
 
-private class PreviewParam : PreviewParameterProvider<TableEditContentUiState> {
-    override val values: Sequence<TableEditContentUiState> = sequenceOf(
-        TableEditContentUiState(
+private class PreviewParam : PreviewParameterProvider<TablePrepareContentUiState> {
+    override val values: Sequence<TablePrepareContentUiState> = sequenceOf(
+        TablePrepareContentUiState(
             tableId = TableId("tableId"),
             tableStatus = TableStatus.PLAYING,
             gameTypeTextResId = R.string.game_type_ring,
@@ -342,7 +342,7 @@ private class PreviewParam : PreviewParameterProvider<TableEditContentUiState> {
             enableSubmitButton = true,
             isEditable = false
         ),
-        TableEditContentUiState(
+        TablePrepareContentUiState(
             tableId = TableId("tableId"),
             tableStatus = TableStatus.PREPARING,
             gameTypeTextResId = R.string.game_type_ring,
@@ -379,12 +379,12 @@ private class PreviewParam : PreviewParameterProvider<TableEditContentUiState> {
     name = "Dark Mode"
 )
 @Composable
-fun TableEditContentPreview(
-    @PreviewParameter(PreviewParam::class) uiState: TableEditContentUiState
+fun TablePrepareContentPreview(
+    @PreviewParameter(PreviewParam::class) uiState: TablePrepareContentUiState
 ) {
     val painter = painterResource(R.drawable.baseline_qr_code_2_24)
     HoldemStackTrackerTheme {
-        TableEditContent(
+        TablePrepareContent(
             uiState = uiState,
             getTableQrPainter = { painter },
             onClickDeletePlayerButton = {},

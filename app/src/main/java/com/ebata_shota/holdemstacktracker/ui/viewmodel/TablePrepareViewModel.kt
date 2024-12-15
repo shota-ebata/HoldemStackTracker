@@ -27,7 +27,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
-import com.ebata_shota.holdemstacktracker.ui.TableEditScreenUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.TablePrepareScreenUiStateMapper
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEvent
@@ -36,8 +36,8 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialogEv
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
-import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableEditScreenDialogUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableEditScreenUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.screen.TablePrepareScreenDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.screen.TablePrepareScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -58,7 +58,7 @@ import java.time.Instant
 import javax.inject.Inject
 
 @HiltViewModel
-class TableEditViewModel
+class TablePrepareViewModel
 @Inject
 constructor(
     savedStateHandle: SavedStateHandle,
@@ -71,7 +71,7 @@ constructor(
     private val movePositionUseCase: MovePositionUseCase,
     private val removePlayers: RemovePlayersUseCase,
     private val renameTablePlayer: RenameTablePlayerUseCase,
-    private val uiStateMapper: TableEditScreenUiStateMapper
+    private val uiStateMapper: TablePrepareScreenUiStateMapper
 ) : ViewModel(),
     MyNameInputDialogEvent,
     PlayerRemoveDialogEvent,
@@ -80,10 +80,10 @@ constructor(
     private val tableIdString: String by savedStateHandle.param()
     private val tableId: TableId = TableId(tableIdString)
 
-    private val _uiState = MutableStateFlow<TableEditScreenUiState>(TableEditScreenUiState.Loading)
+    private val _uiState = MutableStateFlow<TablePrepareScreenUiState>(TablePrepareScreenUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
-    private val _dialogUiState = MutableStateFlow(TableEditScreenDialogUiState())
+    private val _dialogUiState = MutableStateFlow(TablePrepareScreenDialogUiState())
     val dialogUiState = _dialogUiState.asStateFlow()
 
     private val _navigateEvent = MutableSharedFlow<Navigate>()
@@ -516,7 +516,7 @@ constructor(
 
     companion object {
         fun bundle(tableId: TableId) = Bundle().apply {
-            putString(TableEditViewModel::tableIdString.name, tableId.value)
+            putString(TablePrepareViewModel::tableIdString.name, tableId.value)
         }
     }
 }

@@ -140,7 +140,7 @@ constructor(
      */
     sealed interface NavigateEvent {
         data object Back : NavigateEvent
-        data class TableEdit(val tableId: TableId) : NavigateEvent
+        data class TablePrepare(val tableId: TableId) : NavigateEvent
     }
 
     private val _navigateEvent = MutableSharedFlow<NavigateEvent>()
@@ -410,6 +410,6 @@ constructor(
             )
         )
 //        val tableId = TableId("83b543e1-e901-4115-b56b-d610cdd9267d")
-        _navigateEvent.emit(NavigateEvent.TableEdit(tableId))
+        _navigateEvent.emit(NavigateEvent.TablePrepare(tableId))
     }
 }

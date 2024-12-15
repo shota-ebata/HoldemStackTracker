@@ -33,7 +33,7 @@
             android:exported="false"
             android:theme="@style/Theme.HoldemStackTracker" />
         <activity
-            android:name=".ui.activity.TableEditActivity"
+            android:name=".ui.activity.TablePrepareActivity"
             android:exported="false"
             android:theme="@style/Theme.HoldemStackTracker" />
         <activity

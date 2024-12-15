@@ -5,14 +5,14 @@ import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetDoubleToStringUseCase
 import com.ebata_shota.holdemstacktracker.infra.extension.blindText
 import com.ebata_shota.holdemstacktracker.infra.extension.gameTextResId
-import com.ebata_shota.holdemstacktracker.ui.compose.content.TableEditContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.content.TablePrepareContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.PlayerEditRowUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableEditScreenUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.screen.TablePrepareScreenUiState
 import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 
 @ViewModelScoped
-class TableEditScreenUiStateMapper
+class TablePrepareScreenUiStateMapper
 @Inject
 constructor(
     private val getDoubleToString: GetDoubleToStringUseCase
@@ -21,10 +21,10 @@ constructor(
         table: Table,
         myPlayerId: PlayerId,
         btnPlayerId: PlayerId?
-    ): TableEditScreenUiState.Content {
+    ): TablePrepareScreenUiState.Content {
         val isHost = table.hostPlayerId == myPlayerId
-        return TableEditScreenUiState.Content(
-            contentUiState = TableEditContentUiState(
+        return TablePrepareScreenUiState.Content(
+            contentUiState = TablePrepareContentUiState(
                 tableId = table.id,
                 tableStatus = table.tableStatus,
                 gameTypeTextResId = table.rule.gameTextResId(),
@@ -48,11 +48,11 @@ constructor(
                 },
                 // BTNプレイヤーの選択肢
                 btnChosenUiStateList = listOf(
-                    TableEditContentUiState.BtnChosenUiState.BtnChosenRandom(
+                    TablePrepareContentUiState.BtnChosenUiState.BtnChosenRandom(
                         isSelected = btnPlayerId == null
                     )
                 ) + table.playerOrder.map { playerId ->
-                    TableEditContentUiState.BtnChosenUiState.Player(
+                    TablePrepareContentUiState.BtnChosenUiState.Player(
                         id = playerId,
                         name = table.basePlayers.find { it.id == playerId }!!.name,
                         isSelected = btnPlayerId == playerId
