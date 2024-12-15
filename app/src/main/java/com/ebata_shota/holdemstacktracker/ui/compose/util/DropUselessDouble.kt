@@ -31,9 +31,11 @@ fun dropUselessDouble(
     intervalTimeMillis: Long = 500L,
     delayState: DelayState = rememberDelayState(intervalTimeMillis = intervalTimeMillis),
     invoke: () -> Unit,
-) {
-    if (delayState.isDelayed) {
-        delayState.isDelayed = false
-        invoke()
+): () -> Unit {
+    return {
+        if (delayState.isDelayed) {
+            delayState.isDelayed = false
+            invoke()
+        }
     }
 }
