@@ -30,6 +30,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogCon
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
 import com.ebata_shota.holdemstacktracker.ui.compose.util.OnResumedEffect
+import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.MainViewModel
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.MainViewModel.NavigateEvent
 
@@ -81,7 +82,7 @@ fun MainScreen(
                             ) {
                                 DropdownMenuItem(
                                     text = { Text("プレイヤー名変更") },
-                                    onClick = {
+                                    onClick = dropUselessDouble {
                                         expandedSetting = false
                                         viewModel.onClickSettingRename()
                                     },

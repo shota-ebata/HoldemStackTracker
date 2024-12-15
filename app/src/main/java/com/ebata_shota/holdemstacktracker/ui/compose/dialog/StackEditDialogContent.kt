@@ -23,6 +23,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
+import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,13 +57,13 @@ fun StackEditDialogContent(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     OutlinedButton(
-                        onClick = { onDismissRequestStackEditDialog() }
+                        onClick = dropUselessDouble { onDismissRequestStackEditDialog() }
                     ) {
                         Text("Cancel")
                     }
 
                     Button(
-                        onClick = { onClickSubmitButton(uiState.playerId) },
+                        onClick = dropUselessDouble { onClickSubmitButton(uiState.playerId) },
                     ) {
                         Icon(imageVector = Icons.Filled.Done, contentDescription = "done")
                     }

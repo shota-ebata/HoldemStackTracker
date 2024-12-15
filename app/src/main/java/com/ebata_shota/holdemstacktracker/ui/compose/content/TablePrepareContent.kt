@@ -47,6 +47,8 @@ import com.ebata_shota.holdemstacktracker.ui.compose.parts.BlindTextLabel
 import com.ebata_shota.holdemstacktracker.ui.compose.row.PlayerEditRowUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.RadioButtonRow
 import com.ebata_shota.holdemstacktracker.ui.compose.row.UserEditRow
+import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
+import com.ebata_shota.holdemstacktracker.ui.compose.util.rememberDelayState
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import com.ebata_shota.holdemstacktracker.ui.theme.SideSpace
 
@@ -62,6 +64,7 @@ fun TablePrepareContent(
     onChangeBtnChosen: (PlayerId?) -> Unit,
     onClickSubmitButton: () -> Unit
 ) {
+    val delayState = rememberDelayState()
     val qrPainter = getTableQrPainter()
     Surface(
         modifier = Modifier
@@ -153,7 +156,11 @@ fun TablePrepareContent(
                         IconButton(
                             modifier = Modifier
                                 .size(48.dp),
-                            onClick = onClickDeletePlayerButton
+                            onClick = {
+                                dropUselessDouble(delayState) {
+                                    onClickDeletePlayerButton()
+                                }
+                            }
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Delete,
@@ -210,16 +217,22 @@ fun TablePrepareContent(
                         UserEditRow(
                             uiState = playerEditRowUiState,
                             onClickStackEditButton = {
-                                onClickStackEditButton(
-                                    playerEditRowUiState.playerId,
-                                    playerEditRowUiState.stackSize
-                                )
+                                dropUselessDouble(delayState) {
+                                    onClickStackEditButton(
+                                        playerEditRowUiState.playerId,
+                                        playerEditRowUiState.stackSize
+                                    )
+                                }
                             },
                             onClickUpButton = {
-                                onClickUpButton(playerEditRowUiState.playerId)
+                                dropUselessDouble(delayState) {
+                                    onClickUpButton(playerEditRowUiState.playerId)
+                                }
                             },
                             onClickDownButton = {
-                                onClickDownButton(playerEditRowUiState.playerId)
+                                dropUselessDouble(delayState) {
+                                    onClickDownButton(playerEditRowUiState.playerId)
+                                }
                             },
                             modifier = Modifier
                                 .padding(vertical = 4.dp)
@@ -279,7 +292,7 @@ fun TablePrepareContent(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Button(
-                        onClick = onClickSubmitButton,
+                        onClick = dropUselessDouble { onClickSubmitButton() },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),

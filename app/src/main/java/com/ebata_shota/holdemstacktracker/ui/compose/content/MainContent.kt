@@ -62,7 +62,7 @@ fun MainContent(
                         )
                     }
                     FloatingActionButton(
-                        onClick = {
+                        onClick = dropUselessDouble {
                             onClickFloatingButton()
                         },
                     ) {

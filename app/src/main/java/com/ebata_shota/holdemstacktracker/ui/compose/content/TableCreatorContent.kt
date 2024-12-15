@@ -32,6 +32,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.extension.labelResId
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.OutlinedTextFieldWithError
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.TextFieldErrorUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
 import com.ebata_shota.holdemstacktracker.ui.extension.labelResId
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 
@@ -96,7 +97,7 @@ fun TableCreatorContent(
                         .height(56.dp)
                         .selectable(
                             selected = (it == uiState.betViewMode),
-                            onClick = { onClickBetViewMode(it) },
+                            onClick = dropUselessDouble { onClickBetViewMode(it) },
                             role = Role.RadioButton
                         )
                         .padding(horizontal = 16.dp),
@@ -155,7 +156,7 @@ fun TableCreatorContent(
             ) {
                 // Submit Button
                 Button(
-                    onClick = {
+                    onClick = dropUselessDouble {
                         onClickSubmit()
                     },
                     enabled = uiState.enableSubmitButton,
