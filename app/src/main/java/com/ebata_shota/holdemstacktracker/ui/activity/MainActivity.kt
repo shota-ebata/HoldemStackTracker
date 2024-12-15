@@ -4,11 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
-import com.ebata_shota.holdemstacktracker.domain.repository.GmsBarcodeScannerRepository
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.MainScreen
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -33,7 +31,8 @@ class MainActivity : ComponentActivity() {
             HoldemStackTrackerTheme {
                 MainScreen(
                     navigateToTableCreator = ::navigateToTableCreator,
-                    navigateToTableStandby = ::navigateToTableStandby
+                    navigateToTableStandby = ::navigateToTableStandby,
+                    navigateToGame = ::navigateToGame
                 )
             }
         }
@@ -46,6 +45,14 @@ class MainActivity : ComponentActivity() {
 
     private fun navigateToTableStandby(tableId: TableId) {
         val intent = TableEditActivity.intent(
+            context = this,
+            tableId = tableId
+        )
+        startActivity(intent)
+    }
+
+    private fun navigateToGame(tableId: TableId) {
+        val intent = GameActivity.intent(
             context = this,
             tableId = tableId
         )

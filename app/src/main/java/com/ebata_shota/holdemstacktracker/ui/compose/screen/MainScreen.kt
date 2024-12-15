@@ -2,6 +2,7 @@ package com.ebata_shota.holdemstacktracker.ui.compose.screen
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Edit
@@ -13,14 +14,19 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
+import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingOnScreenContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogContent
@@ -34,60 +40,78 @@ import com.ebata_shota.holdemstacktracker.ui.viewmodel.MainViewModel.NavigateEve
 fun MainScreen(
     navigateToTableCreator: () -> Unit,
     navigateToTableStandby: (TableId) -> Unit,
+    navigateToGame: (TableId) -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val uiState: MainScreenUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val dialogUiState: MainScreenDialogUiState by viewModel.dialogUiState.collectAsStateWithLifecycle()
     var expandedSetting by remember { mutableStateOf(false) }
 
+    val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsStateWithLifecycle()
+    LaunchedEffect(lifecycleState) {
+        if (lifecycleState == Lifecycle.State.RESUMED) {
+            viewModel.onResume()
+        }
+    }
+
     viewModel.navigateEvent.collectWithLifecycle {
         when (it) {
             is NavigateEvent.TableCreator -> navigateToTableCreator()
             is NavigateEvent.TableStandby -> navigateToTableStandby(it.tableId)
+            is NavigateEvent.Game -> navigateToGame(it.tableId)
         }
     }
 
     when (val castUiState = uiState) {
         is MainScreenUiState.Loading -> LoadingContent()
         is MainScreenUiState.Content -> {
-            Column {
-                TopAppBar(
-                    title = { Text("Bar") },
-                    actions = {
-                        IconButton(
-                            onClick = { expandedSetting = true }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.MoreVert,
-                                contentDescription = "setting"
-                            )
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Column {
+                    TopAppBar(
+                        title = { Text("Bar") },
+                        actions = {
+                            IconButton(
+                                onClick = { expandedSetting = true }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.MoreVert,
+                                    contentDescription = "setting"
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = expandedSetting,
+                                onDismissRequest = { expandedSetting = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("プレイヤー名変更") },
+                                    onClick = {
+                                        expandedSetting = false
+                                        viewModel.onClickSettingRename()
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Outlined.Edit,
+                                            contentDescription = "Rename"
+                                        )
+                                    }
+                                )
+                            }
                         }
-                        DropdownMenu(
-                            expanded = expandedSetting,
-                            onDismissRequest = { expandedSetting = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("プレイヤー名変更") },
-                                onClick = {
-                                    expandedSetting = false
-                                    viewModel.onClickSettingRename()
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Outlined.Edit,
-                                        contentDescription = "Rename"
-                                    )
-                                }
-                            )
-                        }
-                    }
-                )
-                MainContent(
-                    uiState = castUiState.mainContentUiState,
-                    onClickFloatingButton = viewModel::onClickCreateNewTable,
-                    onClickTableRow = viewModel::onClickTableRow,
-                    onClickQrScan = viewModel::onClickQrScan
-                )
+                    )
+                    MainContent(
+                        uiState = castUiState.mainContentUiState,
+                        onClickFloatingButton = viewModel::onClickCreateNewTable,
+                        onClickTableRow = viewModel::onClickTableRow,
+                        onClickQrScan = viewModel::onClickQrScan
+                    )
+                }
+                if (castUiState.isLoadingOnScreenContent) {
+                    LoadingOnScreenContent(
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
             val myNameInputDialogUiState = dialogUiState.myNameInputDialogUiState
             if (myNameInputDialogUiState != null) {
@@ -103,7 +127,8 @@ fun MainScreen(
 sealed interface MainScreenUiState {
     data object Loading : MainScreenUiState
     data class Content(
-        val mainContentUiState: MainContentUiState
+        val mainContentUiState: MainContentUiState,
+        val isLoadingOnScreenContent: Boolean
     ) : MainScreenUiState
 }
 

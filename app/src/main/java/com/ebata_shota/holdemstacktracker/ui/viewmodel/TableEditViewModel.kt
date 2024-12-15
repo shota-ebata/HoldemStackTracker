@@ -17,7 +17,6 @@ import com.ebata_shota.holdemstacktracker.domain.model.MovePosition
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
-import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
@@ -119,19 +118,8 @@ constructor(
                 selectedBtnPlayerId,
                 qrPainterStateFlow.filterNotNull(),
             ) { table, myPlayerId, selectedBtnPlayerId, _ ->
-                if (
-                    table.tableStatus == TableStatus.PLAYING
-                    && table.playerOrder.any { it == myPlayerId }
-                ) {
-                    // ゲーム中かつplayerOrderに自分が含まれているなら
-                    // ゲーム画面に遷移
-                    navigateToGame(table.id)
-                } else {
-                    _uiState.update {
-                        uiStateMapper.createUiState(table, myPlayerId, selectedBtnPlayerId)
-                    }
-                }
-            }.collect()
+                uiStateMapper.createUiState(table, myPlayerId, selectedBtnPlayerId)
+            }.collect(_uiState)
         }
 
         // 参加プレイヤーに自分が入るための監視
@@ -490,6 +478,7 @@ constructor(
             }
             val newTable = table.copy(btnPlayerId = btnPlayerId)
             createNewGame.invoke(newTable)
+            navigateToGame(tableId)
         }
     }
 

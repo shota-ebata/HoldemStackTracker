@@ -126,7 +126,9 @@ fun PlayerRemoveDialog(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         OutlinedButton(
-                            onClick = { event.onDismissRequestPlayerRemoveDialog() }
+                            onClick = {
+                                event.onDismissRequestPlayerRemoveDialog()
+                            }
                         ) {
                             Text("Cancel")
                         }

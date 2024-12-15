@@ -100,8 +100,11 @@ fun UserEditRow(
                 ) {
                     Box(
                         modifier = Modifier
-                            .clickable { onClickUpButton() }
-                            .size(width = 48.dp, height = 48.dp),
+                            .clickable(
+                                onClick = {
+                                    onClickUpButton()
+                                }
+                            ).size(width = 48.dp, height = 48.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -116,7 +119,11 @@ fun UserEditRow(
                     )
                     Box(
                         modifier = Modifier
-                            .clickable { onClickDownButton() }
+                            .clickable(
+                                onClick = {
+                                    onClickDownButton()
+                                }
+                            )
                             .size(width = 48.dp, height = 48.dp),
                         contentAlignment = Alignment.Center
                     ) {

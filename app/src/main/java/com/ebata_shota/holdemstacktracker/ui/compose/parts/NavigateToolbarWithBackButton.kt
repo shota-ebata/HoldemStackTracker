@@ -31,7 +31,7 @@ fun NavigateToolbarWithBackButton(
             CenterAlignedTopAppBar(
                 title = title,
                 navigationIcon = {
-                    IconButton(onClick = onClickBack) {
+                    IconButton(onClick = { onClickBack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Localized description"
