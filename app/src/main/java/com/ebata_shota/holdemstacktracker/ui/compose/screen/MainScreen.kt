@@ -14,15 +14,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
@@ -32,6 +29,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
+import com.ebata_shota.holdemstacktracker.ui.compose.util.OnResumedEffect
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.MainViewModel
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.MainViewModel.NavigateEvent
 
@@ -47,11 +45,8 @@ fun MainScreen(
     val dialogUiState: MainScreenDialogUiState by viewModel.dialogUiState.collectAsStateWithLifecycle()
     var expandedSetting by remember { mutableStateOf(false) }
 
-    val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsStateWithLifecycle()
-    LaunchedEffect(lifecycleState) {
-        if (lifecycleState == Lifecycle.State.RESUMED) {
-            viewModel.onResume()
-        }
+    OnResumedEffect {
+        viewModel.onResume()
     }
 
     viewModel.navigateEvent.collectWithLifecycle {
