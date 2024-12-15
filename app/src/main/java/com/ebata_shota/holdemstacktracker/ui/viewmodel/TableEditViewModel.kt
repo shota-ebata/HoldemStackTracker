@@ -17,6 +17,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.MovePosition
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
@@ -118,8 +119,21 @@ constructor(
                 selectedBtnPlayerId,
                 qrPainterStateFlow.filterNotNull(),
             ) { table, myPlayerId, selectedBtnPlayerId, _ ->
-                uiStateMapper.createUiState(table, myPlayerId, selectedBtnPlayerId)
-            }.collect(_uiState)
+                if (
+                    table.tableStatus == TableStatus.PLAYING
+                    && table.playerOrder.any { it == myPlayerId }
+                ) {
+                    // ゲーム中かつplayerOrderに自分が含まれているなら
+                    // ゲーム画面に遷移
+                    navigateToGame(table.id)
+                } else {
+                    showContent(
+                        table = table,
+                        myPlayerId = myPlayerId,
+                        selectedBtnPlayerId = selectedBtnPlayerId
+                    )
+                }
+            }.collect()
         }
 
         // 参加プレイヤーに自分が入るための監視
@@ -179,8 +193,23 @@ constructor(
         }
     }
 
+    private fun showContent(
+        table: Table,
+        myPlayerId: PlayerId,
+        selectedBtnPlayerId: PlayerId?
+    ) {
+        _uiState.update {
+            uiStateMapper.createUiState(
+                table = table,
+                myPlayerId = myPlayerId,
+                btnPlayerId = selectedBtnPlayerId
+            )
+        }
+    }
+
 
     private fun showMyNameInputDialog(playerId: PlayerId) {
+        // FIXME: ハードコーディング
         val defaultPlayerName = "Player${playerId.value.take(6)}"
         _dialogUiState.update {
             it.copy(
@@ -478,7 +507,6 @@ constructor(
             }
             val newTable = table.copy(btnPlayerId = btnPlayerId)
             createNewGame.invoke(newTable)
-            navigateToGame(tableId)
         }
     }
 
