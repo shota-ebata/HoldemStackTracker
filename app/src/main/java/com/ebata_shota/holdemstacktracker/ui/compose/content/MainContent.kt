@@ -25,6 +25,8 @@ import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.row.TableSummaryCardRow
 import com.ebata_shota.holdemstacktracker.ui.compose.row.TableSummaryCardRowUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
+import com.ebata_shota.holdemstacktracker.ui.compose.util.rememberDelayState
 import com.ebata_shota.holdemstacktracker.ui.extension.isScrollingUp
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 
@@ -38,6 +40,7 @@ fun MainContent(
 ) {
     val listState: LazyListState = rememberLazyListState()
     val isScrollingUp: Boolean = listState.isScrollingUp().value
+    val delayState = rememberDelayState()
 
     Scaffold(
         modifier = modifier,
@@ -75,6 +78,7 @@ fun MainContent(
     ) { paddingValues ->
 
         if (uiState.tableSummaryList.isEmpty()) {
+            // TODO: Tableがない場合
             Text("なしです")
         }
         LazyColumn(
@@ -87,7 +91,14 @@ fun MainContent(
             items(
                 items = uiState.tableSummaryList
             ) { item ->
-                TableSummaryCardRow(item, onClickTableRow)
+                TableSummaryCardRow(
+                    uiState = item,
+                    onClickTableRow = { tableId ->
+                        dropUselessDouble(delayState) {
+                            onClickTableRow.invoke(tableId)
+                        }
+                    }
+                )
             }
         }
     }
