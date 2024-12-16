@@ -68,7 +68,12 @@ class GetCurrentPlayerIdUseCaseImplTest {
         verify(exactly = 1) { getLatestBetPhaseMock.invoke(game) }
     }
 
-    private fun executeAndAssert(actionStateList: List<BetPhaseAction>, btnPlayerId: PlayerId, expected: PlayerId) {
+    private fun executeAndAssert(
+        actionStateList: List<BetPhaseAction>,
+        btnPlayerId: PlayerId,
+        playerOrder: List<PlayerId>,
+        expected: PlayerId
+    ) {
         val game = createDummyGame(
             players = setOf(
                 GamePlayer(
@@ -94,11 +99,6 @@ class GetCurrentPlayerIdUseCaseImplTest {
                 )
             )
         )
-        val playerOrder = listOf(
-            PlayerId("PlayerId0"),
-            PlayerId("PlayerId1"),
-            PlayerId("PlayerId2")
-        )
         runTest {
             val actual = usecase.invoke(
                 btnPlayerId = btnPlayerId,
@@ -116,7 +116,16 @@ class GetCurrentPlayerIdUseCaseImplTest {
         val btnPlayerId = PlayerId("PlayerId2")
         val actionStateList = listOf<BetPhaseAction>()
         val expected = PlayerId("PlayerId0")
-        executeAndAssert(actionStateList, btnPlayerId, expected)
+        executeAndAssert(
+            actionStateList = actionStateList,
+            btnPlayerId = btnPlayerId,
+            playerOrder = listOf(
+                PlayerId("PlayerId0"),
+                PlayerId("PlayerId1"),
+                PlayerId("PlayerId2")
+            ),
+            expected = expected
+        )
     }
 
     @Test
@@ -126,7 +135,16 @@ class GetCurrentPlayerIdUseCaseImplTest {
             Blind(playerId = PlayerId("PlayerId0"), betSize = 100.0),
         )
         val expected = PlayerId("PlayerId1")
-        executeAndAssert(actionStateList, btnPlayerId, expected)
+        executeAndAssert(
+            actionStateList = actionStateList,
+            btnPlayerId = btnPlayerId,
+            playerOrder = listOf(
+                PlayerId("PlayerId0"),
+                PlayerId("PlayerId1"),
+                PlayerId("PlayerId2")
+            ),
+            expected = expected
+        )
     }
 
     @Test
@@ -137,7 +155,16 @@ class GetCurrentPlayerIdUseCaseImplTest {
             Blind(playerId = PlayerId("PlayerId1"), betSize = 200.0),
         )
         val expected = PlayerId("PlayerId2")
-        executeAndAssert(actionStateList, btnPlayerId, expected)
+        executeAndAssert(
+            actionStateList = actionStateList,
+            btnPlayerId = btnPlayerId,
+            playerOrder = listOf(
+                PlayerId("PlayerId0"),
+                PlayerId("PlayerId1"),
+                PlayerId("PlayerId2")
+            ),
+            expected = expected
+        )
     }
 
     @Test
@@ -149,7 +176,16 @@ class GetCurrentPlayerIdUseCaseImplTest {
             Call(playerId = PlayerId("PlayerId2"), betSize = 200.0),
         )
         val expected = PlayerId("PlayerId0")
-        executeAndAssert(actionStateList, btnPlayerId, expected)
+        executeAndAssert(
+            actionStateList = actionStateList,
+            btnPlayerId = btnPlayerId,
+            playerOrder = listOf(
+                PlayerId("PlayerId0"),
+                PlayerId("PlayerId1"),
+                PlayerId("PlayerId2")
+            ),
+            expected = expected
+        )
     }
 
     @Test
@@ -162,6 +198,47 @@ class GetCurrentPlayerIdUseCaseImplTest {
             Call(playerId = PlayerId("PlayerId0"), betSize = 200.0),
         )
         val expected = PlayerId("PlayerId1")
-        executeAndAssert(actionStateList, btnPlayerId, expected)
+        executeAndAssert(
+            actionStateList = actionStateList,
+            btnPlayerId = btnPlayerId,
+            playerOrder = listOf(
+                PlayerId("PlayerId0"),
+                PlayerId("PlayerId1"),
+                PlayerId("PlayerId2")
+            ),
+            expected = expected
+        )
+    }
+
+    @Test
+    fun test_2players() {
+        val btnPlayerId = PlayerId("PlayerId0")
+        val actionStateList = listOf<BetPhaseAction>()
+        val expected = PlayerId("PlayerId0")
+        executeAndAssert(
+            actionStateList = actionStateList,
+            btnPlayerId = btnPlayerId,
+            playerOrder = listOf(
+                PlayerId("PlayerId0"),
+                PlayerId("PlayerId1")
+            ),
+            expected = expected
+        )
+    }
+
+    @Test
+    fun test_2player_2() {
+        val btnPlayerId = PlayerId("PlayerId1")
+        val actionStateList = listOf<BetPhaseAction>()
+        val expected = PlayerId("PlayerId1")
+        executeAndAssert(
+            actionStateList = actionStateList,
+            btnPlayerId = btnPlayerId,
+            playerOrder = listOf(
+                PlayerId("PlayerId0"),
+                PlayerId("PlayerId1")
+            ),
+            expected = expected
+        )
     }
 }

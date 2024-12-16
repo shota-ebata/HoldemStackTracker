@@ -26,10 +26,15 @@ class GetCurrentPlayerIdUseCaseImpl
         val actionStateList = latestBetPhase.actionStateList
         // 最後にアクションしたプレイヤーIDを取得（アクションがない場合はBTN）
         val latestActionPlayerId = actionStateList.lastOrNull()?.playerId ?: btnPlayerId
-        // ボタンのIDを取得
+        // 最後にアクションしたプレイヤーIDのindexを取得
         val latestActionPlayerIndex = playerOrder.indexOf(latestActionPlayerId)
-        // TODO: 2人の場合の順番を考慮
-        val nextPlayerIndex = (latestActionPlayerIndex + 1) % playerOrder.size
+        val nextPlayerIndex: Int = if (playerOrder.size == 2 && actionStateList.isEmpty()) {
+            // 2人しかいないかつ、まだ誰もアクションしていない場合、BTNからSBを始めるのでnextPlayerはBTNとなる。
+            playerOrder.indexOf(btnPlayerId)
+        } else {
+            // 基本は最後にアクションした人の次の人
+            (latestActionPlayerIndex + 1) % playerOrder.size
+        }
         return playerOrder[nextPlayerIndex]
     }
 }
