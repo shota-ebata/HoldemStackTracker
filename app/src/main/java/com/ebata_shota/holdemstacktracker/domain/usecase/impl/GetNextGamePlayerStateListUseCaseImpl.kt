@@ -3,7 +3,7 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
-import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
+import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGamePlayerStateListUseCase
@@ -25,9 +25,9 @@ constructor(
      */
     override suspend fun invoke(
         pendingBetPerPlayer: Map<PlayerId, Double>,
-        players: List<GamePlayerState>,
+        players: List<GamePlayer>,
         action: BetPhaseAction
-    ): List<GamePlayerState> {
+    ): List<GamePlayer> {
         val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
         val myPlayerStateIndex = players.indexOfFirstOrNull { it.id == myPlayerId }
             ?: throw IllegalStateException("Player not found")

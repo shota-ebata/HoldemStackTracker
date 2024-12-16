@@ -3,7 +3,7 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
+import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPlayerStackUseCase
@@ -21,7 +21,7 @@ constructor(
     override suspend fun invoke(
         latestGame: Game,
         action: BetPhaseAction
-    ): List<GamePlayerState> {
+    ): List<GamePlayer> {
         // BetPhaseでしかActionはできないので
         val latestPhase: BetPhase = getLatestBetPhase.invoke(latestGame)
         // プレイヤーごとの、まだポッドに入っていないベット額
@@ -30,7 +30,7 @@ constructor(
             actionStateList = latestPhase.actionStateList
         )
         // プレイヤーのスタック更新
-        val updatedPlayers: List<GamePlayerState> = getNextPlayerStateList.invoke(
+        val updatedPlayers: List<GamePlayer> = getNextPlayerStateList.invoke(
             pendingBetPerPlayer = pendingBetPerPlayer,
             players = latestGame.players,
             action = action

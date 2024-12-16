@@ -3,7 +3,7 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.Action
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
-import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
+import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
@@ -60,7 +60,7 @@ constructor(
             }
         }.toMutableList()
         // プレイヤーのスタック更新
-        val updatedPlayers: List<GamePlayerState> = getNextPlayerStack.invoke(
+        val updatedPlayers: List<GamePlayer> = getNextPlayerStack.invoke(
             latestGame = latestGame,
             action = action
         )

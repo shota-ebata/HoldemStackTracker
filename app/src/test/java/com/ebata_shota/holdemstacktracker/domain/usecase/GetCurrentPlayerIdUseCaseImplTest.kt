@@ -4,7 +4,7 @@ import com.ebata_shota.holdemstacktracker.createDummyGame
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction.Blind
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction.Call
-import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
+import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCaseImpl
@@ -36,17 +36,17 @@ class GetCurrentPlayerIdUseCaseImplTest {
         )
         val game = createDummyGame(
             players = listOf(
-                GamePlayerState(
+                GamePlayer(
                     id = PlayerId("PlayerId0"),
                     stack = 1000.0,
                     isLeaved = false
                 ),
-                GamePlayerState(
+                GamePlayer(
                     id = PlayerId("PlayerId1"),
                     stack = 1000.0,
                     isLeaved = false
                 ),
-                GamePlayerState(
+                GamePlayer(
                     id = PlayerId("PlayerId2"),
                     stack = 1000.0,
                     isLeaved = false
@@ -65,17 +65,17 @@ class GetCurrentPlayerIdUseCaseImplTest {
     private fun executeAndAssert(actionStateList: List<BetPhaseAction>, btnPlayerId: PlayerId, expected: PlayerId) {
         val game = createDummyGame(
             players = listOf(
-                GamePlayerState(
+                GamePlayer(
                     id = PlayerId("PlayerId0"),
                     stack = 1000.0,
                     isLeaved = false
                 ),
-                GamePlayerState(
+                GamePlayer(
                     id = PlayerId("PlayerId1"),
                     stack = 1000.0,
                     isLeaved = false
                 ),
-                GamePlayerState(
+                GamePlayer(
                     id = PlayerId("PlayerId2"),
                     stack = 1000.0,
                     isLeaved = false

@@ -1,7 +1,7 @@
 package com.ebata_shota.holdemstacktracker
 
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
-import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
+import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -12,7 +12,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import java.time.Instant
 
 fun createDummyGame(
-    players: List<GamePlayerState> = emptyList(),
+    players: List<GamePlayer> = emptyList(),
     phaseList: List<Phase> = emptyList()
 ) = Game(
     version = 0,

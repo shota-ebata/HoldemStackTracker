@@ -4,7 +4,7 @@ import com.ebata_shota.holdemstacktracker.createDummyGame
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
+import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
@@ -54,8 +54,8 @@ class GetNextPlayerStackUseCaseImplTest {
             getNextPlayerStateList = getNextGamePlayerStateListUseCase
         )
 
-        val mockNextPlayerStateListResult = listOf<GamePlayerState>(
-            GamePlayerState(
+        val mockNextPlayerStateListResult = listOf<GamePlayer>(
+            GamePlayer(
                 id = PlayerId("0"),
                 stack = 1000.0,
                 isLeaved = false

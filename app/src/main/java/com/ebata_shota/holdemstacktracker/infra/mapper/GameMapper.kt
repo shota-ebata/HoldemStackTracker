@@ -3,7 +3,7 @@ package com.ebata_shota.holdemstacktracker.infra.mapper
 import com.ebata_shota.holdemstacktracker.domain.model.Action
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
-import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
+import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pod
@@ -90,14 +90,14 @@ constructor() {
         }
     }
 
-    private fun mapToGamePlayerStateList(players: Map<*, *>): List<GamePlayerState> {
+    private fun mapToGamePlayerStateList(players: Map<*, *>): List<GamePlayer> {
         val keys = players.keys
         return keys.map { key ->
             val value = players[key] as Map<*, *>
             val playerId = key as String
             val stack = value[PLAYER_STATE_PLAYER_STACK]!!.getDouble()
             val isLeaved = value[PLAYER_STATE_PLAYER_IS_LEAVED] as Boolean
-            GamePlayerState(
+            GamePlayer(
                 id = PlayerId(playerId),
                 stack = stack,
                 isLeaved = isLeaved
@@ -176,12 +176,12 @@ constructor() {
         index.toString() to playerId.value
     }.toMap()
 
-    private fun mapPlayers(players: List<GamePlayerState>) = players.associate { gamePlayerState ->
+    private fun mapPlayers(players: List<GamePlayer>) = players.associate { gamePlayerState ->
         gamePlayerState.id.value to mapGamePlayer(gamePlayerState)
     }
 
-    private fun mapGamePlayer(gamePlayerState: GamePlayerState) = hashMapOf(
-        PLAYER_STATE_PLAYER_STACK to gamePlayerState.stack,
-        PLAYER_STATE_PLAYER_IS_LEAVED to gamePlayerState.isLeaved
+    private fun mapGamePlayer(gamePlayer: GamePlayer) = hashMapOf(
+        PLAYER_STATE_PLAYER_STACK to gamePlayer.stack,
+        PLAYER_STATE_PLAYER_IS_LEAVED to gamePlayer.isLeaved
     )
 }

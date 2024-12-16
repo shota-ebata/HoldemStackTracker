@@ -2,7 +2,7 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.domain.model.Game
-import com.ebata_shota.holdemstacktracker.domain.model.GamePlayerState
+import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
@@ -33,7 +33,7 @@ constructor(
             players = table.playerOrder.mapNotNull { playerId ->
                 val player = table.basePlayers.find { it.id == playerId }
                 player?.let {
-                    GamePlayerState(
+                    GamePlayer(
                         id = player.id,
                         stack = player.stack,
                         isLeaved = false

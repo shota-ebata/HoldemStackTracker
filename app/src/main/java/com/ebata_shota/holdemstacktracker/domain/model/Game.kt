@@ -8,7 +8,7 @@ import java.time.Instant
 data class Game(
     val version: Long,
     val appVersion: Long,
-    val players: List<GamePlayerState>,
+    val players: List<GamePlayer>,
     val podList: List<Pod>,
     val phaseList: List<Phase>,
     val updateTime: Instant
