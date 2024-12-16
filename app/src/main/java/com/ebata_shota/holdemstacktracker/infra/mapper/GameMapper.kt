@@ -43,7 +43,7 @@ constructor() {
         return Game(
             version = gameMap[GAME_VERSION] as Long,
             appVersion = gameMap[APP_VERSION] as Long,
-            players = mapToGamePlayerStateList(gameMap[PLAYERS] as List<*>),
+            players = mapToGamePlayerStateList(gameMap[PLAYERS] as Map<*, *>),
             podList = (gameMap[PODS] as? List<*>)?.let {
                 mapToPodStateList(it)
             } ?: emptyList(),
@@ -58,10 +58,10 @@ constructor() {
             val actions = it[PHASE_ACTIONS] as? List<*>
             when (PhaseType.of(phaseType)) {
                 PhaseType.Standby -> Phase.Standby
-                PhaseType.PreFlop -> Phase.PreFlop(actionStateList = mapToActionStateList(actions!!))
-                PhaseType.Flop -> Phase.Flop(actionStateList = mapToActionStateList(actions!!))
-                PhaseType.Turn -> Phase.Turn(actionStateList = mapToActionStateList(actions!!))
-                PhaseType.River ->  Phase.River(actionStateList = mapToActionStateList(actions!!))
+                PhaseType.PreFlop -> Phase.PreFlop(actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty())
+                PhaseType.Flop -> Phase.Flop(actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty())
+                PhaseType.Turn -> Phase.Turn(actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty())
+                PhaseType.River ->  Phase.River(actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty())
                 PhaseType.ShowDown -> Phase.ShowDown
                 PhaseType.AllInOpen -> Phase.AllInOpen
                 PhaseType.PotSettlement -> Phase.PotSettlement
@@ -90,11 +90,13 @@ constructor() {
         }
     }
 
-    private fun mapToGamePlayerStateList(players: List<*>): List<GamePlayerState> {
-        return players.map { it as Map<*, *> }.map {
-            val playerId = it[PLAYER_STATE_PLAYER_ID] as String
-            val stack = it[PLAYER_STATE_PLAYER_STACK]!!.getDouble()
-            val isLeaved = it[PLAYER_STATE_PLAYER_IS_LEAVED] as Boolean
+    private fun mapToGamePlayerStateList(players: Map<*, *>): List<GamePlayerState> {
+        val keys = players.keys
+        return keys.map { key ->
+            val value = players[key] as Map<*, *>
+            val playerId = key as String
+            val stack = value[PLAYER_STATE_PLAYER_STACK]!!.getDouble()
+            val isLeaved = value[PLAYER_STATE_PLAYER_IS_LEAVED] as Boolean
             GamePlayerState(
                 id = PlayerId(playerId),
                 stack = stack,
@@ -174,12 +176,11 @@ constructor() {
         index.toString() to playerId.value
     }.toMap()
 
-    private fun mapPlayers(players: List<GamePlayerState>) = players.mapIndexed { index, gamePlayerState ->
-        index.toString() to mapGamePlayer(gamePlayerState)
-    }.toMap()
+    private fun mapPlayers(players: List<GamePlayerState>) = players.associate { gamePlayerState ->
+        gamePlayerState.id.value to mapGamePlayer(gamePlayerState)
+    }
 
     private fun mapGamePlayer(gamePlayerState: GamePlayerState) = hashMapOf(
-        PLAYER_STATE_PLAYER_ID to gamePlayerState.id.value,
         PLAYER_STATE_PLAYER_STACK to gamePlayerState.stack,
         PLAYER_STATE_PLAYER_IS_LEAVED to gamePlayerState.isLeaved
     )
