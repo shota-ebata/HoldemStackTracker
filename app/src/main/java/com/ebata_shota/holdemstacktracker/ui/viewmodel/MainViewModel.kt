@@ -193,9 +193,8 @@ constructor(
                 .first()
             // テーブルが帰ってこれば購読開始できているので画面遷移する
             // テーブルの状態によって遷移先は変わるので判定する
-            val tableStatus = table.tableStatus
             _navigateEvent.emit(
-                when (tableStatus) {
+                when (table.tableStatus) {
                     TableStatus.PREPARING -> NavigateEvent.TableStandby(tableId)
                     TableStatus.PAUSED -> TODO()
                     TableStatus.PLAYING -> NavigateEvent.Game(tableId)
