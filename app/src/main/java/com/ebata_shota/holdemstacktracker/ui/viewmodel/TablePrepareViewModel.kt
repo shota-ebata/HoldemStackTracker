@@ -506,7 +506,10 @@ constructor(
                 table.playerOrder[index]
             }
             val newTable = table.copy(btnPlayerId = btnPlayerId)
-            createNewGame.invoke(newTable)
+            createNewGame.invoke(
+                table = newTable,
+                fromPreFlop = true
+            )
         }
     }
 

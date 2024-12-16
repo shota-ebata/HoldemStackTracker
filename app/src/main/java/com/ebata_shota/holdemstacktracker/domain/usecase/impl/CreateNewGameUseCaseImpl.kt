@@ -16,9 +16,10 @@ class CreateNewGameUseCaseImpl
 @Inject
 constructor(
     private val tableRepository: TableRepository,
-    private val gameRepository: GameRepository
+    private val gameRepository: GameRepository,
 ) : CreateNewGameUseCase {
-    override suspend fun invoke(table: Table) {
+
+    override suspend fun invoke(table: Table, fromPreFlop: Boolean) {
         val updateTime = Instant.now()
         val copiedTable = table.copy(
             tableStatus = TableStatus.PLAYING,
@@ -40,7 +41,10 @@ constructor(
                 }
             },
             podList = emptyList(),
-            phaseList = listOf(Phase.Standby),
+            phaseList = listOfNotNull(
+                Phase.Standby,
+                if (fromPreFlop) Phase.PreFlop(emptyList()) else null
+            ),
             updateTime = updateTime
         )
         tableRepository.sendTable(
