@@ -8,6 +8,7 @@ import javax.inject.Inject
 
 class GetLatestBetPhaseUseCaseImpl
 @Inject constructor() : GetLatestBetPhaseUseCase {
+
     override fun invoke(latestGame: Game): BetPhase {
         val latestPhase: Phase? = latestGame.phaseList.lastOrNull()
         if (latestPhase == null || latestPhase !is BetPhase) {

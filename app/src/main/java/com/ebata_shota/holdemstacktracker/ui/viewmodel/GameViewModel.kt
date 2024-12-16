@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
@@ -11,6 +12,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthReposito
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
@@ -43,6 +45,7 @@ constructor(
     private val getNextGame: GetNextGameUseCase,
     private val isActionRequired: IsActionRequiredUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
+    private val getNextAutoAction: GetNextAutoActionUseCase,
 ) : ViewModel() {
     private val tableId: TableId by savedStateHandle.param()
 
@@ -72,22 +75,47 @@ constructor(
             combine(
                 firebaseAuthRepository.myPlayerIdFlow,
                 tableStateFlow.filterNotNull(),
-                gameStateFlow.filterNotNull(),
-
+                gameStateFlow.filterNotNull()
                 ) { myPlayerId, table, game ->
-                _screenUiState.update {
-                    val currentPlayerId = getCurrentPlayerId.invoke(
-                        btnPlayerId = table.btnPlayerId,
-                        playerOrder = table.playerOrder,
+                val currentPlayerId = getCurrentPlayerId.invoke(
+                    btnPlayerId = table.btnPlayerId,
+                    playerOrder = table.playerOrder,
+                    game = game
+                )
+                var hasAutoAction = false
+                val isCurrentPlayer: Boolean = myPlayerId == currentPlayerId
+                if (isCurrentPlayer) {
+                    val autoAction: BetPhaseAction? = getNextAutoAction.invoke(
+                        playerId = myPlayerId,
+                        table = table,
                         game = game
                     )
-                    GameScreenUiState.Content(
-                        contentUiState = GameContentUiState(
-                            tableId = tableId,
-                            game = game,
-                            isCurrentPlayer = myPlayerId == currentPlayerId
+                    if (autoAction != null) {
+                        // オートアクションがあるなら、それを使って新しいGameを生成
+                        val updatedGame = getNextGame.invoke(
+                            latestGame = game,
+                            action = autoAction,
+                            playerOrder = table.playerOrder
                         )
-                    )
+                        // 更新実行
+                        gameRepository.sendGame(
+                            tableId = tableId,
+                            newGame = updatedGame
+                        )
+                        hasAutoAction = true
+                    }
+                }
+                if (!hasAutoAction) {
+                    // オートアクションがない場合だけ、UiStateを更新する
+                    _screenUiState.update {
+                        GameScreenUiState.Content(
+                            contentUiState = GameContentUiState(
+                                tableId = tableId,
+                                game = game,
+                                isCurrentPlayer = isCurrentPlayer
+                            )
+                        )
+                    }
                 }
             }.collect()
         }

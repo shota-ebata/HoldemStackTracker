@@ -208,8 +208,10 @@ constructor(
         viewModelScope.launch {
             val scanText = scannerRepository.startQrScan()
             // FIXME: バリデーションほしいかも
-            scanText?.let {
-                val tableId = TableId(it)
+            if (scanText != null) {
+                val tableId = TableId(scanText)
+                // 今参加しているテーブルがあればcollectをやめる
+                tableRepository.stopCollectTableFlow()
                 _navigateEvent.emit(NavigateEvent.TableStandby(tableId))
             }
         }

@@ -10,7 +10,7 @@ sealed interface BetPhaseAction : Action {
         val betSize: Double
     }
 
-    sealed interface AutoAction
+    sealed interface AutoAction : BetPhaseAction
 
     data class Blind(
         override val playerId: PlayerId,
