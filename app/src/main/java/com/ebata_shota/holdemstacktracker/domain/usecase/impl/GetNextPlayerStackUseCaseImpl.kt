@@ -20,17 +20,18 @@ constructor(
 ) : GetNextPlayerStackUseCase {
     override suspend fun invoke(
         latestGame: Game,
-        action: BetPhaseAction
-    ): List<GamePlayer> {
+        action: BetPhaseAction,
+        playerOrder: List<PlayerId>
+    ): Set<GamePlayer> {
         // BetPhaseでしかActionはできないので
         val latestPhase: BetPhase = getLatestBetPhase.invoke(latestGame)
         // プレイヤーごとの、まだポッドに入っていないベット額
         val pendingBetPerPlayer: Map<PlayerId, Double> = getPendingBetPerPlayer.invoke(
-            playerOrder = latestGame.playerOrder,
+            playerOrder = playerOrder,
             actionStateList = latestPhase.actionStateList
         )
         // プレイヤーのスタック更新
-        val updatedPlayers: List<GamePlayer> = getNextPlayerStateList.invoke(
+        val updatedPlayers: Set<GamePlayer> = getNextPlayerStateList.invoke(
             pendingBetPerPlayer = pendingBetPerPlayer,
             players = latestGame.players,
             action = action

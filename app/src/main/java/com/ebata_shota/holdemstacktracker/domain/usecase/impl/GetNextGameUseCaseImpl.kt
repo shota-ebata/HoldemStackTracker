@@ -31,18 +31,24 @@ constructor(
 
     override suspend fun invoke(
         latestGame: Game,
-        action: Action
+        action: Action,
+        playerOrder: List<PlayerId>
     ): Game {
         when (action) {
             is BetPhaseAction -> {
-                return getNextGameFromBetPhaseAction(latestGame, action)
+                return getNextGameFromBetPhaseAction(
+                    latestGame = latestGame,
+                    action = action,
+                    playerOrder = playerOrder
+                )
             }
         }
     }
 
     private suspend fun getNextGameFromBetPhaseAction(
         latestGame: Game,
-        action: BetPhaseAction
+        action: BetPhaseAction,
+        playerOrder: List<PlayerId>
     ): Game {
         // BetPhaseでしかActionはできないので
         val latestPhase: BetPhase = getLatestBetPhase.invoke(latestGame)
@@ -60,13 +66,14 @@ constructor(
             }
         }.toMutableList()
         // プレイヤーのスタック更新
-        val updatedPlayers: List<GamePlayer> = getNextPlayerStack.invoke(
+        val updatedPlayers: Set<GamePlayer> = getNextPlayerStack.invoke(
             latestGame = latestGame,
-            action = action
+            action = action,
+            playerOrder = playerOrder
         )
         // アクションしていない人がのこっているか？
         val isActionRequired = isActionRequired.invoke(
-            playerOrder = latestGame.playerOrder,
+            playerOrder = playerOrder,
             actionStateList = updatedActionStateList
         )
         return if (isActionRequired) {
@@ -81,7 +88,7 @@ constructor(
             // もし全員のベットが揃った場合、ポッド更新してフェーズを進める
             // プレイヤーごとの、まだポッドに入っていないベット額
             val pendingBetPerPlayer: Map<PlayerId, Double> = getPendingBetPerPlayer.invoke(
-                playerOrder = latestGame.playerOrder,
+                playerOrder = playerOrder,
                 actionStateList = latestPhase.actionStateList
             )
             // ベット状況をポッドに反映
@@ -91,7 +98,7 @@ constructor(
             )
             // フェーズを進める
             val nextPhase = getNextPhase.invoke(
-                playerOrder = latestGame.playerOrder,
+                playerOrder = playerOrder,
                 phaseList = updatedPhaseLists
             )
             updatedPhaseLists += nextPhase

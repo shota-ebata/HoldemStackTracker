@@ -90,7 +90,7 @@ constructor() {
         }
     }
 
-    private fun mapToGamePlayerStateList(players: Map<*, *>): List<GamePlayer> {
+    private fun mapToGamePlayerStateList(players: Map<*, *>): Set<GamePlayer> {
         val keys = players.keys
         return keys.map { key ->
             val value = players[key] as Map<*, *>
@@ -102,7 +102,7 @@ constructor() {
                 stack = stack,
                 isLeaved = isLeaved
             )
-        }
+        }.toSet()
     }
 
     private fun mapToPodStateList(pods: List<*>): List<Pod> {
@@ -176,8 +176,8 @@ constructor() {
         index.toString() to playerId.value
     }.toMap()
 
-    private fun mapPlayers(players: List<GamePlayer>) = players.associate { gamePlayerState ->
-        gamePlayerState.id.value to mapGamePlayer(gamePlayerState)
+    private fun mapPlayers(players: Set<GamePlayer>) = players.map { gamePlayer ->
+        gamePlayer.id to mapGamePlayer(gamePlayer)
     }
 
     private fun mapGamePlayer(gamePlayer: GamePlayer) = hashMapOf(

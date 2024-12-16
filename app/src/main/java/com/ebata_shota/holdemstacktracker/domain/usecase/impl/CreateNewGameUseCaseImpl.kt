@@ -39,7 +39,7 @@ constructor(
                         isLeaved = false
                     )
                 }
-            },
+            }.toSet(),
             podList = emptyList(),
             phaseList = listOfNotNull(
                 Phase.Standby,

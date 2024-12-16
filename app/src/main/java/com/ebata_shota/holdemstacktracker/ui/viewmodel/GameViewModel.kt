@@ -70,12 +70,23 @@ constructor(
     init {
         viewModelScope.launch {
             combine(
+                firebaseAuthRepository.myPlayerIdFlow,
                 tableStateFlow.filterNotNull(),
-                gameStateFlow.filterNotNull()
-            ) { table, game ->
+                gameStateFlow.filterNotNull(),
+
+                ) { myPlayerId, table, game ->
                 _screenUiState.update {
+                    val currentPlayerId = getCurrentPlayerId.invoke(
+                        btnPlayerId = table.btnPlayerId,
+                        playerOrder = table.playerOrder,
+                        game = game
+                    )
                     GameScreenUiState.Content(
-                        contentUiState = GameContentUiState(game = game)
+                        contentUiState = GameContentUiState(
+                            tableId = tableId,
+                            game = game,
+                            isCurrentPlayer = myPlayerId == currentPlayerId
+                        )
                     )
                 }
             }.collect()

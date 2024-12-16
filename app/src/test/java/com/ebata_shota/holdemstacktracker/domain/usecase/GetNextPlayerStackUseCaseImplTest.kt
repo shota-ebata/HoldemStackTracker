@@ -54,7 +54,7 @@ class GetNextPlayerStackUseCaseImplTest {
             getNextPlayerStateList = getNextGamePlayerStateListUseCase
         )
 
-        val mockNextPlayerStateListResult = listOf<GamePlayer>(
+        val mockNextPlayerStateListResult = setOf<GamePlayer>(
             GamePlayer(
                 id = PlayerId("0"),
                 stack = 1000.0,
@@ -79,12 +79,14 @@ class GetNextPlayerStackUseCaseImplTest {
             )
         )
         val action = BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100.0)
+        val playerOrder = listOf(PlayerId("0"), PlayerId("1"))
 
         runTest {
             // execute
             val actual =  usecase.invoke(
                 latestGame = latestGame,
-                action = action
+                action = action,
+                playerOrder = playerOrder
             )
 
             // assert
@@ -93,7 +95,7 @@ class GetNextPlayerStackUseCaseImplTest {
             }
             verify(exactly = 1) {
                 getPendingBetPerPlayerUseCase.invoke(
-                    playerOrder = latestGame.playerOrder,
+                    playerOrder = playerOrder,
                     actionStateList = mockLatestBetPhaseResult.actionStateList
                 )
             }

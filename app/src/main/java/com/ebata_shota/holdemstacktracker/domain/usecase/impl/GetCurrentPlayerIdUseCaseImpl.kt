@@ -17,15 +17,19 @@ class GetCurrentPlayerIdUseCaseImpl
      */
     override suspend fun invoke(
         btnPlayerId: PlayerId,
+        playerOrder: List<PlayerId>,
         game: Game
     ): PlayerId {
         // 全員の最後のアクションを一つづつ取得
         val latestBetPhase = getLatestBetPhase.invoke(game)
         // 全員の最後のアクションを一つづつ取得
         val actionStateList = latestBetPhase.actionStateList
+        // 最後にアクションしたプレイヤーIDを取得（アクションがない場合はBTN）
         val latestActionPlayerId = actionStateList.lastOrNull()?.playerId ?: btnPlayerId
-        val latestActionPlayerIndex = game.playerOrder.indexOf(latestActionPlayerId)
-        val nextPlayerIndex = (latestActionPlayerIndex + 1) % game.playerOrder.size
-        return game.playerOrder[nextPlayerIndex]
+        // ボタンのIDを取得
+        val latestActionPlayerIndex = playerOrder.indexOf(latestActionPlayerId)
+        // TODO: 2人の場合の順番を考慮
+        val nextPlayerIndex = (latestActionPlayerIndex + 1) % playerOrder.size
+        return playerOrder[nextPlayerIndex]
     }
 }

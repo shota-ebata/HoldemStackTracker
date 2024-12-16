@@ -35,7 +35,7 @@ class GetCurrentPlayerIdUseCaseImplTest {
             getLatestBetPhase = getLatestBetPhaseMock
         )
         val game = createDummyGame(
-            players = listOf(
+            players = setOf(
                 GamePlayer(
                     id = PlayerId("PlayerId0"),
                     stack = 1000.0,
@@ -53,9 +53,15 @@ class GetCurrentPlayerIdUseCaseImplTest {
                 )
             )
         )
+        val playerOrder = listOf(
+            PlayerId("PlayerId0"),
+            PlayerId("PlayerId1"),
+            PlayerId("PlayerId2")
+        )
         runTest {
             usecase.invoke(
                 btnPlayerId = PlayerId("PlayerId0"),
+                playerOrder = playerOrder,
                 game = game
             )
         }
@@ -64,7 +70,7 @@ class GetCurrentPlayerIdUseCaseImplTest {
 
     private fun executeAndAssert(actionStateList: List<BetPhaseAction>, btnPlayerId: PlayerId, expected: PlayerId) {
         val game = createDummyGame(
-            players = listOf(
+            players = setOf(
                 GamePlayer(
                     id = PlayerId("PlayerId0"),
                     stack = 1000.0,
@@ -88,9 +94,15 @@ class GetCurrentPlayerIdUseCaseImplTest {
                 )
             )
         )
+        val playerOrder = listOf(
+            PlayerId("PlayerId0"),
+            PlayerId("PlayerId1"),
+            PlayerId("PlayerId2")
+        )
         runTest {
             val actual = usecase.invoke(
                 btnPlayerId = btnPlayerId,
+                playerOrder = playerOrder,
                 game = game
             )
 

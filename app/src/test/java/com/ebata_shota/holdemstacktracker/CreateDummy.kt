@@ -12,7 +12,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import java.time.Instant
 
 fun createDummyGame(
-    players: List<GamePlayer> = emptyList(),
+    players: Set<GamePlayer> = emptySet(),
     phaseList: List<Phase> = emptyList()
 ) = Game(
     version = 0,
