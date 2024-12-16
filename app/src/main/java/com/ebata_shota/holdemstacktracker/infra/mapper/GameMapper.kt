@@ -176,8 +176,8 @@ constructor() {
         index.toString() to playerId.value
     }.toMap()
 
-    private fun mapPlayers(players: Set<GamePlayer>) = players.map { gamePlayer ->
-        gamePlayer.id to mapGamePlayer(gamePlayer)
+    private fun mapPlayers(players: Set<GamePlayer>) = players.associate { gamePlayer ->
+        gamePlayer.id.value to mapGamePlayer(gamePlayer)
     }
 
     private fun mapGamePlayer(gamePlayer: GamePlayer) = hashMapOf(
