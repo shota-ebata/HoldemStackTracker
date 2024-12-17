@@ -16,9 +16,9 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCas
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
-import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
+import com.ebata_shota.holdemstacktracker.ui.mapper.GameContentUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -46,6 +46,7 @@ constructor(
     private val isActionRequired: IsActionRequiredUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
     private val getNextAutoAction: GetNextAutoActionUseCase,
+    private val uiStateMapper: GameContentUiStateMapper
 ) : ViewModel() {
     private val tableId: TableId by savedStateHandle.param()
 
@@ -109,10 +110,10 @@ constructor(
                     // オートアクションがない場合だけ、UiStateを更新する
                     _screenUiState.update {
                         GameScreenUiState.Content(
-                            contentUiState = GameContentUiState(
-                                tableId = tableId,
+                            contentUiState = uiStateMapper.createUiState(
                                 game = game,
-                                isCurrentPlayer = isCurrentPlayer
+                                table = table,
+                                myPlayerId = myPlayerId
                             )
                         )
                     }
@@ -130,6 +131,7 @@ constructor(
     }
 
     companion object {
+
         fun bundle(tableId: TableId) = Bundle().apply {
             putParcelable(GameViewModel::tableId.name, tableId)
         }

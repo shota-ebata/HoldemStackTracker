@@ -7,6 +7,9 @@ import javax.inject.Inject
 class GetDoubleToStringUseCaseImpl
 @Inject
 constructor() : GetDoubleToStringUseCase {
+    /**
+     * TODO: [Double.toHstString()]に置き換える
+     */
     override fun invoke(
         value: Double,
         betViewMode: BetViewMode

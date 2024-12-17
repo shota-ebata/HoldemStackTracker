@@ -15,7 +15,7 @@ class GetCurrentPlayerIdUseCaseImpl
      * 現在のゲーム状態[Game]で
      * プレイするべきプレイヤーを返す。
      */
-    override suspend fun invoke(
+    override fun invoke(
         btnPlayerId: PlayerId,
         playerOrder: List<PlayerId>,
         game: Game

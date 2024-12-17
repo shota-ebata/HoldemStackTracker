@@ -27,7 +27,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
-import com.ebata_shota.holdemstacktracker.ui.TablePrepareScreenUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.mapper.TablePrepareScreenUiStateMapper
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEvent

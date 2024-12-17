@@ -11,6 +11,11 @@ class GetPendingBetPerPlayerUseCaseImpl
 constructor(
     private val getMaxBetSize: GetMaxBetSizeUseCase
 ) : GetPendingBetPerPlayerUseCase {
+
+    /**
+     * まだ、ポッドに入っていない
+     * Betされているものをプレイヤーごとに返却
+     */
     override fun invoke(
         playerOrder: List<PlayerId>,
         actionStateList: List<BetPhaseAction>

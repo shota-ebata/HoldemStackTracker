@@ -1,4 +1,4 @@
-package com.ebata_shota.holdemstacktracker.ui
+package com.ebata_shota.holdemstacktracker.ui.mapper
 
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
