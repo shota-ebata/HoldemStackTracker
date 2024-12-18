@@ -1,15 +1,14 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.row
 
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -69,10 +68,10 @@ private fun BetSize(betSize: String) {
             .padding(vertical = 4.dp)
             .padding(horizontal = 8.dp)
     ) {
-        Image(
+        Icon(
             modifier = Modifier
                 .size(24.dp),
-            painter = painterResource(R.drawable.chip),
+            painter = painterResource(R.drawable.chip_icon),
             contentDescription = "chip"
         )
         Text(
@@ -99,7 +98,9 @@ private fun PlayerCard(
         )
     ) {
         Column(
-            modifier = Modifier.widthIn(min = 100.dp).padding(8.dp),
+            modifier = Modifier
+                .widthIn(min = 100.dp)
+                .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = uiState.playerName)
