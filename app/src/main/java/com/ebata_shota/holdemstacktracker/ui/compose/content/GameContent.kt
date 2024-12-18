@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -192,16 +193,16 @@ private class GameContentUiStatePreviewParam :
 }
 
 @Preview(
-    widthDp = 480,
     showBackground = true,
     showSystemUi = true,
+    device = Devices.PIXEL_6A,
     name = "Light Mode"
 )
 @Preview(
-    widthDp = 480,
     showBackground = true,
     showSystemUi = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
+    device = Devices.PIXEL_6A,
     name = "Dark Mode"
 )
 @Composable
