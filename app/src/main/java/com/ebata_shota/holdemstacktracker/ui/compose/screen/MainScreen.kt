@@ -143,31 +143,28 @@ fun MainScreen(
                 },
                 floatingActionButtonPosition = FabPosition.End,
             ) { innerPadding ->
-                Box(
+                MainContent(
+                    uiState = castUiState.mainContentUiState,
+                    lazyListState = lazyListState,
+                    onClickTableRow = viewModel::onClickTableRow,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
-                ) {
-                    MainContent(
-                        uiState = castUiState.mainContentUiState,
-                        lazyListState = lazyListState,
-                        onClickTableRow = viewModel::onClickTableRow
-                    )
-                    if (castUiState.isLoadingOnScreenContent) {
-                        LoadingOnScreenContent(
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                    val myNameInputDialogUiState = dialogUiState.myNameInputDialogUiState
-                    if (myNameInputDialogUiState != null) {
-                        MyNameInputDialogContent(
-                            uiState = myNameInputDialogUiState,
-                            event = viewModel
-                        )
-                    }
-                }
+                )
+            }
+            if (castUiState.isLoadingOnScreenContent) {
+                LoadingOnScreenContent(
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
+    }
+    val myNameInputDialogUiState = dialogUiState.myNameInputDialogUiState
+    if (myNameInputDialogUiState != null) {
+        MyNameInputDialogContent(
+            uiState = myNameInputDialogUiState,
+            event = viewModel
+        )
     }
 
 }
