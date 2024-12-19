@@ -409,7 +409,6 @@ constructor(
                 defaultStack = contentUiState.defaultStack.value.text.toDouble()
             )
         )
-//        val tableId = TableId("83b543e1-e901-4115-b56b-d610cdd9267d")
         _navigateEvent.emit(NavigateEvent.TablePrepare(tableId))
     }
 }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,7 +38,9 @@ fun GameContent(
         modifier = modifier.fillMaxSize()
     ) {
         Column(
-            modifier = Modifier.padding(4.dp)
+            modifier = Modifier
+                .safeDrawingPadding()
+                .padding(4.dp)
         ) {
             // TOP
             Row(

@@ -17,7 +17,6 @@ class TableCreatorActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge() // FIXME: 対応する
-
         setContent {
             HoldemStackTrackerTheme {
                 TableCreatorScreen(

@@ -72,6 +72,11 @@ constructor(
         )
 
     init {
+        // テーブル監視開始
+        tableRepository.startCollectTableFlow(tableId)
+        // ゲーム監視開始
+        gameRepository.startCollectGameFlow(tableId)
+
         viewModelScope.launch {
             combine(
                 firebaseAuthRepository.myPlayerIdFlow,
@@ -119,14 +124,6 @@ constructor(
                     }
                 }
             }.collect()
-        }
-
-
-        viewModelScope.launch {
-            // テーブル監視開始
-            tableRepository.startCollectTableFlow(tableId)
-            // ゲーム監視開始
-            gameRepository.startCollectGameFlow(tableId)
         }
     }
 

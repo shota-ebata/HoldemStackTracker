@@ -209,8 +209,6 @@ constructor(
             // FIXME: バリデーションほしいかも
             if (scanText != null) {
                 val tableId = TableId(scanText)
-                // 今参加しているテーブルがあればcollectをやめる
-                tableRepository.stopCollectTableFlow()
                 _navigateEvent.emit(NavigateEvent.TableStandby(tableId))
             }
         }

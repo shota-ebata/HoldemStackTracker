@@ -111,6 +111,9 @@ constructor(
     private val qrPainterStateFlow = MutableStateFlow<Painter?>(null)
 
     init {
+        // テーブル情報の監視をスタートする
+        tableRepository.startCollectTableFlow(tableId)
+
         // UiState生成の監視
         viewModelScope.launch {
             combine(
@@ -182,9 +185,6 @@ constructor(
         }
 
         viewModelScope.launch {
-            // テーブル情報の監視をスタートする
-            tableRepository.startCollectTableFlow(tableId)
-
             // QRコードを生成する
             val painter = BitmapPainter(
                 image = qrBitmapRepository.createQrBitmap(tableId.value).asImageBitmap()
