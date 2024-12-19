@@ -3,9 +3,11 @@ package com.ebata_shota.holdemstacktracker.ui.compose.row
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -61,24 +63,27 @@ fun GamePlayerCard(
 }
 
 @Composable
-private fun BetSize(betSize: String) {
-    // FIXME: 自分が用意したベクター画像に置き換える
+private fun BetSize(betSize: String?) {
+
     Row(
         modifier = Modifier
             .padding(vertical = 4.dp)
             .padding(horizontal = 8.dp)
+            .heightIn(24.dp)
     ) {
-        Icon(
-            modifier = Modifier
-                .size(24.dp),
-            painter = painterResource(R.drawable.chip_icon),
-            contentDescription = "chip"
-        )
-        Text(
-            modifier = Modifier
-                .padding(start = 8.dp),
-            text = betSize
-        )
+        if (betSize != null) {
+            Icon(
+                modifier = Modifier
+                    .size(24.dp),
+                painter = painterResource(R.drawable.chip_icon),
+                contentDescription = "chip"
+            )
+            Text(
+                modifier = Modifier
+                    .padding(start = 8.dp),
+                text = betSize
+            )
+        }
     }
 }
 
@@ -95,7 +100,8 @@ private fun PlayerCard(
             } else {
                 Color.Unspecified
             }
-        )
+        ),
+        shape = RoundedCornerShape(4.dp),
     ) {
         Column(
             modifier = Modifier
@@ -113,7 +119,7 @@ data class GamePlayerUiState(
     val playerName: String,
     val stack: String,
     val playerPosition: PlayerPosition,
-    val betSize: String,
+    val betSize: String?,
     val isLeaved: Boolean,
     val isMine: Boolean,
     val isCurrentPlayer: Boolean
@@ -152,6 +158,15 @@ private class GamePlayerCardPreviewParam :
             stack = "198",
             playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
             betSize = "2",
+            isLeaved = false,
+            isMine = false,
+            isCurrentPlayer = true
+        ),
+        GamePlayerUiState(
+            playerName = "PlayerName",
+            stack = "200",
+            playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
+            betSize = null,
             isLeaved = false,
             isMine = false,
             isCurrentPlayer = true

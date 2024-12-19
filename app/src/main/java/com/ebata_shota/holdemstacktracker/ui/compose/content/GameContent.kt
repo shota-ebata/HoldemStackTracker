@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
 import android.content.res.Configuration
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,27 +9,53 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Label
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.BuildConfig
+import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerCard
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import java.time.Instant
+import kotlin.math.round
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameContent(
     uiState: GameContentUiState,
@@ -120,11 +147,181 @@ fun GameContent(
                     }
             }
 
-            Row(
+            Column(
                 modifier = Modifier
-                    .weight(weight = 0.5f)
+                    .padding(top = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(text = "$uiState")
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Button(
+                        modifier = Modifier
+                            .weight(1.0f)
+                            .heightIn(min = 56.dp),
+                        onClick = {}
+                    ) {
+                        Text("Fold")
+                    }
+                    Button(
+                        modifier = Modifier
+                            .weight(2.0f)
+                            .heightIn(min = 56.dp),
+                        onClick = {}
+                    ) {
+                        Text("Check")
+                    }
+                    Button(
+                        modifier = Modifier
+                            .weight(1.0f)
+                            .heightIn(min = 56.dp),
+                        onClick = {}
+                    ) {
+                        Text("AllIn")
+                    }
+                }
+                var sliderPosition by remember { mutableFloatStateOf(100f) }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Button(
+                        modifier = Modifier
+                            .weight(1.0f),
+                        onClick = {}
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = "Call")
+                            Text(text = "+1（=3）")
+                        }
+                    }
+                    Button(
+                        modifier = Modifier
+                            .weight(1.0f),
+                        onClick = {}
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("Raise")
+                            Text(text = "+${round(sliderPosition).toInt()}（=${round(sliderPosition).toInt() + 2}）")
+                        }
+                    }
+                }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(
+                        onClick = {}
+                    ) {
+                        Text(
+                            textAlign = TextAlign.Center,
+                            text = "スタック"
+                        )
+                        Icon(
+                            imageVector = Icons.Filled.ArrowDropDown,
+                            contentDescription = "arrowDropDown"
+                        )
+                    }
+                    Column(
+                        modifier = Modifier
+                            .weight(0.58f)
+                    ) {
+                        var value by remember { mutableFloatStateOf(0f) }
+                        val interactionSource = remember { MutableInteractionSource() }
+                        val thumbSize = DpSize(20.dp, 20.dp)
+                        Slider(
+                            value = sliderPosition,
+                            onValueChange = { sliderPosition = it },
+                            steps = 9,
+                            valueRange = 0f..100f,
+                            interactionSource = interactionSource,
+                            thumb = {
+                                Label(
+                                    label = {
+                                        PlainTooltip(
+                                            modifier = Modifier
+                                                .sizeIn(45.dp, 25.dp)
+                                                .wrapContentWidth()
+                                        ) {
+                                            Column(
+                                                horizontalAlignment = Alignment.CenterHorizontally
+                                            ) {
+                                                Text(text = "スタック")
+                                                Text(text = "${round(sliderPosition).toInt()}%")
+                                            }
+                                        }
+                                    },
+                                    interactionSource = interactionSource
+                                ) {
+                                    SliderDefaults.Thumb(
+                                        interactionSource = interactionSource
+                                    )
+                                }
+                            },
+                            track = {
+                                SliderDefaults.Track(
+                                    sliderState = it
+                                )
+                            }
+                        )
+                    }
+                    OutlinedButton(
+                        modifier = Modifier
+                            .weight(0.2f)
+                            .padding(vertical = 4.dp),
+                        onClick = {},
+                        shape = ButtonDefaults.shape
+                    ) {
+                        Text(
+                            textAlign = TextAlign.Center,
+                            text = "${round(sliderPosition).toInt()}"
+                        )
+                    }
+//                    IconButton(
+//                        onClick = {}
+//                    ) {
+//                        Icon(
+//                            painter = painterResource(R.drawable.tune_24),
+//                            contentDescription = "tune"
+//                        )
+//                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    OutlinedButton(
+                        modifier = Modifier
+                            .weight(1.0f),
+                        onClick = {}
+                    ) {
+                        Text(text = "2 BB")
+                    }
+                    OutlinedButton(
+                        modifier = Modifier
+                            .weight(1.0f),
+                        onClick = {}
+                    ) {
+                        Text(text = "2.5 BB")
+                    }
+                    OutlinedButton(
+                        modifier = Modifier
+                            .weight(1.0f),
+                        onClick = {}
+                    ) {
+                        Text(text = "3 BB")
+                    }
+                    OutlinedButton(
+                        modifier = Modifier
+                            .weight(1.0f),
+                        onClick = {}
+                    ) {
+                        Text(text = "4 BB")
+                    }
+                }
             }
         }
     }
@@ -189,6 +386,12 @@ private class GameContentUiStatePreviewParam :
                 )
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
+//                rule = Rule.RingGame(
+//                    sbSize = 100.0,
+//                    bbSize = 200.0,
+//                    betViewMode = BetViewMode.Number,
+//                    defaultStack = 200.0
+//                ),
                 totalPod = "0"
             )
         )
