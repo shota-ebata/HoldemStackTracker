@@ -1,13 +1,17 @@
 package com.ebata_shota.holdemstacktracker.ui.mapper
 
+import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.extension.rearrangeListFromIndex
 import com.ebata_shota.holdemstacktracker.domain.extension.toHstString
 import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.Phase
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
+import com.ebata_shota.holdemstacktracker.infra.extension.blindText
 import com.ebata_shota.holdemstacktracker.ui.compose.content.CenterPanelContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
@@ -55,21 +59,35 @@ constructor(
                 playerName = basePlayer.name,
                 stack = gamePlayer.stack.toHstString(table.rule.betViewMode),
                 playerPosition = positions[index],
-                betSize = pendingBetPerPlayer[playerId]!!.toHstString(table.rule.betViewMode),
+                betSize = pendingBetPerPlayer[playerId]?.toHstString(table.rule.betViewMode),
                 isLeaved = gamePlayer.isLeaved,
                 isMine = playerId == myPlayerId,
                 isCurrentPlayer = playerId == currentPlayerId
             )
         }
+        val betPhase: BetPhase? = try {
+            getLatestBetPhase.invoke(game)
+        } catch (e: IllegalStateException) {
+            null
+        }
+
         return GameContentUiState(
             tableId = tableId,
             game = game,
             players = players,
             centerPanelContentUiState = CenterPanelContentUiState(
+                betPhaseTextResId = when (betPhase) {
+                    is Phase.PreFlop -> R.string.label_pre_flop
+                    is Phase.Flop -> R.string.label_flop
+                    is Phase.Turn -> R.string.label_turn
+                    is Phase.River -> R.string.label_river
+                    null -> null
+                },
                 totalPod = game.podList.sumOf {
                     it.podSize
                 }.toHstString(betViewMode = table.rule.betViewMode)
-            )
+            ),
+            blindText = table.rule.blindText(),
         )
     }
 

@@ -39,5 +39,9 @@
     <string name="label_blind">BLIND</string>
     <string name="label_update_datetime">更新日時：</string>
 
-    <string name="label_pod">ポッド</string>
+    <string name="label_pod">Pod</string>
+    <string name="label_pre_flop">PreFlop</string>
+    <string name="label_flop">Flop</string>
+    <string name="label_turn">Turn</string>
+    <string name="label_river">Ricer</string>
 </resources>

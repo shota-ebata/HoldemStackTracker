@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
 import android.content.res.Configuration
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
@@ -21,6 +23,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Label
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Slider
@@ -36,7 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,9 +48,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.BuildConfig
-import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
+import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.Game
-import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerCard
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
@@ -147,6 +149,57 @@ fun GameContent(
                     }
             }
 
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.BottomStart
+            ) {
+                Row(
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                ) {
+                    val labelBorderWidth = 0.5.dp
+                    Box(
+                        modifier = Modifier
+                            .border(
+                                width = labelBorderWidth,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp),
+                            )
+                            .padding(
+                                start = 8.dp,
+                                top = 2.dp,
+                                end = 4.dp,
+                                bottom = 2.dp,
+                            ),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.label_blind),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .border(
+                                width = labelBorderWidth,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
+                            )
+                            .padding(
+                                start = 4.dp,
+                                top = 2.dp,
+                                end = 8.dp,
+                                bottom = 2.dp,
+                            ),
+                    ) {
+                        Text(
+                            text = uiState.blindText,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            }
+
             Column(
                 modifier = Modifier
                     .padding(top = 8.dp),
@@ -229,9 +282,7 @@ fun GameContent(
                         modifier = Modifier
                             .weight(0.58f)
                     ) {
-                        var value by remember { mutableFloatStateOf(0f) }
                         val interactionSource = remember { MutableInteractionSource() }
-                        val thumbSize = DpSize(20.dp, 20.dp)
                         Slider(
                             value = sliderPosition,
                             onValueChange = { sliderPosition = it },
@@ -331,7 +382,8 @@ data class GameContentUiState(
     val tableId: TableId,
     val game: Game,
     val players: List<GamePlayerUiState>,
-    val centerPanelContentUiState: CenterPanelContentUiState
+    val centerPanelContentUiState: CenterPanelContentUiState,
+    val blindText: String,
 )
 
 private class GameContentUiStatePreviewParam :
@@ -386,14 +438,10 @@ private class GameContentUiStatePreviewParam :
                 )
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
-//                rule = Rule.RingGame(
-//                    sbSize = 100.0,
-//                    bbSize = 200.0,
-//                    betViewMode = BetViewMode.Number,
-//                    defaultStack = 200.0
-//                ),
+                betPhaseTextResId = R.string.label_pre_flop,
                 totalPod = "0"
-            )
+            ),
+            blindText = "100/200",
         )
     )
 }

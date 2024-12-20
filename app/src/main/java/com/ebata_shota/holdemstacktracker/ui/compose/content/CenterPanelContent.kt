@@ -1,10 +1,13 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
 import android.content.res.Configuration
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,20 +23,43 @@ fun CenterPanelContent(
     uiState: CenterPanelContentUiState,
     modifier: Modifier = Modifier
 ) {
+    val labelBorderWidth = 0.5.dp
     Card(
         modifier = modifier
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // TODO: フェーズ表示
-            Text(
-                text = stringResource(R.string.label_pod)
-            )
-            Row {
+            val betPhaseTextResId = uiState.betPhaseTextResId
+            if (betPhaseTextResId != null) {
+                Box(
+                    modifier = Modifier
+                        .padding(bottom = 4.dp)
+                ) {
+                    Text(
+                        text = stringResource(betPhaseTextResId),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .border(
+                        width = labelBorderWidth,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        shape = RoundedCornerShape(4.dp),
+                    )
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
-                    text = uiState.totalPod
+                    text = stringResource(R.string.label_pod),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = uiState.totalPod,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
@@ -41,6 +67,7 @@ fun CenterPanelContent(
 }
 
 data class CenterPanelContentUiState(
+    val betPhaseTextResId: Int?,
     val totalPod: String
 )
 
@@ -56,6 +83,7 @@ private fun CenterPanelContentPreview() {
     HoldemStackTrackerTheme {
         CenterPanelContent(
             uiState = CenterPanelContentUiState(
+                betPhaseTextResId = R.string.label_pre_flop,
                 totalPod = "4"
             )
         )
