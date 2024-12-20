@@ -54,6 +54,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerCard
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
+import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
 import java.time.Instant
 import kotlin.math.round
 
@@ -158,11 +159,10 @@ fun GameContent(
                     modifier = Modifier
                         .padding(top = 4.dp)
                 ) {
-                    val labelBorderWidth = 0.5.dp
                     Box(
                         modifier = Modifier
                             .border(
-                                width = labelBorderWidth,
+                                width = OutlineLabelBorderWidth,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp),
                             )
@@ -181,7 +181,7 @@ fun GameContent(
                     Box(
                         modifier = Modifier
                             .border(
-                                width = labelBorderWidth,
+                                width = OutlineLabelBorderWidth,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
                             )

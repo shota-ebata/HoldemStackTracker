@@ -17,13 +17,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
+import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
 
 @Composable
 fun CenterPanelContent(
     uiState: CenterPanelContentUiState,
     modifier: Modifier = Modifier
 ) {
-    val labelBorderWidth = 0.5.dp
     Card(
         modifier = modifier
     ) {
@@ -46,7 +46,7 @@ fun CenterPanelContent(
             Column(
                 modifier = Modifier
                     .border(
-                        width = labelBorderWidth,
+                        width = OutlineLabelBorderWidth,
                         color = MaterialTheme.colorScheme.onSurface,
                         shape = RoundedCornerShape(4.dp),
                     )

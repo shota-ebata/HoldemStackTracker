@@ -4,3 +4,5 @@ import androidx.compose.ui.unit.dp
 
 val SideSpace = 32.dp
 val CardSideSpace = 16.dp
+
+val OutlineLabelBorderWidth = 0.5.dp
