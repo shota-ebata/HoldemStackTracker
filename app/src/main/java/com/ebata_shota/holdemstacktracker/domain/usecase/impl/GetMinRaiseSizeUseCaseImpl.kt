@@ -12,6 +12,7 @@ constructor(
     private val getLatestBetPhase: GetLatestBetPhaseUseCase
 ) : GetMinRaiseSizeUseCase {
 
+    // FIXME: 引数をgameではなくphaseListにしたい
     override fun invoke(
         game: Game,
         minBetSize: Double

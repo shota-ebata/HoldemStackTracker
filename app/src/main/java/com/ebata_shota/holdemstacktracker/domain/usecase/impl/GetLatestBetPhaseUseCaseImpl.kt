@@ -9,6 +9,7 @@ import javax.inject.Inject
 class GetLatestBetPhaseUseCaseImpl
 @Inject constructor() : GetLatestBetPhaseUseCase {
 
+    // FIXME: 引数phaseListにしたい
     override fun invoke(latestGame: Game): BetPhase {
         val latestPhase: Phase? = latestGame.phaseList.lastOrNull()
         if (latestPhase == null || latestPhase !is BetPhase) {
