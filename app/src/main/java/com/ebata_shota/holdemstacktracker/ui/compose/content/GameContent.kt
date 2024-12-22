@@ -371,7 +371,10 @@ fun GameContent(
                                                 horizontalAlignment = Alignment.CenterHorizontally
                                             ) {
                                                 Text(text = stringResource(uiState.sliderLabelTitle))
-                                                Text(text = uiState.sliderLabelBody)
+                                                Text(
+                                                    text = uiState.sliderLabelBody
+                                                        .ifEmpty { stringResource(R.string.label_min) }
+                                                )
 
                                             }
                                         }

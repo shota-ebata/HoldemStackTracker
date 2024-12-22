@@ -45,6 +45,7 @@
     <string name="label_flop">Flop</string>
     <string name="label_turn">Turn</string>
     <string name="label_river">River</string>
+    <string name="label_min">min</string>
 
     <string name="button_label_fold">Fold</string>
     <string name="button_label_check">Check</string>
