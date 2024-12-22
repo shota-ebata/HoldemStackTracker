@@ -5,6 +5,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetPerPlayerUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsActionRequiredUseCaseImpl
 import io.mockk.every
 import io.mockk.mockk
@@ -20,7 +21,10 @@ class IsActionRequiredUseCaseImplTest {
     @Before
     fun setup() {
         usecase = IsActionRequiredUseCaseImpl(
-            getMaxBetSize = GetMaxBetSizeUseCaseImpl()
+            getMaxBetSize = GetMaxBetSizeUseCaseImpl(),
+            getPendingBetPerPlayer = GetPendingBetPerPlayerUseCaseImpl(
+                getMaxBetSize = GetMaxBetSizeUseCaseImpl()
+            )
         )
     }
 
@@ -30,12 +34,15 @@ class IsActionRequiredUseCaseImplTest {
         val getLatestBetPhaseUseCase: GetLatestBetPhaseUseCase = mockk()
         val getMaxBetSizeUseCase: GetMaxBetSizeUseCase = mockk()
         usecase = IsActionRequiredUseCaseImpl(
-            getMaxBetSize = getMaxBetSizeUseCase
+            getMaxBetSize = getMaxBetSizeUseCase,
+            getPendingBetPerPlayer = GetPendingBetPerPlayerUseCaseImpl(
+                getMaxBetSize = GetMaxBetSizeUseCaseImpl()
+            )
         )
         val playerOrder = listOf(
-            PlayerId("0"),
-            PlayerId("1"),
-            PlayerId("2")
+            PlayerId("SB"),
+            PlayerId("BB"),
+            PlayerId("BTN")
         )
         val latestGame = createDummyGame()
         val actionStateList = listOf<BetPhaseAction>()
@@ -59,9 +66,9 @@ class IsActionRequiredUseCaseImplTest {
     private fun executeAndAssert(
         actionStateList: List<BetPhaseAction>,
         playerOrder: List<PlayerId> = listOf(
-            PlayerId("0"),
-            PlayerId("1"),
-            PlayerId("2")
+            PlayerId("SB"),
+            PlayerId("BB"),
+            PlayerId("BTN")
         ),
         expected: Boolean
     ) {
@@ -86,7 +93,7 @@ class IsActionRequiredUseCaseImplTest {
     fun preFlop_SB_Blind() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100.0),
+            BetPhaseAction.Blind(playerId = PlayerId("SB"), betSize = 100.0),
         )
         executeAndAssert(actionStateList, expected = true)
     }
@@ -95,8 +102,8 @@ class IsActionRequiredUseCaseImplTest {
     fun preFlop_BB_Blind() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100.0),
-            BetPhaseAction.Blind(playerId = PlayerId("1"), betSize = 200.0),
+            BetPhaseAction.Blind(playerId = PlayerId("SB"), betSize = 100.0),
+            BetPhaseAction.Blind(playerId = PlayerId("BB"), betSize = 200.0),
         )
         executeAndAssert(actionStateList, expected = true)
     }
@@ -105,9 +112,9 @@ class IsActionRequiredUseCaseImplTest {
     fun preFlop_BTN_Call() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100.0),
-            BetPhaseAction.Blind(playerId = PlayerId("1"), betSize = 200.0),
-            BetPhaseAction.Call(playerId = PlayerId("2"), betSize = 200.0),
+            BetPhaseAction.Blind(playerId = PlayerId("SB"), betSize = 100.0),
+            BetPhaseAction.Blind(playerId = PlayerId("BB"), betSize = 200.0),
+            BetPhaseAction.Call(playerId = PlayerId("BTN"), betSize = 200.0),
         )
         executeAndAssert(actionStateList, expected = true)
     }
@@ -116,10 +123,23 @@ class IsActionRequiredUseCaseImplTest {
     fun preFlop_BTN_Call_And_SB_Call() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100.0),
-            BetPhaseAction.Blind(playerId = PlayerId("1"), betSize = 200.0),
-            BetPhaseAction.Call(playerId = PlayerId("2"), betSize = 200.0),
-            BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 200.0),
+            BetPhaseAction.Blind(playerId = PlayerId("SB"), betSize = 100.0),
+            BetPhaseAction.Blind(playerId = PlayerId("BB"), betSize = 200.0),
+            BetPhaseAction.Call(playerId = PlayerId("BTN"), betSize = 200.0),
+            BetPhaseAction.Call(playerId = PlayerId("SB"), betSize = 200.0),
+        )
+        executeAndAssert(actionStateList, expected = true)
+    }
+
+    @Test
+    fun preFlop_BTN_Call_And_SB_Call_BB_CHECK() {
+        // prepare
+        val actionStateList = listOf(
+            BetPhaseAction.Blind(playerId = PlayerId("SB"), betSize = 100.0),
+            BetPhaseAction.Blind(playerId = PlayerId("BB"), betSize = 200.0),
+            BetPhaseAction.Call(playerId = PlayerId("BTN"), betSize = 200.0),
+            BetPhaseAction.Call(playerId = PlayerId("SB"), betSize = 200.0),
+            BetPhaseAction.Check(playerId = PlayerId("BB")),
         )
         executeAndAssert(actionStateList, expected = false)
     }
@@ -128,9 +148,9 @@ class IsActionRequiredUseCaseImplTest {
     fun preFlop_BTN_Fold() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100.0),
-            BetPhaseAction.Blind(playerId = PlayerId("1"), betSize = 200.0),
-            BetPhaseAction.Fold(playerId = PlayerId("2")),
+            BetPhaseAction.Blind(playerId = PlayerId("SB"), betSize = 100.0),
+            BetPhaseAction.Blind(playerId = PlayerId("BB"), betSize = 200.0),
+            BetPhaseAction.Fold(playerId = PlayerId("BTN")),
         )
         executeAndAssert(actionStateList, expected = true)
     }
@@ -139,33 +159,33 @@ class IsActionRequiredUseCaseImplTest {
     fun preFlop_BTN_Fold_And_SB_Call() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100.0),
-            BetPhaseAction.Blind(playerId = PlayerId("1"), betSize = 200.0),
-            BetPhaseAction.Fold(playerId = PlayerId("2")),
-            BetPhaseAction.Call(playerId = PlayerId("0"), betSize = 200.0),
+            BetPhaseAction.Blind(playerId = PlayerId("SB"), betSize = 100.0),
+            BetPhaseAction.Blind(playerId = PlayerId("BB"), betSize = 200.0),
+            BetPhaseAction.Fold(playerId = PlayerId("BTN")),
+            BetPhaseAction.Call(playerId = PlayerId("SB"), betSize = 200.0),
         )
-        executeAndAssert(actionStateList, expected = false)
+        executeAndAssert(actionStateList, expected = true)
     }
 
     @Test
     fun preFlop_BTN_Fold_And_SB_Fold() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100.0),
-            BetPhaseAction.Blind(playerId = PlayerId("1"), betSize = 200.0),
-            BetPhaseAction.Fold(playerId = PlayerId("2")),
-            BetPhaseAction.Fold(playerId = PlayerId("0")),
+            BetPhaseAction.Blind(playerId = PlayerId("SB"), betSize = 100.0),
+            BetPhaseAction.Blind(playerId = PlayerId("BB"), betSize = 200.0),
+            BetPhaseAction.Fold(playerId = PlayerId("BTN")),
+            BetPhaseAction.Fold(playerId = PlayerId("SB")),
         )
-        executeAndAssert(actionStateList, expected = false)
+        executeAndAssert(actionStateList, expected = true)
     }
 
     @Test
     fun preFlop_BTN_Raise() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100.0),
-            BetPhaseAction.Blind(playerId = PlayerId("1"), betSize = 200.0),
-            BetPhaseAction.Raise(playerId = PlayerId("2"), betSize = 400.0),
+            BetPhaseAction.Blind(playerId = PlayerId("SB"), betSize = 100.0),
+            BetPhaseAction.Blind(playerId = PlayerId("BB"), betSize = 200.0),
+            BetPhaseAction.Raise(playerId = PlayerId("BTN"), betSize = 400.0),
         )
         executeAndAssert(actionStateList, expected = true)
     }
@@ -174,10 +194,10 @@ class IsActionRequiredUseCaseImplTest {
     fun preFlop_BTN_Raise_And_SB_Call() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100.0),
-            BetPhaseAction.Blind(playerId = PlayerId("1"), betSize = 200.0),
-            BetPhaseAction.Raise(playerId = PlayerId("2"), betSize = 400.0),
-            BetPhaseAction.Call(playerId = PlayerId("0"), betSize = 400.0),
+            BetPhaseAction.Blind(playerId = PlayerId("SB"), betSize = 100.0),
+            BetPhaseAction.Blind(playerId = PlayerId("BB"), betSize = 200.0),
+            BetPhaseAction.Raise(playerId = PlayerId("BTN"), betSize = 400.0),
+            BetPhaseAction.Call(playerId = PlayerId("SB"), betSize = 400.0),
         )
         executeAndAssert(actionStateList, expected = true)
     }
@@ -186,11 +206,11 @@ class IsActionRequiredUseCaseImplTest {
     fun preFlop_BTN_Raise_And_SB_Call_And_BB_Call() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100.0),
-            BetPhaseAction.Blind(playerId = PlayerId("1"), betSize = 200.0),
-            BetPhaseAction.Raise(playerId = PlayerId("2"), betSize = 400.0),
-            BetPhaseAction.Call(playerId = PlayerId("0"), betSize = 400.0),
-            BetPhaseAction.Call(playerId = PlayerId("1"), betSize = 400.0),
+            BetPhaseAction.Blind(playerId = PlayerId("SB"), betSize = 100.0),
+            BetPhaseAction.Blind(playerId = PlayerId("BB"), betSize = 200.0),
+            BetPhaseAction.Raise(playerId = PlayerId("BTN"), betSize = 400.0),
+            BetPhaseAction.Call(playerId = PlayerId("SB"), betSize = 400.0),
+            BetPhaseAction.Call(playerId = PlayerId("BB"), betSize = 400.0),
         )
         executeAndAssert(actionStateList, expected = false)
     }
@@ -199,9 +219,9 @@ class IsActionRequiredUseCaseImplTest {
     fun preFlop_BTN_AllIn() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100.0),
-            BetPhaseAction.Blind(playerId = PlayerId("1"), betSize = 200.0),
-            BetPhaseAction.AllIn(playerId = PlayerId("2"), betSize = 1000.0),
+            BetPhaseAction.Blind(playerId = PlayerId("SB"), betSize = 100.0),
+            BetPhaseAction.Blind(playerId = PlayerId("BB"), betSize = 200.0),
+            BetPhaseAction.AllIn(playerId = PlayerId("BTN"), betSize = 1000.0),
         )
         executeAndAssert(actionStateList, expected = true)
     }
@@ -210,10 +230,10 @@ class IsActionRequiredUseCaseImplTest {
     fun preFlop_BTN_AllIn_And_SB_AllIn() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100.0),
-            BetPhaseAction.Blind(playerId = PlayerId("1"), betSize = 200.0),
-            BetPhaseAction.AllIn(playerId = PlayerId("2"), betSize = 1000.0),
-            BetPhaseAction.AllIn(playerId = PlayerId("0"), betSize = 1500.0),
+            BetPhaseAction.Blind(playerId = PlayerId("SB"), betSize = 100.0),
+            BetPhaseAction.Blind(playerId = PlayerId("BB"), betSize = 200.0),
+            BetPhaseAction.AllIn(playerId = PlayerId("BTN"), betSize = 1000.0),
+            BetPhaseAction.AllIn(playerId = PlayerId("SB"), betSize = 1500.0),
         )
         executeAndAssert(actionStateList, expected = true)
     }
@@ -222,11 +242,11 @@ class IsActionRequiredUseCaseImplTest {
     fun preFlop_BTN_AllIn_And_SB_AllIn_And_BB_Fold() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100.0),
-            BetPhaseAction.Blind(playerId = PlayerId("1"), betSize = 200.0),
-            BetPhaseAction.AllIn(playerId = PlayerId("2"), betSize = 1000.0),
-            BetPhaseAction.AllIn(playerId = PlayerId("0"), betSize = 1500.0),
-            BetPhaseAction.Fold(playerId = PlayerId("1")),
+            BetPhaseAction.Blind(playerId = PlayerId("SB"), betSize = 100.0),
+            BetPhaseAction.Blind(playerId = PlayerId("BB"), betSize = 200.0),
+            BetPhaseAction.AllIn(playerId = PlayerId("BTN"), betSize = 1000.0),
+            BetPhaseAction.AllIn(playerId = PlayerId("SB"), betSize = 1500.0),
+            BetPhaseAction.Fold(playerId = PlayerId("BB")),
         )
         executeAndAssert(actionStateList, expected = false)
     }
@@ -235,7 +255,7 @@ class IsActionRequiredUseCaseImplTest {
     fun flop_SB_Check() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Check(playerId = PlayerId("0")),
+            BetPhaseAction.Check(playerId = PlayerId("SB")),
         )
         executeAndAssert(actionStateList, expected = true)
     }
@@ -244,8 +264,8 @@ class IsActionRequiredUseCaseImplTest {
     fun flop_SB_Check_BB_Check() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Check(playerId = PlayerId("0")),
-            BetPhaseAction.Check(playerId = PlayerId("1")),
+            BetPhaseAction.Check(playerId = PlayerId("SB")),
+            BetPhaseAction.Check(playerId = PlayerId("BB")),
         )
         executeAndAssert(actionStateList, expected = true)
     }
@@ -254,9 +274,9 @@ class IsActionRequiredUseCaseImplTest {
     fun flop_SB_Check_BB_Check_BIN_Check() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Check(playerId = PlayerId("0")),
-            BetPhaseAction.Check(playerId = PlayerId("1")),
-            BetPhaseAction.Check(playerId = PlayerId("2")),
+            BetPhaseAction.Check(playerId = PlayerId("SB")),
+            BetPhaseAction.Check(playerId = PlayerId("BB")),
+            BetPhaseAction.Check(playerId = PlayerId("BTN")),
         )
         executeAndAssert(actionStateList, expected = false)
     }
@@ -265,9 +285,9 @@ class IsActionRequiredUseCaseImplTest {
     fun flop_SB_Check_BB_Check_BIN_Fold() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Check(playerId = PlayerId("0")),
-            BetPhaseAction.Check(playerId = PlayerId("1")),
-            BetPhaseAction.Fold(playerId = PlayerId("2")),
+            BetPhaseAction.Check(playerId = PlayerId("SB")),
+            BetPhaseAction.Check(playerId = PlayerId("BB")),
+            BetPhaseAction.Fold(playerId = PlayerId("BTN")),
         )
         executeAndAssert(actionStateList, expected = false)
     }
@@ -276,9 +296,9 @@ class IsActionRequiredUseCaseImplTest {
     fun flop_SB_Check_BB_Fold_BIN_Check() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Check(playerId = PlayerId("0")),
-            BetPhaseAction.Fold(playerId = PlayerId("1")),
-            BetPhaseAction.Check(playerId = PlayerId("2")),
+            BetPhaseAction.Check(playerId = PlayerId("SB")),
+            BetPhaseAction.Fold(playerId = PlayerId("BB")),
+            BetPhaseAction.Check(playerId = PlayerId("BTN")),
         )
         executeAndAssert(actionStateList, expected = false)
     }
@@ -287,9 +307,9 @@ class IsActionRequiredUseCaseImplTest {
     fun flop_SB_Check_BB_Check_BIN_Skip() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Check(playerId = PlayerId("0")),
-            BetPhaseAction.Check(playerId = PlayerId("1")),
-            BetPhaseAction.FoldSkip(playerId = PlayerId("2")),
+            BetPhaseAction.Check(playerId = PlayerId("SB")),
+            BetPhaseAction.Check(playerId = PlayerId("BB")),
+            BetPhaseAction.FoldSkip(playerId = PlayerId("BTN")),
         )
         executeAndAssert(actionStateList, expected = false)
     }
@@ -298,9 +318,9 @@ class IsActionRequiredUseCaseImplTest {
     fun flop_SB_Check_BB_Skip_BIN_Check() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Check(playerId = PlayerId("0")),
-            BetPhaseAction.FoldSkip(playerId = PlayerId("1")),
-            BetPhaseAction.Check(playerId = PlayerId("2")),
+            BetPhaseAction.Check(playerId = PlayerId("SB")),
+            BetPhaseAction.FoldSkip(playerId = PlayerId("BB")),
+            BetPhaseAction.Check(playerId = PlayerId("BTN")),
         )
         executeAndAssert(actionStateList, expected = false)
     }
@@ -309,9 +329,9 @@ class IsActionRequiredUseCaseImplTest {
     fun flop_SB_Check_BB_Check_BIN_Bet() {
         // prepare
         val actionStateList = listOf(
-            BetPhaseAction.Check(playerId = PlayerId("0")),
-            BetPhaseAction.Check(playerId = PlayerId("1")),
-            BetPhaseAction.Bet(playerId = PlayerId("2"), betSize = 200.0),
+            BetPhaseAction.Check(playerId = PlayerId("SB")),
+            BetPhaseAction.Check(playerId = PlayerId("BB")),
+            BetPhaseAction.Bet(playerId = PlayerId("BTN"), betSize = 200.0),
         )
         executeAndAssert(actionStateList, expected = true)
     }
