@@ -18,7 +18,13 @@ fun GameScreen(
     when (val uiState = screenUiState) {
         GameScreenUiState.Loading -> LoadingContent()
         is GameScreenUiState.Content -> GameContent(
-            uiState = uiState.contentUiState
+            uiState = uiState.contentUiState,
+            onClickFoldButton = viewModel::onClickFoldButton,
+            onClickCheckButton = viewModel::onClickCheckButton,
+            onClickAllInButton = viewModel::onClickAllInButton,
+            onClickCallButton = viewModel::onClickCallButton,
+            onClickRaiseButton = viewModel::onClickRaiseButton,
+            onChangeSlider = viewModel::onChangeSlider,
         )
     }
 }

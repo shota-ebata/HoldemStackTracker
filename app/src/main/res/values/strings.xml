@@ -39,9 +39,18 @@
     <string name="label_blind">BLIND</string>
     <string name="label_update_datetime">更新日時：</string>
 
+    <string name="label_stack">Stack</string>
     <string name="label_pod">Pod</string>
     <string name="label_pre_flop">PreFlop</string>
     <string name="label_flop">Flop</string>
     <string name="label_turn">Turn</string>
-    <string name="label_river">Ricer</string>
+    <string name="label_river">River</string>
+
+    <string name="button_label_fold">Fold</string>
+    <string name="button_label_check">Check</string>
+    <string name="button_label_all_in">All In</string>
+    <string name="button_label_call">Call</string>
+    <string name="button_label_raise">Raise</string>
+    <string name="button_label_bet">Bet</string>
+    <string name="button_label_size">Size</string>
 </resources>

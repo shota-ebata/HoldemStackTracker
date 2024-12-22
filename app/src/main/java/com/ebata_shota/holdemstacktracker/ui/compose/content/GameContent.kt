@@ -1,6 +1,8 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
 import android.content.res.Configuration
+import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -10,10 +12,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -32,10 +36,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +46,6 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.R
@@ -53,17 +53,26 @@ import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerCard
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.util.DelayState
+import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
+import com.ebata_shota.holdemstacktracker.ui.compose.util.rememberDelayState
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
 import java.time.Instant
-import kotlin.math.round
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameContent(
     uiState: GameContentUiState,
+    onClickFoldButton: () -> Unit,
+    onClickCheckButton: () -> Unit,
+    onClickAllInButton: () -> Unit,
+    onClickCallButton: () -> Unit,
+    onClickRaiseButton: () -> Unit,
+    onChangeSlider: (Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val delayState: DelayState = rememberDelayState()
     Surface(
         modifier = modifier.fillMaxSize()
     ) {
@@ -76,7 +85,7 @@ fun GameContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 uiState.players
                     .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.TOP }
@@ -93,9 +102,10 @@ fun GameContent(
                 // LEFT
                 Column(
                     modifier = modifier
-                        .fillMaxHeight(),
+                        .fillMaxHeight()
+                        .padding(bottom = 24.dp),
                     horizontalAlignment = AbsoluteAlignment.Left,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.SpaceEvenly
                 ) {
                     uiState.players
                         .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.LEFT }
@@ -107,22 +117,45 @@ fun GameContent(
                         }
                 }
                 // CENTER
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1.0f),
-                    contentAlignment = Alignment.Center
+                Column(
+                    modifier = Modifier.weight(1.0f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Bottom
                 ) {
-                    CenterPanelContent(
-                        uiState = uiState.centerPanelContentUiState
-                    )
+                    Box(
+                        modifier = Modifier
+                            .weight(1.0f)
+                            .fillMaxWidth()
+                            .padding(top = 50.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CenterPanelContent(
+                            uiState = uiState.centerPanelContentUiState
+                        )
+                    }
+                    // BOTTOM
+                    Column(
+                        modifier = Modifier,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Bottom
+                    ) {
+
+                        uiState.players
+                            .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.BOTTOM }
+                            .forEach { playerUiState ->
+                                GamePlayerCard(
+                                    uiState = playerUiState
+                                )
+                            }
+                    }
                 }
                 // RIGHT
                 Column(
                     modifier = modifier
-                        .fillMaxHeight(),
+                        .fillMaxHeight()
+                        .padding(bottom = 24.dp),
                     horizontalAlignment = AbsoluteAlignment.Right,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.SpaceEvenly
                 ) {
                     uiState.players
                         .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.RIGHT }
@@ -134,21 +167,6 @@ fun GameContent(
                 }
             }
 
-            // BOTTOM
-            Column(
-                modifier = modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Bottom
-            ) {
-
-                uiState.players
-                    .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.BOTTOM }
-                    .forEach { playerUiState ->
-                        GamePlayerCard(
-                            uiState = playerUiState
-                        )
-                    }
-            }
 
             Box(
                 modifier = Modifier
@@ -157,46 +175,30 @@ fun GameContent(
             ) {
                 Row(
                     modifier = Modifier
-                        .padding(top = 4.dp)
+                        .border(
+                            width = OutlineLabelBorderWidth,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            shape = RoundedCornerShape(4.dp),
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Text(
+                        modifier = Modifier.padding(end = 4.dp),
+                        text = stringResource(R.string.label_blind),
+                        style = MaterialTheme.typography.bodySmall
+                    )
                     Box(
                         modifier = Modifier
-                            .border(
-                                width = OutlineLabelBorderWidth,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp),
-                            )
-                            .padding(
-                                start = 8.dp,
-                                top = 2.dp,
-                                end = 4.dp,
-                                bottom = 2.dp,
-                            ),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.label_blind),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .border(
-                                width = OutlineLabelBorderWidth,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
-                            )
-                            .padding(
-                                start = 4.dp,
-                                top = 2.dp,
-                                end = 8.dp,
-                                bottom = 2.dp,
-                            ),
-                    ) {
-                        Text(
-                            text = uiState.blindText,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
+                            .height(height = 16.dp)
+                            .width(OutlineLabelBorderWidth)
+                            .background(MaterialTheme.colorScheme.onSurface)
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 4.dp),
+                        text = uiState.blindText,
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
 
@@ -212,53 +214,119 @@ fun GameContent(
                         modifier = Modifier
                             .weight(1.0f)
                             .heightIn(min = 56.dp),
-                        onClick = {}
+                        onClick = {
+                            dropUselessDouble(delayState) {
+                                onClickFoldButton()
+                            }
+                        },
+                        enabled = uiState.isEnableFoldButton
                     ) {
-                        Text("Fold")
+                        Text(
+                            text = stringResource(R.string.button_label_fold),
+                            style = MaterialTheme.typography.titleMedium
+                        )
                     }
                     Button(
                         modifier = Modifier
                             .weight(2.0f)
                             .heightIn(min = 56.dp),
-                        onClick = {}
+                        onClick = {
+                            dropUselessDouble(delayState) {
+                                onClickCheckButton()
+                            }
+                        },
+                        enabled = uiState.isEnableCheckButton
                     ) {
-                        Text("Check")
+                        Text(
+                            text = stringResource(R.string.button_label_check),
+                            style = MaterialTheme.typography.titleMedium
+                        )
                     }
                     Button(
                         modifier = Modifier
                             .weight(1.0f)
                             .heightIn(min = 56.dp),
-                        onClick = {}
+                        onClick = {
+                            dropUselessDouble(delayState) {
+                                onClickAllInButton()
+                            }
+                        },
+                        enabled = uiState.isEnableAllInButton
                     ) {
-                        Text("AllIn")
+                        Text(
+                            text = stringResource(R.string.button_label_all_in),
+                            style = MaterialTheme.typography.titleMedium
+                        )
                     }
                 }
-                var sliderPosition by remember { mutableFloatStateOf(100f) }
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Button(
                         modifier = Modifier
                             .weight(1.0f),
-                        onClick = {}
+                        onClick = {
+                            dropUselessDouble(delayState) {
+                                onClickCallButton()
+                            }
+                        },
+                        enabled = uiState.isEnableCallButton
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text(text = "Call")
-                            Text(text = "+1（=3）")
+                            Text(
+                                text = stringResource(R.string.button_label_call),
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(text = uiState.callButtonSubText)
                         }
                     }
                     Button(
                         modifier = Modifier
                             .weight(1.0f),
-                        onClick = {}
+                        onClick = {
+                            dropUselessDouble(delayState) {
+                                onClickRaiseButton()
+                            }
+                        },
+                        enabled = uiState.isEnableRaiseButton
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text("Raise")
-                            Text(text = "+${round(sliderPosition).toInt()}（=${round(sliderPosition).toInt() + 2}）")
+                            Text(
+                                text = stringResource(R.string.button_label_raise),
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(text = uiState.raiseButtonSubText)
+                        }
+                    }
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedButton(
+                        modifier = Modifier
+                            .weight(0.25f)
+                            .padding(vertical = 4.dp),
+                        onClick = {},
+                        enabled = uiState.isEnableRaiseSizeButton,
+                        shape = ButtonDefaults.shape
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = stringResource(R.string.button_label_size),
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                textAlign = TextAlign.Center,
+                                text = uiState.raiseSizeText
+                            )
                         }
                     }
                 }
@@ -267,28 +335,30 @@ fun GameContent(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextButton(
-                        onClick = {}
+                        onClick = {},
+                        enabled = uiState.isEnableSliderTypeButton
                     ) {
                         Text(
                             textAlign = TextAlign.Center,
-                            text = "スタック"
+                            text = stringResource(uiState.sliderTypeText)
                         )
                         Icon(
                             imageVector = Icons.Filled.ArrowDropDown,
                             contentDescription = "arrowDropDown"
                         )
                     }
-                    Column(
+                    Box(
                         modifier = Modifier
-                            .weight(0.58f)
+                            .padding(end = 24.dp)
                     ) {
                         val interactionSource = remember { MutableInteractionSource() }
                         Slider(
-                            value = sliderPosition,
-                            onValueChange = { sliderPosition = it },
+                            value = uiState.sliderPosition,
+                            onValueChange = onChangeSlider,
                             steps = 9,
-                            valueRange = 0f..100f,
+                            valueRange = 0f..1f,
                             interactionSource = interactionSource,
+                            enabled = uiState.isEnableSlider,
                             thumb = {
                                 Label(
                                     label = {
@@ -300,8 +370,9 @@ fun GameContent(
                                             Column(
                                                 horizontalAlignment = Alignment.CenterHorizontally
                                             ) {
-                                                Text(text = "スタック")
-                                                Text(text = "${round(sliderPosition).toInt()}%")
+                                                Text(text = stringResource(uiState.sliderLabelTitle))
+                                                Text(text = uiState.sliderLabelBody)
+
                                             }
                                         }
                                     },
@@ -319,26 +390,6 @@ fun GameContent(
                             }
                         )
                     }
-                    OutlinedButton(
-                        modifier = Modifier
-                            .weight(0.2f)
-                            .padding(vertical = 4.dp),
-                        onClick = {},
-                        shape = ButtonDefaults.shape
-                    ) {
-                        Text(
-                            textAlign = TextAlign.Center,
-                            text = "${round(sliderPosition).toInt()}"
-                        )
-                    }
-//                    IconButton(
-//                        onClick = {}
-//                    ) {
-//                        Icon(
-//                            painter = painterResource(R.drawable.tune_24),
-//                            contentDescription = "tune"
-//                        )
-//                    }
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -384,6 +435,23 @@ data class GameContentUiState(
     val players: List<GamePlayerUiState>,
     val centerPanelContentUiState: CenterPanelContentUiState,
     val blindText: String,
+    val isEnableFoldButton: Boolean,
+    val isEnableCheckButton: Boolean,
+    val isEnableAllInButton: Boolean,
+    val isEnableCallButton: Boolean,
+    val callButtonSubText: String,
+    val isEnableRaiseButton: Boolean,
+    val raiseButtonSubText: String,
+    val isEnableSliderTypeButton: Boolean,
+    @StringRes
+    val sliderTypeText: Int,
+    val isEnableSlider: Boolean,
+    val sliderPosition: Float,
+    @StringRes
+    val sliderLabelTitle: Int,
+    val sliderLabelBody: String,
+    val isEnableRaiseSizeButton: Boolean,
+    val raiseSizeText: String
 )
 
 private class GameContentUiStatePreviewParam :
@@ -404,37 +472,101 @@ private class GameContentUiStatePreviewParam :
                     playerName = "PlayerName",
                     stack = "198",
                     playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
-                    betSize = "2",
+                    pendingBetSize = "2",
                     isLeaved = false,
                     isMine = false,
-                    isCurrentPlayer = false
+                    isCurrentPlayer = true,
+                    isBtn = false,
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
                     stack = "198",
                     playerPosition = GamePlayerUiState.PlayerPosition.LEFT,
-                    betSize = "2",
+                    pendingBetSize = "2",
                     isLeaved = false,
                     isMine = false,
-                    isCurrentPlayer = false
+                    isCurrentPlayer = false,
+                    isBtn = false,
+                ),
+                GamePlayerUiState(
+                    playerName = "PlayerName",
+                    stack = "198",
+                    playerPosition = GamePlayerUiState.PlayerPosition.LEFT,
+                    pendingBetSize = "2",
+                    isLeaved = false,
+                    isMine = false,
+                    isCurrentPlayer = false,
+                    isBtn = false,
+                ),
+                GamePlayerUiState(
+                    playerName = "PlayerName",
+                    stack = "198",
+                    playerPosition = GamePlayerUiState.PlayerPosition.LEFT,
+                    pendingBetSize = "2",
+                    isLeaved = false,
+                    isMine = false,
+                    isCurrentPlayer = false,
+                    isBtn = false,
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
                     stack = "198",
                     playerPosition = GamePlayerUiState.PlayerPosition.TOP,
-                    betSize = "2",
+                    pendingBetSize = "2",
                     isLeaved = false,
                     isMine = false,
-                    isCurrentPlayer = false
+                    isCurrentPlayer = false,
+                    isBtn = false,
+                ),
+                GamePlayerUiState(
+                    playerName = "PlayerName",
+                    stack = "198",
+                    playerPosition = GamePlayerUiState.PlayerPosition.TOP,
+                    pendingBetSize = "2",
+                    isLeaved = false,
+                    isMine = false,
+                    isCurrentPlayer = false,
+                    isBtn = false,
+                ),
+                GamePlayerUiState(
+                    playerName = "PlayerName",
+                    stack = "198",
+                    playerPosition = GamePlayerUiState.PlayerPosition.TOP,
+                    pendingBetSize = "2",
+                    isLeaved = false,
+                    isMine = false,
+                    isCurrentPlayer = false,
+                    isBtn = false,
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
                     stack = "198",
                     playerPosition = GamePlayerUiState.PlayerPosition.RIGHT,
-                    betSize = "2",
+                    pendingBetSize = "2",
                     isLeaved = false,
                     isMine = false,
-                    isCurrentPlayer = true
+                    isCurrentPlayer = false,
+                    isBtn = true,
+                ),
+                GamePlayerUiState(
+                    playerName = "PlayerName",
+                    stack = "198",
+                    playerPosition = GamePlayerUiState.PlayerPosition.RIGHT,
+                    pendingBetSize = "2",
+                    isLeaved = false,
+                    isMine = false,
+                    isCurrentPlayer = false,
+                    isBtn = false,
+                ),
+                GamePlayerUiState(
+                    playerName = "PlayerName",
+                    stack = "198",
+                    playerPosition = GamePlayerUiState.PlayerPosition.RIGHT,
+                    pendingBetSize = "2",
+                    isLeaved = false,
+                    isMine = false,
+                    isCurrentPlayer = false,
+                    isBtn = false,
                 )
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
@@ -442,6 +574,21 @@ private class GameContentUiStatePreviewParam :
                 totalPod = "0"
             ),
             blindText = "100/200",
+            isEnableFoldButton = true,
+            isEnableCheckButton = true,
+            isEnableAllInButton = true,
+            isEnableCallButton = true,
+            callButtonSubText = "+1",
+            isEnableRaiseButton = true,
+            raiseButtonSubText = "+100（=102)",
+            sliderTypeText = R.string.label_stack,
+            isEnableSliderTypeButton = true,
+            isEnableSlider = true,
+            sliderPosition = 0.0f,
+            sliderLabelTitle = R.string.label_stack,
+            sliderLabelBody = "100%",
+            isEnableRaiseSizeButton = true,
+            raiseSizeText = "+10200",
         )
     )
 }
@@ -466,7 +613,13 @@ private fun GameContentPreview(
 ) {
     HoldemStackTrackerTheme {
         GameContent(
-            uiState = uiState
+            uiState = uiState,
+            onClickFoldButton = {},
+            onClickCheckButton = {},
+            onClickAllInButton = {},
+            onClickCallButton = {},
+            onClickRaiseButton = {},
+            onChangeSlider = {}
         )
     }
 }

@@ -37,7 +37,7 @@ fun GamePlayerCard(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 BetSize(
-                    betSize = uiState.betSize
+                    betSize = uiState.pendingBetSize
                 )
                 PlayerCard(
                     uiState = uiState
@@ -54,7 +54,7 @@ fun GamePlayerCard(
                     uiState = uiState
                 )
                 BetSize(
-                    betSize = uiState.betSize
+                    betSize = uiState.pendingBetSize
                 )
             }
         }
@@ -64,12 +64,10 @@ fun GamePlayerCard(
 
 @Composable
 private fun BetSize(betSize: String?) {
-
     Row(
         modifier = Modifier
-            .padding(vertical = 4.dp)
-            .padding(horizontal = 8.dp)
-            .heightIn(24.dp)
+            .padding(vertical = 2.dp, horizontal = 8.dp)
+            .heightIn(min = 24.dp)
     ) {
         if (betSize != null) {
             Icon(
@@ -109,6 +107,9 @@ private fun PlayerCard(
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            if (uiState.isBtn) {
+                Text(text = "D") // TODO: BTNマークのアイコンを用意する
+            }
             Text(text = uiState.playerName)
             Text(text = uiState.stack)
         }
@@ -119,10 +120,11 @@ data class GamePlayerUiState(
     val playerName: String,
     val stack: String,
     val playerPosition: PlayerPosition,
-    val betSize: String?,
+    val pendingBetSize: String?,
     val isLeaved: Boolean,
     val isMine: Boolean,
-    val isCurrentPlayer: Boolean
+    val isCurrentPlayer: Boolean,
+    val isBtn: Boolean,
 ) {
     val betTextPosition: BetTextPosition = when (playerPosition) {
         PlayerPosition.BOTTOM -> BetTextPosition.TOP
@@ -148,28 +150,31 @@ private class GamePlayerCardPreviewParam :
             playerName = "PlayerName",
             stack = "198",
             playerPosition = GamePlayerUiState.PlayerPosition.TOP,
-            betSize = "2",
+            pendingBetSize = "2",
             isLeaved = false,
             isMine = false,
-            isCurrentPlayer = false
+            isCurrentPlayer = false,
+            isBtn = true
         ),
         GamePlayerUiState(
             playerName = "PlayerName",
             stack = "198",
             playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
-            betSize = "2",
+            pendingBetSize = "2",
             isLeaved = false,
             isMine = false,
-            isCurrentPlayer = true
+            isCurrentPlayer = true,
+            isBtn = false
         ),
         GamePlayerUiState(
             playerName = "PlayerName",
             stack = "200",
             playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
-            betSize = null,
+            pendingBetSize = null,
             isLeaved = false,
             isMine = false,
-            isCurrentPlayer = true
+            isCurrentPlayer = true,
+            isBtn = false
         )
     )
 }
