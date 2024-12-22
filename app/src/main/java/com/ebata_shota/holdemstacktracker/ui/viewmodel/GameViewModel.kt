@@ -12,6 +12,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
@@ -22,6 +23,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
 import com.ebata_shota.holdemstacktracker.ui.mapper.GameContentUiStateMapper
@@ -50,6 +52,8 @@ constructor(
     savedStateHandle: SavedStateHandle,
     private val tableRepository: TableRepository,
     private val gameRepository: GameRepository,
+    private val prefRepository: PrefRepository,
+    private val renameTablePlayer: RenameTablePlayerUseCase,
     private val getNextPhase: GetNextPhaseUseCase,
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val getNextGame: GetNextGameUseCase,
@@ -103,8 +107,6 @@ constructor(
         tableRepository.startCollectTableFlow(tableId)
         // ゲーム監視開始
         gameRepository.startCollectGameFlow(tableId)
-
-        // TODO: 名前変更の監視
 
         // UiState
         viewModelScope.launch {
@@ -160,6 +162,17 @@ constructor(
                         content
                     }
                 }
+            }.collect()
+        }
+
+        // 自分の名前の変更をテーブルに反映するために監視
+        viewModelScope.launch {
+            combine(
+                tableStateFlow.filterNotNull(),
+                firebaseAuthRepository.myPlayerIdFlow,
+                prefRepository.myName.filterNotNull()
+            ) { table, myPlayerId, myName ->
+                renameTablePlayer.invoke(table, myPlayerId, myName)
             }.collect()
         }
 
