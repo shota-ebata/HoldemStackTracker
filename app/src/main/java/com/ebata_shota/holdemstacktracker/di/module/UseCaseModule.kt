@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.di.module
 
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetDoubleToStringUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
@@ -14,11 +15,13 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerU
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPodStateListUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.CreateNewGameUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMinRaiseSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetDoubleToStringUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
@@ -32,6 +35,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetPerPl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionsUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPodStateListUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsActionRequiredUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsNotRaisedYetUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.JoinTableUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.MovePositionUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.RemovePlayersUseCaseImpl
@@ -97,4 +101,10 @@ interface UseCaseModule {
 
     @Binds
     fun bindGetNextAutoActionUseCase(useCase: GetNextAutoActionUseCaseImpl): GetNextAutoActionUseCase
+
+    @Binds
+    fun bindGetCallSizeUseCase(useCase: GetMinRaiseSizeUseCaseImpl): GetMinRaiseSizeUseCase
+
+    @Binds
+    fun bindIsNotRaisedYetUseCase(useCase: IsNotRaisedYetUseCaseImpl): IsNotRaisedYetUseCase
 }
