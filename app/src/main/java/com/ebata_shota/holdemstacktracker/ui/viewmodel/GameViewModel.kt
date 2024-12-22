@@ -163,6 +163,7 @@ constructor(
             }.collect()
         }
 
+        // 最低Raiseサイズ化するための監視
         viewModelScope.launch {
             combine(
                 raiseSizeStateFlow,
@@ -303,6 +304,8 @@ constructor(
                 tableId = tableId,
                 newGame = nextGame,
             )
+            // レイズするたびにレイズサイズを0にする(自動で最低Raiseサイズになってくれる想定
+            raiseSizeStateFlow.update { 0.0 }
         }
     }
 
