@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -107,10 +108,20 @@ private fun PlayerCard(
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (uiState.isBtn) {
-                Text(text = "D") // TODO: BTNマークのアイコンを用意する
+            Row {
+                if (uiState.isBtn) {
+                    Icon(
+                        painter = painterResource(R.drawable.icon_btn),
+                        contentDescription = "icon_btn"
+                    )
+                }
+                Text(
+                    text = uiState.playerName,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+
+                )
             }
-            Text(text = uiState.playerName)
             Text(text = uiState.stack)
         }
     }
@@ -167,7 +178,7 @@ private class GamePlayerCardPreviewParam :
             isBtn = false
         ),
         GamePlayerUiState(
-            playerName = "PlayerName",
+            playerName = "Player123456789",
             stack = "200",
             playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
             pendingBetSize = null,

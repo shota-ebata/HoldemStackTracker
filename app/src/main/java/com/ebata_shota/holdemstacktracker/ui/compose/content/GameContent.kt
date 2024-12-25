@@ -103,6 +103,7 @@ fun GameContent(
                 Column(
                     modifier = modifier
                         .fillMaxHeight()
+                        .weight(1.0f)
                         .padding(bottom = 24.dp),
                     horizontalAlignment = AbsoluteAlignment.Left,
                     verticalArrangement = Arrangement.SpaceEvenly
@@ -153,6 +154,7 @@ fun GameContent(
                 Column(
                     modifier = modifier
                         .fillMaxHeight()
+                        .weight(1.0f)
                         .padding(bottom = 24.dp),
                     horizontalAlignment = AbsoluteAlignment.Right,
                     verticalArrangement = Arrangement.SpaceEvenly
@@ -552,7 +554,7 @@ private class GameContentUiStatePreviewParam :
                     isBtn = true,
                 ),
                 GamePlayerUiState(
-                    playerName = "PlayerName",
+                    playerName = "Player123456789",
                     stack = "198",
                     playerPosition = GamePlayerUiState.PlayerPosition.RIGHT,
                     pendingBetSize = "2",
