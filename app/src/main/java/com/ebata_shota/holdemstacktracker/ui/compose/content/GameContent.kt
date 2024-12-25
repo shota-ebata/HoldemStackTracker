@@ -33,6 +33,7 @@ import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -71,7 +72,8 @@ fun GameContent(
     onClickRaiseButton: () -> Unit,
     onClickRaiseUpSizeButton: () -> Unit,
     onChangeSlider: (Float) -> Unit,
-    modifier: Modifier = Modifier
+    onClickSliderStepSwitch: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val delayState: DelayState = rememberDelayState()
     Surface(
@@ -320,7 +322,7 @@ fun GameContent(
                                 onClickRaiseUpSizeButton()
                             }
                         },
-                        enabled = uiState.isEnableRaiseSizeButton,
+                        enabled = uiState.isEnableRaiseUpSizeButton,
                         shape = ButtonDefaults.shape
                     ) {
                         Column(
@@ -332,7 +334,7 @@ fun GameContent(
                             )
                             Text(
                                 textAlign = TextAlign.Center,
-                                text = uiState.raiseSizeText
+                                text = uiState.raiseUpSizeText
                             )
                         }
                     }
@@ -356,13 +358,13 @@ fun GameContent(
                     }
                     Box(
                         modifier = Modifier
-                            .padding(end = 24.dp)
+                            .weight(1.0f)
                     ) {
                         val interactionSource = remember { MutableInteractionSource() }
                         Slider(
                             value = uiState.sliderPosition,
                             onValueChange = onChangeSlider,
-                            steps = 9,
+                            steps = if (uiState.isEnableSliderStep) 9 else 0,
                             valueRange = 0f..1f,
                             interactionSource = interactionSource,
                             enabled = uiState.isEnableSlider,
@@ -400,6 +402,17 @@ fun GameContent(
                             }
                         )
                     }
+                    Switch(
+                        modifier = Modifier
+                            .padding(
+                                start = 4.dp,
+                                end = 4.dp
+                            ),
+                        checked = uiState.isEnableSliderStep,
+                        onCheckedChange = {
+                            onClickSliderStepSwitch(it)
+                        }
+                    )
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -460,8 +473,9 @@ data class GameContentUiState(
     @StringRes
     val sliderLabelTitle: Int,
     val sliderLabelBody: String,
-    val isEnableRaiseSizeButton: Boolean,
-    val raiseSizeText: String
+    val isEnableSliderStep: Boolean,
+    val isEnableRaiseUpSizeButton: Boolean,
+    val raiseUpSizeText: String,
 )
 
 private class GameContentUiStatePreviewParam :
@@ -596,9 +610,10 @@ private class GameContentUiStatePreviewParam :
             isEnableSlider = true,
             sliderPosition = 0.0f,
             sliderLabelTitle = R.string.label_stack,
+            isEnableSliderStep = true,
             sliderLabelBody = "100%",
-            isEnableRaiseSizeButton = true,
-            raiseSizeText = "+10200",
+            isEnableRaiseUpSizeButton = true,
+            raiseUpSizeText = "+10200",
         )
     )
 }
@@ -630,7 +645,8 @@ private fun GameContentPreview(
             onClickCallButton = {},
             onClickRaiseButton = {},
             onClickRaiseUpSizeButton = {},
-            onChangeSlider = {}
+            onChangeSlider = {},
+            onClickSliderStepSwitch = {}
         )
     }
 }

@@ -27,8 +27,8 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ChangeRaiseUpSizeDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ChangeRaiseSizeUpDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ChangeRaiseUpSizeDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.TextFieldErrorUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
@@ -130,7 +130,15 @@ constructor(
                 gameStateFlow.filterNotNull(),
                 raiseSizeStateFlow,
                 minRaiseSizeFlow,
-            ) { myPlayerId, table, game, raiseSize, minRaiseSize ->
+                prefRepository.isEnableRaiseUpSliderStep,
+            ) {
+                val myPlayerId = it[0] as PlayerId
+                val table = it[1] as Table
+                val game = it[2] as Game
+                val raiseSize = it[3] as Double?
+                val minRaiseSize = it[4] as Double
+                val isEnableSliderStep = it[5] as Boolean
+
                 val currentPlayerId = getCurrentPlayerId.invoke(
                     btnPlayerId = table.btnPlayerId,
                     playerOrder = table.playerOrder,
@@ -168,6 +176,7 @@ constructor(
                             myPlayerId = myPlayerId,
                             raiseSize = raiseSize ?: minRaiseSize,
                             minRaiseSize = minRaiseSize,
+                            isEnableSliderStep = isEnableSliderStep,
                         )
                     )
                     // TODO: フェーズが進んだことを検知したい
@@ -418,6 +427,14 @@ constructor(
         )
         val myPendingBetSize = pendingBetPerPlayer[myPlayerId] ?: 0.0
         return myPendingBetSize
+    }
+
+    fun onClickSliderStepSwitch(
+        value: Boolean,
+    ) {
+        viewModelScope.launch {
+            prefRepository.saveEnableRaiseUpSliderStep(value)
+        }
     }
 
     override fun onChangeRaiseUpSizeDialogTextFieldValue(value: TextFieldValue) {

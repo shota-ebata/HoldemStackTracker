@@ -43,4 +43,10 @@ interface PrefRepository {
      */
     val defaultStackSizeOfBbMode: Flow<Double>
     suspend fun saveDefaultStackSizeOfBBMode(value: Double)
+
+    /**
+     * RaiseUpサイズのスライダーステップON_OFF
+     */
+    val isEnableRaiseUpSliderStep: Flow<Boolean>
+    suspend fun saveEnableRaiseUpSliderStep(value: Boolean)
 }

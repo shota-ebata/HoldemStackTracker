@@ -30,6 +30,7 @@ fun GameScreen(
                 onClickRaiseButton = viewModel::onClickRaiseButton,
                 onClickRaiseUpSizeButton = viewModel::onClickRaiseUpSizeButton,
                 onChangeSlider = viewModel::onChangeSlider,
+                onClickSliderStepSwitch = viewModel::onClickSliderStepSwitch,
             )
 
             val changeRaiseSizeDialogUiState = dialogUiState.changeRaiseSizeUpDialogUiState

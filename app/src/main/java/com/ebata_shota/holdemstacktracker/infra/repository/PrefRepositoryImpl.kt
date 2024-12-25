@@ -11,6 +11,7 @@ import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultSizeOf
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultSizeOfSbOfNumberMode
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultStackSizeOfBbMode
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultStackSizeOfNumberMode
+import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.EnableRaiseUpSliderStep
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.MyName
 import com.ebata_shota.holdemstacktracker.infra.extension.prefFlow
 import com.ebata_shota.holdemstacktracker.infra.extension.setPrefValue
@@ -88,5 +89,14 @@ constructor(
 
     override suspend fun saveDefaultStackSizeOfBBMode(value: Double) {
         dataStore.setPrefValue(DefaultStackSizeOfBbMode, value)
+    }
+
+    override val isEnableRaiseUpSliderStep: Flow<Boolean> by dataStore.prefFlow(
+        key = EnableRaiseUpSliderStep,
+        defaultValue = { true }
+    )
+
+    override suspend fun saveEnableRaiseUpSliderStep(value: Boolean) {
+        dataStore.setPrefValue(EnableRaiseUpSliderStep, value)
     }
 }

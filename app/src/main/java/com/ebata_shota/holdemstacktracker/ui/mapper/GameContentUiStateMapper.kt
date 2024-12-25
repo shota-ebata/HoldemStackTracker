@@ -41,7 +41,8 @@ constructor(
         table: Table,
         myPlayerId: PlayerId,
         raiseSize: Double,
-        minRaiseSize: Double
+        minRaiseSize: Double,
+        isEnableSliderStep: Boolean
     ): GameContentUiState {
         val tableId = table.id
         val startIndex = table.playerOrder.indexOf(myPlayerId)
@@ -206,8 +207,9 @@ constructor(
             sliderPosition = sliderPosition,
             sliderLabelTitle = R.string.label_stack,
             sliderLabelBody = sliderLabelBody,
-            isEnableRaiseSizeButton = isEnableRaiseSizeButton,
-            raiseSizeText = raiseSizeText,
+            isEnableSliderStep = isEnableSliderStep,
+            isEnableRaiseUpSizeButton = isEnableRaiseSizeButton,
+            raiseUpSizeText = raiseSizeText,
         )
     }
 
