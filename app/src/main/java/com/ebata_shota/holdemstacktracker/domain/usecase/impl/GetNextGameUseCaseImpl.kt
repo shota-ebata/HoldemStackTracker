@@ -89,7 +89,7 @@ constructor(
             // プレイヤーごとの、まだポッドに入っていないベット額
             val pendingBetPerPlayer: Map<PlayerId, Double> = getPendingBetPerPlayer.invoke(
                 playerOrder = playerOrder,
-                actionStateList = latestPhase.actionStateList
+                actionStateList = updatedActionStateList
             )
             // ベット状況をポッドに反映
             val updatedPodList: List<Pod> = getPodStateList.invoke(
