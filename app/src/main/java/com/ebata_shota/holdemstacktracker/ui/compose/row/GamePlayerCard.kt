@@ -108,7 +108,9 @@ private fun PlayerCard(
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 if (uiState.isBtn) {
                     Icon(
                         painter = painterResource(R.drawable.icon_btn),
@@ -119,7 +121,6 @@ private fun PlayerCard(
                     text = uiState.playerName,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1
-
                 )
             }
             Text(text = uiState.stack)

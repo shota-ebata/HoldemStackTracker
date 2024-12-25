@@ -69,6 +69,7 @@ fun GameContent(
     onClickAllInButton: () -> Unit,
     onClickCallButton: () -> Unit,
     onClickRaiseButton: () -> Unit,
+    onClickRaiseUpSizeButton: () -> Unit,
     onChangeSlider: (Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -314,7 +315,11 @@ fun GameContent(
                         modifier = Modifier
                             .weight(0.25f)
                             .padding(vertical = 4.dp),
-                        onClick = {},
+                        onClick = {
+                            dropUselessDouble(delayState) {
+                                onClickRaiseUpSizeButton()
+                            }
+                        },
                         enabled = uiState.isEnableRaiseSizeButton,
                         shape = ButtonDefaults.shape
                     ) {
@@ -624,6 +629,7 @@ private fun GameContentPreview(
             onClickAllInButton = {},
             onClickCallButton = {},
             onClickRaiseButton = {},
+            onClickRaiseUpSizeButton = {},
             onChangeSlider = {}
         )
     }

@@ -54,4 +54,6 @@
     <string name="button_label_raise">Raise</string>
     <string name="button_label_bet">Bet</string>
     <string name="button_label_size">Size</string>
+
+    <string name="title_raise_size_dialog">Raise Size</string>
 </resources>
