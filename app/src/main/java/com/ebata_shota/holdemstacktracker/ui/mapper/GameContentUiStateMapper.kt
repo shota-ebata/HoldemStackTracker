@@ -138,53 +138,61 @@ constructor(
 
             // Raiseボタン
             // Raiseしたときに場に出ている額（raiseSize）に足りない額
-            val raiseShortageSize: Double = raiseSize - myPendingBetSize
+            val raiseUpSize = raiseSize - myPendingBetSize
             // 最低レイズ額に足りている場合
-            isEnableRaiseButton = gamePlayer.stack >= raiseShortageSize
+            isEnableRaiseButton = gamePlayer.stack >= raiseUpSize
             // Raiseしたときに場に出ている額（raiseSize）と、
-            val totalRaiseSizeText = if (raiseSize != raiseShortageSize) {
+            val totalRaiseSizeText = if (raiseSize != raiseUpSize) {
                 "（=${(raiseSize).toHstString(table.rule.betViewMode)}）"
             } else {
                 ""
             }
             raiseButtonSubText = if (isEnableRaiseButton) {
-                "+${raiseShortageSize.toHstString(table.rule.betViewMode)}$totalRaiseSizeText"
+                "+${raiseUpSize.toHstString(table.rule.betViewMode)}$totalRaiseSizeText"
             } else {
                 ""
             }
 
             // Slider
-//            when (sliderType) {
-//                GameViewModel.SliderType.Stack -> {
-//                    // (スタック)に対する(レイズしたあと場に出ている額 - 今場に出ている額)の比率
-//                    sliderPosition = ((raiseSize - myPendingBetSize) / gamePlayer.stack).toFloat()
-//                }
-//                GameViewModel.SliderType.Pod -> {
-//                    val totalPodSize = game.podList.sumOf { it.podSize }
-//                    sliderPosition = (raiseSize / totalPodSize).toFloat()
-//                }
-//            }
-            // (スタック)に対する(レイズしたあと場に出ている額 - 今場に出ている額)の比率
-            sliderPosition = ((raiseSize - myPendingBetSize) / gamePlayer.stack).toFloat()
+            when (sliderType) {
+                GameViewModel.SliderType.Stack -> {
+                    // (スタック)に対する(レイズしたあと場に出ている額 - 今場に出ている額)の比率
+                    sliderPosition = (raiseUpSize / gamePlayer.stack).toFloat()
+                }
+                GameViewModel.SliderType.Pod -> {
+                    val totalPodSize = game.podList.sumOf { it.podSize }
+                    sliderPosition = if (totalPodSize != 0.0) {
+                        (raiseSize / totalPodSize).toFloat()
+                    } else {
+                        0.0f
+                    }
 
-            isEnableSlider = isEnableRaiseButton
+                }
+            }
+//            // (スタック)に対する(レイズしたあと場に出ている額 - 今場に出ている額)の比率
+//            sliderPosition = ((raiseSize - myPendingBetSize) / gamePlayer.stack).toFloat()
+
+            isEnableSlider = gamePlayer.stack > minRaiseSize - myPendingBetSize
             // SliderLabel
             // 最低レイズ額の場合ラベルを表示しない（％が0になりうるので見せたくない）
-            sliderLabelStackBody = if (minRaiseSize != raiseSize) {
-                "${(sliderPosition * 100).roundToInt()}%"
-            } else {
-                ""
-            }
+//            sliderLabelStackBody = if (minRaiseSize != raiseSize) {
+//                "${(((raiseSize - myPendingBetSize) / gamePlayer.stack) * 100).roundToInt()}%"
+//            } else {
+//                ""
+//            }
+            sliderLabelStackBody = "${((raiseUpSize / gamePlayer.stack) * 100).roundToInt()}%"
             val totalPodSize = game.podList.sumOf { it.podSize }
             sliderLabelPodBody = if (totalPodSize != 0.0) {
-                "${((raiseSize / totalPodSize) * 100).roundToInt()}%"
+                // Raiseサイズ / Podサイズ
+                val raiseSizePerTotalPodSize = raiseSize / totalPodSize
+                "${(raiseSizePerTotalPodSize * 100).roundToInt()}%"
             } else {
                 ""
             }
 
             // Raiseサイズボタン
             isEnableRaiseSizeButton = isEnableRaiseButton
-            raiseUpSizeText = "+${raiseShortageSize.toHstString(table.rule.betViewMode)}"
+            raiseUpSizeText = "+${raiseUpSize.toHstString(table.rule.betViewMode)}"
         } else {
             // 自分の番ではないなら、無効にする
             isEnableFoldButton = false

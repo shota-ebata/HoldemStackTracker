@@ -413,63 +413,74 @@ constructor(
             )
             val player = game.players.find { it.id == myPlayerId } ?: return@launch
 
+            val minRaiseSize = minRaiseSizeFlow.first()
+            when (sliderType) {
+                SliderType.Stack -> {
+                    // 追加でBetするサイズ
+                    val raiseUpSize = when (table.rule.betViewMode) {
+                        BetViewMode.Number -> (player.stack * value).roundToInt().toDouble()
+                        BetViewMode.BB -> (player.stack * 10 * value).roundToInt() / 10.0
+                    }
 
-//            when (sliderType) {
-//                SliderType.Stack -> {
-//                    // 追加でBetするサイズ
-//                    val raiseUpSize = when (table.rule.betViewMode) {
-//                        BetViewMode.Number -> (player.stack * value).roundToInt().toDouble()
-//                        BetViewMode.BB -> (player.stack * 10 * value).roundToInt() / 10.0
-//                    }
-//
-//                    // 最低の引き上げ幅
-//                    val minRiseUpSize = minRaiseSizeFlow.first() - myPendingBetSize
-//                    val raiseSize: Double = if (raiseUpSize >= minRiseUpSize) {
-//                        // 最低Betサイズを超えている場合は
-//                        // 追加Betサイズ + 今場に出ているベットサイズ
-//                        raiseUpSize + myPendingBetSize
-//                    } else {
-//                        // 下回っている場合は、現在の最低額
-//                        minRaiseSizeFlow.first()
-//                    }
-//                    raiseSizeStateFlow.update { raiseSize }
-//                }
-//                SliderType.Pod -> {
-//                    val totalPodSize = game.podList.sumOf { it.podSize }
-//                    // 追加でBetするサイズ
-//                    val raiseSize = when (table.rule.betViewMode) {
-//                        BetViewMode.Number -> (totalPodSize * value).roundToInt().toDouble()
-//                        BetViewMode.BB -> (totalPodSize * 10 * value).roundToInt() / 10.0
-//                    }
-//
-//                    // 最低の引き上げ幅
-//                    val minRiseUpSize = minRaiseSizeFlow.first() - myPendingBetSize
-//                    if (raiseSize - myPendingBetSize >= minRiseUpSize) {
-//                        raiseSizeStateFlow.update { raiseSize }
-//                    } else {
-//                        // 下回っている場合は、現在の最低額
-//                        raiseSizeStateFlow.update { minRaiseSizeFlow.first() }
-//                    }
-//
-//                }
+                    // 最低の引き上げ幅
+                    val minRiseUpSize = minRaiseSize - myPendingBetSize
+                    val raiseSize: Double = if (raiseUpSize >= minRiseUpSize) {
+                        // 最低Betサイズを超えている場合は
+                        // 追加Betサイズ + 今場に出ているベットサイズ
+                        raiseUpSize + myPendingBetSize
+                    } else {
+                        // 下回っている場合は、現在の最低額
+                        minRaiseSize
+                    }
+                    raiseSizeStateFlow.update { raiseSize }
+                }
+
+                SliderType.Pod -> {
+                    val totalPodSize = game.podList.sumOf { it.podSize }
+                    // 追加でBetするサイズ
+                    val raiseSize = when (table.rule.betViewMode) {
+                        BetViewMode.Number -> (totalPodSize * value).roundToInt().toDouble()
+                        BetViewMode.BB -> (totalPodSize * 10 * value).roundToInt() / 10.0
+                    }
+
+                    // 最低の引き上げ幅
+                    val minRiseUpSize = minRaiseSize - myPendingBetSize
+                    raiseSizeStateFlow.update {
+                        when {
+                            raiseSize - myPendingBetSize > player.stack -> {
+                                // 上回っている場合は、スタック
+                                player.stack
+                            }
+
+                            raiseSize - myPendingBetSize >= minRiseUpSize -> {
+                                raiseSize
+                            }
+
+                            else -> {
+                                // 下回っている場合は、現在の最低額
+                                minRaiseSize
+                            }
+                        }
+                    }
+                }
+            }
+//            // 追加でBetするサイズ
+//            val raiseUpSize = when (table.rule.betViewMode) {
+//                BetViewMode.Number -> (player.stack * value).roundToInt().toDouble()
+//                BetViewMode.BB -> (player.stack * 10 * value).roundToInt() / 10.0
 //            }
-            // 追加でBetするサイズ
-            val raiseUpSize = when (table.rule.betViewMode) {
-                BetViewMode.Number -> (player.stack * value).roundToInt().toDouble()
-                BetViewMode.BB -> (player.stack * 10 * value).roundToInt() / 10.0
-            }
-
-            // 最低の引き上げ幅
-            val minRiseUpSize = minRaiseSizeFlow.first() - myPendingBetSize
-            val raiseSize: Double = if (raiseUpSize >= minRiseUpSize) {
-                // 最低Betサイズを超えている場合は
-                // 追加Betサイズ + 今場に出ているベットサイズ
-                raiseUpSize + myPendingBetSize
-            } else {
-                // 下回っている場合は、現在の最低額
-                minRaiseSizeFlow.first()
-            }
-            raiseSizeStateFlow.update { raiseSize }
+//
+//            // 最低の引き上げ幅
+//            val minRiseUpSize = minRaiseSizeFlow.first() - myPendingBetSize
+//            val raiseSize: Double = if (raiseUpSize >= minRiseUpSize) {
+//                // 最低Betサイズを超えている場合は
+//                // 追加Betサイズ + 今場に出ているベットサイズ
+//                raiseUpSize + myPendingBetSize
+//            } else {
+//                // 下回っている場合は、現在の最低額
+//                minRaiseSizeFlow.first()
+//            }
+//            raiseSizeStateFlow.update { raiseSize }
         }
     }
 
