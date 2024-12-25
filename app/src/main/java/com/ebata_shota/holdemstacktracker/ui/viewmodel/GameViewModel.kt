@@ -295,21 +295,31 @@ constructor(
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
             val betPhase = getLatestBetPhase.invoke(game)
+            val actionStateList = betPhase.actionStateList
             // このフェーズ中、まだBetやAllInをしていない(オープンアクション)
-            val isNotRaisedYet = isNotRaisedYet.invoke(betPhase.actionStateList)
+            val isNotRaisedYet = isNotRaisedYet.invoke(actionStateList)
             val raiseSize = raiseSizeStateFlow.value ?: return@launch
+            val player = game.players.find { it.id == myPlayerId } ?: return@launch
             val nextGame = getNextGame.invoke(
                 latestGame = game,
-                action = if (isNotRaisedYet) {
-                    BetPhaseAction.Bet(
+                action = if (raiseSize == player.stack) {
+                    // レイズサイズ == スタックサイズの場合はAllIn
+                    BetPhaseAction.AllIn(
                         playerId = myPlayerId,
                         betSize = raiseSize
                     )
                 } else {
-                    BetPhaseAction.Raise(
-                        playerId = myPlayerId,
-                        betSize = raiseSize
-                    )
+                    if (isNotRaisedYet) {
+                        BetPhaseAction.Bet(
+                            playerId = myPlayerId,
+                            betSize = raiseSize
+                        )
+                    } else {
+                        BetPhaseAction.Raise(
+                            playerId = myPlayerId,
+                            betSize = raiseSize
+                        )
+                    }
                 },
                 playerOrder = table.playerOrder,
             )
