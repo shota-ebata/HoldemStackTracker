@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
@@ -28,8 +29,15 @@ class GetCurrentPlayerIdUseCaseImpl
         val latestActionPlayerId = actionStateList.lastOrNull()?.playerId ?: btnPlayerId
         // 最後にアクションしたプレイヤーIDのindexを取得
         val latestActionPlayerIndex = playerOrder.indexOf(latestActionPlayerId)
-        val nextPlayerIndex: Int = if (playerOrder.size == 2 && actionStateList.isEmpty()) {
-            // 2人しかいないかつ、まだ誰もアクションしていない場合、BTNからSBを始めるのでnextPlayerはBTNとなる。
+        val nextPlayerIndex: Int = if (
+            playerOrder.size == 2
+            && actionStateList.isEmpty()
+            && latestBetPhase is Phase.PreFlop
+        ) {
+            // 2人しかいない
+            // かつ、まだ誰もアクションしていない
+            // かつ、PreFlopの場合
+            // BTNからSBを始めるのでnextPlayerはBTNとなる。
             playerOrder.indexOf(btnPlayerId)
         } else {
             // 基本は最後にアクションした人の次の人

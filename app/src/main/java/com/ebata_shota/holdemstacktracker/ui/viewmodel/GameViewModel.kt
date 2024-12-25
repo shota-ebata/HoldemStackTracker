@@ -116,6 +116,8 @@ constructor(
         replay = 1
     )
 
+    private val sliderTypeStateFlow = MutableStateFlow(SliderType.Stack)
+
     init {
         // テーブル監視開始
         tableRepository.startCollectTableFlow(tableId)
@@ -130,6 +132,7 @@ constructor(
                 gameStateFlow.filterNotNull(),
                 raiseSizeStateFlow,
                 minRaiseSizeFlow,
+                sliderTypeStateFlow,
                 prefRepository.isEnableRaiseUpSliderStep,
             ) {
                 val myPlayerId = it[0] as PlayerId
@@ -137,7 +140,8 @@ constructor(
                 val game = it[2] as Game
                 val raiseSize = it[3] as Double?
                 val minRaiseSize = it[4] as Double
-                val isEnableSliderStep = it[5] as Boolean
+                val sliderType = it[5] as SliderType
+                val isEnableSliderStep = it[6] as Boolean
 
                 val currentPlayerId = getCurrentPlayerId.invoke(
                     btnPlayerId = table.btnPlayerId,
@@ -177,6 +181,7 @@ constructor(
                             raiseSize = raiseSize ?: minRaiseSize,
                             minRaiseSize = minRaiseSize,
                             isEnableSliderStep = isEnableSliderStep,
+                            sliderType = sliderType,
                         )
                     )
                     // TODO: フェーズが進んだことを検知したい
@@ -383,11 +388,23 @@ constructor(
         }
     }
 
+    fun onClickSliderTypeButton() {
+        sliderTypeStateFlow.update {
+            when (it) {
+                SliderType.Stack -> SliderType.Pod
+                SliderType.Pod -> SliderType.Stack
+            }
+        }
+        // スライダータイプを変更するたび0にする(自動で最低Raiseサイズになってくれる想定
+        raiseSizeStateFlow.update { 0.0 }
+    }
+
     fun onChangeSlider(value: Float) {
         viewModelScope.launch {
             val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+            val sliderType = sliderTypeStateFlow.value
 
             val myPendingBetSize = getPendingBetSize(
                 game = game,
@@ -395,6 +412,47 @@ constructor(
                 myPlayerId = myPlayerId
             )
             val player = game.players.find { it.id == myPlayerId } ?: return@launch
+
+
+//            when (sliderType) {
+//                SliderType.Stack -> {
+//                    // 追加でBetするサイズ
+//                    val raiseUpSize = when (table.rule.betViewMode) {
+//                        BetViewMode.Number -> (player.stack * value).roundToInt().toDouble()
+//                        BetViewMode.BB -> (player.stack * 10 * value).roundToInt() / 10.0
+//                    }
+//
+//                    // 最低の引き上げ幅
+//                    val minRiseUpSize = minRaiseSizeFlow.first() - myPendingBetSize
+//                    val raiseSize: Double = if (raiseUpSize >= minRiseUpSize) {
+//                        // 最低Betサイズを超えている場合は
+//                        // 追加Betサイズ + 今場に出ているベットサイズ
+//                        raiseUpSize + myPendingBetSize
+//                    } else {
+//                        // 下回っている場合は、現在の最低額
+//                        minRaiseSizeFlow.first()
+//                    }
+//                    raiseSizeStateFlow.update { raiseSize }
+//                }
+//                SliderType.Pod -> {
+//                    val totalPodSize = game.podList.sumOf { it.podSize }
+//                    // 追加でBetするサイズ
+//                    val raiseSize = when (table.rule.betViewMode) {
+//                        BetViewMode.Number -> (totalPodSize * value).roundToInt().toDouble()
+//                        BetViewMode.BB -> (totalPodSize * 10 * value).roundToInt() / 10.0
+//                    }
+//
+//                    // 最低の引き上げ幅
+//                    val minRiseUpSize = minRaiseSizeFlow.first() - myPendingBetSize
+//                    if (raiseSize - myPendingBetSize >= minRiseUpSize) {
+//                        raiseSizeStateFlow.update { raiseSize }
+//                    } else {
+//                        // 下回っている場合は、現在の最低額
+//                        raiseSizeStateFlow.update { minRaiseSizeFlow.first() }
+//                    }
+//
+//                }
+//            }
             // 追加でBetするサイズ
             val raiseUpSize = when (table.rule.betViewMode) {
                 BetViewMode.Number -> (player.stack * value).roundToInt().toDouble()
@@ -475,6 +533,11 @@ constructor(
         _dialogUiState.update {
             it.copy(changeRaiseSizeUpDialogUiState = null)
         }
+    }
+
+    enum class SliderType {
+        Stack,
+        Pod,
     }
 
     companion object {

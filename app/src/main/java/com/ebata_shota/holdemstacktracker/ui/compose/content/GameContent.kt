@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -71,6 +72,7 @@ fun GameContent(
     onClickCallButton: () -> Unit,
     onClickRaiseButton: () -> Unit,
     onClickRaiseUpSizeButton: () -> Unit,
+    onClickSliderTypeButton: () -> Unit,
     onChangeSlider: (Float) -> Unit,
     onClickSliderStepSwitch: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -344,12 +346,14 @@ fun GameContent(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextButton(
-                        onClick = {},
+                        onClick = {
+                            onClickSliderTypeButton()
+                        },
                         enabled = uiState.isEnableSliderTypeButton
                     ) {
                         Text(
                             textAlign = TextAlign.Center,
-                            text = stringResource(uiState.sliderTypeText)
+                            text = stringResource(uiState.sliderTypeLabelResId)
                         )
                         Icon(
                             imageVector = Icons.Filled.ArrowDropDown,
@@ -377,14 +381,28 @@ fun GameContent(
                                                 .wrapContentWidth()
                                         ) {
                                             Column(
+                                                modifier = Modifier
+                                                    .widthIn(min = 50.dp),
                                                 horizontalAlignment = Alignment.CenterHorizontally
                                             ) {
-                                                Text(text = stringResource(uiState.sliderLabelTitle))
                                                 Text(
-                                                    text = uiState.sliderLabelBody
-                                                        .ifEmpty { stringResource(R.string.label_min) }
+                                                    text = stringResource(R.string.label_stack),
+                                                    style = MaterialTheme.typography.titleSmall
                                                 )
-
+                                                Text(
+                                                    text = uiState.sliderLabelStackBody
+                                                        .ifEmpty { stringResource(R.string.label_min) },
+                                                    style = MaterialTheme.typography.bodySmall
+                                                )
+                                                Text(
+                                                    text = stringResource(R.string.label_pod),
+                                                    style = MaterialTheme.typography.titleSmall
+                                                )
+                                                Text(
+                                                    text = uiState.sliderLabelPodBody
+                                                        .ifEmpty { stringResource(R.string.label_min) },
+                                                    style = MaterialTheme.typography.bodySmall
+                                                )
                                             }
                                         }
                                     },
@@ -411,7 +429,8 @@ fun GameContent(
                         checked = uiState.isEnableSliderStep,
                         onCheckedChange = {
                             onClickSliderStepSwitch(it)
-                        }
+                        },
+                        enabled = uiState.isEnableSlider
                     )
                 }
                 Row(
@@ -467,12 +486,11 @@ data class GameContentUiState(
     val raiseButtonSubText: String,
     val isEnableSliderTypeButton: Boolean,
     @StringRes
-    val sliderTypeText: Int,
+    val sliderTypeLabelResId: Int,
     val isEnableSlider: Boolean,
     val sliderPosition: Float,
-    @StringRes
-    val sliderLabelTitle: Int,
-    val sliderLabelBody: String,
+    val sliderLabelStackBody: String,
+    val sliderLabelPodBody: String,
     val isEnableSliderStep: Boolean,
     val isEnableRaiseUpSizeButton: Boolean,
     val raiseUpSizeText: String,
@@ -605,13 +623,13 @@ private class GameContentUiStatePreviewParam :
             callButtonSubText = "+1",
             isEnableRaiseButton = true,
             raiseButtonSubText = "+100（=102)",
-            sliderTypeText = R.string.label_stack,
             isEnableSliderTypeButton = true,
+            sliderTypeLabelResId = R.string.label_pod,
             isEnableSlider = true,
             sliderPosition = 0.0f,
-            sliderLabelTitle = R.string.label_stack,
             isEnableSliderStep = true,
-            sliderLabelBody = "100%",
+            sliderLabelStackBody = "",
+            sliderLabelPodBody = "",
             isEnableRaiseUpSizeButton = true,
             raiseUpSizeText = "+10200",
         )
@@ -645,6 +663,7 @@ private fun GameContentPreview(
             onClickCallButton = {},
             onClickRaiseButton = {},
             onClickRaiseUpSizeButton = {},
+            onClickSliderTypeButton = {},
             onChangeSlider = {},
             onClickSliderStepSwitch = {}
         )

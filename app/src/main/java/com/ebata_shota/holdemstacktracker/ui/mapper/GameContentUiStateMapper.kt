@@ -21,6 +21,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.Playe
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.LEFT
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.RIGHT
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.TOP
+import com.ebata_shota.holdemstacktracker.ui.viewmodel.GameViewModel
 import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 import kotlin.math.roundToInt
@@ -42,7 +43,8 @@ constructor(
         myPlayerId: PlayerId,
         raiseSize: Double,
         minRaiseSize: Double,
-        isEnableSliderStep: Boolean
+        isEnableSliderStep: Boolean,
+        sliderType : GameViewModel.SliderType
     ): GameContentUiState {
         val tableId = table.id
         val startIndex = table.playerOrder.indexOf(myPlayerId)
@@ -88,10 +90,15 @@ constructor(
         val isEnableRaiseButton: Boolean
         val raiseButtonSubText: String
         val isEnableSlider: Boolean
+        val sliderTypeLabelResId: Int = when (sliderType) {
+            GameViewModel.SliderType.Stack -> R.string.label_stack
+            GameViewModel.SliderType.Pod -> R.string.label_pod
+        }
         val sliderPosition: Float
-        val sliderLabelBody: String
+        val sliderLabelStackBody: String
+        val sliderLabelPodBody: String
         val isEnableRaiseSizeButton: Boolean
-        val raiseSizeText: String
+        val raiseUpSizeText: String
 
         //  私のターンか
         val isCurrentPlayer = myPlayerId == currentPlayerId && betPhase != null
@@ -147,19 +154,37 @@ constructor(
             }
 
             // Slider
+//            when (sliderType) {
+//                GameViewModel.SliderType.Stack -> {
+//                    // (スタック)に対する(レイズしたあと場に出ている額 - 今場に出ている額)の比率
+//                    sliderPosition = ((raiseSize - myPendingBetSize) / gamePlayer.stack).toFloat()
+//                }
+//                GameViewModel.SliderType.Pod -> {
+//                    val totalPodSize = game.podList.sumOf { it.podSize }
+//                    sliderPosition = (raiseSize / totalPodSize).toFloat()
+//                }
+//            }
             // (スタック)に対する(レイズしたあと場に出ている額 - 今場に出ている額)の比率
             sliderPosition = ((raiseSize - myPendingBetSize) / gamePlayer.stack).toFloat()
+
             isEnableSlider = isEnableRaiseButton
             // SliderLabel
             // 最低レイズ額の場合ラベルを表示しない（％が0になりうるので見せたくない）
-            sliderLabelBody = if (minRaiseSize != raiseSize) {
+            sliderLabelStackBody = if (minRaiseSize != raiseSize) {
                 "${(sliderPosition * 100).roundToInt()}%"
             } else {
                 ""
             }
+            val totalPodSize = game.podList.sumOf { it.podSize }
+            sliderLabelPodBody = if (totalPodSize != 0.0) {
+                "${((raiseSize / totalPodSize) * 100).roundToInt()}%"
+            } else {
+                ""
+            }
+
             // Raiseサイズボタン
             isEnableRaiseSizeButton = isEnableRaiseButton
-            raiseSizeText = "+${raiseShortageSize.toHstString(table.rule.betViewMode)}"
+            raiseUpSizeText = "+${raiseShortageSize.toHstString(table.rule.betViewMode)}"
         } else {
             // 自分の番ではないなら、無効にする
             isEnableFoldButton = false
@@ -171,9 +196,10 @@ constructor(
             raiseButtonSubText = ""
             isEnableSlider = false
             sliderPosition = 0.0f
-            sliderLabelBody = ""
+            sliderLabelStackBody = ""
+            sliderLabelPodBody = ""
             isEnableRaiseSizeButton = false
-            raiseSizeText = ""
+            raiseUpSizeText = ""
 
         }
 
@@ -201,15 +227,15 @@ constructor(
             callButtonSubText = callButtonSubText,
             isEnableRaiseButton = isEnableRaiseButton,
             raiseButtonSubText = raiseButtonSubText,
-            isEnableSliderTypeButton = false,
-            sliderTypeText = R.string.label_stack,
+            isEnableSliderTypeButton = isEnableSlider,
+            sliderTypeLabelResId = sliderTypeLabelResId,
             isEnableSlider = isEnableSlider,
             sliderPosition = sliderPosition,
-            sliderLabelTitle = R.string.label_stack,
-            sliderLabelBody = sliderLabelBody,
+            sliderLabelStackBody = sliderLabelStackBody,
+            sliderLabelPodBody = sliderLabelPodBody,
             isEnableSliderStep = isEnableSliderStep,
             isEnableRaiseUpSizeButton = isEnableRaiseSizeButton,
-            raiseUpSizeText = raiseSizeText,
+            raiseUpSizeText = raiseUpSizeText,
         )
     }
 
