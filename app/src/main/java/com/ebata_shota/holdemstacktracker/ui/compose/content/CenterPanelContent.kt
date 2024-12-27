@@ -55,11 +55,11 @@ fun CenterPanelContent(
             ) {
                 Text(
                     text = stringResource(R.string.label_pod),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.bodySmall
                 )
                 Text(
                     text = uiState.totalPod,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.titleLarge
                 )
             }
         }
