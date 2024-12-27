@@ -65,6 +65,18 @@ constructor(
             playerOrder = table.playerOrder,
             game = game
         )
+        val btnPlayerIndex = table.playerOrder.indexOf(table.btnPlayerId)
+        val sbIndex = if (table.playerOrder.size > 2) {
+            (btnPlayerIndex + 1) % table.playerOrder.size
+        } else {
+            btnPlayerIndex
+        }
+
+        val bbIndex = if (table.playerOrder.size > 2) {
+            (btnPlayerIndex + 2) % table.playerOrder.size
+        } else {
+            (btnPlayerIndex + 1) % table.playerOrder.size
+        }
         val players = sortedPlayerOrder.mapIndexedNotNull { index, playerId ->
             val basePlayer = table.basePlayers.find { it.id == playerId }
                 ?: return@mapIndexedNotNull null
@@ -79,7 +91,12 @@ constructor(
                 isLeaved = gamePlayer.isLeaved,
                 isMine = playerId == myPlayerId,
                 isCurrentPlayer = playerId == currentPlayerId,
-                isBtn = playerId == table.btnPlayerId
+                isBtn = playerId == table.btnPlayerId,
+                positionLabelResId = when (playerId) {
+                    table.playerOrder[sbIndex] -> R.string.position_label_sb
+                    table.playerOrder[bbIndex] -> R.string.position_label_bb
+                    else -> null
+                },
             )
         }
         val betPhase: BetPhase? = try {

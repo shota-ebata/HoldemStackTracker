@@ -59,4 +59,7 @@
     <string name="title_raise_size_dialog">Raise Size</string>
     <string name="label_slider_type_stack">Stack</string>
     <string name="label_slider_type_pot">%1$d Pot</string>
+
+    <string name="position_label_sb">SB</string>
+    <string name="position_label_bb">BB</string>
 </resources>

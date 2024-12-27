@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
 import android.content.res.Configuration
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -302,42 +303,44 @@ fun GameContent(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = stringResource(R.string.button_label_raise),
+                                text = stringResource(uiState.raiseButtonMainLabelResId),
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Text(text = uiState.raiseButtonSubText)
                         }
                     }
                 }
-
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     OutlinedButton(
                         modifier = Modifier
-                            .weight(0.25f)
-                            .padding(vertical = 4.dp),
-                        onClick = {
-                            dropUselessDouble(delayState) {
-                                onClickRaiseUpSizeButton()
-                            }
-                        },
-                        enabled = uiState.isEnableRaiseUpSizeButton,
-                        shape = ButtonDefaults.shape
+                            .weight(1.0f),
+                        onClick = {}
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = stringResource(R.string.button_label_size),
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            Text(
-                                textAlign = TextAlign.Center,
-                                text = uiState.raiseUpSizeText
-                            )
-                        }
+                        Text(text = "2 BB")
+                    }
+                    OutlinedButton(
+                        modifier = Modifier
+                            .weight(1.0f),
+                        onClick = {}
+                    ) {
+                        Text(text = "2.5 BB")
+                    }
+                    OutlinedButton(
+                        modifier = Modifier
+                            .weight(1.0f),
+                        onClick = {}
+                    ) {
+                        Text(text = "3 BB")
+                    }
+                    OutlinedButton(
+                        modifier = Modifier
+                            .weight(1.0f),
+                        onClick = {}
+                    ) {
+                        Text(text = "4 BB")
                     }
                 }
                 Row(
@@ -459,36 +462,33 @@ fun GameContent(
                     )
                 }
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedButton(
                         modifier = Modifier
-                            .weight(1.0f),
-                        onClick = {}
+                            .weight(0.25f)
+                            .padding(vertical = 4.dp),
+                        onClick = {
+                            dropUselessDouble(delayState) {
+                                onClickRaiseUpSizeButton()
+                            }
+                        },
+                        enabled = uiState.isEnableRaiseUpSizeButton,
+                        shape = ButtonDefaults.shape
                     ) {
-                        Text(text = "2 BB")
-                    }
-                    OutlinedButton(
-                        modifier = Modifier
-                            .weight(1.0f),
-                        onClick = {}
-                    ) {
-                        Text(text = "2.5 BB")
-                    }
-                    OutlinedButton(
-                        modifier = Modifier
-                            .weight(1.0f),
-                        onClick = {}
-                    ) {
-                        Text(text = "3 BB")
-                    }
-                    OutlinedButton(
-                        modifier = Modifier
-                            .weight(1.0f),
-                        onClick = {}
-                    ) {
-                        Text(text = "4 BB")
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = stringResource(R.string.button_label_size),
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                textAlign = TextAlign.Center,
+                                text = uiState.raiseUpSizeText
+                            )
+                        }
                     }
                 }
             }
@@ -513,6 +513,8 @@ data class GameContentUiState(
     val callButtonSubText: String,
     // Raise
     val isEnableRaiseButton: Boolean,
+    @StringRes
+    val raiseButtonMainLabelResId: Int,
     val raiseButtonSubText: String,
     // RaiseUp
     val isEnableRaiseUpSizeButton: Boolean,
@@ -564,6 +566,7 @@ private class GameContentUiStatePreviewParam :
                     isMine = false,
                     isCurrentPlayer = true,
                     isBtn = false,
+                    positionLabelResId = null,
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -574,6 +577,7 @@ private class GameContentUiStatePreviewParam :
                     isMine = false,
                     isCurrentPlayer = false,
                     isBtn = false,
+                    positionLabelResId = null,
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -584,6 +588,7 @@ private class GameContentUiStatePreviewParam :
                     isMine = false,
                     isCurrentPlayer = false,
                     isBtn = false,
+                    positionLabelResId = null,
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -594,6 +599,7 @@ private class GameContentUiStatePreviewParam :
                     isMine = false,
                     isCurrentPlayer = false,
                     isBtn = false,
+                    positionLabelResId = null,
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -604,6 +610,7 @@ private class GameContentUiStatePreviewParam :
                     isMine = false,
                     isCurrentPlayer = false,
                     isBtn = false,
+                    positionLabelResId = null,
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -614,6 +621,7 @@ private class GameContentUiStatePreviewParam :
                     isMine = false,
                     isCurrentPlayer = false,
                     isBtn = false,
+                    positionLabelResId = null,
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -624,6 +632,7 @@ private class GameContentUiStatePreviewParam :
                     isMine = false,
                     isCurrentPlayer = false,
                     isBtn = false,
+                    positionLabelResId = null,
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -634,6 +643,7 @@ private class GameContentUiStatePreviewParam :
                     isMine = false,
                     isCurrentPlayer = false,
                     isBtn = true,
+                    positionLabelResId = null,
                 ),
                 GamePlayerUiState(
                     playerName = "Player123456789",
@@ -644,6 +654,7 @@ private class GameContentUiStatePreviewParam :
                     isMine = false,
                     isCurrentPlayer = false,
                     isBtn = false,
+                    positionLabelResId = R.string.position_label_sb,
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -654,6 +665,7 @@ private class GameContentUiStatePreviewParam :
                     isMine = false,
                     isCurrentPlayer = false,
                     isBtn = false,
+                    positionLabelResId = R.string.position_label_bb,
                 )
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
@@ -668,6 +680,7 @@ private class GameContentUiStatePreviewParam :
             isEnableCallButton = true,
             callButtonSubText = "+1",
             isEnableRaiseButton = true,
+            raiseButtonMainLabelResId = R.string.button_label_raise,
             raiseButtonSubText = "+100（=102)",
             isEnableSliderTypeButton = true,
             sliderTypeButtonLabelUiState = GameContentUiState.SliderTypeButtonLabelUiState.Stack,

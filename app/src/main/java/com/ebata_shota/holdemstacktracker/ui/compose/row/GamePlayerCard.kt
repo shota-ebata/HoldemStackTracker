@@ -1,6 +1,10 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.row
 
 import android.content.res.Configuration
+import androidx.annotation.StringRes
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
@@ -18,7 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -26,6 +30,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
+import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
 
 @Composable
 fun GamePlayerCard(
@@ -39,7 +44,10 @@ fun GamePlayerCard(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 BetSize(
-                    betSize = uiState.pendingBetSize
+                    uiState = uiState
+                )
+                Position(
+                    uiState = uiState
                 )
                 PlayerCard(
                     uiState = uiState
@@ -55,8 +63,11 @@ fun GamePlayerCard(
                 PlayerCard(
                     uiState = uiState
                 )
+                Position(
+                    uiState = uiState
+                )
                 BetSize(
-                    betSize = uiState.pendingBetSize
+                    uiState = uiState
                 )
             }
         }
@@ -65,14 +76,49 @@ fun GamePlayerCard(
 }
 
 @Composable
-private fun BetSize(betSize: String?) {
+private fun Position(
+    uiState: GamePlayerUiState,
+) {
+    Row(
+        modifier = Modifier
+            .padding(vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        if (uiState.isBtn) {
+            Icon(
+                painter = painterResource(R.drawable.icon_btn),
+                contentDescription = "icon_btn"
+            )
+        }
+        if (uiState.positionLabelResId != null) {
+            Box(
+                modifier = Modifier
+                    .border(
+                        width = OutlineLabelBorderWidth,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        shape = RoundedCornerShape(4.dp),
+                    )
+                    .padding(horizontal = 8.dp, vertical = 2.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = stringResource(uiState.positionLabelResId))
+            }
+        }
+    }
+}
+
+@Composable
+private fun BetSize(
+    uiState: GamePlayerUiState,
+) {
     Row(
         modifier = Modifier
             .padding(vertical = 2.dp, horizontal = 8.dp)
             .heightIn(min = 24.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (betSize != null) {
+        if (uiState.pendingBetSize != null) {
             Icon(
                 modifier = Modifier
                     .size(24.dp),
@@ -82,7 +128,7 @@ private fun BetSize(betSize: String?) {
             Text(
                 modifier = Modifier
                     .padding(start = 8.dp),
-                text = betSize,
+                text = uiState.pendingBetSize,
                 style = MaterialTheme.typography.titleLarge
             )
         }
@@ -118,12 +164,6 @@ private fun PlayerCard(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (uiState.isBtn) {
-                    Icon(
-                        painter = painterResource(R.drawable.icon_btn),
-                        contentDescription = "icon_btn"
-                    )
-                }
                 Text(
                     text = uiState.playerName,
                     overflow = TextOverflow.Ellipsis,
@@ -145,6 +185,8 @@ data class GamePlayerUiState(
     val isMine: Boolean,
     val isCurrentPlayer: Boolean,
     val isBtn: Boolean,
+    @StringRes
+    val positionLabelResId: Int?,
 ) {
     val betTextPosition: BetTextPosition = when (playerPosition) {
         PlayerPosition.BOTTOM -> BetTextPosition.TOP
@@ -174,7 +216,8 @@ private class GamePlayerCardPreviewParam :
             isLeaved = false,
             isMine = false,
             isCurrentPlayer = false,
-            isBtn = true
+            isBtn = true,
+            positionLabelResId = R.string.position_label_sb,
         ),
         GamePlayerUiState(
             playerName = "PlayerName",
@@ -184,7 +227,8 @@ private class GamePlayerCardPreviewParam :
             isLeaved = false,
             isMine = false,
             isCurrentPlayer = true,
-            isBtn = false
+            isBtn = false,
+            positionLabelResId = R.string.position_label_bb,
         ),
         GamePlayerUiState(
             playerName = "Player123456789",
@@ -194,7 +238,8 @@ private class GamePlayerCardPreviewParam :
             isLeaved = false,
             isMine = false,
             isCurrentPlayer = true,
-            isBtn = false
+            isBtn = false,
+            positionLabelResId = null,
         )
     )
 }
