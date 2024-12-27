@@ -35,6 +35,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenDialogUiSt
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
 import com.ebata_shota.holdemstacktracker.ui.mapper.GameContentUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.model.SliderType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -150,30 +151,30 @@ constructor(
                     playerOrder = table.playerOrder,
                     game = game
                 )
-                var hasAutoAction = false
                 val isCurrentPlayer: Boolean = myPlayerId == currentPlayerId
-                if (isCurrentPlayer) {
-                    val autoAction: BetPhaseAction? = getNextAutoAction.invoke(
+                val autoAction: BetPhaseAction? = if (isCurrentPlayer) {
+                    getNextAutoAction.invoke(
                         playerId = myPlayerId,
                         table = table,
                         game = game
                     )
-                    if (autoAction != null) {
-                        // オートアクションがあるなら、それを使って新しいGameを生成
-                        val updatedGame = getNextGame.invoke(
-                            latestGame = game,
-                            action = autoAction,
-                            playerOrder = table.playerOrder
-                        )
-                        // 更新実行
-                        gameRepository.sendGame(
-                            tableId = tableId,
-                            newGame = updatedGame
-                        )
-                        hasAutoAction = true
-                    }
+                } else {
+                    null
                 }
-                if (!hasAutoAction) {
+
+                if (autoAction != null) {
+                    // オートアクションがあるなら、それを使って新しいGameを生成
+                    val updatedGame = getNextGame.invoke(
+                        latestGame = game,
+                        action = autoAction,
+                        playerOrder = table.playerOrder
+                    )
+                    // 更新実行
+                    gameRepository.sendGame(
+                        tableId = tableId,
+                        newGame = updatedGame
+                    )
+                } else {
                     // オートアクションがない場合だけ、UiStateを更新する
                     val content = GameScreenUiState.Content(
                         contentUiState = uiStateMapper.createUiState(
@@ -226,91 +227,220 @@ constructor(
         }
     }
 
+    private suspend fun doFold(
+        playerOrder: List<PlayerId>,
+        game: Game,
+        myPlayerId: PlayerId,
+    ) {
+        val nextGame = getNextGame.invoke(
+            latestGame = game,
+            action = BetPhaseAction.Fold(
+                playerId = myPlayerId
+            ),
+            playerOrder = playerOrder,
+        )
+        gameRepository.sendGame(
+            tableId = tableId,
+            newGame = nextGame,
+        )
+    }
+
+    private suspend fun doCheck(
+        playerOrder: List<PlayerId>,
+        game: Game,
+        myPlayerId: PlayerId,
+    ) {
+        val nextGame = getNextGame.invoke(
+            latestGame = game,
+            action = BetPhaseAction.Check(
+                playerId = myPlayerId
+            ),
+            playerOrder = playerOrder,
+        )
+        gameRepository.sendGame(
+            tableId = tableId,
+            newGame = nextGame,
+        )
+    }
+
+    private suspend fun doAllIn(
+        playerOrder: List<PlayerId>,
+        game: Game,
+        myPlayerId: PlayerId,
+    ) {
+        val player = game.players.find { it.id == myPlayerId }!!
+        val nextGame = getNextGame.invoke(
+            latestGame = game,
+            action = BetPhaseAction.AllIn(
+                playerId = myPlayerId,
+                betSize = player.stack
+            ),
+            playerOrder = playerOrder,
+        )
+        gameRepository.sendGame(
+            tableId = tableId,
+            newGame = nextGame,
+        )
+    }
+
+    private suspend fun doCall(
+        playerOrder: List<PlayerId>,
+        game: Game,
+        myPlayerId: PlayerId,
+    ) {
+        val betPhase: BetPhase = try {
+            getLatestBetPhase.invoke(game)
+        } catch (e: IllegalStateException) {
+            return
+        }
+        val callSize = getMaxBetSize.invoke(actionStateList = betPhase.actionStateList)
+        val nextGame = getNextGame.invoke(
+            latestGame = game,
+            action = BetPhaseAction.Call(
+                playerId = myPlayerId,
+                betSize = callSize
+            ),
+            playerOrder = playerOrder,
+        )
+        gameRepository.sendGame(
+            tableId = tableId,
+            newGame = nextGame,
+        )
+    }
+
+    private suspend fun doRaise(
+        playerOrder: List<PlayerId>,
+        game: Game,
+        myPlayerId: PlayerId,
+        raiseSize: Double,
+    ) {
+        val player = game.players.find { it.id == myPlayerId }!!
+        val betPhase = getLatestBetPhase.invoke(game)
+        val actionStateList = betPhase.actionStateList
+        // このフェーズ中、まだBetやAllInをしていない(オープンアクション)
+        val isNotRaisedYet = isNotRaisedYet.invoke(actionStateList)
+        val nextGame = getNextGame.invoke(
+            latestGame = game,
+            action = if (raiseSize == player.stack) {
+                // レイズサイズ == スタックサイズの場合はAllIn
+                BetPhaseAction.AllIn(
+                    playerId = myPlayerId,
+                    betSize = raiseSize
+                )
+            } else {
+                if (isNotRaisedYet) {
+                    BetPhaseAction.Bet(
+                        playerId = myPlayerId,
+                        betSize = raiseSize
+                    )
+                } else {
+                    BetPhaseAction.Raise(
+                        playerId = myPlayerId,
+                        betSize = raiseSize
+                    )
+                }
+            },
+            playerOrder = playerOrder,
+        )
+        gameRepository.sendGame(
+            tableId = tableId,
+            newGame = nextGame,
+        )
+    }
+
+    private suspend fun getRaiseSize(
+        table: Table,
+        game: Game,
+        myPlayerId: PlayerId,
+        sliderPosition: Float,
+    ): Double {
+        val betViewMode = table.rule.betViewMode
+        val player = game.players.find { it.id == myPlayerId }!!
+        val stackSize = player.stack
+        val minRaiseSize = minRaiseSizeFlow.first()
+        val myPendingBetSize = getPendingBetSize.invoke(
+            actionList = getLatestBetPhase.invoke(game).actionStateList,
+            playerOrder = table.playerOrder,
+            playerId = myPlayerId
+        )
+
+        val raiseSize: Double = when (sliderTypeStateFlow.value) {
+            SliderType.Stack -> {
+                getRaiseSizeByStackSlider.invoke(
+                    betViewMode = betViewMode,
+                    stackSize = stackSize,
+                    minRaiseSize = minRaiseSize,
+                    myPendingBetSize = myPendingBetSize,
+                    sliderPosition = sliderPosition,
+                )
+            }
+
+            SliderType.Pod -> {
+                getRaiseSizeByPodSlider.invoke(
+                    betViewMode = betViewMode,
+                    totalPodSize = game.podList.sumOf { it.podSize },
+                    stackSize = stackSize,
+                    pendingBetSize = myPendingBetSize,
+                    minRaiseSize = minRaiseSize,
+                    sliderPosition = sliderPosition
+                )
+            }
+        }
+        return raiseSize
+    }
+
     fun onClickFoldButton() {
         viewModelScope.launch {
-            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
             val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
+            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
-            val nextGame = getNextGame.invoke(
-                latestGame = game,
-                action = BetPhaseAction.Fold(
-                    playerId = myPlayerId
-                ),
+            doFold(
                 playerOrder = table.playerOrder,
-            )
-            gameRepository.sendGame(
-                tableId = tableId,
-                newGame = nextGame,
+                game = game,
+                myPlayerId = myPlayerId,
             )
         }
     }
 
     fun onClickCheckButton() {
         viewModelScope.launch {
-            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
             val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
+            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
-            val nextGame = getNextGame.invoke(
-                latestGame = game,
-                action = BetPhaseAction.Check(
-                    playerId = myPlayerId
-                ),
+            doCheck(
                 playerOrder = table.playerOrder,
-            )
-            gameRepository.sendGame(
-                tableId = tableId,
-                newGame = nextGame,
+                game = game,
+                myPlayerId = myPlayerId,
             )
         }
     }
 
     fun onClickAllInButton() {
         viewModelScope.launch {
-            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
             val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
+            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
-            val player = game.players.find { it.id == myPlayerId }!!
-            val nextGame = getNextGame.invoke(
-                latestGame = game,
-                action = BetPhaseAction.AllIn(
-                    playerId = myPlayerId,
-                    betSize = player.stack
-                ),
+            doAllIn(
                 playerOrder = table.playerOrder,
-            )
-            gameRepository.sendGame(
-                tableId = tableId,
-                newGame = nextGame,
+                game = game,
+                myPlayerId = myPlayerId,
             )
         }
     }
 
     fun onClickCallButton() {
         viewModelScope.launch {
-            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
             val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
+            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
-            val betPhase: BetPhase = try {
-                getLatestBetPhase.invoke(game)
-            } catch (e: IllegalStateException) {
-                return@launch
-            }
-            val callSize = getMaxBetSize.invoke(actionStateList = betPhase.actionStateList)
-            val nextGame = getNextGame.invoke(
-                latestGame = game,
-                action = BetPhaseAction.Call(
-                    playerId = myPlayerId,
-                    betSize = callSize
-                ),
-                playerOrder = table.playerOrder,
-            )
-            gameRepository.sendGame(
-                tableId = tableId,
-                newGame = nextGame,
+            doCall(
+                game = game,
+                myPlayerId = myPlayerId,
+                playerOrder = table.playerOrder
             )
         }
     }
@@ -323,39 +453,13 @@ constructor(
             val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
-
-            val betPhase = getLatestBetPhase.invoke(game)
-            val actionStateList = betPhase.actionStateList
-            // このフェーズ中、まだBetやAllInをしていない(オープンアクション)
-            val isNotRaisedYet = isNotRaisedYet.invoke(actionStateList)
             val raiseSize = raiseSizeStateFlow.value ?: return@launch
-            val player = game.players.find { it.id == myPlayerId } ?: return@launch
-            val nextGame = getNextGame.invoke(
-                latestGame = game,
-                action = if (raiseSize == player.stack) {
-                    // レイズサイズ == スタックサイズの場合はAllIn
-                    BetPhaseAction.AllIn(
-                        playerId = myPlayerId,
-                        betSize = raiseSize
-                    )
-                } else {
-                    if (isNotRaisedYet) {
-                        BetPhaseAction.Bet(
-                            playerId = myPlayerId,
-                            betSize = raiseSize
-                        )
-                    } else {
-                        BetPhaseAction.Raise(
-                            playerId = myPlayerId,
-                            betSize = raiseSize
-                        )
-                    }
-                },
+
+            doRaise(
                 playerOrder = table.playerOrder,
-            )
-            gameRepository.sendGame(
-                tableId = tableId,
-                newGame = nextGame,
+                game = game,
+                myPlayerId = myPlayerId,
+                raiseSize = raiseSize,
             )
             // レイズするたびにレイズサイズを0にする(自動で最低Raiseサイズになってくれる想定
             raiseSizeStateFlow.update { 0.0 }
@@ -406,42 +510,14 @@ constructor(
             val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
-            val sliderType = sliderTypeStateFlow.value
 
-            val myPendingBetSize = getPendingBetSize.invoke(
-                actionList = getLatestBetPhase.invoke(game).actionStateList,
-                playerOrder = table.playerOrder,
-                playerId = myPlayerId
+            val raiseSize: Double = getRaiseSize(
+                table = table,
+                game = game,
+                myPlayerId = myPlayerId,
+                sliderPosition = sliderPosition
             )
-            val player = game.players.find { it.id == myPlayerId } ?: return@launch
-
-            val minRaiseSize = minRaiseSizeFlow.first()
-            val stackSize = player.stack
-            val betViewMode = table.rule.betViewMode
-            when (sliderType) {
-                SliderType.Stack -> {
-                    val raiseSize: Double = getRaiseSizeByStackSlider.invoke(
-                        betViewMode = betViewMode,
-                        stackSize = stackSize,
-                        minRaiseSize = minRaiseSize,
-                        myPendingBetSize = myPendingBetSize,
-                        sliderPosition = sliderPosition,
-                    )
-                    raiseSizeStateFlow.update { raiseSize }
-                }
-
-                SliderType.Pod -> {
-                    val raiseSize = getRaiseSizeByPodSlider.invoke(
-                        betViewMode = betViewMode,
-                        totalPodSize = game.podList.sumOf { it.podSize },
-                        stackSize = stackSize,
-                        pendingBetSize = myPendingBetSize,
-                        minRaiseSize = minRaiseSize,
-                        sliderPosition = sliderPosition
-                    )
-                    raiseSizeStateFlow.update { raiseSize }
-                }
-            }
+            raiseSizeStateFlow.update { raiseSize }
         }
     }
 
@@ -457,11 +533,13 @@ constructor(
         // TODO: バリデーションしたい
         _dialogUiState.update {
             val changeRaiseSizeDialogUiState = it.changeRaiseSizeUpDialogUiState ?: return@update it
+            val textFieldWithErrorUiState = changeRaiseSizeDialogUiState
+                .textFieldWithErrorUiState.copy(
+                    value = value
+                )
             it.copy(
                 changeRaiseSizeUpDialogUiState = changeRaiseSizeDialogUiState.copy(
-                    textFieldWithErrorUiState = changeRaiseSizeDialogUiState.textFieldWithErrorUiState.copy(
-                        value = value
-                    )
+                    textFieldWithErrorUiState = textFieldWithErrorUiState
                 )
             )
         }
@@ -469,8 +547,10 @@ constructor(
 
     override fun onClickSubmitChangeRaiseUpSizeDialog() {
         viewModelScope.launch {
-            val text = _dialogUiState.value.changeRaiseSizeUpDialogUiState?.textFieldWithErrorUiState?.value?.text
-                    ?: return@launch
+            val text = dialogUiState.value.changeRaiseSizeUpDialogUiState
+                ?.textFieldWithErrorUiState
+                ?.value
+                ?.text ?: return@launch
             val raiseUpSize = text.toDouble() // TODO: バリデーションしたい
             val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
@@ -491,11 +571,6 @@ constructor(
         _dialogUiState.update {
             it.copy(changeRaiseSizeUpDialogUiState = null)
         }
-    }
-
-    enum class SliderType {
-        Stack,
-        Pod,
     }
 
     companion object {

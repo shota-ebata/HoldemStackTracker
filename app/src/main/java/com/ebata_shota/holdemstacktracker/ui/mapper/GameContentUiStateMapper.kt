@@ -23,6 +23,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.Playe
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.LEFT
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.RIGHT
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.TOP
+import com.ebata_shota.holdemstacktracker.ui.model.SliderType
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.GameViewModel
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.flow.first
@@ -48,7 +49,7 @@ constructor(
         raiseSize: Double,
         minRaiseSize: Double,
         isEnableSliderStep: Boolean,
-        sliderType: GameViewModel.SliderType,
+        sliderType: SliderType,
     ): GameContentUiState {
         val tableId = table.id
         val startIndex = table.playerOrder.indexOf(myPlayerId)
@@ -95,8 +96,8 @@ constructor(
         val raiseButtonSubText: String
         val isEnableSlider: Boolean
         val sliderTypeButtonLabelUiState = when (sliderType) {
-            GameViewModel.SliderType.Stack -> SliderTypeButtonLabelUiState.Stack
-            GameViewModel.SliderType.Pod -> SliderTypeButtonLabelUiState.Pod(
+            SliderType.Stack -> SliderTypeButtonLabelUiState.Stack
+            SliderType.Pod -> SliderTypeButtonLabelUiState.Pod(
                 podSliderMaxRatio = prefRepository.podSliderMaxRatio.first()
             )
         }
@@ -161,11 +162,11 @@ constructor(
 
             // Slider
             when (sliderType) {
-                GameViewModel.SliderType.Stack -> {
+                SliderType.Stack -> {
                     // (スタック)に対する(レイズしたあと場に出ている額 - 今場に出ている額)の比率
                     sliderPosition = (raiseUpSize / gamePlayer.stack).toFloat()
                 }
-                GameViewModel.SliderType.Pod -> {
+                SliderType.Pod -> {
                     val totalPodSize = game.podList.sumOf { it.podSize }
                     sliderPosition = if (totalPodSize != 0.0) {
                         (raiseSize / totalPodSize).toFloat() / 2
