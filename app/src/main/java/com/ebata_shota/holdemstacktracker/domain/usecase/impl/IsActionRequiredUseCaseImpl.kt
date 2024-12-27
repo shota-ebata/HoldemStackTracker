@@ -4,6 +4,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSize
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import javax.inject.Inject
 
@@ -11,7 +12,7 @@ class IsActionRequiredUseCaseImpl
 @Inject
 constructor(
     private val getMaxBetSize: GetMaxBetSizeUseCase,
-    private val getPendingBetPerPlayer: GetPendingBetPerPlayerUseCase
+    private val getPendingBetSize: GetPendingBetSize,
 ) : IsActionRequiredUseCase {
 
     /**
@@ -44,11 +45,11 @@ constructor(
                 }
                 // その人がすでに賭けているベット額がコール額と一致していないなら、アクションが必要
                 is BetPhaseAction.Check -> {
-                    val pendingBetPerPlayer = getPendingBetPerPlayer.invoke(
+                    val pendingBet = getPendingBetSize.invoke(
+                        actionList = actionStateList,
                         playerOrder = playerOrder,
-                        actionStateList = actionStateList
+                        playerId = action.playerId
                     )
-                    val pendingBet = pendingBetPerPlayer[action.playerId] ?: 0.0
                     pendingBet != callBetSize
                 }
                 is BetPhaseAction.Fold -> false

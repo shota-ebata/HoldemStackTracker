@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.domain.extension.toHstString
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
-import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -24,7 +23,9 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSize
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByPodSlider
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlider
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ChangeRaiseSizeUpDialogUiState
@@ -50,7 +51,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.roundToInt
 
 @HiltViewModel
 class GameViewModel
@@ -69,8 +69,10 @@ constructor(
     private val getLatestBetPhase: GetLatestBetPhaseUseCase,
     private val getMaxBetSize: GetMaxBetSizeUseCase,
     private val getMinRaiseSize: GetMinRaiseSizeUseCase,
-    private val getPendingBetPerPlayer: GetPendingBetPerPlayerUseCase,
     private val isNotRaisedYet: IsNotRaisedYetUseCase,
+    private val getRaiseSizeByPodSlider: GetRaiseSizeByPodSlider,
+    private val getRaiseSizeByStackSlider: GetRaiseSizeByStackSlider,
+    private val getPendingBetSize: GetPendingBetSize,
     private val uiStateMapper: GameContentUiStateMapper,
 ) : ViewModel(), ChangeRaiseUpSizeDialogEvent {
     private val tableId: TableId by savedStateHandle.param()
@@ -367,10 +369,10 @@ constructor(
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
             val raiseSize = raiseSizeStateFlow.value ?: return@launch
-            val myPendingBetSize = getPendingBetSize(
-                game = game,
+            val myPendingBetSize = getPendingBetSize.invoke(
+                actionList = getLatestBetPhase.invoke(game).actionStateList,
                 playerOrder = table.playerOrder,
-                myPlayerId = myPlayerId
+                playerId = myPlayerId
             )
             val raiseUpSize = raiseSize - myPendingBetSize
             _dialogUiState.update {
@@ -399,103 +401,48 @@ constructor(
         raiseSizeStateFlow.update { 0.0 }
     }
 
-    fun onChangeSlider(value: Float) {
+    fun onChangeSlider(sliderPosition: Float) {
         viewModelScope.launch {
             val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
             val sliderType = sliderTypeStateFlow.value
 
-            val myPendingBetSize = getPendingBetSize(
-                game = game,
+            val myPendingBetSize = getPendingBetSize.invoke(
+                actionList = getLatestBetPhase.invoke(game).actionStateList,
                 playerOrder = table.playerOrder,
-                myPlayerId = myPlayerId
+                playerId = myPlayerId
             )
             val player = game.players.find { it.id == myPlayerId } ?: return@launch
 
             val minRaiseSize = minRaiseSizeFlow.first()
+            val stackSize = player.stack
+            val betViewMode = table.rule.betViewMode
             when (sliderType) {
                 SliderType.Stack -> {
-                    // 追加でBetするサイズ
-                    val raiseUpSize = when (table.rule.betViewMode) {
-                        BetViewMode.Number -> (player.stack * value).roundToInt().toDouble()
-                        BetViewMode.BB -> (player.stack * 10 * value).roundToInt() / 10.0
-                    }
-
-                    // 最低の引き上げ幅
-                    val minRiseUpSize = minRaiseSize - myPendingBetSize
-                    val raiseSize: Double = if (raiseUpSize >= minRiseUpSize) {
-                        // 最低Betサイズを超えている場合は
-                        // 追加Betサイズ + 今場に出ているベットサイズ
-                        raiseUpSize + myPendingBetSize
-                    } else {
-                        // 下回っている場合は、現在の最低額
-                        minRaiseSize
-                    }
+                    val raiseSize: Double = getRaiseSizeByStackSlider.invoke(
+                        betViewMode = betViewMode,
+                        stackSize = stackSize,
+                        minRaiseSize = minRaiseSize,
+                        myPendingBetSize = myPendingBetSize,
+                        sliderPosition = sliderPosition,
+                    )
                     raiseSizeStateFlow.update { raiseSize }
                 }
 
                 SliderType.Pod -> {
-                    val totalPodSize = game.podList.sumOf { it.podSize }
-                    // 追加でBetするサイズ
-                    val raiseSize = when (table.rule.betViewMode) {
-                        BetViewMode.Number -> (totalPodSize * value).roundToInt().toDouble()
-                        BetViewMode.BB -> (totalPodSize * 10 * value).roundToInt() / 10.0
-                    }
-
-                    // 最低の引き上げ幅
-                    val minRiseUpSize = minRaiseSize - myPendingBetSize
-                    raiseSizeStateFlow.update {
-                        when {
-                            raiseSize - myPendingBetSize > player.stack -> {
-                                // 上回っている場合は、スタック
-                                player.stack
-                            }
-
-                            raiseSize - myPendingBetSize >= minRiseUpSize -> {
-                                raiseSize
-                            }
-
-                            else -> {
-                                // 下回っている場合は、現在の最低額
-                                minRaiseSize
-                            }
-                        }
-                    }
+                    val raiseSize = getRaiseSizeByPodSlider.invoke(
+                        betViewMode = betViewMode,
+                        totalPodSize = game.podList.sumOf { it.podSize },
+                        stackSize = stackSize,
+                        pendingBetSize = myPendingBetSize,
+                        minRaiseSize = minRaiseSize,
+                        sliderPosition = sliderPosition
+                    )
+                    raiseSizeStateFlow.update { raiseSize }
                 }
             }
-//            // 追加でBetするサイズ
-//            val raiseUpSize = when (table.rule.betViewMode) {
-//                BetViewMode.Number -> (player.stack * value).roundToInt().toDouble()
-//                BetViewMode.BB -> (player.stack * 10 * value).roundToInt() / 10.0
-//            }
-//
-//            // 最低の引き上げ幅
-//            val minRiseUpSize = minRaiseSizeFlow.first() - myPendingBetSize
-//            val raiseSize: Double = if (raiseUpSize >= minRiseUpSize) {
-//                // 最低Betサイズを超えている場合は
-//                // 追加Betサイズ + 今場に出ているベットサイズ
-//                raiseUpSize + myPendingBetSize
-//            } else {
-//                // 下回っている場合は、現在の最低額
-//                minRaiseSizeFlow.first()
-//            }
-//            raiseSizeStateFlow.update { raiseSize }
         }
-    }
-
-    private fun getPendingBetSize(
-        game: Game,
-        playerOrder: List<PlayerId>,
-        myPlayerId: PlayerId,
-    ): Double {
-        val actionStateList = getLatestBetPhase.invoke(game).actionStateList
-        val pendingBetPerPlayer = getPendingBetPerPlayer.invoke(
-            playerOrder = playerOrder,
-            actionStateList = actionStateList
-        )
-        val myPendingBetSize = pendingBetPerPlayer[myPlayerId] ?: 0.0
-        return myPendingBetSize
     }
 
     fun onClickSliderStepSwitch(
@@ -529,10 +476,10 @@ constructor(
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
-            val myPendingBetSize = getPendingBetSize(
-                game = game,
+            val myPendingBetSize = getPendingBetSize.invoke(
+                actionList = getLatestBetPhase.invoke(game).actionStateList,
                 playerOrder = table.playerOrder,
-                myPlayerId = myPlayerId
+                playerId = myPlayerId
             )
             val raiseSize = raiseUpSize + myPendingBetSize
             raiseSizeStateFlow.update { raiseSize }

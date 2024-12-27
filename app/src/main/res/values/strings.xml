@@ -56,4 +56,6 @@
     <string name="button_label_size">Size</string>
 
     <string name="title_raise_size_dialog">Raise Size</string>
+    <string name="label_slider_type_stack">Stack</string>
+    <string name="label_slider_type_pod">%1$d Pod</string>
 </resources>

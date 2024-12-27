@@ -1,7 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
 import android.content.res.Configuration
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -351,9 +350,21 @@ fun GameContent(
                         },
                         enabled = uiState.isEnableSliderTypeButton
                     ) {
+                        val sliderTypeButtonLabelUiState = uiState.sliderTypeButtonLabelUiState
                         Text(
                             textAlign = TextAlign.Center,
-                            text = stringResource(uiState.sliderTypeLabelResId)
+                            text = when (sliderTypeButtonLabelUiState) {
+                                is GameContentUiState.SliderTypeButtonLabelUiState.Stack -> {
+                                    stringResource(sliderTypeButtonLabelUiState.labelResId)
+                                }
+
+                                is GameContentUiState.SliderTypeButtonLabelUiState.Pod -> {
+                                    stringResource(
+                                        sliderTypeButtonLabelUiState.labelResId,
+                                        sliderTypeButtonLabelUiState.podSliderMaxRatio
+                                    )
+                                }
+                            }
                         )
                         Icon(
                             imageVector = Icons.Filled.ArrowDropDown,
@@ -368,7 +379,21 @@ fun GameContent(
                         Slider(
                             value = uiState.sliderPosition,
                             onValueChange = onChangeSlider,
-                            steps = if (uiState.isEnableSliderStep) 9 else 0,
+                            // FIXME: マジックナンバーを解消
+                            steps = if (uiState.isEnableSliderStep) {
+                                when (uiState.sliderTypeButtonLabelUiState) {
+                                    is GameContentUiState.SliderTypeButtonLabelUiState.Stack -> {
+                                        9
+                                    }
+
+                                    is GameContentUiState.SliderTypeButtonLabelUiState.Pod -> {
+                                        19
+                                    }
+                                }
+
+                            } else {
+                                0
+                            },
                             valueRange = 0f..1f,
                             interactionSource = interactionSource,
                             enabled = uiState.isEnableSlider,
@@ -477,24 +502,44 @@ data class GameContentUiState(
     val players: List<GamePlayerUiState>,
     val centerPanelContentUiState: CenterPanelContentUiState,
     val blindText: String,
+    // Fold
     val isEnableFoldButton: Boolean,
+    // Check
     val isEnableCheckButton: Boolean,
+    // AllIn
     val isEnableAllInButton: Boolean,
+    // Call
     val isEnableCallButton: Boolean,
     val callButtonSubText: String,
+    // Raise
     val isEnableRaiseButton: Boolean,
     val raiseButtonSubText: String,
+    // RaiseUp
+    val isEnableRaiseUpSizeButton: Boolean,
+    val raiseUpSizeText: String,
+    // SliderButton
     val isEnableSliderTypeButton: Boolean,
-    @StringRes
-    val sliderTypeLabelResId: Int,
+    val sliderTypeButtonLabelUiState: SliderTypeButtonLabelUiState,
+    // Slider
     val isEnableSlider: Boolean,
     val sliderPosition: Float,
     val sliderLabelStackBody: String,
     val sliderLabelPodBody: String,
+    // StepSwitch
     val isEnableSliderStep: Boolean,
-    val isEnableRaiseUpSizeButton: Boolean,
-    val raiseUpSizeText: String,
-)
+) {
+    sealed interface SliderTypeButtonLabelUiState {
+        data object Stack : SliderTypeButtonLabelUiState {
+            val labelResId = R.string.label_slider_type_stack
+        }
+
+        data class Pod(
+            val podSliderMaxRatio: Int,
+        ) : SliderTypeButtonLabelUiState {
+            val labelResId = R.string.label_slider_type_pod
+        }
+    }
+}
 
 private class GameContentUiStatePreviewParam :
     PreviewParameterProvider<GameContentUiState> {
@@ -624,7 +669,7 @@ private class GameContentUiStatePreviewParam :
             isEnableRaiseButton = true,
             raiseButtonSubText = "+100（=102)",
             isEnableSliderTypeButton = true,
-            sliderTypeLabelResId = R.string.label_pod,
+            sliderTypeButtonLabelUiState = GameContentUiState.SliderTypeButtonLabelUiState.Stack,
             isEnableSlider = true,
             sliderPosition = 0.0f,
             isEnableSliderStep = true,

@@ -13,6 +13,7 @@ import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultStackS
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultStackSizeOfNumberMode
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.EnableRaiseUpSliderStep
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.MyName
+import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.PodSliderMaxRatio
 import com.ebata_shota.holdemstacktracker.infra.extension.prefFlow
 import com.ebata_shota.holdemstacktracker.infra.extension.setPrefValue
 import kotlinx.coroutines.flow.Flow
@@ -98,5 +99,14 @@ constructor(
 
     override suspend fun saveEnableRaiseUpSliderStep(value: Boolean) {
         dataStore.setPrefValue(EnableRaiseUpSliderStep, value)
+    }
+
+    override val podSliderMaxRatio: Flow<Int> by dataStore.prefFlow(
+        key = PodSliderMaxRatio,
+        defaultValue = { 2 }
+    )
+
+    override suspend fun savePodSliderMaxRatio(value: Int) {
+        dataStore.setPrefValue(PodSliderMaxRatio, value)
     }
 }

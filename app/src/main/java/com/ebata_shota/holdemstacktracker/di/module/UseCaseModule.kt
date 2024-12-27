@@ -1,19 +1,22 @@
 package com.ebata_shota.holdemstacktracker.di.module
 
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetDoubleToStringUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGamePlayerStateListUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPlayerStackUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSize
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPodStateListUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByPodSlider
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlider
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
@@ -21,19 +24,22 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.CreateNewGameUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMinRaiseSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetDoubleToStringUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMinRaiseSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextAutoActionUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextGamePlayerStateListUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextGameUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextPlayerStackUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetPerPlayerUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetSizeImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionsUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPodStateListUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetRaiseSizeByPodSliderImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetRaiseSizeByStackSliderImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsActionRequiredUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsNotRaisedYetUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.JoinTableUseCaseImpl
@@ -107,4 +113,13 @@ interface UseCaseModule {
 
     @Binds
     fun bindIsNotRaisedYetUseCase(useCase: IsNotRaisedYetUseCaseImpl): IsNotRaisedYetUseCase
+
+    @Binds
+    fun bindGetRaiseSizeByPodSlider(useCase: GetRaiseSizeByPodSliderImpl): GetRaiseSizeByPodSlider
+
+    @Binds
+    fun bindGetRaiseSizeByStackSlider(useCase: GetRaiseSizeByStackSliderImpl): GetRaiseSizeByStackSlider
+
+    @Binds
+    fun bindGetPendingBetSize(useCase: GetPendingBetSizeImpl): GetPendingBetSize
 }

@@ -8,6 +8,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
+import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
@@ -16,6 +17,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.infra.extension.blindText
 import com.ebata_shota.holdemstacktracker.ui.compose.content.CenterPanelContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState.SliderTypeButtonLabelUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.BOTTOM
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.LEFT
@@ -23,6 +25,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.Playe
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.TOP
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.GameViewModel
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -35,16 +38,17 @@ constructor(
     private val getMaxBetSize: GetMaxBetSizeUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
     private val isNotRaisedYet: IsNotRaisedYetUseCase,
+    private val prefRepository: PrefRepository,
 ) {
 
-    fun createUiState(
+    suspend fun createUiState(
         game: Game,
         table: Table,
         myPlayerId: PlayerId,
         raiseSize: Double,
         minRaiseSize: Double,
         isEnableSliderStep: Boolean,
-        sliderType : GameViewModel.SliderType
+        sliderType: GameViewModel.SliderType,
     ): GameContentUiState {
         val tableId = table.id
         val startIndex = table.playerOrder.indexOf(myPlayerId)
@@ -90,9 +94,11 @@ constructor(
         val isEnableRaiseButton: Boolean
         val raiseButtonSubText: String
         val isEnableSlider: Boolean
-        val sliderTypeLabelResId: Int = when (sliderType) {
-            GameViewModel.SliderType.Stack -> R.string.label_stack
-            GameViewModel.SliderType.Pod -> R.string.label_pod
+        val sliderTypeButtonLabelUiState = when (sliderType) {
+            GameViewModel.SliderType.Stack -> SliderTypeButtonLabelUiState.Stack
+            GameViewModel.SliderType.Pod -> SliderTypeButtonLabelUiState.Pod(
+                podSliderMaxRatio = prefRepository.podSliderMaxRatio.first()
+            )
         }
         val sliderPosition: Float
         val sliderLabelStackBody: String
@@ -162,7 +168,7 @@ constructor(
                 GameViewModel.SliderType.Pod -> {
                     val totalPodSize = game.podList.sumOf { it.podSize }
                     sliderPosition = if (totalPodSize != 0.0) {
-                        (raiseSize / totalPodSize).toFloat()
+                        (raiseSize / totalPodSize).toFloat() / 2
                     } else {
                         0.0f
                     }
@@ -208,7 +214,6 @@ constructor(
             sliderLabelPodBody = ""
             isEnableRaiseSizeButton = false
             raiseUpSizeText = ""
-
         }
 
         return GameContentUiState(
@@ -236,7 +241,7 @@ constructor(
             isEnableRaiseButton = isEnableRaiseButton,
             raiseButtonSubText = raiseButtonSubText,
             isEnableSliderTypeButton = isEnableSlider,
-            sliderTypeLabelResId = sliderTypeLabelResId,
+            sliderTypeButtonLabelUiState = sliderTypeButtonLabelUiState,
             isEnableSlider = isEnableSlider,
             sliderPosition = sliderPosition,
             sliderLabelStackBody = sliderLabelStackBody,
