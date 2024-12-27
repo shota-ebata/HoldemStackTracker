@@ -41,6 +41,7 @@
 
     <string name="label_stack">Stack</string>
     <string name="label_pod">Pod</string>
+    <string name="label_bet">Bet</string>
     <string name="label_pre_flop">PreFlop</string>
     <string name="label_flop">Flop</string>
     <string name="label_turn">Turn</string>
