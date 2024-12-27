@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -68,7 +69,8 @@ private fun BetSize(betSize: String?) {
     Row(
         modifier = Modifier
             .padding(vertical = 2.dp, horizontal = 8.dp)
-            .heightIn(min = 24.dp)
+            .heightIn(min = 24.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         if (betSize != null) {
             Icon(
@@ -80,7 +82,8 @@ private fun BetSize(betSize: String?) {
             Text(
                 modifier = Modifier
                     .padding(start = 8.dp),
-                text = betSize
+                text = betSize,
+                style = MaterialTheme.typography.titleLarge
             )
         }
     }
