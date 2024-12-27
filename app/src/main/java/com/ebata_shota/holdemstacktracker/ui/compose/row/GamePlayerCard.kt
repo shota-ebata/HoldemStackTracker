@@ -108,6 +108,10 @@ private fun PlayerCard(
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                text = uiState.stack,
+                style = MaterialTheme.typography.titleLarge
+            )
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -120,10 +124,11 @@ private fun PlayerCard(
                 Text(
                     text = uiState.playerName,
                     overflow = TextOverflow.Ellipsis,
-                    maxLines = 1
+                    maxLines = 1,
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
-            Text(text = uiState.stack)
+
         }
     }
 }
