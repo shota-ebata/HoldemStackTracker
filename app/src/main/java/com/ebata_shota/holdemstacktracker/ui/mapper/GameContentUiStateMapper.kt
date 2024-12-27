@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.mapper
 
+import androidx.annotation.StringRes
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.extension.rearrangeListFromIndex
 import com.ebata_shota.holdemstacktracker.domain.extension.toHstString
@@ -92,6 +93,12 @@ constructor(
         val isEnableCallButton: Boolean
         val callButtonSubText: String
         val isEnableRaiseButton: Boolean
+        @StringRes
+        val raiseButtonMainLabelResId: Int = if (isNotRaisedYet.invoke(betPhase?.actionStateList.orEmpty())) {
+            R.string.button_label_bet
+        } else {
+            R.string.button_label_raise
+        }
         val raiseButtonSubText: String
         val isEnableSlider: Boolean
         val sliderTypeButtonLabelUiState = when (sliderType) {
@@ -130,6 +137,11 @@ constructor(
             // All-Inボタン
             isEnableAllInButton = true
 
+            val myPendingBetSizeText = if (myPendingBetSize != 0.0){
+                "${myPendingBetSize.toHstString(table.rule.betViewMode)} → "
+            } else {
+                ""
+            }
             // Callボタン
             val callSize: Double = maxBetSize
             // 現在ベットされている最高額より自分がベットしてる額が少ない
@@ -137,7 +149,7 @@ constructor(
             isEnableCallButton = maxBetSize > myPendingBetSize
                     && gamePlayer.stack > callSize
             callButtonSubText = if (isEnableCallButton) {
-                "${myPendingBetSize.toHstString(table.rule.betViewMode)} → ${callSize.toHstString(table.rule.betViewMode)}"
+                "$myPendingBetSizeText${callSize.toHstString(table.rule.betViewMode)}"
             } else {
                 ""
             }
@@ -148,7 +160,7 @@ constructor(
             // 最低レイズ額に足りている場合
             isEnableRaiseButton = gamePlayer.stack >= raiseUpSize
             raiseButtonSubText = if (isEnableRaiseButton) {
-                "${myPendingBetSize.toHstString(table.rule.betViewMode)} →  ${raiseSize.toHstString(table.rule.betViewMode)}"
+                "$myPendingBetSizeText ${raiseSize.toHstString(table.rule.betViewMode)}"
             } else {
                 ""
             }
@@ -234,6 +246,7 @@ constructor(
             isEnableCallButton = isEnableCallButton,
             callButtonSubText = callButtonSubText,
             isEnableRaiseButton = isEnableRaiseButton,
+            raiseButtonMainLabelResId = raiseButtonMainLabelResId,
             raiseButtonSubText = raiseButtonSubText,
             isEnableSliderTypeButton = isEnableSlider,
             sliderTypeButtonLabelUiState = sliderTypeButtonLabelUiState,
