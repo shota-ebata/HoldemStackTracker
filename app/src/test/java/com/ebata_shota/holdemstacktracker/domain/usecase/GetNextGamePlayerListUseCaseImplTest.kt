@@ -1,30 +1,33 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
-import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextGamePlayerStateListUseCaseImpl
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertSame
 import org.junit.Before
 import org.junit.Test
 
 class GetNextGamePlayerListUseCaseImplTest {
-    private lateinit var usecase: GetNextGamePlayerStateListUseCaseImpl
+    private lateinit var useCase: GetNextGamePlayerStateListUseCaseImpl
 
     private val firebaseAuthRepository: FirebaseAuthRepository = mockk()
 
+    private val dispatcher = StandardTestDispatcher()
+
     @Before
     fun setup() {
-        usecase = GetNextGamePlayerStateListUseCaseImpl(
-            firebaseAuthRepository = firebaseAuthRepository
+        useCase = GetNextGamePlayerStateListUseCaseImpl(
+            firebaseAuthRepository = firebaseAuthRepository,
+            dispatcher = dispatcher
         )
     }
 
@@ -40,9 +43,9 @@ class GetNextGamePlayerListUseCaseImplTest {
         action: BetPhaseAction,
         expected: Set<GamePlayer>,
     ) {
-        runTest {
+        runTest(dispatcher) {
             // execute
-            val actual: Set<GamePlayer> = usecase.invoke(
+            val actual: Set<GamePlayer> = useCase.invoke(
                 pendingBetPerPlayer = pendingBetPerPlayer,
                 players = players,
                 action = action

@@ -4,7 +4,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 
 interface GetPendingBetSize {
-    fun invoke(
+    suspend fun invoke(
         actionList: List<BetPhaseAction>,
         playerOrder: List<PlayerId>,
         playerId: PlayerId,

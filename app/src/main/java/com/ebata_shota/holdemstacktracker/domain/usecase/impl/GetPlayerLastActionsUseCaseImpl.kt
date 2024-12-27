@@ -13,7 +13,7 @@ constructor() : GetPlayerLastActionsUseCase {
     /**
      * @return プレイヤーそれぞれの最後のActionのMap
      */
-    override fun invoke(
+    override suspend fun invoke(
         playerOrder: List<PlayerId>,
         phaseList: List<Phase>
     ): Map<PlayerId, BetPhaseAction?> {

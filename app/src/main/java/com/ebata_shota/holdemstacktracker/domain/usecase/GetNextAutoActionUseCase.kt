@@ -7,7 +7,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Table
 
 interface GetNextAutoActionUseCase {
 
-    fun invoke(
+    suspend fun invoke(
         playerId: PlayerId,
         table: Table,
         game: Game

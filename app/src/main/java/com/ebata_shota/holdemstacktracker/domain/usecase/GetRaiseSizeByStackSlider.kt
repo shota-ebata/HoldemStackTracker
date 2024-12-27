@@ -4,7 +4,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 
 interface GetRaiseSizeByStackSlider {
 
-    fun invoke(
+    suspend fun invoke(
         betViewMode: BetViewMode,
         stackSize: Double,
         minRaiseSize: Double,

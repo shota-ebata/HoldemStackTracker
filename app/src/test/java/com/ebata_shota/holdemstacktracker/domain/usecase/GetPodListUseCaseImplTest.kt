@@ -3,32 +3,38 @@ package com.ebata_shota.holdemstacktracker.domain.usecase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pod
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPodStateListUseCaseImpl
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
 class GetPodListUseCaseImplTest {
-    private lateinit var usecase: GetPodStateListUseCaseImpl
+    private lateinit var useCase: GetPodStateListUseCaseImpl
+
+    private val dispatcher = StandardTestDispatcher()
 
     @Before
     fun setup() {
-        usecase = GetPodStateListUseCaseImpl()
+        useCase = GetPodStateListUseCaseImpl(dispatcher)
     }
 
     private fun executeAndAssert(
         pendingBetPerPlayer: Map<PlayerId, Double>,
         expectedList: List<Pod>
     ) {
-        // execute
-        val updatedPodList: List<Pod> = usecase.invoke(
-            podList = emptyList(),
-            pendingBetPerPlayer = pendingBetPerPlayer
-        )
-        // テスト用にIDを0に上書き
-        val actualList = updatedPodList.map { it.copy(id = 0L) }
-        // assert
-        actualList.zip(expectedList) { actual, expected ->
-            assertEquals(expected, actual)
+        runTest(dispatcher) {
+            // execute
+            val updatedPodList: List<Pod> = useCase.invoke(
+                podList = emptyList(),
+                pendingBetPerPlayer = pendingBetPerPlayer
+            )
+            // テスト用にIDを0に上書き
+            val actualList = updatedPodList.map { it.copy(id = 0L) }
+            // assert
+            actualList.zip(expectedList) { actual, expected ->
+                assertEquals(expected, actual)
+            }
         }
     }
 

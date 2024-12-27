@@ -17,7 +17,7 @@ class TablePrepareScreenUiStateMapper
 constructor(
     private val getDoubleToString: GetDoubleToStringUseCase
 ) {
-    fun createUiState(
+    suspend fun createUiState(
         table: Table,
         myPlayerId: PlayerId,
         btnPlayerId: PlayerId?

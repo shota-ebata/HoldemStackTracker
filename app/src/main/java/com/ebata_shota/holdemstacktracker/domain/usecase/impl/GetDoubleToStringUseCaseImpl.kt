@@ -10,7 +10,7 @@ constructor() : GetDoubleToStringUseCase {
     /**
      * TODO: [Double.toHstString()]に置き換える
      */
-    override fun invoke(
+    override suspend fun invoke(
         value: Double,
         betViewMode: BetViewMode
     ): String = when (betViewMode) {

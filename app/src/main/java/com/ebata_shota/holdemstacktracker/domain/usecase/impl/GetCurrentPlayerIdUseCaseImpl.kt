@@ -1,26 +1,31 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
+import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class GetCurrentPlayerIdUseCaseImpl
 @Inject constructor(
-    private val getLatestBetPhase: GetLatestBetPhaseUseCase
+    private val getLatestBetPhase: GetLatestBetPhaseUseCase,
+    @CoroutineDispatcherDefault
+    private val dispatcher: CoroutineDispatcher,
 ) : GetCurrentPlayerIdUseCase {
 
     /**
      * 現在のゲーム状態[Game]で
      * プレイするべきプレイヤーを返す。
      */
-    override fun invoke(
+    override suspend fun invoke(
         btnPlayerId: PlayerId,
         playerOrder: List<PlayerId>,
         game: Game
-    ): PlayerId {
+    ): PlayerId = withContext(dispatcher) {
         // 全員の最後のアクションを一つづつ取得
         val latestBetPhase = getLatestBetPhase.invoke(game)
         // 全員の最後のアクションを一つづつ取得
@@ -43,6 +48,6 @@ class GetCurrentPlayerIdUseCaseImpl
             // 基本は最後にアクションした人の次の人
             (latestActionPlayerIndex + 1) % playerOrder.size
         }
-        return playerOrder[nextPlayerIndex]
+        return@withContext playerOrder[nextPlayerIndex]
     }
 }

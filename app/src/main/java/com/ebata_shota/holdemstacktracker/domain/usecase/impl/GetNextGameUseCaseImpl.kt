@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
+import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.Action
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
@@ -16,6 +17,9 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPlayerStackUseCa
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPodStateListUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.MainCoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class GetNextGameUseCaseImpl
@@ -27,16 +31,18 @@ constructor(
     private val getPodStateList: GetPodStateListUseCase,
     private val getNextPhase: GetNextPhaseUseCase,
     private val getNextPlayerStack: GetNextPlayerStackUseCase,
+    @CoroutineDispatcherDefault
+    private val dispatcher: CoroutineDispatcher
 ) : GetNextGameUseCase {
 
     override suspend fun invoke(
         latestGame: Game,
         action: Action,
         playerOrder: List<PlayerId>
-    ): Game {
+    ): Game = withContext(dispatcher) {
         when (action) {
             is BetPhaseAction -> {
-                return getNextGameFromBetPhaseAction(
+                return@withContext getNextGameFromBetPhaseAction(
                     latestGame = latestGame,
                     action = action,
                     playerOrder = playerOrder

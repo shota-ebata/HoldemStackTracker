@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
+import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -9,6 +10,8 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCas
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPlayerStackUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGamePlayerStateListUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class GetNextPlayerStackUseCaseImpl
@@ -17,12 +20,15 @@ constructor(
     private val getLatestBetPhase: GetLatestBetPhaseUseCase,
     private val getPendingBetPerPlayer: GetPendingBetPerPlayerUseCase,
     private val getNextPlayerStateList: GetNextGamePlayerStateListUseCase,
+    @CoroutineDispatcherDefault
+    private val dispatcher: CoroutineDispatcher
 ) : GetNextPlayerStackUseCase {
+
     override suspend fun invoke(
         latestGame: Game,
         action: BetPhaseAction,
         playerOrder: List<PlayerId>
-    ): Set<GamePlayer> {
+    ): Set<GamePlayer> = withContext(dispatcher) {
         // BetPhaseでしかActionはできないので
         val latestPhase: BetPhase = getLatestBetPhase.invoke(latestGame)
         // プレイヤーごとの、まだポッドに入っていないベット額
@@ -36,6 +42,6 @@ constructor(
             players = latestGame.players,
             action = action
         )
-        return updatedPlayers
+        return@withContext updatedPlayers
     }
 }

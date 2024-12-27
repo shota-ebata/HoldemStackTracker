@@ -5,33 +5,39 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction.*
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionsUseCaseImpl
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
 class GetPlayerLastActionsUseCaseImplTest {
-    private lateinit var usecase: GetPlayerLastActionsUseCaseImpl
+    private lateinit var useCase: GetPlayerLastActionsUseCaseImpl
+
+    private val dispatcher = StandardTestDispatcher()
 
     @Before
     fun setup() {
-        usecase = GetPlayerLastActionsUseCaseImpl()
+        useCase = GetPlayerLastActionsUseCaseImpl()
     }
 
     private fun executeAndAssert(
         phaseList: List<Phase>,
         expected: Map<PlayerId, BetPhaseAction?>
     ) {
-        // execute
-        val actual = usecase.invoke(
-            playerOrder = listOf(
-                PlayerId("0"),
-                PlayerId("1"),
-                PlayerId("2"),
-            ),
-            phaseList = phaseList
-        )
-        // assert
-        assertEquals(expected, actual)
+        runTest(dispatcher) {
+            // execute
+            val actual = useCase.invoke(
+                playerOrder = listOf(
+                    PlayerId("0"),
+                    PlayerId("1"),
+                    PlayerId("2"),
+                ),
+                phaseList = phaseList
+            )
+            // assert
+            assertEquals(expected, actual)
+        }
     }
 
     @Test

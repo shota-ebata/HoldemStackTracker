@@ -4,7 +4,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 
 interface IsActionRequiredUseCase {
-    fun invoke(
+    suspend fun invoke(
         playerOrder: List<PlayerId>,
         actionStateList: List<BetPhaseAction>
     ): Boolean

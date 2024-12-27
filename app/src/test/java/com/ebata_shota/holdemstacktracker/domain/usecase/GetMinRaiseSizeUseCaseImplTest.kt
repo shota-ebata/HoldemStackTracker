@@ -6,6 +6,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMinRaiseSizeUseCaseImpl
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -14,10 +16,15 @@ class GetMinRaiseSizeUseCaseImplTest {
 
     private lateinit var useCase: GetMinRaiseSizeUseCaseImpl
 
+    private val dispatcher = StandardTestDispatcher()
+
     @Before
     fun setup() {
         useCase = GetMinRaiseSizeUseCaseImpl(
-            getLatestBetPhase = GetLatestBetPhaseUseCaseImpl()
+            getLatestBetPhase = GetLatestBetPhaseUseCaseImpl(
+                dispatcher = dispatcher
+            ),
+            dispatcher = dispatcher,
         )
     }
 
@@ -40,12 +47,14 @@ class GetMinRaiseSizeUseCaseImplTest {
                 )
             )
         )
-        val actual: Double = useCase.invoke(
-            game = game,
-            minBetSize = 2.0
-        )
-        val expected = 4.0
-        assertEquals(expected, actual, 0.0)
+        runTest(dispatcher) {
+            val actual: Double = useCase.invoke(
+                game = game,
+                minBetSize = 2.0
+            )
+            val expected = 4.0
+            assertEquals(expected, actual, 0.0)
+        }
     }
 
     @Test
@@ -71,12 +80,14 @@ class GetMinRaiseSizeUseCaseImplTest {
                 )
             )
         )
-        val actual: Double = useCase.invoke(
-            game = game,
-            minBetSize = 2.0
-        )
-        val expected = 8.0
-        assertEquals(expected, actual, 0.0)
+        runTest(dispatcher) {
+            val actual: Double = useCase.invoke(
+                game = game,
+                minBetSize = 2.0
+            )
+            val expected = 8.0
+            assertEquals(expected, actual, 0.0)
+        }
     }
 
     @Test
@@ -106,12 +117,14 @@ class GetMinRaiseSizeUseCaseImplTest {
                 )
             )
         )
-        val actual: Double = useCase.invoke(
-            game = game,
-            minBetSize = 2.0
-        )
-        val expected = 8.0
-        assertEquals(expected, actual, 0.0)
+        runTest(dispatcher) {
+            val actual: Double = useCase.invoke(
+                game = game,
+                minBetSize = 2.0
+            )
+            val expected = 8.0
+            assertEquals(expected, actual, 0.0)
+        }
     }
 
     @Test
@@ -124,12 +137,14 @@ class GetMinRaiseSizeUseCaseImplTest {
                 )
             )
         )
-        val actual: Double = useCase.invoke(
-            game = game,
-            minBetSize = 2.0
-        )
-        val expected = 2.0
-        assertEquals(expected, actual, 0.0)
+        runTest(dispatcher) {
+            val actual: Double = useCase.invoke(
+                game = game,
+                minBetSize = 2.0
+            )
+            val expected = 2.0
+            assertEquals(expected, actual, 0.0)
+        }
     }
 
     @Test
@@ -147,12 +162,14 @@ class GetMinRaiseSizeUseCaseImplTest {
                 )
             )
         )
-        val actual: Double = useCase.invoke(
-            game = game,
-            minBetSize = 2.0
-        )
-        val expected = 4.0
-        assertEquals(expected, actual, 0.0)
+        runTest(dispatcher) {
+            val actual: Double = useCase.invoke(
+                game = game,
+                minBetSize = 2.0
+            )
+            val expected = 4.0
+            assertEquals(expected, actual, 0.0)
+        }
     }
 
     @Test
@@ -170,11 +187,13 @@ class GetMinRaiseSizeUseCaseImplTest {
                 )
             )
         )
-        val actual: Double = useCase.invoke(
-            game = game,
-            minBetSize = 2.0
-        )
-        val expected = 10.0
-        assertEquals(expected, actual, 0.0)
+        runTest(dispatcher) {
+            val actual: Double = useCase.invoke(
+                game = game,
+                minBetSize = 2.0
+            )
+            val expected = 10.0
+            assertEquals(expected, actual, 0.0)
+        }
     }
 }

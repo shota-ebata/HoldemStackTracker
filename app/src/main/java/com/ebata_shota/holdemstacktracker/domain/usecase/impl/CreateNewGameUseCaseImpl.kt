@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.BuildConfig
+import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
@@ -9,6 +10,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import java.time.Instant
 import javax.inject.Inject
 
@@ -17,9 +20,11 @@ class CreateNewGameUseCaseImpl
 constructor(
     private val tableRepository: TableRepository,
     private val gameRepository: GameRepository,
+    @CoroutineDispatcherDefault
+    private val dispatcher: CoroutineDispatcher,
 ) : CreateNewGameUseCase {
 
-    override suspend fun invoke(table: Table, fromPreFlop: Boolean) {
+    override suspend fun invoke(table: Table, fromPreFlop: Boolean) = withContext(dispatcher) {
         val updateTime = Instant.now()
         val copiedTable = table.copy(
             tableStatus = TableStatus.PLAYING,

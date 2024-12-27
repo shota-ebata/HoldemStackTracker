@@ -87,7 +87,7 @@ constructor(
     }
 
     // TODO: UseCaseへ移動
-    private fun createMainContent(ringGame: Rule.RingGame) =
+    private suspend fun createMainContent(ringGame: Rule.RingGame) =
         TableCreatorUiState.MainContent(
             tableCreatorContentUiState = TableCreatorContentUiState(
                 gameType = GameType.RingGame,

@@ -16,7 +16,7 @@ constructor(
     private val getPlayerLastActions: GetPlayerLastActionsUseCase
 ) : GetNextAutoActionUseCase {
 
-    override fun invoke(
+    override suspend fun invoke(
         playerId: PlayerId,
         table: Table,
         game: Game
@@ -50,7 +50,7 @@ constructor(
         }
     }
 
-    private fun getPreFlopAutoAction(
+    private suspend fun getPreFlopAutoAction(
         latestPhase: Phase.PreFlop,
         table: Table,
         playerId: PlayerId,
@@ -69,7 +69,7 @@ constructor(
         }
     }
 
-    private fun getPreFlopRingGameAutoAction(
+    private suspend fun getPreFlopRingGameAutoAction(
         actionList: List<BetPhaseAction>,
         playerId: PlayerId,
         rule: Rule.RingGame,
@@ -143,7 +143,7 @@ constructor(
         }
     }
 
-    private fun getAutoAction(
+    private suspend fun getAutoAction(
         game: Game,
         playerId: PlayerId,
         table: Table

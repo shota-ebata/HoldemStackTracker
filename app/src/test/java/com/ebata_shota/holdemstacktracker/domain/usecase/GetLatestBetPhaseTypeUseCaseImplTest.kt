@@ -3,17 +3,21 @@ package com.ebata_shota.holdemstacktracker.domain.usecase
 import com.ebata_shota.holdemstacktracker.createDummyGame
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 
 
 class GetLatestBetPhaseTypeUseCaseImplTest {
-    private lateinit var usecase: GetLatestBetPhaseUseCaseImpl
+    private lateinit var useCase: GetLatestBetPhaseUseCaseImpl
+
+    private val dispatcher = StandardTestDispatcher()
 
     @Before
     fun setup() {
-        usecase = GetLatestBetPhaseUseCaseImpl()
+        useCase = GetLatestBetPhaseUseCaseImpl(dispatcher)
     }
 
     @Test
@@ -24,7 +28,9 @@ class GetLatestBetPhaseTypeUseCaseImplTest {
             )
         )
         assertThrows(IllegalStateException::class.java) {
-            usecase.invoke(latestGame = game)
+            runTest(dispatcher) {
+                useCase.invoke(latestGame = game)
+            }
         }
     }
 
@@ -36,8 +42,10 @@ class GetLatestBetPhaseTypeUseCaseImplTest {
                 Phase.PreFlop(actionStateList = emptyList())
             )
         )
-        val phase = usecase.invoke(latestGame = game)
-        assert(phase is Phase.PreFlop)
+        runTest(dispatcher) {
+            val phase = useCase.invoke(latestGame = game)
+            assert(phase is Phase.PreFlop)
+        }
     }
 
     @Test
@@ -49,8 +57,11 @@ class GetLatestBetPhaseTypeUseCaseImplTest {
                 Phase.Flop(actionStateList = emptyList())
             )
         )
-        val phase = usecase.invoke(latestGame = game)
-        assert(phase is Phase.Flop)
+
+        runTest(dispatcher) {
+            val phase = useCase.invoke(latestGame = game)
+            assert(phase is Phase.Flop)
+        }
     }
 
     @Test
@@ -63,8 +74,10 @@ class GetLatestBetPhaseTypeUseCaseImplTest {
                 Phase.Turn(actionStateList = emptyList()),
             )
         )
-        val phase = usecase.invoke(latestGame = game)
-        assert(phase is Phase.Turn)
+        runTest(dispatcher) {
+            val phase = useCase.invoke(latestGame = game)
+            assert(phase is Phase.Turn)
+        }
     }
 
     @Test
@@ -78,8 +91,10 @@ class GetLatestBetPhaseTypeUseCaseImplTest {
                 Phase.River(actionStateList = emptyList()),
             )
         )
-        val phase = usecase.invoke(latestGame = game)
-        assert(phase is Phase.River)
+        runTest(dispatcher) {
+            val phase = useCase.invoke(latestGame = game)
+            assert(phase is Phase.River)
+        }
     }
 
     @Test
@@ -95,7 +110,9 @@ class GetLatestBetPhaseTypeUseCaseImplTest {
             )
         )
         assertThrows(IllegalStateException::class.java) {
-            usecase.invoke(latestGame = game)
+            runTest(dispatcher) {
+                useCase.invoke(latestGame = game)
+            }
         }
     }
 
@@ -113,7 +130,9 @@ class GetLatestBetPhaseTypeUseCaseImplTest {
             )
         )
         assertThrows(IllegalStateException::class.java) {
-            usecase.invoke(latestGame = game)
+            runTest(dispatcher) {
+                useCase.invoke(latestGame = game)
+            }
         }
     }
 
@@ -132,7 +151,9 @@ class GetLatestBetPhaseTypeUseCaseImplTest {
             )
         )
         assertThrows(IllegalStateException::class.java) {
-            usecase.invoke(latestGame = game)
+            runTest(dispatcher) {
+                useCase.invoke(latestGame = game)
+            }
         }
     }
 }

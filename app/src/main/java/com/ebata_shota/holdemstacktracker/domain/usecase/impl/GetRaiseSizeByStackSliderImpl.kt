@@ -1,25 +1,31 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
+import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlider
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
 class GetRaiseSizeByStackSliderImpl
 @Inject
-constructor() : GetRaiseSizeByStackSlider {
+constructor(
+    @CoroutineDispatcherDefault
+    private val dispatcher: CoroutineDispatcher
+) : GetRaiseSizeByStackSlider {
 
     /**
      * Stackスライダーから
      * Raiseサイズを取得する
      */
-    override fun invoke(
+    override suspend fun invoke(
         betViewMode: BetViewMode,
         stackSize: Double,
         minRaiseSize: Double,
         myPendingBetSize: Double,
         sliderPosition: Float,
-    ): Double {
+    ): Double = withContext(dispatcher) {
         // 追加でBetするサイズ
         val raiseUpSize = when (betViewMode) {
             BetViewMode.Number -> {
@@ -40,6 +46,6 @@ constructor() : GetRaiseSizeByStackSlider {
             // 下回っている場合は、現在の最低額
             minRaiseSize
         }
-        return raiseSize
+        return@withContext raiseSize
     }
 }

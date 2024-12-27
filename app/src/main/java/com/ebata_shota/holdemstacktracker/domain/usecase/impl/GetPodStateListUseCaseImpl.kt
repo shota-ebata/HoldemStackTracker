@@ -1,22 +1,29 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
+import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pod
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPodStateListUseCase
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.random.Random
 
 class GetPodStateListUseCaseImpl
 @Inject
-constructor() : GetPodStateListUseCase {
-    override fun invoke(
+constructor(
+    @CoroutineDispatcherDefault
+    private val dispatcher: CoroutineDispatcher
+) : GetPodStateListUseCase {
+
+    override suspend fun invoke(
         podList: List<Pod>,
         pendingBetPerPlayer: Map<PlayerId, Double>
-    ): List<Pod> {
+    ): List<Pod> = withContext(dispatcher) {
         // ポッドに入っていないベットが残っているプレイヤー数
         val pendingBetPlayerCount: Int = pendingBetPerPlayer.size
-        return if (pendingBetPlayerCount > 0) {
+        return@withContext if (pendingBetPlayerCount > 0) {
             // 1人以上の場合、ポッドに入れていく
             getNewPodStateList(
                 podList = podList,

@@ -4,20 +4,29 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetPerPlayerUseCaseImpl
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
 class GetPendingBetPerPlayerUseCaseImplTest {
-    private lateinit var usecase: GetPendingBetPerPlayerUseCaseImpl
+    private lateinit var useCase: GetPendingBetPerPlayerUseCaseImpl
+
+    private val dispatcher = StandardTestDispatcher()
 
     @Before
     fun setup() {
-        usecase = GetPendingBetPerPlayerUseCaseImpl(
-            getMaxBetSize = GetMaxBetSizeUseCaseImpl()
+        useCase = GetPendingBetPerPlayerUseCaseImpl(
+            getMaxBetSize = GetMaxBetSizeUseCaseImpl(
+                dispatcher = dispatcher
+            ),
+            dispatcher = dispatcher
         )
     }
 
@@ -35,21 +44,24 @@ class GetPendingBetPerPlayerUseCaseImplTest {
             PlayerId("2"),
         )
         val getMaxBetSizeUseCase: GetMaxBetSizeUseCase = mockk()
-        every { getMaxBetSizeUseCase.invoke(any()) } returns 200.0
-        usecase = GetPendingBetPerPlayerUseCaseImpl(
-            getMaxBetSize = getMaxBetSizeUseCase
+        coEvery { getMaxBetSizeUseCase.invoke(any()) } returns 200.0
+        useCase = GetPendingBetPerPlayerUseCaseImpl(
+            getMaxBetSize = getMaxBetSizeUseCase,
+            dispatcher = dispatcher
         )
 
         // execute
-        usecase.invoke(
-            playerOrder = playerOrder,
-            actionStateList = actionStateList
-        )
+        runTest(dispatcher) {
+            useCase.invoke(
+                playerOrder = playerOrder,
+                actionStateList = actionStateList
+            )
+        }
 
         // assert
         playerOrder.forEach { playerId ->
             val playerActionList = actionStateList.filter { it.playerId == playerId }
-            verify(exactly = 1) { getMaxBetSizeUseCase.invoke(playerActionList) }
+            coVerify(exactly = 1) { getMaxBetSizeUseCase.invoke(playerActionList) }
         }
     }
 
@@ -62,11 +74,13 @@ class GetPendingBetPerPlayerUseCaseImplTest {
         actionStateList: List<BetPhaseAction>,
         expected: Map<PlayerId, Double>
     ) {
-        val actual: Map<PlayerId, Double> = usecase.invoke(
-            playerOrder = playerOrder,
-            actionStateList = actionStateList
-        )
-        assertEquals(expected, actual)
+        runTest(dispatcher) {
+            val actual: Map<PlayerId, Double> = useCase.invoke(
+                playerOrder = playerOrder,
+                actionStateList = actionStateList
+            )
+            assertEquals(expected, actual)
+        }
     }
 
     @Test

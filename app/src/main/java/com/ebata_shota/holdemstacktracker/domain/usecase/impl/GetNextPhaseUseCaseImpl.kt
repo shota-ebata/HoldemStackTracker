@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
+import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.AllInOpen
@@ -15,18 +16,22 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase.Turn
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class GetNextPhaseUseCaseImpl
 @Inject
 constructor(
-    private val getPlayerLastActions: GetPlayerLastActionsUseCase
+    private val getPlayerLastActions: GetPlayerLastActionsUseCase,
+    @CoroutineDispatcherDefault
+    private val dispatcher: CoroutineDispatcher,
 ) : GetNextPhaseUseCase {
-    override fun invoke(
+    override suspend fun invoke(
         playerOrder: List<PlayerId>,
-        phaseList: List<Phase>
-    ): Phase {
-        return when (val latestPhase: Phase? = phaseList.lastOrNull()) {
+        phaseList: List<Phase>,
+    ): Phase = withContext(dispatcher) {
+        return@withContext when (val latestPhase: Phase? = phaseList.lastOrNull()) {
             is Standby -> PreFlop(actionStateList = emptyList())
             is BetPhase -> getNextPhaseStateFromBetPhase(playerOrder, phaseList, latestPhase)
             is AllInOpen -> PotSettlement
@@ -40,7 +45,7 @@ constructor(
         }
     }
 
-    private fun getNextPhaseStateFromBetPhase(
+    private suspend fun getNextPhaseStateFromBetPhase(
         playerOrder: List<PlayerId>,
         phaseList: List<Phase>,
         latestPhase: BetPhase

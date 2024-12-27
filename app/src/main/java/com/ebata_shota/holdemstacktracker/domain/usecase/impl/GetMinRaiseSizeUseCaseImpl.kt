@@ -1,22 +1,27 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
+import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class GetMinRaiseSizeUseCaseImpl
 @Inject
 constructor(
-    private val getLatestBetPhase: GetLatestBetPhaseUseCase
+    private val getLatestBetPhase: GetLatestBetPhaseUseCase,
+    @CoroutineDispatcherDefault
+    private val dispatcher: CoroutineDispatcher
 ) : GetMinRaiseSizeUseCase {
 
     // FIXME: 引数をgameではなくphaseListにしたい
-    override fun invoke(
+    override suspend fun invoke(
         game: Game,
         minBetSize: Double
-    ): Double {
+    ): Double = withContext(dispatcher) {
         val betPhase = getLatestBetPhase.invoke(game)
         // 最低引き上げ額
         var minUpliftSize: Double = minBetSize
@@ -36,6 +41,6 @@ constructor(
                 }
             }
         }
-        return minUpliftSize + maxBetSize
+        return@withContext minUpliftSize + maxBetSize
     }
 }

@@ -198,12 +198,14 @@ constructor(
         myPlayerId: PlayerId,
         selectedBtnPlayerId: PlayerId?
     ) {
-        _uiState.update {
-            uiStateMapper.createUiState(
-                table = table,
-                myPlayerId = myPlayerId,
-                btnPlayerId = selectedBtnPlayerId
-            )
+        viewModelScope.launch {
+            _uiState.update {
+                uiStateMapper.createUiState(
+                    table = table,
+                    myPlayerId = myPlayerId,
+                    btnPlayerId = selectedBtnPlayerId
+                )
+            }
         }
     }
 

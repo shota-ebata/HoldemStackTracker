@@ -6,25 +6,40 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetPerPlayerUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetSizeImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsActionRequiredUseCaseImpl
-import io.mockk.every
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.verify
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
 class IsActionRequiredUseCaseImplTest {
 
-    private lateinit var usecase: IsActionRequiredUseCaseImpl
+    private lateinit var useCase: IsActionRequiredUseCaseImpl
+
+    private val dispatcher = StandardTestDispatcher()
 
     @Before
     fun setup() {
-        usecase = IsActionRequiredUseCaseImpl(
-            getMaxBetSize = GetMaxBetSizeUseCaseImpl(),
-            getPendingBetPerPlayer = GetPendingBetPerPlayerUseCaseImpl(
-                getMaxBetSize = GetMaxBetSizeUseCaseImpl()
-            )
+        // TODO: hilt
+        useCase = IsActionRequiredUseCaseImpl(
+            getMaxBetSize = GetMaxBetSizeUseCaseImpl(
+                dispatcher = dispatcher
+            ),
+            getPendingBetSize = GetPendingBetSizeImpl(
+                getPendingBetPerPlayer = GetPendingBetPerPlayerUseCaseImpl(
+                    getMaxBetSize = GetMaxBetSizeUseCaseImpl(
+                        dispatcher = dispatcher
+                    ),
+                    dispatcher = dispatcher
+                ),
+                dispatcher = dispatcher
+            ),
+            dispatcher = dispatcher
         )
     }
 
@@ -33,11 +48,19 @@ class IsActionRequiredUseCaseImplTest {
         // prepare
         val getLatestBetPhaseUseCase: GetLatestBetPhaseUseCase = mockk()
         val getMaxBetSizeUseCase: GetMaxBetSizeUseCase = mockk()
-        usecase = IsActionRequiredUseCaseImpl(
+        // TODO: Hilt
+        useCase = IsActionRequiredUseCaseImpl(
             getMaxBetSize = getMaxBetSizeUseCase,
-            getPendingBetPerPlayer = GetPendingBetPerPlayerUseCaseImpl(
-                getMaxBetSize = GetMaxBetSizeUseCaseImpl()
-            )
+            getPendingBetSize = GetPendingBetSizeImpl(
+                getPendingBetPerPlayer = GetPendingBetPerPlayerUseCaseImpl(
+                    getMaxBetSize = GetMaxBetSizeUseCaseImpl(
+                        dispatcher = dispatcher
+                    ),
+                    dispatcher = dispatcher
+                ),
+                dispatcher = dispatcher
+            ),
+            dispatcher = dispatcher
         )
         val playerOrder = listOf(
             PlayerId("SB"),
@@ -46,19 +69,21 @@ class IsActionRequiredUseCaseImplTest {
         )
         val latestGame = createDummyGame()
         val actionStateList = listOf<BetPhaseAction>()
-        every { getLatestBetPhaseUseCase.invoke(latestGame) } returns Phase.PreFlop(
+        coEvery { getLatestBetPhaseUseCase.invoke(latestGame) } returns Phase.PreFlop(
             actionStateList = actionStateList
         )
-        every { getMaxBetSizeUseCase.invoke(any()) } returns 0.0
+        coEvery { getMaxBetSizeUseCase.invoke(any()) } returns 0.0
 
         // execute
-        usecase.invoke(
-            playerOrder = playerOrder,
-            actionStateList = actionStateList
-        )
+        runTest(dispatcher) {
+            useCase.invoke(
+                playerOrder = playerOrder,
+                actionStateList = actionStateList
+            )
+        }
 
         // assert
-        verify(exactly = 1) {
+        coVerify(exactly = 1) {
             getMaxBetSizeUseCase.invoke(actionStateList.takeLast(playerOrder.size))
         }
     }
@@ -73,13 +98,15 @@ class IsActionRequiredUseCaseImplTest {
         expected: Boolean
     ) {
         // execute
-        val actual: Boolean = usecase.invoke(
-            playerOrder = playerOrder,
-            actionStateList = actionStateList
-        )
+        runTest(dispatcher) {
+            val actual: Boolean = useCase.invoke(
+                playerOrder = playerOrder,
+                actionStateList = actionStateList
+            )
 
-        // assert
-        assertEquals(expected, actual)
+            // assert
+            assertEquals(expected, actual)
+        }
     }
 
     @Test

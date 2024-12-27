@@ -9,7 +9,7 @@ interface GetPodStateListUseCase {
      * @param podList ポッド状況
      * @param pendingBetPerPlayer ポッドに入っていない別途が残っているプレイヤーのベット状況
      */
-    fun invoke(
+    suspend fun invoke(
         podList: List<Pod>,
         pendingBetPerPlayer: Map<PlayerId, Double>
     ): List<Pod>

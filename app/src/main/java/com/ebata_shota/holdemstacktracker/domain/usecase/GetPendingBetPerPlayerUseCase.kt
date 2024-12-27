@@ -7,7 +7,7 @@ interface GetPendingBetPerPlayerUseCase {
     /**
      * プレイヤーごとの、まだポッドに入っていないベット額
      */
-    fun invoke(
+    suspend fun invoke(
         playerOrder: List<PlayerId>,
         actionStateList: List<BetPhaseAction>
     ): Map<PlayerId, Double>

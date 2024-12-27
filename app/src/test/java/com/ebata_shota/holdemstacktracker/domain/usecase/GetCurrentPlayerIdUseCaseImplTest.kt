@@ -9,31 +9,39 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
-import io.mockk.every
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.verify
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
 class GetCurrentPlayerIdUseCaseImplTest {
-    private lateinit var usecase: GetCurrentPlayerIdUseCaseImpl
+    private lateinit var useCase: GetCurrentPlayerIdUseCaseImpl
+
+    private val dispatcher = StandardTestDispatcher()
 
     @Before
     fun setup() {
-        usecase = GetCurrentPlayerIdUseCaseImpl(
-            getLatestBetPhase = GetLatestBetPhaseUseCaseImpl()
+        useCase = GetCurrentPlayerIdUseCaseImpl(
+            getLatestBetPhase = GetLatestBetPhaseUseCaseImpl(
+                dispatcher = dispatcher
+            ),
+            dispatcher = dispatcher,
         )
     }
 
     @Test
     fun getCurrentPlayerId_call_getLatestBetPhase() {
         val getLatestBetPhaseMock = mockk<GetLatestBetPhaseUseCaseImpl>()
-        every { getLatestBetPhaseMock.invoke(any()) } returns (Phase.PreFlop(actionStateList = emptyList()))
-        usecase = GetCurrentPlayerIdUseCaseImpl(
-            getLatestBetPhase = getLatestBetPhaseMock
+        coEvery { getLatestBetPhaseMock.invoke(any()) } returns (Phase.PreFlop(actionStateList = emptyList()))
+        useCase = GetCurrentPlayerIdUseCaseImpl(
+            getLatestBetPhase = getLatestBetPhaseMock,
+            dispatcher = dispatcher,
         )
+
         val game = createDummyGame(
             players = setOf(
                 GamePlayer(
@@ -58,14 +66,14 @@ class GetCurrentPlayerIdUseCaseImplTest {
             PlayerId("PlayerId1"),
             PlayerId("PlayerId2")
         )
-        runTest {
-            usecase.invoke(
+        runTest(dispatcher) {
+            useCase.invoke(
                 btnPlayerId = PlayerId("PlayerId0"),
                 playerOrder = playerOrder,
                 game = game
             )
         }
-        verify(exactly = 1) { getLatestBetPhaseMock.invoke(game) }
+        coVerify(exactly = 1) { getLatestBetPhaseMock.invoke(game) }
     }
 
     private fun executeAndAssert(
@@ -99,13 +107,12 @@ class GetCurrentPlayerIdUseCaseImplTest {
                 )
             )
         )
-        runTest {
-            val actual = usecase.invoke(
+        runTest(dispatcher) {
+            val actual = useCase.invoke(
                 btnPlayerId = btnPlayerId,
                 playerOrder = playerOrder,
                 game = game
             )
-
             assertEquals(expected, actual)
         }
     }
