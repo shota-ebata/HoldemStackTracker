@@ -658,7 +658,8 @@ private class GameContentUiStatePreviewParam :
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
                 betPhaseTextResId = R.string.label_pre_flop,
-                totalPod = "0"
+                totalPod = "0",
+                pendingTotalBetSize = "2"
             ),
             blindText = "100/200",
             isEnableFoldButton = true,

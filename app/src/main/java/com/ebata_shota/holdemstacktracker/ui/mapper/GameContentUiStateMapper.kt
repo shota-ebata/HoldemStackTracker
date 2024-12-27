@@ -231,7 +231,8 @@ constructor(
                 },
                 totalPod = game.podList.sumOf {
                     it.podSize
-                }.toHstString(betViewMode = table.rule.betViewMode)
+                }.toHstString(betViewMode = table.rule.betViewMode),
+                pendingTotalBetSize = pendingBetPerPlayer.map { it.value }.sum().toHstString(table.rule.betViewMode)
             ),
             blindText = table.rule.blindText(),
             isEnableFoldButton = isEnableFoldButton,

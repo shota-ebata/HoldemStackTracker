@@ -62,13 +62,35 @@ fun CenterPanelContent(
                     style = MaterialTheme.typography.titleLarge
                 )
             }
+
+            Column(
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .border(
+                        width = OutlineLabelBorderWidth,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        shape = RoundedCornerShape(4.dp),
+                    )
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.label_bet),
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = uiState.pendingTotalBetSize,
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
         }
     }
 }
 
 data class CenterPanelContentUiState(
     val betPhaseTextResId: Int?,
-    val totalPod: String
+    val totalPod: String,
+    val pendingTotalBetSize: String,
 )
 
 @Preview(showBackground = true, showSystemUi = false, name = "Light Mode")
@@ -84,7 +106,8 @@ private fun CenterPanelContentPreview() {
         CenterPanelContent(
             uiState = CenterPanelContentUiState(
                 betPhaseTextResId = R.string.label_pre_flop,
-                totalPod = "4"
+                totalPod = "400",
+                pendingTotalBetSize = "100"
             )
         )
     }
