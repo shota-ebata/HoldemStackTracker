@@ -24,7 +24,6 @@ import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.Playe
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.RIGHT
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.TOP
 import com.ebata_shota.holdemstacktracker.ui.model.SliderType
-import com.ebata_shota.holdemstacktracker.ui.viewmodel.GameViewModel
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -97,13 +96,13 @@ constructor(
         val isEnableSlider: Boolean
         val sliderTypeButtonLabelUiState = when (sliderType) {
             SliderType.Stack -> SliderTypeButtonLabelUiState.Stack
-            SliderType.Pod -> SliderTypeButtonLabelUiState.Pod(
-                podSliderMaxRatio = prefRepository.podSliderMaxRatio.first()
+            SliderType.Pot -> SliderTypeButtonLabelUiState.Pot(
+                potSliderMaxRatio = prefRepository.potSliderMaxRatio.first()
             )
         }
         val sliderPosition: Float
         val sliderLabelStackBody: String
-        val sliderLabelPodBody: String
+        val sliderLabelPotBody: String
         val isEnableRaiseSizeButton: Boolean
         val raiseUpSizeText: String
 
@@ -160,10 +159,10 @@ constructor(
                     // (スタック)に対する(レイズしたあと場に出ている額)の比率
                     sliderPosition = (raiseSize / (gamePlayer.stack + myPendingBetSize)).toFloat()
                 }
-                SliderType.Pod -> {
-                    val totalPodSize = game.podList.sumOf { it.podSize }
-                    sliderPosition = if (totalPodSize != 0.0) {
-                        (raiseSize / totalPodSize).toFloat() / prefRepository.podSliderMaxRatio.first()
+                SliderType.Pot -> {
+                    val totalPotSize = game.potList.sumOf { it.potSize }
+                    sliderPosition = if (totalPotSize != 0.0) {
+                        (raiseSize / totalPotSize).toFloat() / prefRepository.potSliderMaxRatio.first()
                     } else {
                         0.0f
                     }
@@ -182,11 +181,11 @@ constructor(
 //                ""
 //            }
             sliderLabelStackBody = "${((raiseSize / (gamePlayer.stack + myPendingBetSize)) * 100).roundToInt()}%"
-            val totalPodSize = game.podList.sumOf { it.podSize }
-            sliderLabelPodBody = if (totalPodSize != 0.0) {
-                // Raiseサイズ / Podサイズ
-                val raiseSizePerTotalPodSize = raiseSize / totalPodSize
-                "${(raiseSizePerTotalPodSize * 100).roundToInt()}%"
+            val totalPotSize = game.potList.sumOf { it.potSize }
+            sliderLabelPotBody = if (totalPotSize != 0.0) {
+                // Raiseサイズ / Potサイズ
+                val raiseSizePerTotalPotSize = raiseSize / totalPotSize
+                "${(raiseSizePerTotalPotSize * 100).roundToInt()}%"
             } else {
                 ""
             }
@@ -206,7 +205,7 @@ constructor(
             isEnableSlider = false
             sliderPosition = 0.0f
             sliderLabelStackBody = ""
-            sliderLabelPodBody = ""
+            sliderLabelPotBody = ""
             isEnableRaiseSizeButton = false
             raiseUpSizeText = ""
         }
@@ -223,8 +222,8 @@ constructor(
                     is Phase.River -> R.string.label_river
                     null -> null
                 },
-                totalPod = game.podList.sumOf {
-                    it.podSize
+                totalPot = game.potList.sumOf {
+                    it.potSize
                 }.toHstString(betViewMode = table.rule.betViewMode),
                 pendingTotalBetSize = pendingBetPerPlayer.map { it.value }.sum().toHstString(table.rule.betViewMode)
             ),
@@ -241,7 +240,7 @@ constructor(
             isEnableSlider = isEnableSlider,
             sliderPosition = sliderPosition,
             sliderLabelStackBody = sliderLabelStackBody,
-            sliderLabelPodBody = sliderLabelPodBody,
+            sliderLabelPotBody = sliderLabelPotBody,
             isEnableSliderStep = isEnableSliderStep,
             isEnableRaiseUpSizeButton = isEnableRaiseSizeButton,
             raiseUpSizeText = raiseUpSizeText,

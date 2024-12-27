@@ -358,10 +358,10 @@ fun GameContent(
                                     stringResource(sliderTypeButtonLabelUiState.labelResId)
                                 }
 
-                                is GameContentUiState.SliderTypeButtonLabelUiState.Pod -> {
+                                is GameContentUiState.SliderTypeButtonLabelUiState.Pot -> {
                                     stringResource(
                                         sliderTypeButtonLabelUiState.labelResId,
-                                        sliderTypeButtonLabelUiState.podSliderMaxRatio
+                                        sliderTypeButtonLabelUiState.potSliderMaxRatio
                                     )
                                 }
                             }
@@ -386,7 +386,7 @@ fun GameContent(
                                         9
                                     }
 
-                                    is GameContentUiState.SliderTypeButtonLabelUiState.Pod -> {
+                                    is GameContentUiState.SliderTypeButtonLabelUiState.Pot -> {
                                         19
                                     }
                                 }
@@ -420,11 +420,11 @@ fun GameContent(
                                                     style = MaterialTheme.typography.bodySmall
                                                 )
                                                 Text(
-                                                    text = stringResource(R.string.label_pod),
+                                                    text = stringResource(R.string.label_pot),
                                                     style = MaterialTheme.typography.titleSmall
                                                 )
                                                 Text(
-                                                    text = uiState.sliderLabelPodBody
+                                                    text = uiState.sliderLabelPotBody
                                                         .ifEmpty { stringResource(R.string.label_min) },
                                                     style = MaterialTheme.typography.bodySmall
                                                 )
@@ -524,7 +524,7 @@ data class GameContentUiState(
     val isEnableSlider: Boolean,
     val sliderPosition: Float,
     val sliderLabelStackBody: String,
-    val sliderLabelPodBody: String,
+    val sliderLabelPotBody: String,
     // StepSwitch
     val isEnableSliderStep: Boolean,
 ) {
@@ -533,10 +533,10 @@ data class GameContentUiState(
             val labelResId = R.string.label_slider_type_stack
         }
 
-        data class Pod(
-            val podSliderMaxRatio: Int,
+        data class Pot(
+            val potSliderMaxRatio: Int,
         ) : SliderTypeButtonLabelUiState {
-            val labelResId = R.string.label_slider_type_pod
+            val labelResId = R.string.label_slider_type_pot
         }
     }
 }
@@ -550,7 +550,7 @@ private class GameContentUiStatePreviewParam :
                 version = 0,
                 appVersion = BuildConfig.VERSION_CODE.toLong(),
                 players = emptySet(),
-                podList = emptyList(),
+                potList = emptyList(),
                 phaseList = emptyList(),
                 updateTime = Instant.now()
             ),
@@ -658,7 +658,7 @@ private class GameContentUiStatePreviewParam :
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
                 betPhaseTextResId = R.string.label_pre_flop,
-                totalPod = "0",
+                totalPot = "0",
                 pendingTotalBetSize = "2"
             ),
             blindText = "100/200",
@@ -675,7 +675,7 @@ private class GameContentUiStatePreviewParam :
             sliderPosition = 0.0f,
             isEnableSliderStep = true,
             sliderLabelStackBody = "",
-            sliderLabelPodBody = "",
+            sliderLabelPotBody = "",
             isEnableRaiseUpSizeButton = true,
             raiseUpSizeText = "+10200",
         )

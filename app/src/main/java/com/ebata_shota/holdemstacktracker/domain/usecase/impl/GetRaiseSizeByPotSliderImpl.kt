@@ -3,36 +3,36 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByPodSlider
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByPotSlider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-class GetRaiseSizeByPodSliderImpl
+class GetRaiseSizeByPotSliderImpl
 @Inject
 constructor(
     private val prefRepository: PrefRepository,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher
-) : GetRaiseSizeByPodSlider {
+) : GetRaiseSizeByPotSlider {
 
     /**
-     * Podスライダーから
+     * Potスライダーから
      * Raiseサイズを取得する
      */
     override suspend fun invoke(
         betViewMode: BetViewMode,
-        totalPodSize: Double,
+        totalPotSize: Double,
         stackSize: Double,
         pendingBetSize: Double,
         minRaiseSize: Double,
         sliderPosition: Float,
     ): Double = withContext(dispatcher) {
-        val podSliderRatioMax = prefRepository.podSliderMaxRatio.first()
+        val potSliderRatioMax = prefRepository.potSliderMaxRatio.first()
         // スライダー最大位置でのRaiseサイズ
-        val raiseSizeOfSliderMaxPosition = totalPodSize * podSliderRatioMax
+        val raiseSizeOfSliderMaxPosition = totalPotSize * potSliderRatioMax
         // スライダーポジションをそのままRaiseサイズに変換
         val raiseSizeBySliderPosition = when (betViewMode) {
             BetViewMode.Number -> {

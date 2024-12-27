@@ -24,7 +24,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCas
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSize
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByPodSlider
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByPotSlider
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlider
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
@@ -71,7 +71,7 @@ constructor(
     private val getMaxBetSize: GetMaxBetSizeUseCase,
     private val getMinRaiseSize: GetMinRaiseSizeUseCase,
     private val isNotRaisedYet: IsNotRaisedYetUseCase,
-    private val getRaiseSizeByPodSlider: GetRaiseSizeByPodSlider,
+    private val getRaiseSizeByPotSlider: GetRaiseSizeByPotSlider,
     private val getRaiseSizeByStackSlider: GetRaiseSizeByStackSlider,
     private val getPendingBetSize: GetPendingBetSize,
     private val uiStateMapper: GameContentUiStateMapper,
@@ -375,10 +375,10 @@ constructor(
                 )
             }
 
-            SliderType.Pod -> {
-                getRaiseSizeByPodSlider.invoke(
+            SliderType.Pot -> {
+                getRaiseSizeByPotSlider.invoke(
                     betViewMode = betViewMode,
-                    totalPodSize = game.podList.sumOf { it.podSize },
+                    totalPotSize = game.potList.sumOf { it.potSize },
                     stackSize = stackSize,
                     pendingBetSize = myPendingBetSize,
                     minRaiseSize = minRaiseSize,
@@ -497,8 +497,8 @@ constructor(
     fun onClickSliderTypeButton() {
         sliderTypeStateFlow.update {
             when (it) {
-                SliderType.Stack -> SliderType.Pod
-                SliderType.Pod -> SliderType.Stack
+                SliderType.Stack -> SliderType.Pot
+                SliderType.Pot -> SliderType.Stack
             }
         }
         // スライダータイプを変更するたび0にする(自動で最低Raiseサイズになってくれる想定

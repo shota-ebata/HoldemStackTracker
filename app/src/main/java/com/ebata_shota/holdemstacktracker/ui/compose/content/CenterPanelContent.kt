@@ -54,11 +54,11 @@ fun CenterPanelContent(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(R.string.label_pod),
+                    text = stringResource(R.string.label_pot),
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = uiState.totalPod,
+                    text = uiState.totalPot,
                     style = MaterialTheme.typography.titleLarge
                 )
             }
@@ -89,7 +89,7 @@ fun CenterPanelContent(
 
 data class CenterPanelContentUiState(
     val betPhaseTextResId: Int?,
-    val totalPod: String,
+    val totalPot: String,
     val pendingTotalBetSize: String,
 )
 
@@ -106,7 +106,7 @@ private fun CenterPanelContentPreview() {
         CenterPanelContent(
             uiState = CenterPanelContentUiState(
                 betPhaseTextResId = R.string.label_pre_flop,
-                totalPod = "400",
+                totalPot = "400",
                 pendingTotalBetSize = "100"
             )
         )

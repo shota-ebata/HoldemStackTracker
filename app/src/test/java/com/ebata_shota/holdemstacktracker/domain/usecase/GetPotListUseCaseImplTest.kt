@@ -1,36 +1,36 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.Pod
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPodStateListUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.model.Pot
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPotStateListUseCaseImpl
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class GetPodListUseCaseImplTest {
-    private lateinit var useCase: GetPodStateListUseCaseImpl
+class GetPotListUseCaseImplTest {
+    private lateinit var useCase: GetPotStateListUseCaseImpl
 
     private val dispatcher = StandardTestDispatcher()
 
     @Before
     fun setup() {
-        useCase = GetPodStateListUseCaseImpl(dispatcher)
+        useCase = GetPotStateListUseCaseImpl(dispatcher)
     }
 
     private fun executeAndAssert(
         pendingBetPerPlayer: Map<PlayerId, Double>,
-        expectedList: List<Pod>
+        expectedList: List<Pot>
     ) {
         runTest(dispatcher) {
             // execute
-            val updatedPodList: List<Pod> = useCase.invoke(
-                podList = emptyList(),
+            val updatedPotList: List<Pot> = useCase.invoke(
+                potList = emptyList(),
                 pendingBetPerPlayer = pendingBetPerPlayer
             )
             // テスト用にIDを0に上書き
-            val actualList = updatedPodList.map { it.copy(id = 0L) }
+            val actualList = updatedPotList.map { it.copy(id = 0L) }
             // assert
             actualList.zip(expectedList) { actual, expected ->
                 assertEquals(expected, actual)
@@ -46,10 +46,10 @@ class GetPodListUseCaseImplTest {
             PlayerId("2") to 200.0,
         )
         val expectedList = listOf(
-            Pod(
+            Pot(
                 id = 0L,
-                podNumber = 0L,
-                podSize = 600.0,
+                potNumber = 0L,
+                potSize = 600.0,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
                     PlayerId("1"),
@@ -69,10 +69,10 @@ class GetPodListUseCaseImplTest {
             PlayerId("2") to 100.0,
         )
         val expectedList = listOf(
-            Pod(
+            Pot(
                 id = 0L,
-                podNumber = 0L,
-                podSize = 300.0,
+                potNumber = 0L,
+                potSize = 300.0,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
                     PlayerId("1"),
@@ -80,10 +80,10 @@ class GetPodListUseCaseImplTest {
                 ),
                 isClosed = true
             ),
-            Pod(
+            Pot(
                 id = 0L,
-                podNumber = 1L,
-                podSize = 200.0,
+                potNumber = 1L,
+                potSize = 200.0,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
                     PlayerId("1"),
@@ -102,10 +102,10 @@ class GetPodListUseCaseImplTest {
             PlayerId("2") to 300.0,
         )
         val expectedList = listOf(
-            Pod(
+            Pot(
                 id = 0L,
-                podNumber = 0L,
-                podSize = 300.0,
+                potNumber = 0L,
+                potSize = 300.0,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
                     PlayerId("1"),
@@ -113,20 +113,20 @@ class GetPodListUseCaseImplTest {
                 ),
                 isClosed = true
             ),
-            Pod(
+            Pot(
                 id = 0L,
-                podNumber = 1L,
-                podSize = 200.0,
+                potNumber = 1L,
+                potSize = 200.0,
                 involvedPlayerIds = listOf(
                     PlayerId("1"),
                     PlayerId("2"),
                 ),
                 isClosed = true
             ),
-            Pod(
+            Pot(
                 id = 0L,
-                podNumber = 2L,
-                podSize = 100.0,
+                potNumber = 2L,
+                potSize = 100.0,
                 involvedPlayerIds = listOf(
                     PlayerId("2"),
                 ),

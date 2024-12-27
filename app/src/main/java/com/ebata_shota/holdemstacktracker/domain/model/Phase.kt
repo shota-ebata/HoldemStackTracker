@@ -29,7 +29,7 @@ sealed interface Phase {
     data object AllInOpen : Phase
 
     /**
-     * ポッド決済フェーズ
+     * ポット決済フェーズ
      */
     data object PotSettlement : Phase
 

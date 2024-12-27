@@ -18,7 +18,7 @@ constructor(
 ) : GetPendingBetPerPlayerUseCase {
 
     /**
-     * まだ、ポッドに入っていない
+     * まだ、ポットに入っていない
      * Betされているものをプレイヤーごとに返却
      */
     override suspend fun invoke(

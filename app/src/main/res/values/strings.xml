@@ -40,7 +40,7 @@
     <string name="label_update_datetime">更新日時：</string>
 
     <string name="label_stack">Stack</string>
-    <string name="label_pod">Pod</string>
+    <string name="label_pot">Pot</string>
     <string name="label_bet">Bet</string>
     <string name="label_pre_flop">PreFlop</string>
     <string name="label_flop">Flop</string>
@@ -58,5 +58,5 @@
 
     <string name="title_raise_size_dialog">Raise Size</string>
     <string name="label_slider_type_stack">Stack</string>
-    <string name="label_slider_type_pod">%1$d Pod</string>
+    <string name="label_slider_type_pot">%1$d Pot</string>
 </resources>

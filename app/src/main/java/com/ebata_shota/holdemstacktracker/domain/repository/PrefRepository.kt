@@ -51,9 +51,9 @@ interface PrefRepository {
     suspend fun saveEnableRaiseUpSliderStep(value: Boolean)
 
     /**
-     * Podスライダーの最大位置の比率
-     * 例）2 ： 最大位置が 2 Pod
+     * Potスライダーの最大位置の比率
+     * 例）2 ： 最大位置が 2 Pot
      */
-    val podSliderMaxRatio: Flow<Int>
-    suspend fun savePodSliderMaxRatio(value: Int)
+    val potSliderMaxRatio: Flow<Int>
+    suspend fun savePotSliderMaxRatio(value: Int)
 }

@@ -18,7 +18,7 @@ fun createDummyGame(
     version = 0,
     appVersion = BuildConfig.VERSION_CODE.toLong(),
     players = players,
-    podList = emptyList(),
+    potList = emptyList(),
     phaseList = phaseList,
     updateTime = Instant.now()
 )

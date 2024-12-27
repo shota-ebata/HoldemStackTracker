@@ -45,7 +45,7 @@ constructor(
                     )
                 }
             }.toSet(),
-            podList = emptyList(),
+            potList = emptyList(),
             phaseList = listOfNotNull(
                 Phase.Standby,
                 if (fromPreFlop) Phase.PreFlop(emptyList()) else null

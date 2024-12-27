@@ -18,7 +18,7 @@ constructor(
 ) : GetPendingBetSize {
     /**
      * 特定の一人の現在Betしていて
-     * まだPodに入っていないサイズを取得する
+     * まだPotに入っていないサイズを取得する
      */
     override suspend fun invoke(
         actionList: List<BetPhaseAction>,

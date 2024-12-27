@@ -16,5 +16,5 @@ object AppPreferencesKeys {
     val DefaultStackSizeOfNumberMode = intPreferencesKey("default_stack_size_of_number_mode")
     val DefaultStackSizeOfBbMode = doublePreferencesKey("default_stack_size_of_bb_mode")
     val EnableRaiseUpSliderStep = booleanPreferencesKey("enable_slider_step")
-    val PodSliderMaxRatio = intPreferencesKey("pod_slider_max_ratio")
+    val PotSliderMaxRatio = intPreferencesKey("pot_slider_max_ratio")
 }

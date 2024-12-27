@@ -9,16 +9,15 @@ import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.Pod
+import com.ebata_shota.holdemstacktracker.domain.model.Pot
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPlayerStackUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetPodStateListUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotStateListUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.MainCoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -28,7 +27,7 @@ constructor(
     private val isActionRequired: IsActionRequiredUseCase,
     private val getLatestBetPhase: GetLatestBetPhaseUseCase,
     private val getPendingBetPerPlayer: GetPendingBetPerPlayerUseCase,
-    private val getPodStateList: GetPodStateListUseCase,
+    private val getPotStateList: GetPotStateListUseCase,
     private val getNextPhase: GetNextPhaseUseCase,
     private val getNextPlayerStack: GetNextPlayerStackUseCase,
     @CoroutineDispatcherDefault
@@ -91,15 +90,15 @@ constructor(
                 phaseList = updatedPhaseLists
             )
         } else {
-            // もし全員のベットが揃った場合、ポッド更新してフェーズを進める
-            // プレイヤーごとの、まだポッドに入っていないベット額
+            // もし全員のベットが揃った場合、ポット更新してフェーズを進める
+            // プレイヤーごとの、まだポットに入っていないベット額
             val pendingBetPerPlayer: Map<PlayerId, Double> = getPendingBetPerPlayer.invoke(
                 playerOrder = playerOrder,
                 actionStateList = updatedActionStateList
             )
-            // ベット状況をポッドに反映
-            val updatedPodList: List<Pod> = getPodStateList.invoke(
-                podList = latestGame.podList,
+            // ベット状況をポットに反映
+            val updatedPotList: List<Pot> = getPotStateList.invoke(
+                potList = latestGame.potList,
                 pendingBetPerPlayer = pendingBetPerPlayer
             )
             // フェーズを進める
@@ -113,7 +112,7 @@ constructor(
                 version = latestGame.version + 1L,
                 players = updatedPlayers,
                 phaseList = updatedPhaseLists,
-                podList = updatedPodList,
+                potList = updatedPotList,
             )
         }
     }

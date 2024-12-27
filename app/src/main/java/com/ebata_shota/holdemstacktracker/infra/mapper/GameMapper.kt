@@ -6,7 +6,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.Pod
+import com.ebata_shota.holdemstacktracker.domain.model.Pot
 import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType
 import com.ebata_shota.holdemstacktracker.infra.model.PhaseType
 import java.time.Instant
@@ -25,10 +25,10 @@ constructor() {
         private const val PLAYER_STATE_PLAYER_ID = "playerId"
         private const val PLAYER_STATE_PLAYER_STACK = "stack"
         private const val PLAYER_STATE_PLAYER_IS_LEAVED = "isLeaved"
-        private const val PODS = "pods"
-        private const val POD_SIZE = "podSize"
-        private const val POD_IS_CLOSED = "isClosed"
-        private const val POD_INVOLVED_PLAYER_IDS = "involvedPlayerIds"
+        private const val POTS = "pots"
+        private const val POT_SIZE = "potSize"
+        private const val POT_IS_CLOSED = "isClosed"
+        private const val POT_INVOLVED_PLAYER_IDS = "involvedPlayerIds"
         private const val PHASES = "phases"
         private const val PHASE_TYPE = "phaseType"
         private const val PHASE_ACTIONS = "actions"
@@ -44,8 +44,8 @@ constructor() {
             version = gameMap[GAME_VERSION] as Long,
             appVersion = gameMap[APP_VERSION] as Long,
             players = mapToGamePlayerStateList(gameMap[PLAYERS] as Map<*, *>),
-            podList = (gameMap[PODS] as? List<*>)?.let {
-                mapToPodStateList(it)
+            potList = (gameMap[POTS] as? List<*>)?.let {
+                mapToPotStateList(it)
             } ?: emptyList(),
             phaseList = mapToPhaseStateList(gameMap[PHASES] as List<*>),
             updateTime = Instant.ofEpochMilli(gameMap[UPDATE_TIME] as Long)
@@ -105,18 +105,18 @@ constructor() {
         }.toSet()
     }
 
-    private fun mapToPodStateList(pods: List<*>): List<Pod> {
-        return pods.map { it as Map<*, *> }.mapIndexed { index, map ->
-            val podSize = map[POD_SIZE]!!.getDouble()
-            val isClosed = map[POD_IS_CLOSED] as Boolean
-            val involvedPlayerIds = (map[POD_INVOLVED_PLAYER_IDS] as List<*>).map {
+    private fun mapToPotStateList(pots: List<*>): List<Pot> {
+        return pots.map { it as Map<*, *> }.mapIndexed { index, map ->
+            val potSize = map[POT_SIZE]!!.getDouble()
+            val isClosed = map[POT_IS_CLOSED] as Boolean
+            val involvedPlayerIds = (map[POT_INVOLVED_PLAYER_IDS] as List<*>).map {
                 PlayerId(it as String)
             }
-            Pod(
+            Pot(
                 id = index.toLong(),
-                podNumber = 0,
+                potNumber = 0,
                 involvedPlayerIds = involvedPlayerIds,
-                podSize = podSize,
+                potSize = potSize,
                 isClosed = isClosed
             )
         }
@@ -131,7 +131,7 @@ constructor() {
         APP_VERSION to newGame.appVersion,
         UPDATE_TIME to newGame.updateTime.toEpochMilli(),
         PLAYERS to mapPlayers(newGame.players),
-        PODS to mapPods(newGame.podList),
+        POTS to mapPots(newGame.potList),
         PHASES to mapPhases(newGame.phaseList)
     )
 
@@ -162,17 +162,17 @@ constructor() {
         }
     ).toMap()
 
-    private fun mapPods(podList: List<Pod>) = podList.associate { podState ->
-        podState.podNumber.toString() to mapPod(podState)
+    private fun mapPots(potList: List<Pot>) = potList.associate { pot ->
+        pot.potNumber.toString() to mapPot(pot)
     }
 
-    private fun mapPod(pod: Pod) = hashMapOf(
-        POD_SIZE to pod.podSize,
-        POD_IS_CLOSED to pod.isClosed,
-        POD_INVOLVED_PLAYER_IDS to mapInvolvedPlayerIds(pod)
+    private fun mapPot(pot: Pot) = hashMapOf(
+        POT_SIZE to pot.potSize,
+        POT_IS_CLOSED to pot.isClosed,
+        POT_INVOLVED_PLAYER_IDS to mapInvolvedPlayerIds(pot)
     )
 
-    private fun mapInvolvedPlayerIds(pod: Pod) = pod.involvedPlayerIds.mapIndexed { index, playerId ->
+    private fun mapInvolvedPlayerIds(pot: Pot) = pot.involvedPlayerIds.mapIndexed { index, playerId ->
         index.toString() to playerId.value
     }.toMap()
 
