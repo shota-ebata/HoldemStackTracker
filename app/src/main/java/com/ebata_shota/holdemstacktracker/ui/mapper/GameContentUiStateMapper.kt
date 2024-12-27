@@ -132,13 +132,13 @@ constructor(
             isEnableAllInButton = true
 
             // Callボタン
-            val callShortageSize: Double = maxBetSize - myPendingBetSize
+            val callSize: Double = maxBetSize
             // 現在ベットされている最高額より自分がベットしてる額が少ない
             // コールしてもAll-Inにならない場合
             isEnableCallButton = maxBetSize > myPendingBetSize
-                    && gamePlayer.stack > callShortageSize
+                    && gamePlayer.stack > callSize
             callButtonSubText = if (isEnableCallButton) {
-                "+${callShortageSize.toHstString(table.rule.betViewMode)}"
+                "${myPendingBetSize.toHstString(table.rule.betViewMode)} → ${callSize.toHstString(table.rule.betViewMode)}"
             } else {
                 ""
             }
@@ -148,14 +148,8 @@ constructor(
             val raiseUpSize = raiseSize - myPendingBetSize
             // 最低レイズ額に足りている場合
             isEnableRaiseButton = gamePlayer.stack >= raiseUpSize
-            // Raiseしたときに場に出ている額（raiseSize）と、
-            val totalRaiseSizeText = if (raiseSize != raiseUpSize) {
-                "（=${(raiseSize).toHstString(table.rule.betViewMode)}）"
-            } else {
-                ""
-            }
             raiseButtonSubText = if (isEnableRaiseButton) {
-                "+${raiseUpSize.toHstString(table.rule.betViewMode)}$totalRaiseSizeText"
+                "${myPendingBetSize.toHstString(table.rule.betViewMode)} →  ${raiseSize.toHstString(table.rule.betViewMode)}"
             } else {
                 ""
             }
@@ -163,13 +157,13 @@ constructor(
             // Slider
             when (sliderType) {
                 SliderType.Stack -> {
-                    // (スタック)に対する(レイズしたあと場に出ている額 - 今場に出ている額)の比率
-                    sliderPosition = (raiseUpSize / gamePlayer.stack).toFloat()
+                    // (スタック)に対する(レイズしたあと場に出ている額)の比率
+                    sliderPosition = (raiseSize / (gamePlayer.stack + myPendingBetSize)).toFloat()
                 }
                 SliderType.Pod -> {
                     val totalPodSize = game.podList.sumOf { it.podSize }
                     sliderPosition = if (totalPodSize != 0.0) {
-                        (raiseSize / totalPodSize).toFloat() / 2
+                        (raiseSize / totalPodSize).toFloat() / prefRepository.podSliderMaxRatio.first()
                     } else {
                         0.0f
                     }
@@ -187,7 +181,7 @@ constructor(
 //            } else {
 //                ""
 //            }
-            sliderLabelStackBody = "${((raiseUpSize / gamePlayer.stack) * 100).roundToInt()}%"
+            sliderLabelStackBody = "${((raiseSize / (gamePlayer.stack + myPendingBetSize)) * 100).roundToInt()}%"
             val totalPodSize = game.podList.sumOf { it.podSize }
             sliderLabelPodBody = if (totalPodSize != 0.0) {
                 // Raiseサイズ / Podサイズ

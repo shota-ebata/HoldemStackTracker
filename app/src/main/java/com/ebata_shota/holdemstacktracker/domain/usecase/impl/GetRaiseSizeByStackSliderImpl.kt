@@ -26,10 +26,10 @@ constructor(
         myPendingBetSize: Double,
         sliderPosition: Float,
     ): Double = withContext(dispatcher) {
-        // 追加でBetするサイズ
-        val raiseUpSize = when (betViewMode) {
+        // Raiseサイズ
+        val raiseSize = when (betViewMode) {
             BetViewMode.Number -> {
-                (stackSize * sliderPosition).roundToInt().toDouble()
+                ((stackSize + myPendingBetSize) * sliderPosition).roundToInt().toDouble()
             }
 
             BetViewMode.BB -> {
@@ -37,15 +37,13 @@ constructor(
             }
         }
         // 最低の引き上げ幅
-        val minRiseUpSize = minRaiseSize - myPendingBetSize
-        val raiseSize: Double = if (raiseUpSize >= minRiseUpSize) {
-            // 最低Betサイズを超えている場合は
-            // 追加Betサイズ + 今場に出ているベットサイズ
-            raiseUpSize + myPendingBetSize
+//        val minRiseUpSize = minRaiseSize - myPendingBetSize
+        return@withContext if (raiseSize >= minRaiseSize) {
+            // Raiseサイズが最低を超えている場合は
+            raiseSize
         } else {
             // 下回っている場合は、現在の最低額
             minRaiseSize
         }
-        return@withContext raiseSize
     }
 }

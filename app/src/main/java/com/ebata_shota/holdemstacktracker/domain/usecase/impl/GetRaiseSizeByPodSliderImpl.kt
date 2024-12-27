@@ -49,12 +49,12 @@ constructor(
         val minRiseUpSize = minRaiseSize - pendingBetSize
         // stackと最低引き上げ額の範囲でRaiseサイズを収める
         val raiseSize = when {
-            raiseUpSize > stackSize -> {
+            raiseSizeBySliderPosition > stackSize + pendingBetSize -> {
                 // 上回っている場合は、スタックを引き上げサイズに
-                stackSize
+                stackSize + pendingBetSize
             }
 
-            raiseUpSize >= minRiseUpSize -> {
+            raiseSizeBySliderPosition >= minRaiseSize -> {
                 // スタック > 引き上げサイズ >= 最低引き上げサイズ
                 raiseSizeBySliderPosition
             }
