@@ -1,7 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.parts
 
 import android.content.res.Configuration
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -9,7 +8,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
@@ -22,7 +20,7 @@ fun RaiseSizeChangeButton(
 ) {
     OutlinedButton(
         modifier = modifier,
-//        shape = RoundedCornerShape(8.dp),
+        enabled = uiState.isEnable,
         onClick = { onClickRaiseSizeButton(uiState.raiseSize) }
     ) {
         Text(
@@ -35,6 +33,7 @@ fun RaiseSizeChangeButton(
 data class RaiseSizeChangeButtonUiState(
     val labelStringSource: StringSource,
     val raiseSize: Int,
+    val isEnable: Boolean,
 )
 
 @Preview(showBackground = true, showSystemUi = false, name = "Light Mode")
@@ -51,7 +50,8 @@ private fun RaiseSizeChangeButtonPreview() {
             RaiseSizeChangeButton(
                 uiState = RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource(id = R.string.position_label_sb),
-                    raiseSize = 4
+                    raiseSize = 4,
+                    isEnable = true,
                 ),
                 onClickRaiseSizeButton = {},
             )

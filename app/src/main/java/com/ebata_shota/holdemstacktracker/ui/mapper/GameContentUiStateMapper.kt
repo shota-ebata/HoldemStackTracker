@@ -106,6 +106,9 @@ constructor(
         } catch (e: IllegalStateException) {
             null
         }
+        //  私のターンか
+        val isCurrentPlayer = myPlayerId == currentPlayerId && betPhase != null
+
         val isEnableFoldButton: Boolean
         val isEnableCheckButton: Boolean
         val isEnableAllInButton: Boolean
@@ -128,11 +131,12 @@ constructor(
 
         val raiseSizeButtonUiStates: List<RaiseSizeChangeButtonUiState> =
             createRaiseSizeChangeButtonUiStates(
-                isNotRaisedYet,
-                isExistPot,
-                totalPotSize,
-                table,
-                betPhase
+                isNotRaisedYet = isNotRaisedYet,
+                isExistPot = isExistPot,
+                totalPotSize = totalPotSize,
+                table = table,
+                betPhase = betPhase,
+                isEnableRaiseSizeButtons = isCurrentPlayer
             )
         val isEnableSlider: Boolean
         val sliderTypeButtonLabelUiState = when (sliderType) {
@@ -147,8 +151,6 @@ constructor(
         val isEnableRaiseSizeButton: Boolean
         val raiseUpSizeText: String
 
-        //  私のターンか
-        val isCurrentPlayer = myPlayerId == currentPlayerId && betPhase != null
         if (isCurrentPlayer) {
             // 現在ベット中の最高額
             val maxBetSize = if (betPhase != null) {
@@ -200,33 +202,24 @@ constructor(
             }
 
             // Slider
-            when (sliderType) {
+            sliderPosition = when (sliderType) {
                 SliderType.Stack -> {
                     // (スタック)に対する(レイズしたあと場に出ている額)の比率
-                    sliderPosition = (raiseSize.toFloat() / (gamePlayer.stack + myPendingBetSize).toFloat())
+                    (raiseSize.toFloat() / (gamePlayer.stack + myPendingBetSize).toFloat())
                 }
+
                 SliderType.Pot -> {
-                    sliderPosition = if (totalPotSize != 0) {
+                    if (totalPotSize != 0) {
                         (raiseSize.toFloat() / totalPotSize.toFloat()) / prefRepository.potSliderMaxRatio.first().toFloat()
                     } else {
                         0.0f
                     }
-
                 }
             }
-//            // (スタック)に対する(レイズしたあと場に出ている額 - 今場に出ている額)の比率
-//            sliderPosition = ((raiseSize - myPendingBetSize) / gamePlayer.stack).toFloat()
 
             isEnableSlider = gamePlayer.stack > minRaiseSize - myPendingBetSize
             // SliderLabel
-            // 最低レイズ額の場合ラベルを表示しない（％が0になりうるので見せたくない）
-//            sliderLabelStackBody = if (minRaiseSize != raiseSize) {
-//                "${(((raiseSize - myPendingBetSize) / gamePlayer.stack) * 100).roundToInt()}%"
-//            } else {
-//                ""
-//            }
             sliderLabelStackBody = "${((raiseSize.toDouble() / (gamePlayer.stack + myPendingBetSize)) * 100).roundToInt()}%"
-            val totalPotSize = game.potList.sumOf { it.potSize }
             sliderLabelPotBody = if (totalPotSize != 0) {
                 // Raiseサイズ / Potサイズ
                 val raiseSizePerTotalPotSize = raiseSize.toDouble() / totalPotSize.toDouble()
@@ -300,30 +293,36 @@ constructor(
         totalPotSize: Int,
         table: Table,
         betPhase: BetPhase?,
-    ) = if (isNotRaisedYet) {
+        isEnableRaiseSizeButtons: Boolean
+    ): List<RaiseSizeChangeButtonUiState> = if (isNotRaisedYet) {
         // まだベットされていない
         if (isExistPot) {
             //  ポッドがある
             listOf(
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("1/4"),
-                    raiseSize = (totalPotSize * 0.25).roundToInt() // TODO: 丸め注意
+                    raiseSize = (totalPotSize * 0.25).roundToInt(), // TODO: 丸め注意
+                    isEnable = isEnableRaiseSizeButtons
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("1/3"),
-                    raiseSize = (totalPotSize / 3.0).roundToInt()// TODO: 丸め注意
+                    raiseSize = (totalPotSize / 3.0).roundToInt(), // TODO: 丸め注意
+                    isEnable = isEnableRaiseSizeButtons
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("1/2"),
-                    raiseSize = (totalPotSize * 0.5).roundToInt() // TODO: 丸め注意
+                    raiseSize = (totalPotSize * 0.5).roundToInt(), // TODO: 丸め注意
+                    isEnable = isEnableRaiseSizeButtons
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("2/3"),
-                    raiseSize = ((totalPotSize * 2) / 3.0).roundToInt() // TODO: 丸め注意
+                    raiseSize = ((totalPotSize * 2) / 3.0).roundToInt(), // TODO: 丸め注意
+                    isEnable = isEnableRaiseSizeButtons
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("Pot"),
-                    raiseSize = totalPotSize
+                    raiseSize = totalPotSize,
+                    isEnable = isEnableRaiseSizeButtons
                 ),
             )
         } else {
@@ -331,22 +330,26 @@ constructor(
             listOf(
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource(R.string.raise_size_button_label_bb, "2"),
-                    raiseSize = table.rule.minBetSize * 2 // FIXME: BBを使うのに、minBetSizeを使っているのが
+                    raiseSize = table.rule.minBetSize * 2, // FIXME: BBを使うのに、minBetSizeを使っているのが
+                    isEnable = isEnableRaiseSizeButtons
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource(
                         R.string.raise_size_button_label_bb,
                         "2.5"
                     ),
-                    raiseSize = (table.rule.minBetSize * 2.5).roundToInt() // TODO: 丸め注意
+                    raiseSize = (table.rule.minBetSize * 2.5).roundToInt(), // TODO: 丸め注意
+                    isEnable = isEnableRaiseSizeButtons
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource(R.string.raise_size_button_label_bb, "3"),
-                    raiseSize = table.rule.minBetSize * 3
+                    raiseSize = table.rule.minBetSize * 3,
+                    isEnable = isEnableRaiseSizeButtons
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource(R.string.raise_size_button_label_bb, "4"),
-                    raiseSize = table.rule.minBetSize * 4
+                    raiseSize = table.rule.minBetSize * 4,
+                    isEnable = isEnableRaiseSizeButtons
                 ),
             )
         }
@@ -358,19 +361,23 @@ constructor(
         listOf(
             RaiseSizeChangeButtonUiState(
                 labelStringSource = StringSource(R.string.raise_size_button_label_x, "2"),
-                raiseSize = betSize * 2
+                raiseSize = betSize * 2,
+                isEnable = isEnableRaiseSizeButtons
             ),
             RaiseSizeChangeButtonUiState(
                 labelStringSource = StringSource(R.string.raise_size_button_label_x, "2.5"),
-                raiseSize = (betSize * 2.5).roundToInt()
+                raiseSize = (betSize * 2.5).roundToInt(),
+                isEnable = isEnableRaiseSizeButtons
             ),
             RaiseSizeChangeButtonUiState(
                 labelStringSource = StringSource(R.string.raise_size_button_label_x, "3"),
-                raiseSize = betSize * 3
+                raiseSize = betSize * 3,
+                isEnable = isEnableRaiseSizeButtons
             ),
             RaiseSizeChangeButtonUiState(
                 labelStringSource = StringSource(R.string.raise_size_button_label_x, "4"),
-                raiseSize = betSize * 4
+                raiseSize = betSize * 4,
+                isEnable = isEnableRaiseSizeButtons
             ),
         )
     }

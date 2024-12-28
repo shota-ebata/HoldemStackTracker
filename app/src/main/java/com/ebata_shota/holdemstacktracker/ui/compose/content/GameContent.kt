@@ -671,19 +671,23 @@ private class GameContentUiStatePreviewParam :
             raiseSizeButtonUiStates = listOf(
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("2 BB"),
-                    raiseSize = 200
+                    raiseSize = 200,
+                    isEnable = true,
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("2.5 BB"),
-                    raiseSize = 250
+                    raiseSize = 250,
+                    isEnable = true,
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("3 BB"),
-                    raiseSize = 300
+                    raiseSize = 300,
+                    isEnable = true,
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("4 BB"),
-                    raiseSize = 400
+                    raiseSize = 400,
+                    isEnable = true,
                 ),
             ),
             isEnableSliderTypeButton = true,
