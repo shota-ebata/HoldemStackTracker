@@ -203,11 +203,11 @@ constructor(
             when (sliderType) {
                 SliderType.Stack -> {
                     // (スタック)に対する(レイズしたあと場に出ている額)の比率
-                    sliderPosition = (raiseSize / (gamePlayer.stack + myPendingBetSize)).toFloat()
+                    sliderPosition = (raiseSize.toFloat() / (gamePlayer.stack + myPendingBetSize).toFloat())
                 }
                 SliderType.Pot -> {
                     sliderPosition = if (totalPotSize != 0) {
-                        (raiseSize / totalPotSize).toFloat() / prefRepository.potSliderMaxRatio.first()
+                        (raiseSize.toFloat() / totalPotSize.toFloat()) / prefRepository.potSliderMaxRatio.first().toFloat()
                     } else {
                         0.0f
                     }
