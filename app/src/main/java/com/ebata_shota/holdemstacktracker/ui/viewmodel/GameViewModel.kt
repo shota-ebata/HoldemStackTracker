@@ -464,9 +464,8 @@ constructor(
                 myPlayerId = myPlayerId,
                 raiseSize = raiseSize,
             )
-            // レイズするたびにレイズサイズを0にする(自動で最低Raiseサイズになってくれる想定
-            // TODO: ちゃんとした値をいれる
-            raiseSizeStateFlow.update { 0 }
+            // レイズするたびに最小Raiseサイズにする
+            raiseSizeStateFlow.update { minRaiseSizeFlow.first() }
         }
     }
 
@@ -508,15 +507,16 @@ constructor(
     }
 
     fun onClickSliderTypeButton() {
-        sliderTypeStateFlow.update {
-            when (it) {
-                SliderType.Stack -> SliderType.Pot
-                SliderType.Pot -> SliderType.Stack
+        viewModelScope.launch {
+            sliderTypeStateFlow.update {
+                when (it) {
+                    SliderType.Stack -> SliderType.Pot
+                    SliderType.Pot -> SliderType.Stack
+                }
             }
+            // スライダータイプを変更するたび最小Raiseサイズにする
+            raiseSizeStateFlow.update { minRaiseSizeFlow.first() }
         }
-        // スライダータイプを変更するたび0にする(自動で最低Raiseサイズになってくれる想定
-        // TODO: ちゃんと最小にしたい
-        raiseSizeStateFlow.update { 0 }
     }
 
     fun onChangeSlider(sliderPosition: Float) {
