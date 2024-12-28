@@ -27,6 +27,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByPotSlider
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlider
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
+import com.ebata_shota.holdemstacktracker.domain.util.combine
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ChangeRaiseSizeUpDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ChangeRaiseUpSizeDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.TextFieldErrorUiState
@@ -139,17 +140,8 @@ constructor(
                 minRaiseSizeFlow,
                 sliderTypeStateFlow,
                 prefRepository.isEnableRaiseUpSliderStep,
-            ) {
+            ) { myPlayerId, table, game, raiseSize, minRaiseSize, sliderType, isEnableSliderStep ->
                 // FIXME: combine内部での問題が検知しづらい
-                // TODO: 以下の方法は辛いので、拡張関数を用意する
-                val myPlayerId = it[0] as PlayerId
-                val table = it[1] as Table
-                val game = it[2] as Game
-                val raiseSize = it[3] as Int?
-                val minRaiseSize = it[4] as Int
-                val sliderType = it[5] as SliderType
-                val isEnableSliderStep = it[6] as Boolean
-
                 val currentPlayerId = getCurrentPlayerId.invoke(
                     btnPlayerId = table.btnPlayerId,
                     playerOrder = table.playerOrder,
