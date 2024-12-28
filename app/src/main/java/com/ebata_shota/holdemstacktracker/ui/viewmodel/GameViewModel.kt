@@ -140,56 +140,8 @@ constructor(
                 minRaiseSizeFlow,
                 sliderTypeStateFlow,
                 prefRepository.isEnableRaiseUpSliderStep,
-            ) { myPlayerId, table, game, raiseSize, minRaiseSize, sliderType, isEnableSliderStep ->
-                // FIXME: combine内部での問題が検知しづらい
-                val currentPlayerId = getCurrentPlayerId.invoke(
-                    btnPlayerId = table.btnPlayerId,
-                    playerOrder = table.playerOrder,
-                    game = game
-                )
-                val isCurrentPlayer: Boolean = myPlayerId == currentPlayerId
-                val autoAction: BetPhaseAction? = if (isCurrentPlayer) {
-                    getNextAutoAction.invoke(
-                        playerId = myPlayerId,
-                        table = table,
-                        game = game
-                    )
-                } else {
-                    null
-                }
-
-                if (autoAction != null) {
-                    // オートアクションがあるなら、それを使って新しいGameを生成
-                    val updatedGame = getNextGame.invoke(
-                        latestGame = game,
-                        action = autoAction,
-                        playerOrder = table.playerOrder
-                    )
-                    // 更新実行
-                    gameRepository.sendGame(
-                        tableId = tableId,
-                        newGame = updatedGame
-                    )
-                } else {
-                    // オートアクションがない場合だけ、UiStateを更新する
-                    val content = GameScreenUiState.Content(
-                        contentUiState = uiStateMapper.createUiState(
-                            game = game,
-                            table = table,
-                            myPlayerId = myPlayerId,
-                            raiseSize = raiseSize ?: minRaiseSize,
-                            minRaiseSize = minRaiseSize,
-                            isEnableSliderStep = isEnableSliderStep,
-                            sliderType = sliderType,
-                        )
-                    )
-                    // TODO: フェーズが進んだことを検知したい
-                    //   たとえば、Raiseサイズをフェーズが進んだタイミングで最低にしたい。
-                    _screenUiState.update {
-                        content
-                    }
-                }
-            }.collect()
+                transform = ::observer
+            ) .collect()
         }
 
         // 自分の名前の変更をテーブルに反映するために監視
@@ -197,10 +149,9 @@ constructor(
             combine(
                 tableStateFlow.filterNotNull(),
                 firebaseAuthRepository.myPlayerIdFlow,
-                prefRepository.myName.filterNotNull()
-            ) { table, myPlayerId, myName ->
-                renameTablePlayer.invoke(table, myPlayerId, myName)
-            }.collect()
+                prefRepository.myName.filterNotNull(),
+                transform = renameTablePlayer::invoke
+            ).collect()
         }
 
         // 最低Raiseサイズ化するための監視
@@ -220,6 +171,65 @@ constructor(
                     raiseSizeStateFlow.update { minRaiseSize }
                 }
             }.collect()
+        }
+    }
+
+    private suspend fun observer(
+        myPlayerId: PlayerId,
+        table: Table,
+        game: Game,
+        raiseSize: Int?,
+        minRaiseSize: Int,
+        sliderType: SliderType,
+        isEnableSliderStep: Boolean,
+    ) {
+        // FIXME: combine内部での問題が検知しづらい
+        val currentPlayerId = getCurrentPlayerId.invoke(
+            btnPlayerId = table.btnPlayerId,
+            playerOrder = table.playerOrder,
+            game = game
+        )
+        val isCurrentPlayer: Boolean = myPlayerId == currentPlayerId
+        val autoAction: BetPhaseAction? = if (isCurrentPlayer) {
+            getNextAutoAction.invoke(
+                playerId = myPlayerId,
+                table = table,
+                game = game
+            )
+        } else {
+            null
+        }
+
+        if (autoAction != null) {
+            // オートアクションがあるなら、それを使って新しいGameを生成
+            val updatedGame = getNextGame.invoke(
+                latestGame = game,
+                action = autoAction,
+                playerOrder = table.playerOrder
+            )
+            // 更新実行
+            gameRepository.sendGame(
+                tableId = tableId,
+                newGame = updatedGame
+            )
+        } else {
+            // オートアクションがない場合だけ、UiStateを更新する
+            val content = GameScreenUiState.Content(
+                contentUiState = uiStateMapper.createUiState(
+                    game = game,
+                    table = table,
+                    myPlayerId = myPlayerId,
+                    raiseSize = raiseSize ?: minRaiseSize,
+                    minRaiseSize = minRaiseSize,
+                    isEnableSliderStep = isEnableSliderStep,
+                    sliderType = sliderType,
+                )
+            )
+            // TODO: フェーズが進んだことを検知したい
+            //   たとえば、Raiseサイズをフェーズが進んだタイミングで最低にしたい。
+            _screenUiState.update {
+                content
+            }
         }
     }
 
