@@ -9,9 +9,7 @@ interface DefaultRuleStateOfRingRepository {
     val ringGameFlow: Flow<Rule.RingGame>
 
     suspend fun setDefaultBetViewMode(value: BetViewMode)
-    suspend fun setDefaultSizeOfSbOfNumberMode(value: Int)
-    suspend fun setDefaultSizeOfSbOfBbMode(value: Double)
-    suspend fun saveDefaultSizeOfBbOfNumberMode(value: Int)
-    suspend fun setDefaultStackSizeOfNumberMode(value: Int)
-    suspend fun setDefaultStackSizeOfBbMode(value: Double)
+    suspend fun setDefaultSizeOfSb(value: Int)
+    suspend fun saveDefaultSizeOfBb(value: Int)
+    suspend fun setDefaultStackSize(value: Int)
 }

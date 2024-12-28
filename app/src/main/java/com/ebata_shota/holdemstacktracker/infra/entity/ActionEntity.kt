@@ -6,5 +6,5 @@ import androidx.annotation.Keep
 data class ActionState(
     val playerId: String,
     val type: String,
-    val betSize: Double
+    val betSize: Int
 )

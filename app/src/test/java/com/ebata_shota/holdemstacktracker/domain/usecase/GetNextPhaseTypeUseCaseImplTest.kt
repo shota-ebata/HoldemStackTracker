@@ -104,8 +104,8 @@ class GetNextPhaseTypeUseCaseImplTest {
                  phaseList = listOf(
                      PreFlop(
                          actionStateList = listOf(
-                             BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100.0),
-                             BetPhaseAction.Blind(playerId = PlayerId("1"), betSize = 100.0),
+                             BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100),
+                             BetPhaseAction.Blind(playerId = PlayerId("1"), betSize = 100),
                              BetPhaseAction.Fold(playerId = PlayerId("2")),
                              BetPhaseAction.Fold(playerId = PlayerId("0")),
                          )
@@ -124,11 +124,11 @@ class GetNextPhaseTypeUseCaseImplTest {
                 phaseList = listOf(
                     PreFlop(
                         actionStateList = listOf(
-                            BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100.0),
-                            BetPhaseAction.Blind(playerId = PlayerId("1"), betSize = 100.0),
+                            BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100),
+                            BetPhaseAction.Blind(playerId = PlayerId("1"), betSize = 100),
                             BetPhaseAction.Fold(playerId = PlayerId("2")),
-                            BetPhaseAction.AllIn(playerId = PlayerId("0"), betSize = 1000.0),
-                            BetPhaseAction.AllIn(playerId = PlayerId("1"), betSize = 1500.0),
+                            BetPhaseAction.AllIn(playerId = PlayerId("0"), betSize = 1000),
+                            BetPhaseAction.AllIn(playerId = PlayerId("1"), betSize = 1500),
                         )
                     )
                 )

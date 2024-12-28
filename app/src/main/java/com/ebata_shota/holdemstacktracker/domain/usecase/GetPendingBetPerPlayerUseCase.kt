@@ -10,5 +10,5 @@ interface GetPendingBetPerPlayerUseCase {
     suspend fun invoke(
         playerOrder: List<PlayerId>,
         actionStateList: List<BetPhaseAction>
-    ): Map<PlayerId, Double>
+    ): Map<PlayerId, Int>
 }

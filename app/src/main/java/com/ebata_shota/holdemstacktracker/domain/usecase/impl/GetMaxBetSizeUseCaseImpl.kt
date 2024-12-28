@@ -13,14 +13,14 @@ constructor(
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
 ) : GetMaxBetSizeUseCase {
-    override suspend fun invoke(actionStateList: List<BetPhaseAction>): Double =
+    override suspend fun invoke(actionStateList: List<BetPhaseAction>): Int =
         withContext(dispatcher) {
             return@withContext actionStateList.maxOfOrNull {
             if (it is BetPhaseAction.BetAction) {
                 it.betSize
             } else {
-                0.0
+                0
             }
-        } ?: 0.0
+        } ?: 0
     }
 }

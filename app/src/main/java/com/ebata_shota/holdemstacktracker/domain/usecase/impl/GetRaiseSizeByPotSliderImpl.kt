@@ -23,26 +23,17 @@ constructor(
      * Raiseサイズを取得する
      */
     override suspend fun invoke(
-        betViewMode: BetViewMode,
-        totalPotSize: Double,
-        stackSize: Double,
-        pendingBetSize: Double,
-        minRaiseSize: Double,
+        totalPotSize: Int,
+        stackSize: Int,
+        pendingBetSize: Int,
+        minRaiseSize: Int,
         sliderPosition: Float,
-    ): Double = withContext(dispatcher) {
+    ): Int = withContext(dispatcher) {
         val potSliderRatioMax = prefRepository.potSliderMaxRatio.first()
         // スライダー最大位置でのRaiseサイズ
         val raiseSizeOfSliderMaxPosition = totalPotSize * potSliderRatioMax
         // スライダーポジションをそのままRaiseサイズに変換
-        val raiseSizeBySliderPosition = when (betViewMode) {
-            BetViewMode.Number -> {
-                (raiseSizeOfSliderMaxPosition * sliderPosition).roundToInt().toDouble()
-            }
-
-            BetViewMode.BB -> {
-                (raiseSizeOfSliderMaxPosition * 10 * sliderPosition).roundToInt() / 10.0
-            }
-        }
+        val raiseSizeBySliderPosition = (raiseSizeOfSliderMaxPosition * sliderPosition).roundToInt()
         // 引き上げサイズ
         val raiseUpSize = raiseSizeBySliderPosition - pendingBetSize
         // 最低の引き上げサイズ

@@ -40,7 +40,6 @@ fun TableCreatorScreen(
                 uiState = uiStateCast.tableCreatorContentUiState,
                 onChangeSizeOfSB = viewModel::onChangeSizeOfSB,
                 onChangeSizeOfBB = viewModel::onChangeSizeOfBB,
-                onClickBetViewMode = viewModel::onClickBetViewMode,
                 onChangeStackSize = viewModel::onChangeStackSize,
                 onClickSubmit = viewModel::onClickSubmit
             )

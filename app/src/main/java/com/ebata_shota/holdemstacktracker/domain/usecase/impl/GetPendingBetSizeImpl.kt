@@ -24,11 +24,11 @@ constructor(
         actionList: List<BetPhaseAction>,
         playerOrder: List<PlayerId>,
         playerId: PlayerId,
-    ): Double = withContext(dispatcher) {
+    ): Int = withContext(dispatcher) {
         val pendingBetPerPlayer = getPendingBetPerPlayer.invoke(
             playerOrder = playerOrder,
             actionStateList = actionList
         )
-        return@withContext pendingBetPerPlayer[playerId] ?: 0.0
+        return@withContext pendingBetPerPlayer[playerId] ?: 0
     }
 }

@@ -39,7 +39,6 @@ constructor() {
     }
 
     fun mapToGame(gameMap: Map<*, *>): Game {
-
         return Game(
             version = gameMap[GAME_VERSION] as Long,
             appVersion = gameMap[APP_VERSION] as Long,
@@ -75,7 +74,7 @@ constructor() {
         return actions.map { it as Map<*, *> }.map {
             val playerId = PlayerId(it[PHASE_ACTION_PLAYER_ID] as String)
             val actionType = it[PHASE_ACTION_ACTION_TYPE] as String
-            val betSize = it[PHASE_ACTION_BET_SIZE]?.getDouble()
+            val betSize = it[PHASE_ACTION_BET_SIZE]?.getInt()
             when(BetPhaseActionType.of(actionType)) {
                 BetPhaseActionType.Blind -> BetPhaseAction.Blind(playerId = playerId, betSize = betSize!!)
                 BetPhaseActionType.Fold -> BetPhaseAction.Fold(playerId = playerId)
@@ -95,7 +94,7 @@ constructor() {
         return keys.map { key ->
             val value = players[key] as Map<*, *>
             val playerId = key as String
-            val stack = value[PLAYER_STATE_PLAYER_STACK]!!.getDouble()
+            val stack = value[PLAYER_STATE_PLAYER_STACK]!!.getInt()!!
             val isLeaved = value[PLAYER_STATE_PLAYER_IS_LEAVED] as Boolean
             GamePlayer(
                 id = PlayerId(playerId),
@@ -107,7 +106,7 @@ constructor() {
 
     private fun mapToPotStateList(pots: List<*>): List<Pot> {
         return pots.map { it as Map<*, *> }.mapIndexed { index, map ->
-            val potSize = map[POT_SIZE]!!.getDouble()
+            val potSize = map[POT_SIZE]!!.getInt()!!
             val isClosed = map[POT_IS_CLOSED] as Boolean
             val involvedPlayerIds = (map[POT_INVOLVED_PLAYER_IDS] as List<*>).map {
                 PlayerId(it as String)
@@ -122,7 +121,7 @@ constructor() {
         }
     }
 
-    private fun Any.getDouble() = (this as? Double) ?: (this as Long).toDouble()
+    private fun Any.getInt() = (this as? Long)?.toInt()
 
     fun mapToHashMap(
         newGame: Game

@@ -31,7 +31,7 @@ constructor(
         val playerOrderSize = playerOrder.size
         val lastActionList = actionStateList.takeLast(playerOrderSize)
         // コールベットサイズ
-        val callBetSize: Double = getMaxBetSize.invoke(lastActionList)
+        val callBetSize: Int = getMaxBetSize.invoke(lastActionList)
         // Blindを除いたアクション一覧
         val lastActionListWithoutBlind = lastActionList
             .filterNot { it is BetPhaseAction.Blind } // Blindは除く

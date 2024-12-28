@@ -3,7 +3,6 @@ package com.ebata_shota.holdemstacktracker.ui.mapper
 import androidx.annotation.StringRes
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.extension.rearrangeListFromIndex
-import com.ebata_shota.holdemstacktracker.domain.extension.toHstString
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
@@ -49,8 +48,8 @@ constructor(
         game: Game,
         table: Table,
         myPlayerId: PlayerId,
-        raiseSize: Double,
-        minRaiseSize: Double,
+        raiseSize: Int,
+        minRaiseSize: Int,
         isEnableSliderStep: Boolean,
         sliderType: SliderType,
     ): GameContentUiState {
@@ -88,9 +87,9 @@ constructor(
             val pendingBetSize = pendingBetPerPlayer[playerId]
             GamePlayerUiState(
                 playerName = basePlayer.name,
-                stack = gamePlayer.stack.toHstString(table.rule.betViewMode),
+                stack = "%,d".format(gamePlayer.stack),
                 playerPosition = positions[index],
-                pendingBetSize = pendingBetSize?.toHstString(table.rule.betViewMode),
+                pendingBetSize = pendingBetSize?.let { "%,d".format(it) },
                 isLeaved = gamePlayer.isLeaved,
                 isMine = playerId == myPlayerId,
                 isCurrentPlayer = playerId == currentPlayerId,
@@ -114,10 +113,10 @@ constructor(
         val callButtonSubText: String
         val isEnableRaiseButton: Boolean
 
-        val totalPotSize: Double = game.potList.sumOf { it.potSize }
+        val totalPotSize: Int = game.potList.sumOf { it.potSize }
 
         val isNotRaisedYet: Boolean = isNotRaisedYet.invoke(betPhase?.actionStateList.orEmpty())
-        val isExistPot: Boolean = totalPotSize != 0.0
+        val isExistPot: Boolean = totalPotSize != 0
 
         @StringRes
         val raiseButtonMainLabelResId: Int = if (isNotRaisedYet) {
@@ -127,7 +126,14 @@ constructor(
         }
         val raiseButtonSubText: String
 
-        val raiseSizeButtonUiStates: List<RaiseSizeChangeButtonUiState> = createRaiseSizeChangeButtonUiStates(isNotRaisedYet, isExistPot, totalPotSize, table, betPhase)
+        val raiseSizeButtonUiStates: List<RaiseSizeChangeButtonUiState> =
+            createRaiseSizeChangeButtonUiStates(
+                isNotRaisedYet,
+                isExistPot,
+                totalPotSize,
+                table,
+                betPhase
+            )
         val isEnableSlider: Boolean
         val sliderTypeButtonLabelUiState = when (sliderType) {
             SliderType.Stack -> SliderTypeButtonLabelUiState.Stack
@@ -148,10 +154,10 @@ constructor(
             val maxBetSize = if (betPhase != null) {
                 getMaxBetSize.invoke(actionStateList = betPhase.actionStateList)
             } else {
-                0.0
+                0
             }
             // 自分がベットしている額
-            val myPendingBetSize = pendingBetPerPlayer[myPlayerId] ?: 0.0
+            val myPendingBetSize: Int = pendingBetPerPlayer[myPlayerId] ?: 0
             // 自分
             val gamePlayer = game.players.find { it.id == myPlayerId }!!
 
@@ -165,19 +171,19 @@ constructor(
             // All-Inボタン
             isEnableAllInButton = true
 
-            val myPendingBetSizeText = if (myPendingBetSize != 0.0){
-                "${myPendingBetSize.toHstString(table.rule.betViewMode)} → "
+            val myPendingBetSizeText = if (myPendingBetSize != 0) {
+                "${"%,d".format(myPendingBetSize)} → "
             } else {
                 ""
             }
             // Callボタン
-            val callSize: Double = maxBetSize
+            val callSize: Int = maxBetSize
             // 現在ベットされている最高額より自分がベットしてる額が少ない
             // コールしてもAll-Inにならない場合
             isEnableCallButton = maxBetSize > myPendingBetSize
                     && gamePlayer.stack > callSize
             callButtonSubText = if (isEnableCallButton) {
-                "$myPendingBetSizeText${callSize.toHstString(table.rule.betViewMode)}"
+                "$myPendingBetSizeText${"%,d".format(callSize)}"
             } else {
                 ""
             }
@@ -188,7 +194,7 @@ constructor(
             // 最低レイズ額に足りている場合
             isEnableRaiseButton = gamePlayer.stack >= raiseUpSize
             raiseButtonSubText = if (isEnableRaiseButton) {
-                "$myPendingBetSizeText ${raiseSize.toHstString(table.rule.betViewMode)}"
+                "$myPendingBetSizeText ${"%,d".format(raiseSize)}"
             } else {
                 ""
             }
@@ -200,7 +206,7 @@ constructor(
                     sliderPosition = (raiseSize / (gamePlayer.stack + myPendingBetSize)).toFloat()
                 }
                 SliderType.Pot -> {
-                    sliderPosition = if (totalPotSize != 0.0) {
+                    sliderPosition = if (totalPotSize != 0) {
                         (raiseSize / totalPotSize).toFloat() / prefRepository.potSliderMaxRatio.first()
                     } else {
                         0.0f
@@ -219,11 +225,11 @@ constructor(
 //            } else {
 //                ""
 //            }
-            sliderLabelStackBody = "${((raiseSize / (gamePlayer.stack + myPendingBetSize)) * 100).roundToInt()}%"
+            sliderLabelStackBody = "${((raiseSize.toDouble() / (gamePlayer.stack + myPendingBetSize)) * 100).roundToInt()}%"
             val totalPotSize = game.potList.sumOf { it.potSize }
-            sliderLabelPotBody = if (totalPotSize != 0.0) {
+            sliderLabelPotBody = if (totalPotSize != 0) {
                 // Raiseサイズ / Potサイズ
-                val raiseSizePerTotalPotSize = raiseSize / totalPotSize
+                val raiseSizePerTotalPotSize = raiseSize.toDouble() / totalPotSize.toDouble()
                 "${(raiseSizePerTotalPotSize * 100).roundToInt()}%"
             } else {
                 ""
@@ -231,7 +237,7 @@ constructor(
 
             // Raiseサイズボタン
             isEnableRaiseSizeButton = isEnableRaiseButton
-            raiseUpSizeText = "+${raiseUpSize.toHstString(table.rule.betViewMode)}"
+            raiseUpSizeText = "+${"%,d".format(raiseUpSize)}"
         } else {
             // 自分の番ではないなら、無効にする
             isEnableFoldButton = false
@@ -261,10 +267,10 @@ constructor(
                     is Phase.River -> R.string.label_river
                     null -> null
                 },
-                totalPot = game.potList.sumOf {
-                    it.potSize
-                }.toHstString(betViewMode = table.rule.betViewMode),
-                pendingTotalBetSize = pendingBetPerPlayer.map { it.value }.sum().toHstString(table.rule.betViewMode)
+                totalPot = "%,d".format(
+                    game.potList.sumOf { it.potSize }
+                ),
+                pendingTotalBetSize = "%,d".format(pendingBetPerPlayer.map { it.value }.sum())
             ),
             blindText = table.rule.blindText(),
             isEnableFoldButton = isEnableFoldButton,
@@ -291,7 +297,7 @@ constructor(
     private fun createRaiseSizeChangeButtonUiStates(
         isNotRaisedYet: Boolean,
         isExistPot: Boolean,
-        totalPotSize: Double,
+        totalPotSize: Int,
         table: Table,
         betPhase: BetPhase?,
     ) = if (isNotRaisedYet) {
@@ -301,19 +307,19 @@ constructor(
             listOf(
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("1/4"),
-                    raiseSize = totalPotSize * 0.25 // TODO: 丸め注意
+                    raiseSize = (totalPotSize * 0.25).roundToInt() // TODO: 丸め注意
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("1/3"),
-                    raiseSize = (totalPotSize / 3) // TODO: 丸め注意
+                    raiseSize = (totalPotSize / 3.0).roundToInt()// TODO: 丸め注意
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("1/2"),
-                    raiseSize = totalPotSize * 0.5 // TODO: 丸め注意
+                    raiseSize = (totalPotSize * 0.5).roundToInt() // TODO: 丸め注意
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("2/3"),
-                    raiseSize = ((totalPotSize * 2) / 3) // TODO: 丸め注意
+                    raiseSize = ((totalPotSize * 2) / 3.0).roundToInt() // TODO: 丸め注意
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("Pot"),
@@ -332,7 +338,7 @@ constructor(
                         R.string.raise_size_button_label_bb,
                         "2.5"
                     ),
-                    raiseSize = table.rule.minBetSize * 2.5 // TODO: 丸め注意
+                    raiseSize = (table.rule.minBetSize * 2.5).roundToInt() // TODO: 丸め注意
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource(R.string.raise_size_button_label_bb, "3"),
@@ -348,7 +354,7 @@ constructor(
         // 誰かがベットしてる
         val lastBetAction = betPhase?.actionStateList?.filterIsInstance<BetPhaseAction.BetAction>()
             ?.lastOrNull()
-        val betSize = lastBetAction?.betSize ?: 0.0
+        val betSize = lastBetAction?.betSize ?: 0
         listOf(
             RaiseSizeChangeButtonUiState(
                 labelStringSource = StringSource(R.string.raise_size_button_label_x, "2"),
@@ -356,7 +362,7 @@ constructor(
             ),
             RaiseSizeChangeButtonUiState(
                 labelStringSource = StringSource(R.string.raise_size_button_label_x, "2.5"),
-                raiseSize = betSize * 2.5
+                raiseSize = (betSize * 2.5).roundToInt()
             ),
             RaiseSizeChangeButtonUiState(
                 labelStringSource = StringSource(R.string.raise_size_button_label_x, "3"),

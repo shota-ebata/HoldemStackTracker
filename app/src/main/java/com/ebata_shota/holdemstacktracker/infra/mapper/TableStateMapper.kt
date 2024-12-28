@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.infra.mapper
 
+import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -25,7 +26,6 @@ constructor() {
         private const val RULE_TYPE_RING_GAME = "RingGame"
         private const val RULE_SB_SIZE = "sbSize"
         private const val RULE_BB_SIZE = "bbSize"
-        private const val RULE_BET_VIEW_MODE = "betViewMode"
         private const val RULE_DEFAULT_STACK = "defaultStack"
         private const val BASE_PLAYERS = "basePlayers"
         private const val WAIT_PLAYER_IDS = "waitPlayerIds"
@@ -40,7 +40,7 @@ constructor() {
         private const val UPDATE_TIME = "updateTime"
     }
 
-    private fun Any.getDouble() = (this as? Double) ?: (this as Long).toDouble()
+    private fun Any.getInt() = (this as? Long)?.toInt()
 
     fun mapToTableState(tableId: TableId, tableMap: Map<*, *>): Table {
         return Table(
@@ -66,17 +66,16 @@ constructor() {
         PlayerBaseState(
             id = PlayerId(it[PLAYER_ID] as String),
             name = it[PLAYER_NAME] as String,
-            stack = it[PLAYER_STACK]!!.getDouble()
+            stack = it[PLAYER_STACK]!!.getInt()!!
         )
     }
 
     private fun mapToRuleState(rule: Map<*, *>) = when (val ruleType = rule[RULE_TYPE] as String) {
         RULE_TYPE_RING_GAME -> {
             Rule.RingGame(
-                sbSize = rule[RULE_SB_SIZE]!!.getDouble(),
-                bbSize = rule[RULE_BB_SIZE]!!.getDouble(),
-                betViewMode = BetViewMode.of(rule[RULE_BET_VIEW_MODE] as String),
-                defaultStack = rule[RULE_DEFAULT_STACK]!!.getDouble()
+                sbSize = rule[RULE_SB_SIZE]!!.getInt()!!,
+                bbSize = rule[RULE_BB_SIZE]!!.getInt()!!,
+                defaultStack = rule[RULE_DEFAULT_STACK]!!.getInt()!!
             )
         }
 
@@ -92,7 +91,6 @@ constructor() {
             is Rule.RingGame -> {
                 mapOf(
                     RULE_TYPE to RULE_TYPE_RING_GAME,
-                    RULE_BET_VIEW_MODE to table.rule.betViewMode.name,
                     RULE_SB_SIZE to ruleState.sbSize,
                     RULE_BB_SIZE to ruleState.bbSize,
                     RULE_DEFAULT_STACK to ruleState.defaultStack

@@ -37,23 +37,23 @@ class GetMinRaiseSizeUseCaseImplTest {
                     actionStateList = listOf(
                         BetPhaseAction.Blind(
                             playerId = PlayerId("PlayerId1"),
-                            betSize = 1.0
+                            betSize = 1
                         ),
                         BetPhaseAction.Blind(
                             playerId = PlayerId("PlayerId2"),
-                            betSize = 2.0
+                            betSize = 2
                         )
                     )
                 )
             )
         )
         runTest(dispatcher) {
-            val actual: Double = useCase.invoke(
+            val actual: Int = useCase.invoke(
                 game = game,
-                minBetSize = 2.0
+                minBetSize = 2
             )
-            val expected = 4.0
-            assertEquals(expected, actual, 0.0)
+            val expected = 4
+            assertEquals(expected, actual)
         }
     }
 
@@ -66,27 +66,27 @@ class GetMinRaiseSizeUseCaseImplTest {
                     actionStateList = listOf(
                         BetPhaseAction.Blind(
                             playerId = PlayerId("PlayerId1"),
-                            betSize = 1.0
+                            betSize = 1
                         ),
                         BetPhaseAction.Bet(
                             playerId = PlayerId("PlayerId2"),
-                            betSize = 2.0
+                            betSize = 2
                         ),
                         BetPhaseAction.Blind(
                             playerId = PlayerId("PlayerId3"),
-                            betSize = 5.0
+                            betSize = 5
                         )
                     )
                 )
             )
         )
         runTest(dispatcher) {
-            val actual: Double = useCase.invoke(
+            val actual: Int = useCase.invoke(
                 game = game,
-                minBetSize = 2.0
+                minBetSize = 2
             )
-            val expected = 8.0
-            assertEquals(expected, actual, 0.0)
+            val expected = 8
+            assertEquals(expected, actual)
         }
     }
 
@@ -99,31 +99,31 @@ class GetMinRaiseSizeUseCaseImplTest {
                     actionStateList = listOf(
                         BetPhaseAction.Blind(
                             playerId = PlayerId("PlayerId1"),
-                            betSize = 1.0
+                            betSize = 1
                         ),
                         BetPhaseAction.Blind(
                             playerId = PlayerId("PlayerId2"),
-                            betSize = 2.0
+                            betSize = 2
                         ),
                         BetPhaseAction.Bet(
                             playerId = PlayerId("PlayerId3"),
-                            betSize = 5.0
+                            betSize = 5
                         ),
                         BetPhaseAction.AllIn(
                             playerId = PlayerId("PlayerId4"),
-                            betSize = 3.0
+                            betSize = 3
                         )
                     )
                 )
             )
         )
         runTest(dispatcher) {
-            val actual: Double = useCase.invoke(
+            val actual: Int = useCase.invoke(
                 game = game,
-                minBetSize = 2.0
+                minBetSize = 2
             )
-            val expected = 8.0
-            assertEquals(expected, actual, 0.0)
+            val expected = 8
+            assertEquals(expected, actual)
         }
     }
 
@@ -138,12 +138,12 @@ class GetMinRaiseSizeUseCaseImplTest {
             )
         )
         runTest(dispatcher) {
-            val actual: Double = useCase.invoke(
+            val actual: Int = useCase.invoke(
                 game = game,
-                minBetSize = 2.0
+                minBetSize = 2
             )
-            val expected = 2.0
-            assertEquals(expected, actual, 0.0)
+            val expected = 2
+            assertEquals(expected, actual)
         }
     }
 
@@ -156,19 +156,19 @@ class GetMinRaiseSizeUseCaseImplTest {
                     actionStateList = listOf(
                         BetPhaseAction.Bet(
                             playerId = PlayerId("PlayerId1"),
-                            betSize = 2.0
+                            betSize = 2
                         ),
                     )
                 )
             )
         )
         runTest(dispatcher) {
-            val actual: Double = useCase.invoke(
+            val actual: Int = useCase.invoke(
                 game = game,
-                minBetSize = 2.0
+                minBetSize = 2
             )
-            val expected = 4.0
-            assertEquals(expected, actual, 0.0)
+            val expected = 4
+            assertEquals(expected, actual)
         }
     }
 
@@ -181,19 +181,19 @@ class GetMinRaiseSizeUseCaseImplTest {
                     actionStateList = listOf(
                         BetPhaseAction.Bet(
                             playerId = PlayerId("PlayerId1"),
-                            betSize = 5.0
+                            betSize = 5
                         ),
                     )
                 )
             )
         )
         runTest(dispatcher) {
-            val actual: Double = useCase.invoke(
+            val actual: Int = useCase.invoke(
                 game = game,
-                minBetSize = 2.0
+                minBetSize = 2
             )
-            val expected = 10.0
-            assertEquals(expected, actual, 0.0)
+            val expected = 10
+            assertEquals(expected, actual)
         }
     }
 }

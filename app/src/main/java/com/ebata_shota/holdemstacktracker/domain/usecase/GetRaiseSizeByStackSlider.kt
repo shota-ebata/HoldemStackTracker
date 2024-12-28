@@ -1,14 +1,11 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
-import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
-
 interface GetRaiseSizeByStackSlider {
 
     suspend fun invoke(
-        betViewMode: BetViewMode,
-        stackSize: Double,
-        minRaiseSize: Double,
-        myPendingBetSize: Double,
+        stackSize: Int,
+        minRaiseSize: Int,
+        myPendingBetSize: Int,
         sliderPosition: Float,
-    ): Double
+    ): Int
 }

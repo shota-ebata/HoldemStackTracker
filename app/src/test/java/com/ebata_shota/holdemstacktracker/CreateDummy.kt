@@ -1,13 +1,12 @@
 package com.ebata_shota.holdemstacktracker
 
-import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
-import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
-import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
+import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import java.time.Instant
 
@@ -31,7 +30,7 @@ fun createDummyTable(
     version = 0L,
     appVersion = BuildConfig.VERSION_CODE.toLong(),
     hostPlayerId = PlayerId(""),
-    rule = Rule.RingGame(sbSize = 100.0, bbSize = 200.0, betViewMode = BetViewMode.Number, defaultStack = 1000.0),
+    rule = Rule.RingGame(sbSize = 100, bbSize = 200, defaultStack = 1000),
     playerOrder = playerOrder,
     btnPlayerId = PlayerId(""),
     basePlayers = emptyList(),

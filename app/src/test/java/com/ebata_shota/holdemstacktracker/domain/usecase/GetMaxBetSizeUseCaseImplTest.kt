@@ -28,8 +28,8 @@ class GetMaxBetSizeUseCaseImplTest {
             val actual = useCase.invoke(
                 actionStateList = emptyList()
             )
-            val expected = 0.0
-            assertEquals(expected, actual, 0.0)
+            val expected = 0
+            assertEquals(expected, actual)
         }
     }
 
@@ -46,27 +46,27 @@ class GetMaxBetSizeUseCaseImplTest {
                     )
                 )
             )
-            val expected = 0.0
-            assertEquals(expected, actual, 0.0)
+            val expected = 0
+            assertEquals(expected, actual)
         }
     }
 
     private fun createFullActions() = listOf(
         BetPhaseAction.Blind(
             playerId = PlayerId(""),
-            betSize = 100.0
+            betSize = 100
         ),
         BetPhaseAction.Blind(
             playerId = PlayerId(""),
-            betSize = 200.0
+            betSize = 200
         ),
         BetPhaseAction.Call(
             playerId = PlayerId(""),
-            betSize = 200.0
+            betSize = 200
         ),
         BetPhaseAction.Raise(
             playerId = PlayerId(""),
-            betSize = 400.0
+            betSize = 400
         ),
         BetPhaseAction.Fold(
             playerId = PlayerId("")
@@ -76,11 +76,11 @@ class GetMaxBetSizeUseCaseImplTest {
         ),
         BetPhaseAction.AllIn(
             playerId = PlayerId(""),
-            betSize = 1000.0
+            betSize = 1000
         ),
         BetPhaseAction.AllIn(
             playerId = PlayerId(""),
-            betSize = 900.0
+            betSize = 900
         )
     )
 
@@ -90,8 +90,8 @@ class GetMaxBetSizeUseCaseImplTest {
             val actual = useCase.invoke(
                 actionStateList = createFullActions().take(1)
             )
-            val expected = 100.0
-            assertEquals(expected, actual, 0.0)
+            val expected = 100
+            assertEquals(expected, actual)
         }
     }
 
@@ -101,8 +101,8 @@ class GetMaxBetSizeUseCaseImplTest {
             val actual = useCase.invoke(
                 actionStateList = createFullActions().take(2)
             )
-            val expected = 200.0
-            assertEquals(expected, actual, 0.0)
+            val expected = 200
+            assertEquals(expected, actual)
         }
     }
 
@@ -112,8 +112,8 @@ class GetMaxBetSizeUseCaseImplTest {
             val actual = useCase.invoke(
                 actionStateList = createFullActions().take(3)
             )
-            val expected = 200.0
-            assertEquals(expected, actual, 0.0)
+            val expected = 200
+            assertEquals(expected, actual)
         }
     }
 
@@ -123,8 +123,8 @@ class GetMaxBetSizeUseCaseImplTest {
             val actual = useCase.invoke(
                 actionStateList = createFullActions().take(4)
             )
-            val expected = 400.0
-            assertEquals(expected, actual, 0.0)
+            val expected = 400
+            assertEquals(expected, actual)
         }
     }
 
@@ -134,8 +134,8 @@ class GetMaxBetSizeUseCaseImplTest {
             val actual = useCase.invoke(
                 actionStateList = createFullActions().take(5)
             )
-            val expected = 400.0
-            assertEquals(expected, actual, 0.0)
+            val expected = 400
+            assertEquals(expected, actual)
         }
     }
 
@@ -145,8 +145,8 @@ class GetMaxBetSizeUseCaseImplTest {
             val actual = useCase.invoke(
                 actionStateList = createFullActions().take(6)
             )
-            val expected = 400.0
-            assertEquals(expected, actual, 0.0)
+            val expected = 400
+            assertEquals(expected, actual)
         }
     }
 
@@ -156,8 +156,8 @@ class GetMaxBetSizeUseCaseImplTest {
             val actual = useCase.invoke(
                 actionStateList = createFullActions().take(7)
             )
-            val expected = 1000.0
-            assertEquals(expected, actual, 0.0)
+            val expected = 1000
+            assertEquals(expected, actual)
         }
     }
 
@@ -167,8 +167,8 @@ class GetMaxBetSizeUseCaseImplTest {
             val actual = useCase.invoke(
                 actionStateList = createFullActions().take(8)
             )
-            val expected = 1000.0
-            assertEquals(expected, actual, 0.0)
+            val expected = 1000
+            assertEquals(expected, actual)
         }
     }
 }

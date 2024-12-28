@@ -4,6 +4,6 @@ import androidx.annotation.Keep
 
 @Keep
 data class GamePlayerEntity(
-    val stack: Double,
+    val stack: Int,
     val isLeaved: Boolean
 )

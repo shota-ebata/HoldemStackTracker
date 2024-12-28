@@ -100,10 +100,9 @@ private fun RuleLabelPreview() {
     HoldemStackTrackerTheme {
         RuleLabel(
             rule = Rule.RingGame(
-                sbSize = 50.0,
-                bbSize = 100.0,
-                betViewMode = BetViewMode.Number,
-                defaultStack = 10000.0
+                sbSize = 50,
+                bbSize = 100,
+                defaultStack = 10000
             )
         )
     }

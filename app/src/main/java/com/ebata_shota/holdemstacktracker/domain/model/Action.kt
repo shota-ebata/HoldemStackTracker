@@ -7,14 +7,14 @@ sealed interface Action {
 sealed interface BetPhaseAction : Action {
 
     sealed interface BetAction : BetPhaseAction {
-        val betSize: Double
+        val betSize: Int
     }
 
     sealed interface AutoAction : BetPhaseAction
 
     data class Blind(
         override val playerId: PlayerId,
-        override val betSize: Double
+        override val betSize: Int
     ) : BetAction, AutoAction
 
     sealed interface PlayerAction
@@ -29,22 +29,22 @@ sealed interface BetPhaseAction : Action {
 
     data class Call(
         override val playerId: PlayerId,
-        override val betSize: Double
+        override val betSize: Int
     ) : BetAction, PlayerAction
 
     data class Bet(
         override val playerId: PlayerId,
-        override val betSize: Double
+        override val betSize: Int
     ) : BetAction, PlayerAction
 
     data class Raise(
         override val playerId: PlayerId,
-        override val betSize: Double
+        override val betSize: Int
     ) : BetAction, PlayerAction
 
     data class AllIn(
         override val playerId: PlayerId,
-        override val betSize: Double
+        override val betSize: Int
     ) : BetAction, PlayerAction
 
     sealed interface Skip: AutoAction

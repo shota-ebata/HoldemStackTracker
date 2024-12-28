@@ -74,7 +74,7 @@ fun GameContent(
     onClickAllInButton: () -> Unit,
     onClickCallButton: () -> Unit,
     onClickRaiseButton: () -> Unit,
-    onClickRaiseSizeButton: (Double) -> Unit,
+    onClickRaiseSizeButton: (Int) -> Unit,
     onClickRaiseUpSizeButton: () -> Unit,
     onClickSliderTypeButton: () -> Unit,
     onChangeSlider: (Float) -> Unit,
@@ -671,19 +671,19 @@ private class GameContentUiStatePreviewParam :
             raiseSizeButtonUiStates = listOf(
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("2 BB"),
-                    raiseSize = 2.0
+                    raiseSize = 200
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("2.5 BB"),
-                    raiseSize = 2.5
+                    raiseSize = 250
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("3 BB"),
-                    raiseSize = 3.0
+                    raiseSize = 300
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("4 BB"),
-                    raiseSize = 4.0
+                    raiseSize = 400
                 ),
             ),
             isEnableSliderTypeButton = true,

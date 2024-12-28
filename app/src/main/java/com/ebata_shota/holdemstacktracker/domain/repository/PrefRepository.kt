@@ -15,34 +15,22 @@ interface PrefRepository {
     suspend fun saveDefaultBetViewMode(betViewMode: BetViewMode)
 
     /**
-     * デフォルトSBサイズ（Numberモード）
+     * デフォルトSBサイズ
      */
-    val defaultSizeOfSbOfNumberMode: Flow<Int>
-    suspend fun saveDefaultSizeOfSbOfNumberMode(value: Int)
+    val defaultSizeOfSb: Flow<Int>
+    suspend fun saveDefaultSizeOfSb(value: Int)
 
     /**
-     * デフォルトSBサイズ（BBモード）
+     * デフォルトBBサイズ
      */
-    val defaultSizeOfSbOfBbMode: Flow<Double>
-    suspend fun saveDefaultSizeOfSbOfBbMode(value: Double)
-
-    /**
-     * デフォルトBBサイズ（Numberモードしかない）
-     */
-    val defaultSizeOfBbOfNumberMode: Flow<Int>
-    suspend fun saveDefaultSizeOfBbOfNumberMode(value: Int)
+    val defaultSizeOfBb: Flow<Int>
+    suspend fun saveDefaultSizeOfBb(value: Int)
 
     /**
      * デフォルトスタックサイズ（Numberモード）
      */
-    val defaultStackSizeOfNumberMode: Flow<Int>
-    suspend fun saveDefaultStackSizeOfNumberMode(value: Int)
-
-    /**
-     * デフォルトスタックサイズ（BBモード）
-     */
-    val defaultStackSizeOfBbMode: Flow<Double>
-    suspend fun saveDefaultStackSizeOfBBMode(value: Double)
+    val defaultStackSize: Flow<Int>
+    suspend fun saveDefaultStackSize(value: Int)
 
     /**
      * RaiseUpサイズのスライダーステップON_OFF

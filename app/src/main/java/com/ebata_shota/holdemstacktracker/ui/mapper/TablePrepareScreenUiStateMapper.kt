@@ -2,7 +2,6 @@ package com.ebata_shota.holdemstacktracker.ui.mapper
 
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetDoubleToStringUseCase
 import com.ebata_shota.holdemstacktracker.infra.extension.blindText
 import com.ebata_shota.holdemstacktracker.infra.extension.gameTextResId
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TablePrepareContentUiState
@@ -14,9 +13,7 @@ import javax.inject.Inject
 @ViewModelScoped
 class TablePrepareScreenUiStateMapper
 @Inject
-constructor(
-    private val getDoubleToString: GetDoubleToStringUseCase
-) {
+constructor() {
     suspend fun createUiState(
         table: Table,
         myPlayerId: PlayerId,
@@ -35,10 +32,7 @@ constructor(
                     val player = table.basePlayers.find { it.id == playerId }
                         ?: return@mapNotNull null
 
-                    val playerStackString = getDoubleToString.invoke(
-                        value = player.stack,
-                        betViewMode = table.rule.betViewMode
-                    )
+                    val playerStackString = player.stack.toString() // FIXME: "%,d"にフォーマットしたかったが、ダイアログのEditTextに影響するのでやめた（どうにかしたい)
                     PlayerEditRowUiState(
                         playerId = playerId,
                         playerName = player.name,

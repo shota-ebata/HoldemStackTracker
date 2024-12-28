@@ -1,16 +1,14 @@
 package com.ebata_shota.holdemstacktracker.domain.model
 
 sealed interface Rule {
-    val betViewMode: BetViewMode
-    val defaultStack: Double
-    val minBetSize: Double
+    val defaultStack: Int
+    val minBetSize: Int
 
     data class RingGame(
-        val sbSize: Double,
-        val bbSize: Double,
-        override val betViewMode: BetViewMode,
-        override val defaultStack: Double
+        val sbSize: Int,
+        val bbSize: Int,
+        override val defaultStack: Int
     ) : Rule {
-        override val minBetSize = bbSize
+        override val minBetSize: Int = bbSize
     }
 }

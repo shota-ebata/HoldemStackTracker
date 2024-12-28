@@ -15,7 +15,6 @@ import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthReposito
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetDoubleToStringUseCase
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableCreatorContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
@@ -46,7 +45,6 @@ constructor(
     private val defaultRuleStateOfRingRepository: DefaultRuleStateOfRingRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val prefRepository: PrefRepository,
-    private val getDoubleToString: GetDoubleToStringUseCase
 ) : ViewModel(), MyNameInputDialogEvent {
 
     /**
@@ -91,33 +89,22 @@ constructor(
         TableCreatorUiState.MainContent(
             tableCreatorContentUiState = TableCreatorContentUiState(
                 gameType = GameType.RingGame,
-                betViewMode = ringGame.betViewMode,
                 sbSize = TextFieldErrorUiState(
                     label = R.string.sb_size_label,
                     value = TextFieldValue(
-                        getDoubleToString.invoke(
-                            value = ringGame.sbSize,
-                            betViewMode = ringGame.betViewMode
-                        )
+                        "%,d".format(ringGame.sbSize)
                     )
                 ),
                 bbSize = TextFieldErrorUiState(
                     label = R.string.bb_size_label,
                     value = TextFieldValue(
-                        getDoubleToString.invoke(
-                            value = ringGame.bbSize,
-                            betViewMode = ringGame.betViewMode
-                        )
+                        "%,d".format(ringGame.bbSize)
                     ),
-                    isEnabled = ringGame.betViewMode == BetViewMode.Number
                 ),
                 defaultStack = TextFieldErrorUiState(
                     label = R.string.default_stack_label,
                     value = TextFieldValue(
-                        getDoubleToString.invoke(
-                            value = ringGame.defaultStack,
-                            betViewMode = ringGame.betViewMode
-                        )
+                        ringGame.defaultStack.toString()
                     )
                 ),
                 bottomErrorMessage = null
@@ -153,30 +140,14 @@ constructor(
         viewModelScope.launch {
             val contentUiState = tableCreatorContentUiState ?: return@launch
             var errorMessage: ErrorMessage? = null
-            when (contentUiState.betViewMode) {
-                BetViewMode.Number -> {
-                    val intValue = value.text.toIntOrNull()
-                    if (intValue != null && intValue > 0) {
-                        // デフォルトを更新しておく
-                        defaultRuleStateOfRingRepository.setDefaultSizeOfSbOfNumberMode(intValue)
-                    } else {
-                        // エラーがある場合はエラーメッセージ
-                        errorMessage =
-                            ErrorMessage(errorMessageResId = R.string.input_error_message)
-                    }
-                }
-
-                BetViewMode.BB -> {
-                    val doubleValue: Double? = value.text.toDoubleOrNull()
-                    if (doubleValue != null && doubleValue > 0) {
-                        // デフォルトを更新しておく
-                        defaultRuleStateOfRingRepository.setDefaultSizeOfSbOfBbMode(doubleValue)
-                    } else {
-                        // エラーがある場合はエラーメッセージ
-                        errorMessage =
-                            ErrorMessage(errorMessageResId = R.string.input_error_message)
-                    }
-                }
+            val intValue = value.text.toIntOrNull()
+            if (intValue != null && intValue > 0) {
+                // デフォルトを更新しておく
+                defaultRuleStateOfRingRepository.setDefaultSizeOfSb(intValue)
+            } else {
+                // エラーがある場合はエラーメッセージ
+                errorMessage =
+                    ErrorMessage(errorMessageResId = R.string.input_error_message)
             }
             _screenUiState.update {
                 TableCreatorUiState.MainContent(
@@ -197,16 +168,11 @@ constructor(
     fun onChangeSizeOfBB(value: TextFieldValue) {
         viewModelScope.launch {
             val contentUiState = tableCreatorContentUiState ?: return@launch
-
-            if (contentUiState.betViewMode == BetViewMode.BB) {
-                // BBはBBモードでは1.0固定なので、編集できない
-                return@launch
-            }
             val intValue = value.text.toIntOrNull()
             var errorMessage: ErrorMessage? = null
             if (intValue != null && intValue > 0) {
                 // デフォルトを更新しておく
-                defaultRuleStateOfRingRepository.saveDefaultSizeOfBbOfNumberMode(intValue)
+                defaultRuleStateOfRingRepository.saveDefaultSizeOfBb(intValue)
             } else {
                 // エラーがある場合はエラーメッセージ
                 errorMessage = ErrorMessage(errorMessageResId = R.string.input_error_message)
@@ -237,30 +203,20 @@ constructor(
             _screenUiState.update {
                 TableCreatorUiState.MainContent(
                     tableCreatorContentUiState = contentUiState.copy(
-                        betViewMode = value,
                         sbSize = contentUiState.sbSize.copy(
                             value = TextFieldValue(
-                                getDoubleToString.invoke(
-                                    value = defaultRingGame.sbSize,
-                                    betViewMode = value
-                                )
+                                "%,d".format(defaultRingGame.sbSize)
                             )
                         ),
                         bbSize = contentUiState.bbSize.copy(
                             value = TextFieldValue(
-                                getDoubleToString.invoke(
-                                    value = defaultRingGame.bbSize,
-                                    betViewMode = value
-                                )
+                                "%,d".format(defaultRingGame.bbSize)
                             ),
                             isEnabled = value == BetViewMode.Number
                         ),
                         defaultStack = contentUiState.defaultStack.copy(
                             value = TextFieldValue(
-                                getDoubleToString.invoke(
-                                    value = defaultRingGame.defaultStack,
-                                    betViewMode = value
-                                )
+                                "%,d".format(defaultRingGame.defaultStack)
                             )
                         )
                     )
@@ -278,54 +234,27 @@ constructor(
             if (uiState !is TableCreatorUiState.MainContent) {
                 return@launch
             }
-            when (uiState.tableCreatorContentUiState.betViewMode) {
-                BetViewMode.Number -> {
-                    val intValue = value.text.toIntOrNull()
-                    var errorMessage: ErrorMessage? = null
-                    if (intValue != null && intValue > 0) {
-                        // デフォルトを更新しておく
-                        defaultRuleStateOfRingRepository.setDefaultStackSizeOfNumberMode(
-                            intValue
+            val intValue = value.text.toIntOrNull()
+            var errorMessage: ErrorMessage? = null
+            if (intValue != null && intValue > 0) {
+                // デフォルトを更新しておく
+                defaultRuleStateOfRingRepository.setDefaultStackSize(
+                    intValue
+                )
+            } else {
+                // エラーがある場合はエラーメッセージ
+                errorMessage =
+                    ErrorMessage(errorMessageResId = R.string.input_error_message)
+            }
+            _screenUiState.update {
+                uiState.copy(
+                    tableCreatorContentUiState = uiState.tableCreatorContentUiState.copy(
+                        defaultStack = uiState.tableCreatorContentUiState.defaultStack.copy(
+                            value = value,
+                            error = errorMessage
                         )
-                    } else {
-                        // エラーがある場合はエラーメッセージ
-                        errorMessage =
-                            ErrorMessage(errorMessageResId = R.string.input_error_message)
-                    }
-                    _screenUiState.update {
-                        uiState.copy(
-                            tableCreatorContentUiState = uiState.tableCreatorContentUiState.copy(
-                                defaultStack = uiState.tableCreatorContentUiState.defaultStack.copy(
-                                    value = value,
-                                    error = errorMessage
-                                )
-                            )
-                        )
-                    }
-                }
-
-                BetViewMode.BB -> {
-                    val doubleValue: Double? = value.text.toDoubleOrNull()
-                    var errorMessage: ErrorMessage? = null
-                    if (doubleValue != null && doubleValue > 0) {
-                        // デフォルトを更新しておく
-                        defaultRuleStateOfRingRepository.setDefaultStackSizeOfBbMode(doubleValue)
-                    } else {
-                        // エラーがある場合はエラーメッセージ
-                        errorMessage =
-                            ErrorMessage(errorMessageResId = R.string.input_error_message)
-                    }
-                    _screenUiState.update {
-                        uiState.copy(
-                            tableCreatorContentUiState = uiState.tableCreatorContentUiState.copy(
-                                defaultStack = uiState.tableCreatorContentUiState.defaultStack.copy(
-                                    value = value,
-                                    error = errorMessage
-                                )
-                            )
-                        )
-                    }
-                }
+                    )
+                )
             }
         }
     }
@@ -397,16 +326,14 @@ constructor(
 
     private suspend fun createTable() {
         val tableId = TableId(randomIdRepository.generateRandomId())
-        // TODO: いろいろ
+        // TODO: バリデーション
         val contentUiState = tableCreatorContentUiState ?: return
-        val betViewMode = contentUiState.betViewMode
         tableRepository.createNewTable(
             tableId = tableId,
             rule = Rule.RingGame(
-                sbSize = contentUiState.sbSize.value.text.toDouble(),
-                bbSize = contentUiState.bbSize.value.text.toDouble(),
-                betViewMode = betViewMode,
-                defaultStack = contentUiState.defaultStack.value.text.toDouble()
+                sbSize = contentUiState.sbSize.value.text.toInt(),
+                bbSize = contentUiState.bbSize.value.text.toInt(),
+                defaultStack = contentUiState.defaultStack.value.text.toInt()
             )
         )
         _navigateEvent.emit(NavigateEvent.TablePrepare(tableId))

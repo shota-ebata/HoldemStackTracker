@@ -6,11 +6,9 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultBetViewMode
-import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultSizeOfBbOfNumberMode
-import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultSizeOfSbOfBbMode
-import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultSizeOfSbOfNumberMode
-import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultStackSizeOfBbMode
-import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultStackSizeOfNumberMode
+import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultSizeOfBb
+import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultSizeOfSb
+import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultStackSize
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.EnableRaiseUpSliderStep
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.MyName
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.PotSliderMaxRatio
@@ -47,49 +45,31 @@ constructor(
         dataStore.setPrefValue(DefaultBetViewMode, betViewMode.ordinal)
     }
 
-    override val defaultSizeOfSbOfNumberMode: Flow<Int> by dataStore.prefFlow(
-        key = DefaultSizeOfSbOfNumberMode,
+    override val defaultSizeOfSb: Flow<Int> by dataStore.prefFlow(
+        key = DefaultSizeOfSb,
         defaultValue = { 1 }
     )
 
-    override suspend fun saveDefaultSizeOfSbOfNumberMode(value: Int) {
-        dataStore.setPrefValue(DefaultSizeOfSbOfNumberMode, value)
+    override suspend fun saveDefaultSizeOfSb(value: Int) {
+        dataStore.setPrefValue(DefaultSizeOfSb, value)
     }
 
-    override val defaultSizeOfSbOfBbMode: Flow<Double> by dataStore.prefFlow(
-        key = DefaultSizeOfSbOfBbMode,
-        defaultValue = { 0.5 }
-    )
-
-    override suspend fun saveDefaultSizeOfSbOfBbMode(value: Double) {
-        dataStore.setPrefValue(DefaultSizeOfSbOfBbMode, value)
-    }
-
-    override val defaultSizeOfBbOfNumberMode: Flow<Int> by dataStore.prefFlow(
-        key = DefaultSizeOfBbOfNumberMode,
+    override val defaultSizeOfBb: Flow<Int> by dataStore.prefFlow(
+        key = DefaultSizeOfBb,
         defaultValue = { 2 }
     )
 
-    override suspend fun saveDefaultSizeOfBbOfNumberMode(value: Int) {
-        dataStore.setPrefValue(DefaultSizeOfBbOfNumberMode, value)
+    override suspend fun saveDefaultSizeOfBb(value: Int) {
+        dataStore.setPrefValue(DefaultSizeOfBb, value)
     }
 
-    override val defaultStackSizeOfNumberMode: Flow<Int> by dataStore.prefFlow(
-        key = DefaultStackSizeOfNumberMode,
+    override val defaultStackSize: Flow<Int> by dataStore.prefFlow(
+        key = DefaultStackSize,
         defaultValue = { 200 }
     )
 
-    override suspend fun saveDefaultStackSizeOfNumberMode(value: Int) {
-        dataStore.setPrefValue(DefaultStackSizeOfNumberMode, value)
-    }
-
-    override val defaultStackSizeOfBbMode: Flow<Double> by dataStore.prefFlow(
-        key = DefaultStackSizeOfBbMode,
-        defaultValue = { 50.0 }
-    )
-
-    override suspend fun saveDefaultStackSizeOfBBMode(value: Double) {
-        dataStore.setPrefValue(DefaultStackSizeOfBbMode, value)
+    override suspend fun saveDefaultStackSize(value: Int) {
+        dataStore.setPrefValue(DefaultStackSize, value)
     }
 
     override val isEnableRaiseUpSliderStep: Flow<Boolean> by dataStore.prefFlow(

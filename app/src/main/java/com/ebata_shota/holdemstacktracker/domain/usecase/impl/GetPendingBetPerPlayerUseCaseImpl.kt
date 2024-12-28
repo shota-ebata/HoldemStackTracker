@@ -23,13 +23,13 @@ constructor(
      */
     override suspend fun invoke(
         playerOrder: List<PlayerId>,
-        actionStateList: List<BetPhaseAction>
-    ): Map<PlayerId, Double> = withContext(dispatcher) {
+        actionStateList: List<BetPhaseAction>,
+    ): Map<PlayerId, Int> = withContext(dispatcher) {
         return@withContext playerOrder.associateWith { playerId ->
             // このフェーズでの、特定プレイヤーのアクション一覧を取得
             val playerActionList = actionStateList.filter { it.playerId == playerId }
             // プレイヤーの最大ベットサイズ = そのプレイヤーの最終的なベットサイズ
             getMaxBetSize.invoke(playerActionList)
-        }.filter { it.value > 0.0 }
+        }.filter { it.value > 0 }
     }
 }

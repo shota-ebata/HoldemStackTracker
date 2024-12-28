@@ -20,7 +20,7 @@ class GetPotListUseCaseImplTest {
     }
 
     private fun executeAndAssert(
-        pendingBetPerPlayer: Map<PlayerId, Double>,
+        pendingBetPerPlayer: Map<PlayerId, Int>,
         expectedList: List<Pot>
     ) {
         runTest(dispatcher) {
@@ -40,16 +40,16 @@ class GetPotListUseCaseImplTest {
 
     @Test
     fun all_call() {
-        val pendingBetPerPlayer: Map<PlayerId, Double> = mapOf(
-            PlayerId("0") to 200.0,
-            PlayerId("1") to 200.0,
-            PlayerId("2") to 200.0,
+        val pendingBetPerPlayer: Map<PlayerId, Int> = mapOf(
+            PlayerId("0") to 200,
+            PlayerId("1") to 200,
+            PlayerId("2") to 200,
         )
         val expectedList = listOf(
             Pot(
                 id = 0L,
                 potNumber = 0L,
-                potSize = 600.0,
+                potSize = 600,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
                     PlayerId("1"),
@@ -63,16 +63,16 @@ class GetPotListUseCaseImplTest {
 
     @Test
     fun all_in_2() {
-        val pendingBetPerPlayer: Map<PlayerId, Double> = mapOf(
-            PlayerId("0") to 200.0,
-            PlayerId("1") to 200.0,
-            PlayerId("2") to 100.0,
+        val pendingBetPerPlayer: Map<PlayerId, Int> = mapOf(
+            PlayerId("0") to 200,
+            PlayerId("1") to 200,
+            PlayerId("2") to 100,
         )
         val expectedList = listOf(
             Pot(
                 id = 0L,
                 potNumber = 0L,
-                potSize = 300.0,
+                potSize = 300,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
                     PlayerId("1"),
@@ -83,7 +83,7 @@ class GetPotListUseCaseImplTest {
             Pot(
                 id = 0L,
                 potNumber = 1L,
-                potSize = 200.0,
+                potSize = 200,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
                     PlayerId("1"),
@@ -96,16 +96,16 @@ class GetPotListUseCaseImplTest {
 
     @Test
     fun all_in_3() {
-        val pendingBetPerPlayer: Map<PlayerId, Double> = mapOf(
-            PlayerId("0") to 100.0,
-            PlayerId("1") to 200.0,
-            PlayerId("2") to 300.0,
+        val pendingBetPerPlayer: Map<PlayerId, Int> = mapOf(
+            PlayerId("0") to 100,
+            PlayerId("1") to 200,
+            PlayerId("2") to 300,
         )
         val expectedList = listOf(
             Pot(
                 id = 0L,
                 potNumber = 0L,
-                potSize = 300.0,
+                potSize = 300,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
                     PlayerId("1"),
@@ -116,7 +116,7 @@ class GetPotListUseCaseImplTest {
             Pot(
                 id = 0L,
                 potNumber = 1L,
-                potSize = 200.0,
+                potSize = 200,
                 involvedPlayerIds = listOf(
                     PlayerId("1"),
                     PlayerId("2"),
@@ -126,7 +126,7 @@ class GetPotListUseCaseImplTest {
             Pot(
                 id = 0L,
                 potNumber = 2L,
-                potSize = 100.0,
+                potSize = 100,
                 involvedPlayerIds = listOf(
                     PlayerId("2"),
                 ),

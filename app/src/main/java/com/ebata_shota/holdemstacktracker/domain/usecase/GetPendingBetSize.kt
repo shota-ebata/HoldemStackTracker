@@ -8,5 +8,5 @@ interface GetPendingBetSize {
         actionList: List<BetPhaseAction>,
         playerOrder: List<PlayerId>,
         playerId: PlayerId,
-    ): Double
+    ): Int
 }

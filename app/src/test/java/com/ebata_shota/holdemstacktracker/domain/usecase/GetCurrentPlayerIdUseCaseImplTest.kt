@@ -46,17 +46,17 @@ class GetCurrentPlayerIdUseCaseImplTest {
             players = setOf(
                 GamePlayer(
                     id = PlayerId("PlayerId0"),
-                    stack = 1000.0,
+                    stack = 1000,
                     isLeaved = false
                 ),
                 GamePlayer(
                     id = PlayerId("PlayerId1"),
-                    stack = 1000.0,
+                    stack = 1000,
                     isLeaved = false
                 ),
                 GamePlayer(
                     id = PlayerId("PlayerId2"),
-                    stack = 1000.0,
+                    stack = 1000,
                     isLeaved = false
                 )
             )
@@ -86,17 +86,17 @@ class GetCurrentPlayerIdUseCaseImplTest {
             players = setOf(
                 GamePlayer(
                     id = PlayerId("PlayerId0"),
-                    stack = 1000.0,
+                    stack = 1000,
                     isLeaved = false
                 ),
                 GamePlayer(
                     id = PlayerId("PlayerId1"),
-                    stack = 1000.0,
+                    stack = 1000,
                     isLeaved = false
                 ),
                 GamePlayer(
                     id = PlayerId("PlayerId2"),
-                    stack = 1000.0,
+                    stack = 1000,
                     isLeaved = false
                 )
             ),
@@ -139,7 +139,7 @@ class GetCurrentPlayerIdUseCaseImplTest {
     fun test_after_sb() {
         val btnPlayerId = PlayerId("PlayerId2")
         val actionStateList = listOf<BetPhaseAction>(
-            Blind(playerId = PlayerId("PlayerId0"), betSize = 100.0),
+            Blind(playerId = PlayerId("PlayerId0"), betSize = 100),
         )
         val expected = PlayerId("PlayerId1")
         executeAndAssert(
@@ -158,8 +158,8 @@ class GetCurrentPlayerIdUseCaseImplTest {
     fun test_after_bb() {
         val btnPlayerId = PlayerId("PlayerId2")
         val actionStateList = listOf<BetPhaseAction>(
-            Blind(playerId = PlayerId("PlayerId0"), betSize = 100.0),
-            Blind(playerId = PlayerId("PlayerId1"), betSize = 200.0),
+            Blind(playerId = PlayerId("PlayerId0"), betSize = 100),
+            Blind(playerId = PlayerId("PlayerId1"), betSize = 200),
         )
         val expected = PlayerId("PlayerId2")
         executeAndAssert(
@@ -178,9 +178,9 @@ class GetCurrentPlayerIdUseCaseImplTest {
     fun test_after_btn() {
         val btnPlayerId = PlayerId("PlayerId2")
         val actionStateList = listOf<BetPhaseAction>(
-            Blind(playerId = PlayerId("PlayerId0"), betSize = 100.0),
-            Blind(playerId = PlayerId("PlayerId1"), betSize = 200.0),
-            Call(playerId = PlayerId("PlayerId2"), betSize = 200.0),
+            Blind(playerId = PlayerId("PlayerId0"), betSize = 100),
+            Blind(playerId = PlayerId("PlayerId1"), betSize = 200),
+            Call(playerId = PlayerId("PlayerId2"), betSize = 200),
         )
         val expected = PlayerId("PlayerId0")
         executeAndAssert(
@@ -199,10 +199,10 @@ class GetCurrentPlayerIdUseCaseImplTest {
     fun test1() {
         val btnPlayerId = PlayerId("PlayerId2")
         val actionStateList = listOf<BetPhaseAction>(
-            Blind(playerId = PlayerId("PlayerId0"), betSize = 100.0),
-            Blind(playerId = PlayerId("PlayerId1"), betSize = 200.0),
-            Call(playerId = PlayerId("PlayerId2"), betSize = 200.0),
-            Call(playerId = PlayerId("PlayerId0"), betSize = 200.0),
+            Blind(playerId = PlayerId("PlayerId0"), betSize = 100),
+            Blind(playerId = PlayerId("PlayerId1"), betSize = 200),
+            Call(playerId = PlayerId("PlayerId2"), betSize = 200),
+            Call(playerId = PlayerId("PlayerId0"), betSize = 200),
         )
         val expected = PlayerId("PlayerId1")
         executeAndAssert(

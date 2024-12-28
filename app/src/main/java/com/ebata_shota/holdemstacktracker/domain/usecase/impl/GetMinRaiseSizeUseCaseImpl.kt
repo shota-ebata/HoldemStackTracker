@@ -20,13 +20,13 @@ constructor(
     // FIXME: 引数をgameではなくphaseListにしたい
     override suspend fun invoke(
         game: Game,
-        minBetSize: Double
-    ): Double = withContext(dispatcher) {
+        minBetSize: Int
+    ): Int = withContext(dispatcher) {
         val betPhase = getLatestBetPhase.invoke(game)
         // 最低引き上げ額
-        var minUpliftSize: Double = minBetSize
+        var minUpliftSize: Int = minBetSize
         // 最高Bet額
-        var maxBetSize = 0.0
+        var maxBetSize = 0
         betPhase.actionStateList.forEach { betPhaseAction ->
             if (betPhaseAction is BetPhaseAction.BetAction) {
                 if (

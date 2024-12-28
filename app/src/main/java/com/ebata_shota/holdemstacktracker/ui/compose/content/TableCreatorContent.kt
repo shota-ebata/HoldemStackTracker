@@ -34,7 +34,6 @@ import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.OutlinedTextFieldWithError
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.TextFieldErrorUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
-import com.ebata_shota.holdemstacktracker.ui.extension.labelResId
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 
 @Composable
@@ -42,7 +41,6 @@ fun TableCreatorContent(
     uiState: TableCreatorContentUiState,
     onChangeSizeOfSB: (TextFieldValue) -> Unit,
     onChangeSizeOfBB: (TextFieldValue) -> Unit,
-    onClickBetViewMode: (BetViewMode) -> Unit,
     onChangeStackSize: (TextFieldValue) -> Unit,
     onClickSubmit: () -> Unit,
     modifier: Modifier = Modifier
@@ -77,37 +75,6 @@ fun TableCreatorContent(
                 ) {
                     RadioButton(
                         selected = (it == uiState.gameType),
-                        onClick = null
-                    )
-                    Text(
-                        text = stringResource(it.labelResId()),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
-                }
-            }
-
-            Text(
-                text = stringResource(R.string.bet_view_type),
-                modifier = Modifier.padding(top = 16.dp)
-            )
-
-            BetViewMode.entries.forEach {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .selectable(
-                            selected = (it == uiState.betViewMode),
-                            onClick = dropUselessDouble { onClickBetViewMode(it) },
-                            role = Role.RadioButton
-                        )
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = (it == uiState.betViewMode),
                         onClick = null
                     )
                     Text(
@@ -175,7 +142,6 @@ fun TableCreatorContent(
 
 data class TableCreatorContentUiState(
     val gameType: GameType,
-    val betViewMode: BetViewMode,
     val sbSize: TextFieldErrorUiState,
     val bbSize: TextFieldErrorUiState,
     val defaultStack: TextFieldErrorUiState,
@@ -199,24 +165,22 @@ fun TableCreatorContentPreview() {
         TableCreatorContent(
             uiState = TableCreatorContentUiState(
                 gameType = GameType.RingGame,
-                betViewMode = BetViewMode.Number,
                 sbSize = TextFieldErrorUiState(
                     label = R.string.sb_size_label,
-                    value = TextFieldValue("0.0")
+                    value = TextFieldValue("0")
                 ),
                 bbSize = TextFieldErrorUiState(
                     label = R.string.bb_size_label,
-                    value = TextFieldValue("0.0")
+                    value = TextFieldValue("0")
                 ),
                 defaultStack = TextFieldErrorUiState(
                     label = R.string.default_stack_label,
-                    value = TextFieldValue("0.0")
+                    value = TextFieldValue("0")
                 ),
                 bottomErrorMessage = null
             ),
             onChangeSizeOfSB = {},
             onChangeSizeOfBB = {},
-            onClickBetViewMode = {},
             onChangeStackSize = {},
             onClickSubmit = {}
         )

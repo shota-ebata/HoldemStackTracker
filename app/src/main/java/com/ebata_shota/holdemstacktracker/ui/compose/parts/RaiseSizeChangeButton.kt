@@ -17,7 +17,7 @@ import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 @Composable
 fun RaiseSizeChangeButton(
     uiState: RaiseSizeChangeButtonUiState,
-    onClickRaiseSizeButton: (Double) -> Unit,
+    onClickRaiseSizeButton: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     OutlinedButton(
@@ -34,7 +34,7 @@ fun RaiseSizeChangeButton(
 
 data class RaiseSizeChangeButtonUiState(
     val labelStringSource: StringSource,
-    val raiseSize: Double,
+    val raiseSize: Int,
 )
 
 @Preview(showBackground = true, showSystemUi = false, name = "Light Mode")
@@ -51,7 +51,7 @@ private fun RaiseSizeChangeButtonPreview() {
             RaiseSizeChangeButton(
                 uiState = RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource(id = R.string.position_label_sb),
-                    raiseSize = 4.0
+                    raiseSize = 4
                 ),
                 onClickRaiseSizeButton = {},
             )

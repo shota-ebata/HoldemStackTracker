@@ -27,9 +27,9 @@ constructor(
      * @param action 今回のアクション
      */
     override suspend fun invoke(
-        pendingBetPerPlayer: Map<PlayerId, Double>,
+        pendingBetPerPlayer: Map<PlayerId, Int>,
         players: Set<GamePlayer>,
-        action: BetPhaseAction
+        action: BetPhaseAction,
     ): Set<GamePlayer> = withContext(dispatcher) {
         val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
         return@withContext when (action) {
@@ -38,7 +38,7 @@ constructor(
 
                 return@withContext players.map { gamePlayer ->
                     if (gamePlayer.id == action.playerId) {
-                        val latestBetSize: Double = pendingBetPerPlayer[myPlayerId] ?: 0.0
+                        val latestBetSize: Int = pendingBetPerPlayer[myPlayerId] ?: 0
                         gamePlayer.copy(stack = gamePlayer.stack + latestBetSize - action.betSize)
                     } else {
                         gamePlayer

@@ -14,33 +14,14 @@ constructor(
     private val prefRepository: PrefRepository
 ) : DefaultRuleStateOfRingRepository {
     override val ringGameFlow: Flow<Rule.RingGame> = combine(
-        prefRepository.defaultBetViewMode,
-        prefRepository.defaultSizeOfSbOfNumberMode,
-        prefRepository.defaultSizeOfSbOfBbMode,
-        prefRepository.defaultSizeOfBbOfNumberMode,
-        prefRepository.defaultStackSizeOfNumberMode,
-        prefRepository.defaultStackSizeOfBbMode
-    ) {
-        val defaultBetViewMode = it[0] as BetViewMode
-        val defaultSizeOfSbOfNumberMode = it[1] as Int
-        val defaultSizeOfSbOfBbMode = it[2] as Double
-        val defaultSizeOfBbOfNumberMode = it[3] as Int
-        val defaultStackSizeOfNumberMode = it[4] as Int
-        val defaultStackSizeOfBBMode = it[5] as Double
+        prefRepository.defaultSizeOfSb,
+        prefRepository.defaultSizeOfBb,
+        prefRepository.defaultStackSize,
+    ) { defaultSizeOfSb, defaultSizeOfBb, defaultStackSize ->
         Rule.RingGame(
-            sbSize = when (defaultBetViewMode) {
-                BetViewMode.Number -> defaultSizeOfSbOfNumberMode.toDouble()
-                BetViewMode.BB -> defaultSizeOfSbOfBbMode
-            },
-            bbSize = when (defaultBetViewMode) {
-                BetViewMode.Number -> defaultSizeOfBbOfNumberMode.toDouble()
-                BetViewMode.BB -> 1.0
-            },
-            betViewMode = defaultBetViewMode,
-            defaultStack = when (defaultBetViewMode) {
-                BetViewMode.Number -> defaultStackSizeOfNumberMode.toDouble()
-                BetViewMode.BB -> defaultStackSizeOfBBMode
-            }
+            sbSize = defaultSizeOfSb,
+            bbSize = defaultSizeOfBb,
+            defaultStack = defaultStackSize
         )
     }
 
@@ -48,23 +29,15 @@ constructor(
         prefRepository.saveDefaultBetViewMode(value)
     }
 
-    override suspend fun setDefaultSizeOfSbOfNumberMode(value: Int) {
-        prefRepository.saveDefaultSizeOfSbOfNumberMode(value)
+    override suspend fun setDefaultSizeOfSb(value: Int) {
+        prefRepository.saveDefaultSizeOfSb(value)
     }
 
-    override suspend fun setDefaultSizeOfSbOfBbMode(value: Double) {
-        prefRepository.saveDefaultSizeOfSbOfBbMode(value)
+    override suspend fun saveDefaultSizeOfBb(value: Int) {
+        prefRepository.saveDefaultSizeOfBb(value)
     }
 
-    override suspend fun saveDefaultSizeOfBbOfNumberMode(value: Int) {
-        prefRepository.saveDefaultSizeOfBbOfNumberMode(value)
-    }
-
-    override suspend fun setDefaultStackSizeOfNumberMode(value: Int) {
-        prefRepository.saveDefaultStackSizeOfNumberMode(value)
-    }
-
-    override suspend fun setDefaultStackSizeOfBbMode(value: Double) {
-        prefRepository.saveDefaultStackSizeOfBBMode(value)
+    override suspend fun setDefaultStackSize(value: Int) {
+        prefRepository.saveDefaultStackSize(value)
     }
 }

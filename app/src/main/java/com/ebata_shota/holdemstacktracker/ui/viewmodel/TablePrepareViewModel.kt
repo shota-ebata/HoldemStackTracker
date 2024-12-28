@@ -349,7 +349,7 @@ constructor(
                 ?: return@launch
             val index = table.basePlayers.indexOfFirstOrNull { it.id == playerId }
                 ?: return@launch
-            val stack = stackValueText.toDouble() // TODO: バリデーションしたい
+            val stack = stackValueText.toInt() // TODO: バリデーションしたい
             if (table.basePlayers[index].stack == stack) {
                 // スタックに変化がないので更新しない
                 _dialogUiState.update {

@@ -5,7 +5,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ebata_shota.holdemstacktracker.domain.extension.toHstString
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
@@ -106,13 +105,16 @@ constructor(
             initialValue = null
         )
 
-    private val raiseSizeStateFlow: MutableStateFlow<Double?> = MutableStateFlow(null)
+    private val raiseSizeStateFlow: MutableStateFlow<Int?> = MutableStateFlow(null)
 
-    private val minRaiseSizeFlow: SharedFlow<Double> = combine(
+    private val minRaiseSizeFlow: SharedFlow<Int> = combine(
         tableStateFlow.filterNotNull(),
         gameStateFlow.filterNotNull()
     ) { table, game ->
-        getMinRaiseSize.invoke(game = game, minBetSize = table.rule.minBetSize)
+        getMinRaiseSize.invoke(
+            game = game,
+            minBetSize = table.rule.minBetSize
+        )
     }.shareIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
@@ -138,11 +140,13 @@ constructor(
                 sliderTypeStateFlow,
                 prefRepository.isEnableRaiseUpSliderStep,
             ) {
+                // FIXME: combine内部での問題が検知しづらい
+                // TODO: 以下の方法は辛いので、拡張関数を用意する
                 val myPlayerId = it[0] as PlayerId
                 val table = it[1] as Table
                 val game = it[2] as Game
-                val raiseSize = it[3] as Double?
-                val minRaiseSize = it[4] as Double
+                val raiseSize = it[3] as Int?
+                val minRaiseSize = it[4] as Int
                 val sliderType = it[5] as SliderType
                 val isEnableSliderStep = it[6] as Boolean
 
@@ -312,7 +316,7 @@ constructor(
         playerOrder: List<PlayerId>,
         game: Game,
         myPlayerId: PlayerId,
-        raiseSize: Double,
+        raiseSize: Int,
     ) {
         val player = game.players.find { it.id == myPlayerId }!!
         val betPhase = getLatestBetPhase.invoke(game)
@@ -353,8 +357,7 @@ constructor(
         game: Game,
         myPlayerId: PlayerId,
         sliderPosition: Float,
-    ): Double {
-        val betViewMode = table.rule.betViewMode
+    ): Int {
         val player = game.players.find { it.id == myPlayerId }!!
         val stackSize = player.stack
         val minRaiseSize = minRaiseSizeFlow.first()
@@ -364,10 +367,9 @@ constructor(
             playerId = myPlayerId
         )
 
-        val raiseSize: Double = when (sliderTypeStateFlow.value) {
+        val raiseSize: Int = when (sliderTypeStateFlow.value) {
             SliderType.Stack -> {
                 getRaiseSizeByStackSlider.invoke(
-                    betViewMode = betViewMode,
                     stackSize = stackSize,
                     minRaiseSize = minRaiseSize,
                     myPendingBetSize = myPendingBetSize,
@@ -377,7 +379,6 @@ constructor(
 
             SliderType.Pot -> {
                 getRaiseSizeByPotSlider.invoke(
-                    betViewMode = betViewMode,
                     totalPotSize = game.potList.sumOf { it.potSize },
                     stackSize = stackSize,
                     pendingBetSize = myPendingBetSize,
@@ -462,14 +463,15 @@ constructor(
                 raiseSize = raiseSize,
             )
             // レイズするたびにレイズサイズを0にする(自動で最低Raiseサイズになってくれる想定
-            raiseSizeStateFlow.update { 0.0 }
+            // TODO: ちゃんとした値をいれる
+            raiseSizeStateFlow.update { 0 }
         }
     }
 
     /**
      * Raiseボタン
      */
-    fun onClickRaiseSizeButton(value: Double) {
+    fun onClickRaiseSizeButton(value: Int) {
         viewModelScope.launch {
             raiseSizeStateFlow.update { value }
         }
@@ -493,7 +495,7 @@ constructor(
                     changeRaiseSizeUpDialogUiState = ChangeRaiseSizeUpDialogUiState(
                         textFieldWithErrorUiState = TextFieldErrorUiState(
                             value = TextFieldValue(
-                                text = raiseUpSize.toHstString(table.rule.betViewMode)
+                                text = "%,d".format(raiseUpSize)
                             )
                         ),
                         isEnableSubmitButton = true
@@ -511,7 +513,8 @@ constructor(
             }
         }
         // スライダータイプを変更するたび0にする(自動で最低Raiseサイズになってくれる想定
-        raiseSizeStateFlow.update { 0.0 }
+        // TODO: ちゃんと最小にしたい
+        raiseSizeStateFlow.update { 0 }
     }
 
     fun onChangeSlider(sliderPosition: Float) {
@@ -520,7 +523,7 @@ constructor(
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
-            val raiseSize: Double = getRaiseSize(
+            val raiseSize: Int = getRaiseSize(
                 table = table,
                 game = game,
                 myPlayerId = myPlayerId,
@@ -560,7 +563,7 @@ constructor(
                 ?.textFieldWithErrorUiState
                 ?.value
                 ?.text ?: return@launch
-            val raiseUpSize = text.toDouble() // TODO: バリデーションしたい
+            val raiseUpSize = text.toInt() // TODO: バリデーションしたい
             val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
