@@ -466,6 +466,15 @@ constructor(
         }
     }
 
+    /**
+     * Raiseボタン
+     */
+    fun onClickRaiseSizeButton(value: Double) {
+        viewModelScope.launch {
+            raiseSizeStateFlow.update { value }
+        }
+    }
+
     fun onClickRaiseUpSizeButton() {
         viewModelScope.launch {
             val table = tableStateFlow.value ?: return@launch

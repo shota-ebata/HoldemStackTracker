@@ -28,6 +28,7 @@ fun GameScreen(
                 onClickAllInButton = viewModel::onClickAllInButton,
                 onClickCallButton = viewModel::onClickCallButton,
                 onClickRaiseButton = viewModel::onClickRaiseButton,
+                onClickRaiseSizeButton = viewModel::onClickRaiseSizeButton,
                 onClickRaiseUpSizeButton = viewModel::onClickRaiseUpSizeButton,
                 onClickSliderTypeButton = viewModel::onClickSliderTypeButton,
                 onChangeSlider = viewModel::onChangeSlider,

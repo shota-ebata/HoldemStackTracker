@@ -52,7 +52,10 @@ import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.ui.compose.parts.RaiseSizeChangeButton
+import com.ebata_shota.holdemstacktracker.ui.compose.parts.RaiseSizeChangeButtonUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerCard
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.util.DelayState
@@ -71,6 +74,7 @@ fun GameContent(
     onClickAllInButton: () -> Unit,
     onClickCallButton: () -> Unit,
     onClickRaiseButton: () -> Unit,
+    onClickRaiseSizeButton: (Double) -> Unit,
     onClickRaiseUpSizeButton: () -> Unit,
     onClickSliderTypeButton: () -> Unit,
     onChangeSlider: (Float) -> Unit,
@@ -314,33 +318,13 @@ fun GameContent(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    OutlinedButton(
-                        modifier = Modifier
-                            .weight(1.0f),
-                        onClick = {}
-                    ) {
-                        Text(text = "2 BB")
-                    }
-                    OutlinedButton(
-                        modifier = Modifier
-                            .weight(1.0f),
-                        onClick = {}
-                    ) {
-                        Text(text = "2.5 BB")
-                    }
-                    OutlinedButton(
-                        modifier = Modifier
-                            .weight(1.0f),
-                        onClick = {}
-                    ) {
-                        Text(text = "3 BB")
-                    }
-                    OutlinedButton(
-                        modifier = Modifier
-                            .weight(1.0f),
-                        onClick = {}
-                    ) {
-                        Text(text = "4 BB")
+                    uiState.raiseSizeButtonUiStates.forEach {
+                        RaiseSizeChangeButton(
+                            modifier = Modifier
+                                .weight(1.0f),
+                            uiState = it,
+                            onClickRaiseSizeButton = onClickRaiseSizeButton
+                        )
                     }
                 }
                 Row(
@@ -519,6 +503,8 @@ data class GameContentUiState(
     // RaiseUp
     val isEnableRaiseUpSizeButton: Boolean,
     val raiseUpSizeText: String,
+    // RaiseSizeButton
+    val raiseSizeButtonUiStates: List<RaiseSizeChangeButtonUiState>,
     // SliderButton
     val isEnableSliderTypeButton: Boolean,
     val sliderTypeButtonLabelUiState: SliderTypeButtonLabelUiState,
@@ -682,6 +668,24 @@ private class GameContentUiStatePreviewParam :
             isEnableRaiseButton = true,
             raiseButtonMainLabelResId = R.string.button_label_raise,
             raiseButtonSubText = "+100（=102)",
+            raiseSizeButtonUiStates = listOf(
+                RaiseSizeChangeButtonUiState(
+                    labelStringSource = StringSource("2 BB"),
+                    raiseSize = 2.0
+                ),
+                RaiseSizeChangeButtonUiState(
+                    labelStringSource = StringSource("2.5 BB"),
+                    raiseSize = 2.5
+                ),
+                RaiseSizeChangeButtonUiState(
+                    labelStringSource = StringSource("3 BB"),
+                    raiseSize = 3.0
+                ),
+                RaiseSizeChangeButtonUiState(
+                    labelStringSource = StringSource("4 BB"),
+                    raiseSize = 4.0
+                ),
+            ),
             isEnableSliderTypeButton = true,
             sliderTypeButtonLabelUiState = GameContentUiState.SliderTypeButtonLabelUiState.Stack,
             isEnableSlider = true,
@@ -721,6 +725,7 @@ private fun GameContentPreview(
             onClickAllInButton = {},
             onClickCallButton = {},
             onClickRaiseButton = {},
+            onClickRaiseSizeButton = {},
             onClickRaiseUpSizeButton = {},
             onClickSliderTypeButton = {},
             onChangeSlider = {},
