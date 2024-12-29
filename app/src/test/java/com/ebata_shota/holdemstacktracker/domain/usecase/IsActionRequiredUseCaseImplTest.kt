@@ -6,7 +6,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetPerPlayerUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetSizeImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsActionRequiredUseCaseImpl
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -30,7 +30,7 @@ class IsActionRequiredUseCaseImplTest {
             getMaxBetSize = GetMaxBetSizeUseCaseImpl(
                 dispatcher = dispatcher
             ),
-            getPendingBetSize = GetPendingBetSizeImpl(
+            getPendingBetSize = GetPendingBetSizeUseCaseImpl(
                 getPendingBetPerPlayer = GetPendingBetPerPlayerUseCaseImpl(
                     getMaxBetSize = GetMaxBetSizeUseCaseImpl(
                         dispatcher = dispatcher
@@ -51,7 +51,7 @@ class IsActionRequiredUseCaseImplTest {
         // TODO: Hilt
         useCase = IsActionRequiredUseCaseImpl(
             getMaxBetSize = getMaxBetSizeUseCase,
-            getPendingBetSize = GetPendingBetSizeImpl(
+            getPendingBetSize = GetPendingBetSizeUseCaseImpl(
                 getPendingBetPerPlayer = GetPendingBetPerPlayerUseCaseImpl(
                     getMaxBetSize = GetMaxBetSizeUseCaseImpl(
                         dispatcher = dispatcher

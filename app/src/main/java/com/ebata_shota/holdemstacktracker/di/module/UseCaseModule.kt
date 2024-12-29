@@ -10,8 +10,10 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGamePlayerStateL
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPlayerStackUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneDownRaiseSizeUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneUpRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSize
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotStateListUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByPotSlider
@@ -32,8 +34,10 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextGamePlayerS
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextGameUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextPlayerStackUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetOneDownRaiseSizeUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetOneUpRaiseSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetPerPlayerUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetSizeImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionsUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPotStateListUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetRaiseSizeByPotSliderImpl
@@ -116,5 +120,11 @@ interface UseCaseModule {
     fun bindGetRaiseSizeByStackSlider(useCase: GetRaiseSizeByStackSliderImpl): GetRaiseSizeByStackSlider
 
     @Binds
-    fun bindGetPendingBetSize(useCase: GetPendingBetSizeImpl): GetPendingBetSize
+    fun bindGetPendingBetSize(useCase: GetPendingBetSizeUseCaseImpl): GetPendingBetSizeUseCase
+
+    @Binds
+    fun bindGetOneDownRaiseSizeUseCase(useCase: GetOneDownRaiseSizeUseCaseImpl): GetOneDownRaiseSizeUseCase
+
+    @Binds
+    fun bindGetOneUpRaiseSizeUseCase(useCase: GetOneUpRaiseSizeUseCaseImpl): GetOneUpRaiseSizeUseCase
 }

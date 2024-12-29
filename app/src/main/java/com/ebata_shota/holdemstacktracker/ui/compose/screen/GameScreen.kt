@@ -7,8 +7,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ChangeRaiseUpSizeDialog
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ChangeRaiseSizeUpDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.GameViewModel
 
 @Composable
@@ -16,7 +14,6 @@ fun GameScreen(
     viewModel: GameViewModel = hiltViewModel()
 ) {
     val screenUiState: GameScreenUiState by viewModel.screenUiState.collectAsStateWithLifecycle()
-    val dialogUiState: GameScreenDialogUiState by viewModel.dialogUiState.collectAsStateWithLifecycle()
 
     when (val uiState = screenUiState) {
         GameScreenUiState.Loading -> LoadingContent()
@@ -29,19 +26,12 @@ fun GameScreen(
                 onClickCallButton = viewModel::onClickCallButton,
                 onClickRaiseButton = viewModel::onClickRaiseButton,
                 onClickRaiseSizeButton = viewModel::onClickRaiseSizeButton,
-                onClickRaiseUpSizeButton = viewModel::onClickRaiseUpSizeButton,
+                onClickLeftButton = viewModel::onClickMinusButton,
+                onClickRightButton = viewModel::onClickPlusButton,
                 onClickSliderTypeButton = viewModel::onClickSliderTypeButton,
                 onChangeSlider = viewModel::onChangeSlider,
                 onClickSliderStepSwitch = viewModel::onClickSliderStepSwitch,
             )
-
-            val changeRaiseSizeDialogUiState = dialogUiState.changeRaiseSizeUpDialogUiState
-            if (changeRaiseSizeDialogUiState != null) {
-                ChangeRaiseUpSizeDialog(
-                    uiState = changeRaiseSizeDialogUiState,
-                    event = viewModel
-                )
-            }
         }
     }
 }
@@ -52,7 +42,3 @@ sealed interface GameScreenUiState {
         val contentUiState: GameContentUiState
     ) : GameScreenUiState
 }
-
-data class GameScreenDialogUiState(
-    val changeRaiseSizeUpDialogUiState: ChangeRaiseSizeUpDialogUiState?,
-)

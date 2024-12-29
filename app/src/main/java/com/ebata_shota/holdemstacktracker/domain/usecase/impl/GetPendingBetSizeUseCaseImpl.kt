@@ -4,18 +4,18 @@ import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefau
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSize
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSizeUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class GetPendingBetSizeImpl
+class GetPendingBetSizeUseCaseImpl
 @Inject
 constructor(
     private val getPendingBetPerPlayer: GetPendingBetPerPlayerUseCase,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher
-) : GetPendingBetSize {
+) : GetPendingBetSizeUseCase {
     /**
      * 特定の一人の現在Betしていて
      * まだPotに入っていないサイズを取得する

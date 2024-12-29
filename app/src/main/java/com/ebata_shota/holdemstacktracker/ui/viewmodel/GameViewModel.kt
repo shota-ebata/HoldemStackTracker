@@ -1,7 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
 import android.os.Bundle
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,16 +21,14 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSize
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneDownRaiseSizeUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneUpRaiseSizeUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByPotSlider
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlider
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.util.combine
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ChangeRaiseSizeUpDialogUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ChangeRaiseUpSizeDialogEvent
-import com.ebata_shota.holdemstacktracker.ui.compose.parts.TextFieldErrorUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
 import com.ebata_shota.holdemstacktracker.ui.mapper.GameContentUiStateMapper
@@ -73,20 +70,15 @@ constructor(
     private val isNotRaisedYet: IsNotRaisedYetUseCase,
     private val getRaiseSizeByPotSlider: GetRaiseSizeByPotSlider,
     private val getRaiseSizeByStackSlider: GetRaiseSizeByStackSlider,
-    private val getPendingBetSize: GetPendingBetSize,
+    private val getPendingBetSize: GetPendingBetSizeUseCase,
+    private val getOneDownRaiseSize: GetOneDownRaiseSizeUseCase,
+    private val getOneUpRaiseSize: GetOneUpRaiseSizeUseCase,
     private val uiStateMapper: GameContentUiStateMapper,
-) : ViewModel(), ChangeRaiseUpSizeDialogEvent {
+) : ViewModel() {
     private val tableId: TableId by savedStateHandle.param()
 
     private val _screenUiState = MutableStateFlow<GameScreenUiState>(GameScreenUiState.Loading)
     val screenUiState = _screenUiState.asStateFlow()
-
-    private val _dialogUiState = MutableStateFlow(
-        GameScreenDialogUiState(
-            changeRaiseSizeUpDialogUiState = null
-        )
-    )
-    val dialogUiState = _dialogUiState.asStateFlow()
 
     // Tableの状態を保持
     private val tableStateFlow: StateFlow<Table?> = tableRepository.tableStateFlow
@@ -478,31 +470,30 @@ constructor(
         }
     }
 
-    fun onClickRaiseUpSizeButton() {
+    fun onClickMinusButton() {
         viewModelScope.launch {
+            val currentRaiseSize = raiseSizeStateFlow.value ?: return@launch
+            val minRaiseSize = minRaiseSizeFlow.first()
+            val nextRaiseSize = getOneDownRaiseSize.invoke(
+                currentRaiseSize = currentRaiseSize,
+                minRaiseSize = minRaiseSize,
+            )
+            raiseSizeStateFlow.update { nextRaiseSize }
+        }
+    }
+
+    fun onClickPlusButton() {
+        viewModelScope.launch {
+            val currentRaiseSize = raiseSizeStateFlow.value ?: return@launch
             val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
-            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
-            val raiseSize = raiseSizeStateFlow.value ?: return@launch
-            val myPendingBetSize = getPendingBetSize.invoke(
-                actionList = getLatestBetPhase.invoke(game).actionStateList,
-                playerOrder = table.playerOrder,
-                playerId = myPlayerId
+            val nextRaiseSize = getOneUpRaiseSize.invoke(
+                currentRaiseSize = currentRaiseSize,
+                game = game,
+                playerOrder = table.playerOrder
             )
-            val raiseUpSize = raiseSize - myPendingBetSize
-            _dialogUiState.update {
-                it.copy(
-                    changeRaiseSizeUpDialogUiState = ChangeRaiseSizeUpDialogUiState(
-                        textFieldWithErrorUiState = TextFieldErrorUiState(
-                            value = TextFieldValue(
-                                text = "%,d".format(raiseUpSize)
-                            )
-                        ),
-                        isEnableSubmitButton = true
-                    )
-                )
-            }
+            raiseSizeStateFlow.update { nextRaiseSize }
         }
     }
 
@@ -540,50 +531,6 @@ constructor(
     ) {
         viewModelScope.launch {
             prefRepository.saveEnableRaiseUpSliderStep(value)
-        }
-    }
-
-    override fun onChangeRaiseUpSizeDialogTextFieldValue(value: TextFieldValue) {
-        // TODO: バリデーションしたい
-        _dialogUiState.update {
-            val changeRaiseSizeDialogUiState = it.changeRaiseSizeUpDialogUiState ?: return@update it
-            val textFieldWithErrorUiState = changeRaiseSizeDialogUiState
-                .textFieldWithErrorUiState.copy(
-                    value = value
-                )
-            it.copy(
-                changeRaiseSizeUpDialogUiState = changeRaiseSizeDialogUiState.copy(
-                    textFieldWithErrorUiState = textFieldWithErrorUiState
-                )
-            )
-        }
-    }
-
-    override fun onClickSubmitChangeRaiseUpSizeDialog() {
-        viewModelScope.launch {
-            val text = dialogUiState.value.changeRaiseSizeUpDialogUiState
-                ?.textFieldWithErrorUiState
-                ?.value
-                ?.text ?: return@launch
-            val raiseUpSize = text.toInt() // TODO: バリデーションしたい
-            val table = tableStateFlow.value ?: return@launch
-            val game = gameStateFlow.value ?: return@launch
-            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
-
-            val myPendingBetSize = getPendingBetSize.invoke(
-                actionList = getLatestBetPhase.invoke(game).actionStateList,
-                playerOrder = table.playerOrder,
-                playerId = myPlayerId
-            )
-            val raiseSize = raiseUpSize + myPendingBetSize
-            raiseSizeStateFlow.update { raiseSize }
-            onDismissChangeRaiseUpSizeDialog()
-        }
-    }
-
-    override fun onDismissChangeRaiseUpSizeDialog() {
-        _dialogUiState.update {
-            it.copy(changeRaiseSizeUpDialogUiState = null)
         }
     }
 

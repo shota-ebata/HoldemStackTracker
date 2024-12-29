@@ -24,12 +24,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Label
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -42,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
@@ -75,7 +75,8 @@ fun GameContent(
     onClickCallButton: () -> Unit,
     onClickRaiseButton: () -> Unit,
     onClickRaiseSizeButton: (Int) -> Unit,
-    onClickRaiseUpSizeButton: () -> Unit,
+    onClickLeftButton: () -> Unit,
+    onClickRightButton: () -> Unit,
     onClickSliderTypeButton: () -> Unit,
     onChangeSlider: (Float) -> Unit,
     onClickSliderStepSwitch: (Boolean) -> Unit,
@@ -331,31 +332,12 @@ fun GameContent(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    TextButton(
-                        onClick = {
-                            onClickSliderTypeButton()
-                        },
-                        enabled = uiState.isEnableSliderTypeButton
+                    IconButton(
+                        onClick = onClickLeftButton
                     ) {
-                        val sliderTypeButtonLabelUiState = uiState.sliderTypeButtonLabelUiState
-                        Text(
-                            textAlign = TextAlign.Center,
-                            text = when (sliderTypeButtonLabelUiState) {
-                                is GameContentUiState.SliderTypeButtonLabelUiState.Stack -> {
-                                    stringResource(sliderTypeButtonLabelUiState.labelResId)
-                                }
-
-                                is GameContentUiState.SliderTypeButtonLabelUiState.Pot -> {
-                                    stringResource(
-                                        sliderTypeButtonLabelUiState.labelResId,
-                                        sliderTypeButtonLabelUiState.potSliderMaxRatio
-                                    )
-                                }
-                            }
-                        )
                         Icon(
-                            imageVector = Icons.Filled.ArrowDropDown,
-                            contentDescription = "arrowDropDown"
+                            painter = painterResource(R.drawable.remove_24),
+                            contentDescription = null
                         )
                     }
                     Box(
@@ -432,6 +414,49 @@ fun GameContent(
                             }
                         )
                     }
+                    IconButton(
+                        onClick = onClickRightButton
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.add_24),
+                            contentDescription = null
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(
+                        onClick = {
+                            onClickSliderTypeButton()
+                        },
+                        enabled = uiState.isEnableSliderTypeButton
+                    ) {
+                        val sliderTypeButtonLabelUiState = uiState.sliderTypeButtonLabelUiState
+                        Text(
+                            textAlign = TextAlign.Center,
+                            text = when (sliderTypeButtonLabelUiState) {
+                                is GameContentUiState.SliderTypeButtonLabelUiState.Stack -> {
+                                    stringResource(sliderTypeButtonLabelUiState.labelResId)
+                                }
+
+                                is GameContentUiState.SliderTypeButtonLabelUiState.Pot -> {
+                                    stringResource(
+                                        sliderTypeButtonLabelUiState.labelResId,
+                                        sliderTypeButtonLabelUiState.potSliderMaxRatio
+                                    )
+                                }
+                            }
+                        )
+                        Icon(
+                            imageVector = Icons.Filled.ArrowDropDown,
+                            contentDescription = "arrowDropDown"
+                        )
+                    }
+
                     Switch(
                         modifier = Modifier
                             .padding(
@@ -444,36 +469,6 @@ fun GameContent(
                         },
                         enabled = uiState.isEnableSlider
                     )
-                }
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    OutlinedButton(
-                        modifier = Modifier
-                            .weight(0.25f)
-                            .padding(vertical = 4.dp),
-                        onClick = {
-                            dropUselessDouble(delayState) {
-                                onClickRaiseUpSizeButton()
-                            }
-                        },
-                        enabled = uiState.isEnableRaiseUpSizeButton,
-                        shape = ButtonDefaults.shape
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = stringResource(R.string.button_label_size),
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            Text(
-                                textAlign = TextAlign.Center,
-                                text = uiState.raiseUpSizeText
-                            )
-                        }
-                    }
                 }
             }
         }
@@ -730,7 +725,8 @@ private fun GameContentPreview(
             onClickCallButton = {},
             onClickRaiseButton = {},
             onClickRaiseSizeButton = {},
-            onClickRaiseUpSizeButton = {},
+            onClickLeftButton = {},
+            onClickRightButton = {},
             onClickSliderTypeButton = {},
             onChangeSlider = {},
             onClickSliderStepSwitch = {}

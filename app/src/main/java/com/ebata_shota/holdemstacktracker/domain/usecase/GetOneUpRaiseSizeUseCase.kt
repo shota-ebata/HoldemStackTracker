@@ -1,12 +1,12 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
-import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
+import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 
-interface GetPendingBetSize {
+interface GetOneUpRaiseSizeUseCase {
     suspend fun invoke(
-        actionList: List<BetPhaseAction>,
+        currentRaiseSize: Int,
+        game: Game,
         playerOrder: List<PlayerId>,
-        playerId: PlayerId,
     ): Int
 }

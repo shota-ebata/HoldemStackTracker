@@ -4,8 +4,7 @@ import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefau
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSize
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -15,7 +14,7 @@ class IsActionRequiredUseCaseImpl
 @Inject
 constructor(
     private val getMaxBetSize: GetMaxBetSizeUseCase,
-    private val getPendingBetSize: GetPendingBetSize,
+    private val getPendingBetSize: GetPendingBetSizeUseCase,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher
 ) : IsActionRequiredUseCase {
