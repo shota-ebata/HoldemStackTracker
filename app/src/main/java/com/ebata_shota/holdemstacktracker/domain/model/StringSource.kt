@@ -56,3 +56,5 @@ private constructor(
         )
     }
 }
+
+fun String.toStringSource(): StringSource = StringSource(this)

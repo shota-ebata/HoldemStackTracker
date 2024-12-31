@@ -146,8 +146,8 @@ constructor(
             )
         }
         val sliderPosition: Float
-        val sliderLabelStackBody: String
-        val sliderLabelPotBody: String
+        val sliderLabelStackBody: StringSource
+        val sliderLabelPotBody: StringSource
         val isEnableRaiseSizeButton: Boolean
         val raiseUpSizeText: String
 
@@ -215,13 +215,13 @@ constructor(
 
             isEnableSlider = gamePlayer.stack > minRaiseSize - myPendingBetSize
             // SliderLabel
-            sliderLabelStackBody = "${((raiseSize.toDouble() / (gamePlayer.stack + myPendingBetSize)) * 100).roundToInt()}%"
+            sliderLabelStackBody = StringSource(R.string.text_ratio, ((raiseSize.toDouble() / (gamePlayer.stack + myPendingBetSize)) * 100).roundToInt())
             sliderLabelPotBody = if (totalPotSize != 0) {
                 // Raiseサイズ / Potサイズ
                 val raiseSizePerTotalPotSize = raiseSize.toDouble() / totalPotSize.toDouble()
-                "${(raiseSizePerTotalPotSize * 100).roundToInt()}%"
+                StringSource(R.string.text_ratio, (raiseSizePerTotalPotSize * 100).roundToInt())
             } else {
-                ""
+                StringSource(R.string.text_hyphen)
             }
 
             // Raiseサイズボタン
@@ -238,8 +238,8 @@ constructor(
             raiseButtonSubText = ""
             isEnableSlider = false
             sliderPosition = 0.0f
-            sliderLabelStackBody = ""
-            sliderLabelPotBody = ""
+            sliderLabelStackBody = StringSource(R.string.text_hyphen)
+            sliderLabelPotBody = StringSource(R.string.text_hyphen)
             isEnableRaiseSizeButton = false
             raiseUpSizeText = ""
         }
@@ -275,8 +275,8 @@ constructor(
             sliderTypeButtonLabelUiState = sliderTypeButtonLabelUiState,
             isEnableSlider = isEnableSlider,
             sliderPosition = sliderPosition,
-            sliderLabelStackBody = sliderLabelStackBody,
-            sliderLabelPotBody = sliderLabelPotBody,
+            stackRatioText = sliderLabelStackBody,
+            potRatioText = sliderLabelPotBody,
             isEnableSliderStep = isEnableSliderStep,
             isEnableRaiseUpSizeButton = isEnableRaiseSizeButton,
             raiseUpSizeText = raiseUpSizeText,

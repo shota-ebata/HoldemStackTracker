@@ -49,11 +49,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.domain.model.toStringSource
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.RaiseSizeChangeButton
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.RaiseSizeChangeButtonUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerCard
@@ -384,8 +386,7 @@ fun GameContent(
                                                     style = MaterialTheme.typography.titleSmall
                                                 )
                                                 Text(
-                                                    text = uiState.sliderLabelStackBody
-                                                        .ifEmpty { stringResource(R.string.label_min) },
+                                                    text = uiState.stackRatioText.getString(),
                                                     style = MaterialTheme.typography.bodySmall
                                                 )
                                                 Text(
@@ -393,8 +394,7 @@ fun GameContent(
                                                     style = MaterialTheme.typography.titleSmall
                                                 )
                                                 Text(
-                                                    text = uiState.sliderLabelPotBody
-                                                        .ifEmpty { stringResource(R.string.label_min) },
+                                                    text = uiState.potRatioText.getString(),
                                                     style = MaterialTheme.typography.bodySmall
                                                 )
                                             }
@@ -457,10 +457,42 @@ fun GameContent(
                         )
                     }
 
+                    Row {
+                        Column(
+                            modifier = Modifier
+                                .widthIn(min = 50.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = stringResource(R.string.label_stack),
+                                style = MaterialTheme.typography.titleSmall
+                            )
+                            Text(
+                                text = uiState.stackRatioText.getString(),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .widthIn(min = 50.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.label_pot),
+                                style = MaterialTheme.typography.titleSmall,
+                            )
+                            Text(
+                                text = uiState.potRatioText.getString(),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+
                     Switch(
                         modifier = Modifier
                             .padding(
-                                start = 4.dp,
+                                start = 24.dp,
                                 end = 4.dp
                             ),
                         checked = uiState.isEnableSliderStep,
@@ -506,8 +538,8 @@ data class GameContentUiState(
     // Slider
     val isEnableSlider: Boolean,
     val sliderPosition: Float,
-    val sliderLabelStackBody: String,
-    val sliderLabelPotBody: String,
+    val stackRatioText: StringSource,
+    val potRatioText: StringSource,
     // StepSwitch
     val isEnableSliderStep: Boolean,
 ) {
@@ -690,8 +722,8 @@ private class GameContentUiStatePreviewParam :
             isEnableSlider = true,
             sliderPosition = 0.0f,
             isEnableSliderStep = true,
-            sliderLabelStackBody = "",
-            sliderLabelPotBody = "",
+            stackRatioText = "".toStringSource(),
+            potRatioText = "".toStringSource(),
             isEnableRaiseUpSizeButton = true,
             raiseUpSizeText = "+10200",
         )

@@ -70,4 +70,8 @@
     <string name="action_label_raise">Raised</string>
 
 
+    <string name="text_hyphen">-</string>
+    <string name="text_ratio">%1$d%%</string>
+
+
 </resources>
