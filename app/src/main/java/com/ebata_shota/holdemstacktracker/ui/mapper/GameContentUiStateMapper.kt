@@ -173,11 +173,7 @@ constructor(
             // All-Inボタン
             isEnableAllInButton = true
 
-            val myPendingBetSizeText = if (myPendingBetSize != 0) {
-                "${"%,d".format(myPendingBetSize)} → "
-            } else {
-                ""
-            }
+            val myPendingBetSizeText = "${"%,d".format(myPendingBetSize)} → "
             // Callボタン
             val callSize: Int = maxBetSize
             // 現在ベットされている最高額より自分がベットしてる額が少ない
