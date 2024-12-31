@@ -36,7 +36,7 @@ constructor(
             // 端数がないので、切りよく下げる
             val nextRaiseSize = currentRaiseSize - getMinNumberForDigits(changeDigit)
             // 現在のRaiseSizeから下げる
-            if (currentDigitCount > getDigitCount(nextRaiseSize)) {
+            if (currentDigitCount > getDigitCount(nextRaiseSize) && changeDigit - 1 > 0) {
                 // 桁数下がりそうなら、下げ幅を変更する
                 currentRaiseSize - getMinNumberForDigits(changeDigit - 1)
             } else {
