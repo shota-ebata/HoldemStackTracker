@@ -12,6 +12,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase.Standby
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.Turn
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextPhaseUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionsUseCaseImpl
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -26,7 +27,12 @@ class GetNextPhaseTypeUseCaseImplTest {
     @Before
     fun setup() {
         useCase = GetNextPhaseUseCaseImpl(
-            getPlayerLastActions = GetPlayerLastActionsUseCaseImpl(),
+            getPlayerLastActions = GetPlayerLastActionsUseCaseImpl(
+                getPlayerLastActionUseCase = GetPlayerLastActionUseCaseImpl(
+                    dispatcher = dispatcher
+                ),
+                dispatcher = dispatcher
+            ),
             dispatcher = dispatcher
         )
     }

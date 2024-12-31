@@ -62,12 +62,12 @@
     <string name="position_label_sb">SB</string>
     <string name="position_label_bb">BB</string>
 
-    <string name="action_label_fold">Folded</string>
-    <string name="action_label_check">Checked</string>
-    <string name="action_label_all_in">All-In</string>
-    <string name="action_label_call">Called</string>
-    <string name="action_label_bet">Betted</string>
-    <string name="action_label_raise">Raised</string>
+    <string name="action_label_fold">FOLD</string>
+    <string name="action_label_check">CHECK</string>
+    <string name="action_label_all_in">ALL-IN</string>
+    <string name="action_label_call">CALL</string>
+    <string name="action_label_bet">BET</string>
+    <string name="action_label_raise">RAISE</string>
 
 
     <string name="text_hyphen">-</string>

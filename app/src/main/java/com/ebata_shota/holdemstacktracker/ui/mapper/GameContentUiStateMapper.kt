@@ -15,8 +15,19 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCa
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.infra.extension.blindText
+import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType
+import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType.AllIn
+import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType.AllInSkip
+import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType.Bet
+import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType.Blind
+import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType.Call
+import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType.Check
+import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType.Fold
+import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType.FoldSkip
+import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType.Raise
 import com.ebata_shota.holdemstacktracker.ui.compose.content.CenterPanelContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState.SliderTypeButtonLabelUiState
@@ -41,6 +52,7 @@ constructor(
     private val getMaxBetSize: GetMaxBetSizeUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
     private val isNotRaisedYet: IsNotRaisedYetUseCase,
+    private val getPlayerLastAction: GetPlayerLastActionUseCase,
     private val prefRepository: PrefRepository,
 ) {
 
@@ -85,6 +97,19 @@ constructor(
             val gamePlayer = game.players.find { it.id == playerId }
                 ?: return@mapIndexedNotNull null
             val pendingBetSize = pendingBetPerPlayer[playerId]
+            val actionType: BetPhaseActionType? = if (playerId != currentPlayerId) {
+                // 自分のターン以外で、アクションを表示する
+                val playerLastAction = getPlayerLastAction.invoke(
+                    playerId = playerId,
+                    phaseList = game.phaseList
+                )
+                playerLastAction?.let {
+                    BetPhaseActionType.of(it)
+                }
+            } else {
+                null
+            }
+
             GamePlayerUiState(
                 playerName = basePlayer.name,
                 stack = "%,d".format(gamePlayer.stack),
@@ -99,6 +124,18 @@ constructor(
                     table.playerOrder[bbIndex] -> R.string.position_label_bb
                     else -> null
                 },
+                lastActionText = when (actionType) {
+                    Blind -> null
+                    Fold -> StringSource(R.string.action_label_fold)
+                    Check -> StringSource(R.string.action_label_check)
+                    Call -> StringSource(R.string.action_label_call)
+                    Bet -> StringSource(R.string.action_label_bet)
+                    Raise -> StringSource(R.string.action_label_raise)
+                    AllIn -> StringSource(R.string.action_label_all_in)
+                    AllInSkip -> StringSource(R.string.action_label_all_in)
+                    FoldSkip -> StringSource(R.string.action_label_fold)
+                    else -> null
+                }
             )
         }
         val betPhase: BetPhase? = try {

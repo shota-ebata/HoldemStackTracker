@@ -1,9 +1,13 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
-import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction.*
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction.AllIn
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction.Blind
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction.Call
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction.Fold
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionsUseCaseImpl
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -18,7 +22,12 @@ class GetPlayerLastActionsUseCaseImplTest {
 
     @Before
     fun setup() {
-        useCase = GetPlayerLastActionsUseCaseImpl()
+        useCase = GetPlayerLastActionsUseCaseImpl(
+            getPlayerLastActionUseCase = GetPlayerLastActionUseCaseImpl(
+                dispatcher = dispatcher
+            ),
+            dispatcher = dispatcher
+        )
     }
 
     private fun executeAndAssert(

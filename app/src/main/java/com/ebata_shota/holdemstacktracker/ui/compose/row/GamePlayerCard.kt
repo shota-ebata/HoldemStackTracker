@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
+import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
 
@@ -67,7 +68,8 @@ fun GamePlayerCard(
                     uiState = uiState
                 )
                 BetSize(
-                    uiState = uiState
+                    uiState = uiState,
+                    modifier = Modifier.padding(bottom = 4.dp)
                 )
             }
         }
@@ -83,7 +85,7 @@ private fun Position(
         modifier = Modifier
             .padding(vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(2.dp)
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         if (uiState.isBtn) {
             Icon(
@@ -105,15 +107,29 @@ private fun Position(
                 Text(text = stringResource(uiState.positionLabelResId))
             }
         }
+        val lastActionText = uiState.lastActionText
+        if (lastActionText != null) {
+            Card(
+                shape = RoundedCornerShape(4.dp),
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp),
+                    text = lastActionText.getString()
+                )
+            }
+
+        }
     }
 }
 
 @Composable
 private fun BetSize(
     uiState: GamePlayerUiState,
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .padding(vertical = 2.dp, horizontal = 8.dp)
             .heightIn(min = 24.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -159,7 +175,7 @@ private fun PlayerCard(
         ) {
             Text(
                 text = uiState.stack,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleMedium
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -187,6 +203,7 @@ data class GamePlayerUiState(
     val isBtn: Boolean,
     @StringRes
     val positionLabelResId: Int?,
+    val lastActionText: StringSource?,
 ) {
     val betTextPosition: BetTextPosition = when (playerPosition) {
         PlayerPosition.BOTTOM -> BetTextPosition.TOP
@@ -218,6 +235,7 @@ private class GamePlayerCardPreviewParam :
             isCurrentPlayer = false,
             isBtn = true,
             positionLabelResId = R.string.position_label_sb,
+            lastActionText = StringSource(R.string.action_label_bet)
         ),
         GamePlayerUiState(
             playerName = "PlayerName",
@@ -229,6 +247,7 @@ private class GamePlayerCardPreviewParam :
             isCurrentPlayer = true,
             isBtn = false,
             positionLabelResId = R.string.position_label_bb,
+            lastActionText = StringSource(R.string.action_label_bet)
         ),
         GamePlayerUiState(
             playerName = "Player123456789",
@@ -240,6 +259,7 @@ private class GamePlayerCardPreviewParam :
             isCurrentPlayer = true,
             isBtn = false,
             positionLabelResId = null,
+            lastActionText = StringSource(R.string.action_label_bet)
         )
     )
 }

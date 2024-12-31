@@ -11,25 +11,23 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class GetPlayerLastActionsUseCaseImpl
+class GetPlayerLastActionUseCaseImpl
 @Inject
 constructor(
-    private val getPlayerLastActionUseCase: GetPlayerLastActionUseCase,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher
-) : GetPlayerLastActionsUseCase {
+) : GetPlayerLastActionUseCase {
+
     /**
-     * @return プレイヤーそれぞれの最後のActionのMap
+     * @return プレイヤーの最後のAction
      */
     override suspend fun invoke(
-        playerOrder: List<PlayerId>,
+        playerId: PlayerId,
         phaseList: List<Phase>
-    ): Map<PlayerId, BetPhaseAction?> = withContext(dispatcher) {
-        return@withContext playerOrder.associateWith { playerId ->
-            getPlayerLastActionUseCase.invoke(
-                playerId = playerId,
-                phaseList = phaseList
-            )
-        }
+    ): BetPhaseAction? = withContext(dispatcher) {
+        val betPhaseAllActions = phaseList.filterIsInstance<BetPhase>().flatMap { it.actionStateList }
+        val playerAllActions = betPhaseAllActions.filter { it.playerId == playerId }
+        // そのプレイヤーの最後のアクションを確認
+        return@withContext playerAllActions.lastOrNull()
     }
 }

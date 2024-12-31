@@ -49,7 +49,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
 import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.Game
@@ -112,13 +111,19 @@ fun GameContent(
                     .weight(weight = 1.0f)
             ) {
                 // LEFT
+                val leftPlayerSize = uiState.players
+                    .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.LEFT }
+                    .size
                 Column(
                     modifier = modifier
                         .fillMaxHeight()
-                        .weight(1.0f)
-                        .padding(bottom = 24.dp),
+                        .weight(1.0f),
                     horizontalAlignment = AbsoluteAlignment.Left,
-                    verticalArrangement = Arrangement.SpaceEvenly
+                    verticalArrangement = if (leftPlayerSize >= 2) {
+                        Arrangement.SpaceEvenly
+                    } else {
+                        Arrangement.Top
+                    },
                 ) {
                     uiState.players
                         .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.LEFT }
@@ -138,8 +143,7 @@ fun GameContent(
                     Box(
                         modifier = Modifier
                             .weight(1.0f)
-                            .fillMaxWidth()
-                            .padding(top = 50.dp),
+                            .fillMaxWidth(),
                         contentAlignment = Alignment.Center
                     ) {
                         CenterPanelContent(
@@ -152,7 +156,6 @@ fun GameContent(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Bottom
                     ) {
-
                         uiState.players
                             .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.BOTTOM }
                             .forEach { playerUiState ->
@@ -163,13 +166,19 @@ fun GameContent(
                     }
                 }
                 // RIGHT
+                val rightPlayerSize = uiState.players
+                    .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.RIGHT }
+                    .size
                 Column(
                     modifier = modifier
                         .fillMaxHeight()
-                        .weight(1.0f)
-                        .padding(bottom = 24.dp),
+                        .weight(1.0f),
                     horizontalAlignment = AbsoluteAlignment.Right,
-                    verticalArrangement = Arrangement.SpaceEvenly
+                    verticalArrangement = if (rightPlayerSize >= 2) {
+                        Arrangement.SpaceEvenly
+                    } else {
+                        Arrangement.Top
+                    },
                 ) {
                     uiState.players
                         .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.RIGHT }
@@ -580,6 +589,7 @@ private class GameContentUiStatePreviewParam :
                     isCurrentPlayer = true,
                     isBtn = false,
                     positionLabelResId = null,
+                    lastActionText = StringSource(R.string.action_label_bet),
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -591,6 +601,7 @@ private class GameContentUiStatePreviewParam :
                     isCurrentPlayer = false,
                     isBtn = false,
                     positionLabelResId = null,
+                    lastActionText = StringSource(R.string.action_label_all_in),
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -602,6 +613,7 @@ private class GameContentUiStatePreviewParam :
                     isCurrentPlayer = false,
                     isBtn = false,
                     positionLabelResId = null,
+                    lastActionText = StringSource(R.string.action_label_all_in),
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -613,6 +625,7 @@ private class GameContentUiStatePreviewParam :
                     isCurrentPlayer = false,
                     isBtn = false,
                     positionLabelResId = null,
+                    lastActionText = StringSource(R.string.action_label_all_in),
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -624,6 +637,7 @@ private class GameContentUiStatePreviewParam :
                     isCurrentPlayer = false,
                     isBtn = false,
                     positionLabelResId = null,
+                    lastActionText = StringSource(R.string.action_label_all_in),
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -635,6 +649,7 @@ private class GameContentUiStatePreviewParam :
                     isCurrentPlayer = false,
                     isBtn = false,
                     positionLabelResId = null,
+                    lastActionText = StringSource(R.string.action_label_all_in),
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -646,6 +661,7 @@ private class GameContentUiStatePreviewParam :
                     isCurrentPlayer = false,
                     isBtn = false,
                     positionLabelResId = null,
+                    lastActionText = StringSource(R.string.action_label_all_in),
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -657,6 +673,7 @@ private class GameContentUiStatePreviewParam :
                     isCurrentPlayer = false,
                     isBtn = true,
                     positionLabelResId = null,
+                    lastActionText = StringSource(R.string.action_label_all_in),
                 ),
                 GamePlayerUiState(
                     playerName = "Player123456789",
@@ -668,6 +685,7 @@ private class GameContentUiStatePreviewParam :
                     isCurrentPlayer = false,
                     isBtn = false,
                     positionLabelResId = R.string.position_label_sb,
+                    lastActionText = StringSource(R.string.action_label_bet),
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -679,6 +697,7 @@ private class GameContentUiStatePreviewParam :
                     isCurrentPlayer = false,
                     isBtn = false,
                     positionLabelResId = R.string.position_label_bb,
+                    lastActionText = StringSource(R.string.action_label_all_in),
                 )
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
