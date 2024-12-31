@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.di.module
 
+import com.ebata_shota.holdemstacktracker.domain.repository.ActionHistoryRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRuleStateOfRingRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
@@ -9,6 +10,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableSummaryRepository
+import com.ebata_shota.holdemstacktracker.infra.repository.ActionHistoryRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.DefaultRuleStateOfRingRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.FirebaseAuthRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.GameRepositoryImpl
@@ -63,4 +65,8 @@ interface RepositoryModule {
     @Singleton
     @Binds
     fun bindGmsBarcodeScannerRepository(repo: GmsBarcodeScannerRepositoryImpl): GmsBarcodeScannerRepository
+
+    @Singleton
+    @Binds
+    fun bindActionHistoryRepository(repo: ActionHistoryRepositoryImpl): ActionHistoryRepository
 }
