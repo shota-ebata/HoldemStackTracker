@@ -111,19 +111,12 @@ fun GameContent(
                     .weight(weight = 1.0f)
             ) {
                 // LEFT
-                val leftPlayerSize = uiState.players
-                    .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.LEFT }
-                    .size
                 Column(
                     modifier = modifier
                         .fillMaxHeight()
                         .weight(1.0f),
                     horizontalAlignment = AbsoluteAlignment.Left,
-                    verticalArrangement = if (leftPlayerSize >= 2) {
-                        Arrangement.SpaceEvenly
-                    } else {
-                        Arrangement.Top
-                    },
+                    verticalArrangement = Arrangement.SpaceEvenly,
                 ) {
                     uiState.players
                         .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.LEFT }
@@ -166,19 +159,12 @@ fun GameContent(
                     }
                 }
                 // RIGHT
-                val rightPlayerSize = uiState.players
-                    .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.RIGHT }
-                    .size
                 Column(
                     modifier = modifier
                         .fillMaxHeight()
                         .weight(1.0f),
                     horizontalAlignment = AbsoluteAlignment.Right,
-                    verticalArrangement = if (rightPlayerSize >= 2) {
-                        Arrangement.SpaceEvenly
-                    } else {
-                        Arrangement.Top
-                    },
+                    verticalArrangement = Arrangement.SpaceEvenly,
                 ) {
                     uiState.players
                         .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.RIGHT }
