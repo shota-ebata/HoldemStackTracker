@@ -383,19 +383,19 @@ fun GameContent(
                                             ) {
                                                 Text(
                                                     text = stringResource(R.string.label_stack),
-                                                    style = MaterialTheme.typography.titleSmall
+                                                    style = MaterialTheme.typography.bodySmall
                                                 )
                                                 Text(
                                                     text = uiState.stackRatioText.getString(),
-                                                    style = MaterialTheme.typography.bodySmall
-                                                )
-                                                Text(
-                                                    text = stringResource(R.string.label_pot),
                                                     style = MaterialTheme.typography.titleSmall
                                                 )
                                                 Text(
-                                                    text = uiState.potRatioText.getString(),
+                                                    text = stringResource(R.string.label_pot),
                                                     style = MaterialTheme.typography.bodySmall
+                                                )
+                                                Text(
+                                                    text = uiState.potRatioText.getString(),
+                                                    style = MaterialTheme.typography.titleSmall
                                                 )
                                             }
                                         }
@@ -465,11 +465,11 @@ fun GameContent(
                         ) {
                             Text(
                                 text = stringResource(R.string.label_stack),
-                                style = MaterialTheme.typography.titleSmall
+                                style = MaterialTheme.typography.bodySmall
                             )
                             Text(
                                 text = uiState.stackRatioText.getString(),
-                                style = MaterialTheme.typography.bodySmall
+                                style = MaterialTheme.typography.titleSmall
                             )
                         }
 
@@ -480,11 +480,11 @@ fun GameContent(
                         ) {
                             Text(
                                 text = stringResource(R.string.label_pot),
-                                style = MaterialTheme.typography.titleSmall,
+                                style = MaterialTheme.typography.bodySmall,
                             )
                             Text(
                                 text = uiState.potRatioText.getString(),
-                                style = MaterialTheme.typography.bodySmall
+                                style = MaterialTheme.typography.titleSmall
                             )
                         }
                     }
