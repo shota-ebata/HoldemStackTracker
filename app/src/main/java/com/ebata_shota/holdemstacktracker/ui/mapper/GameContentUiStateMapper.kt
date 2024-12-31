@@ -172,6 +172,8 @@ constructor(
                 betPhase = betPhase,
                 isEnableRaiseSizeButtons = isCurrentPlayer
             )
+        val isEnableMinusButton: Boolean
+        val isEnablePlusButton: Boolean
         val isEnableSlider: Boolean
         val sliderTypeButtonLabelUiState = when (sliderType) {
             SliderType.Stack -> SliderTypeButtonLabelUiState.Stack
@@ -247,6 +249,10 @@ constructor(
                 }
             }
 
+            // MinusButton
+            isEnableMinusButton = raiseSize > minRaiseSize
+            // PlusButton
+            isEnablePlusButton = raiseSize < gamePlayer.stack
             isEnableSlider = gamePlayer.stack > minRaiseSize - myPendingBetSize
             // SliderLabel
             sliderLabelStackBody = StringSource(R.string.text_ratio, ((raiseSize.toDouble() / (gamePlayer.stack + myPendingBetSize)) * 100).roundToInt())
@@ -270,7 +276,9 @@ constructor(
             callButtonSubText = ""
             isEnableRaiseButton = false
             raiseButtonSubText = ""
+            isEnableMinusButton = false
             isEnableSlider = false
+            isEnablePlusButton = false
             sliderPosition = 0.0f
             sliderLabelStackBody = StringSource(R.string.text_hyphen)
             sliderLabelPotBody = StringSource(R.string.text_hyphen)
@@ -307,6 +315,8 @@ constructor(
             raiseSizeButtonUiStates = raiseSizeButtonUiStates,
             isEnableSliderTypeButton = isEnableSlider,
             sliderTypeButtonLabelUiState = sliderTypeButtonLabelUiState,
+            isEnableMinusButton = isEnableMinusButton,
+            isEnablePlusButton = isEnablePlusButton,
             isEnableSlider = isEnableSlider,
             sliderPosition = sliderPosition,
             stackRatioText = sliderLabelStackBody,

@@ -76,8 +76,8 @@ fun GameContent(
     onClickCallButton: () -> Unit,
     onClickRaiseButton: () -> Unit,
     onClickRaiseSizeButton: (Int) -> Unit,
-    onClickLeftButton: () -> Unit,
-    onClickRightButton: () -> Unit,
+    onClickMinusButton: () -> Unit,
+    onClickPlusButton: () -> Unit,
     onClickSliderTypeButton: () -> Unit,
     onChangeSlider: (Float) -> Unit,
     onClickSliderStepSwitch: (Boolean) -> Unit,
@@ -330,7 +330,8 @@ fun GameContent(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(
-                        onClick = onClickLeftButton
+                        onClick = onClickMinusButton,
+                        enabled = uiState.isEnableMinusButton,
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.remove_24),
@@ -410,7 +411,8 @@ fun GameContent(
                         )
                     }
                     IconButton(
-                        onClick = onClickRightButton
+                        onClick = onClickPlusButton,
+                        enabled = uiState.isEnablePlusButton,
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.add_24),
@@ -530,11 +532,15 @@ data class GameContentUiState(
     // SliderButton
     val isEnableSliderTypeButton: Boolean,
     val sliderTypeButtonLabelUiState: SliderTypeButtonLabelUiState,
+    // MinusButton
+    val isEnableMinusButton: Boolean,
     // Slider
     val isEnableSlider: Boolean,
     val sliderPosition: Float,
     val stackRatioText: StringSource,
     val potRatioText: StringSource,
+    // PlusButton
+    val isEnablePlusButton: Boolean,
     // StepSwitch
     val isEnableSliderStep: Boolean,
 ) {
@@ -724,6 +730,8 @@ private class GameContentUiStatePreviewParam :
             ),
             isEnableSliderTypeButton = true,
             sliderTypeButtonLabelUiState = GameContentUiState.SliderTypeButtonLabelUiState.Stack,
+            isEnableMinusButton = true,
+            isEnablePlusButton = true,
             isEnableSlider = true,
             sliderPosition = 0.0f,
             isEnableSliderStep = true,
@@ -762,8 +770,8 @@ private fun GameContentPreview(
             onClickCallButton = {},
             onClickRaiseButton = {},
             onClickRaiseSizeButton = {},
-            onClickLeftButton = {},
-            onClickRightButton = {},
+            onClickMinusButton = {},
+            onClickPlusButton = {},
             onClickSliderTypeButton = {},
             onChangeSlider = {},
             onClickSliderStepSwitch = {}
