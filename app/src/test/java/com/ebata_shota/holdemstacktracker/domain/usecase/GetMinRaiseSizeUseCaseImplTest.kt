@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.createDummyGame
+import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -36,10 +37,12 @@ class GetMinRaiseSizeUseCaseImplTest {
                 Phase.PreFlop(
                     actionStateList = listOf(
                         BetPhaseAction.Blind(
+                            actionId = ActionId(""),
                             playerId = PlayerId("PlayerId1"),
                             betSize = 1
                         ),
                         BetPhaseAction.Blind(
+                            actionId = ActionId(""),
                             playerId = PlayerId("PlayerId2"),
                             betSize = 2
                         )
@@ -65,14 +68,17 @@ class GetMinRaiseSizeUseCaseImplTest {
                 Phase.PreFlop(
                     actionStateList = listOf(
                         BetPhaseAction.Blind(
+                            actionId = ActionId(""),
                             playerId = PlayerId("PlayerId1"),
                             betSize = 1
                         ),
                         BetPhaseAction.Bet(
+                            actionId = ActionId(""),
                             playerId = PlayerId("PlayerId2"),
                             betSize = 2
                         ),
                         BetPhaseAction.Blind(
+                            actionId = ActionId(""),
                             playerId = PlayerId("PlayerId3"),
                             betSize = 5
                         )
@@ -98,18 +104,22 @@ class GetMinRaiseSizeUseCaseImplTest {
                 Phase.PreFlop(
                     actionStateList = listOf(
                         BetPhaseAction.Blind(
+                            actionId = ActionId(""),
                             playerId = PlayerId("PlayerId1"),
                             betSize = 1
                         ),
                         BetPhaseAction.Blind(
+                            actionId = ActionId(""),
                             playerId = PlayerId("PlayerId2"),
                             betSize = 2
                         ),
                         BetPhaseAction.Bet(
+                            actionId = ActionId(""),
                             playerId = PlayerId("PlayerId3"),
                             betSize = 5
                         ),
                         BetPhaseAction.AllIn(
+                            actionId = ActionId(""),
                             playerId = PlayerId("PlayerId4"),
                             betSize = 3
                         )
@@ -155,6 +165,7 @@ class GetMinRaiseSizeUseCaseImplTest {
                 Phase.Flop(
                     actionStateList = listOf(
                         BetPhaseAction.Bet(
+                            actionId = ActionId(""),
                             playerId = PlayerId("PlayerId1"),
                             betSize = 2
                         ),
@@ -180,6 +191,7 @@ class GetMinRaiseSizeUseCaseImplTest {
                 Phase.Flop(
                     actionStateList = listOf(
                         BetPhaseAction.Bet(
+                            actionId = ActionId(""),
                             playerId = PlayerId("PlayerId1"),
                             betSize = 5
                         ),

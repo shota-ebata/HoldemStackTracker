@@ -1,11 +1,13 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
+import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.Table
+import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
 import javax.inject.Inject
@@ -13,7 +15,8 @@ import javax.inject.Inject
 class GetNextAutoActionUseCaseImpl
 @Inject
 constructor(
-    private val getPlayerLastActions: GetPlayerLastActionsUseCase
+    private val getPlayerLastActions: GetPlayerLastActionsUseCase,
+    private val randomIdRepository: RandomIdRepository
 ) : GetNextAutoActionUseCase {
 
     override suspend fun invoke(
@@ -104,13 +107,17 @@ constructor(
             // bbに足りている場合のみ、SBを支払う
             stack >= rule.bbSize -> {
                 BetPhaseAction.Blind(
+                    actionId = ActionId(randomIdRepository.generateRandomId()),
                     playerId = playerId,
                     betSize = rule.sbSize
                 )
             }
             // 足りない場合は強制Fold
             else -> {
-                BetPhaseAction.Fold(playerId)
+                BetPhaseAction.Fold(
+                    actionId = ActionId(randomIdRepository.generateRandomId()),
+                    playerId = playerId,
+                )
             }
         }
     }
@@ -123,22 +130,27 @@ constructor(
         val stack = game.players.find { it.id == playerId }!!.stack
         return when {
             // bbを超えている場合は、BBを支払う
-            stack >= rule.bbSize -> {
+            stack > rule.bbSize -> {
                 BetPhaseAction.Blind(
+                    actionId = ActionId(randomIdRepository.generateRandomId()),
                     playerId = playerId,
-                    betSize = rule.bbSize
+                    betSize = rule.bbSize,
                 )
             }
             // bbと一致している場合は、BBのサイズでAllIn
             stack == rule.bbSize -> {
                 BetPhaseAction.AllIn(
+                    actionId = ActionId(randomIdRepository.generateRandomId()),
                     playerId = playerId,
                     betSize = stack
                 )
             }
             // 足りない場合は強制Fold
             else -> {
-                BetPhaseAction.Fold(playerId)
+                BetPhaseAction.Fold(
+                    actionId = ActionId(randomIdRepository.generateRandomId()),
+                    playerId = playerId
+                )
             }
         }
     }
@@ -157,11 +169,17 @@ constructor(
         // オートアクションがある場合は返す
         return when (lastActions[playerId]) {
             is BetPhaseAction.Fold, is BetPhaseAction.FoldSkip -> {
-                BetPhaseAction.FoldSkip(playerId)
+                BetPhaseAction.FoldSkip(
+                    actionId = ActionId(randomIdRepository.generateRandomId()),
+                    playerId = playerId
+                )
             }
 
             is BetPhaseAction.AllIn, is BetPhaseAction.AllInSkip -> {
-                BetPhaseAction.AllInSkip(playerId)
+                BetPhaseAction.AllInSkip(
+                    actionId = ActionId(randomIdRepository.generateRandomId()),
+                    playerId = playerId
+                )
             }
 
             is BetPhaseAction.Blind,
@@ -173,7 +191,10 @@ constructor(
                 val gamePlayer = game.players.find { it.id == playerId }
                 if (gamePlayer?.isLeaved == true) {
                     // 離席の場合は強制Fold
-                    BetPhaseAction.Fold(playerId)
+                    BetPhaseAction.Fold(
+                        actionId = ActionId(randomIdRepository.generateRandomId()),
+                        playerId = playerId,
+                    )
                 } else {
                     null
                 }

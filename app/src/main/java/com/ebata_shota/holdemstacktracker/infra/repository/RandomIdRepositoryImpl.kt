@@ -11,6 +11,6 @@ constructor(
 ) : RandomIdRepository {
 
     override fun generateRandomId(): String {
-        return UUID.randomUUID().toString()
+        return UUID.randomUUID().toString().take(6)
     }
 }

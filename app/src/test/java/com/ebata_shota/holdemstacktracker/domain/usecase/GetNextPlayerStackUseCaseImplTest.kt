@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.createDummyGame
+import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
@@ -91,7 +92,7 @@ class GetNextPlayerStackUseCaseImplTest {
                 Phase.PreFlop(actionStateList = emptyList())
             )
         )
-        val action = BetPhaseAction.Blind(playerId = PlayerId("0"), betSize = 100)
+        val action = BetPhaseAction.Blind(actionId = ActionId(""), playerId = PlayerId("0"), betSize = 100)
         val playerOrder = listOf(PlayerId("0"), PlayerId("1"))
 
         runTest(dispatcher) {

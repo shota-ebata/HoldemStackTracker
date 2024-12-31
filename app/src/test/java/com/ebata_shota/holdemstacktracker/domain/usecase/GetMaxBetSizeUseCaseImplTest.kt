@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
+import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
@@ -39,9 +40,11 @@ class GetMaxBetSizeUseCaseImplTest {
             val actual = useCase.invoke(
                 actionStateList = listOf(
                     BetPhaseAction.Check(
+                        actionId = ActionId(""),
                         playerId = PlayerId("")
                     ),
                     BetPhaseAction.Check(
+                        actionId = ActionId(""),
                         playerId = PlayerId("")
                     )
                 )
@@ -53,32 +56,40 @@ class GetMaxBetSizeUseCaseImplTest {
 
     private fun createFullActions() = listOf(
         BetPhaseAction.Blind(
+            actionId = ActionId(""),
             playerId = PlayerId(""),
             betSize = 100
         ),
         BetPhaseAction.Blind(
+            actionId = ActionId(""),
             playerId = PlayerId(""),
             betSize = 200
         ),
         BetPhaseAction.Call(
+            actionId = ActionId(""),
             playerId = PlayerId(""),
             betSize = 200
         ),
         BetPhaseAction.Raise(
+            actionId = ActionId(""),
             playerId = PlayerId(""),
             betSize = 400
         ),
         BetPhaseAction.Fold(
+            actionId = ActionId(""),
             playerId = PlayerId("")
         ),
         BetPhaseAction.FoldSkip(
+            actionId = ActionId(""),
             playerId = PlayerId("")
         ),
         BetPhaseAction.AllIn(
+            actionId = ActionId(""),
             playerId = PlayerId(""),
             betSize = 1000
         ),
         BetPhaseAction.AllIn(
+            actionId = ActionId(""),
             playerId = PlayerId(""),
             betSize = 900
         )

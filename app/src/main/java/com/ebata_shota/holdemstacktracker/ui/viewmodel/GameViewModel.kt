@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
@@ -29,6 +30,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlid
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.util.combine
+import com.ebata_shota.holdemstacktracker.infra.repository.RandomIdRepositoryImpl
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
 import com.ebata_shota.holdemstacktracker.ui.mapper.GameContentUiStateMapper
@@ -61,6 +63,7 @@ constructor(
     private val renameTablePlayer: RenameTablePlayerUseCase,
     private val getNextPhase: GetNextPhaseUseCase,
     private val firebaseAuthRepository: FirebaseAuthRepository,
+    private val randomIdRepositoryImpl: RandomIdRepositoryImpl,
     private val getNextGame: GetNextGameUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
     private val getNextAutoAction: GetNextAutoActionUseCase,
@@ -233,6 +236,7 @@ constructor(
         val nextGame = getNextGame.invoke(
             latestGame = game,
             action = BetPhaseAction.Fold(
+                actionId = ActionId(randomIdRepositoryImpl.generateRandomId()),
                 playerId = myPlayerId
             ),
             playerOrder = playerOrder,
@@ -251,6 +255,7 @@ constructor(
         val nextGame = getNextGame.invoke(
             latestGame = game,
             action = BetPhaseAction.Check(
+                actionId = ActionId(randomIdRepositoryImpl.generateRandomId()),
                 playerId = myPlayerId
             ),
             playerOrder = playerOrder,
@@ -270,6 +275,7 @@ constructor(
         val nextGame = getNextGame.invoke(
             latestGame = game,
             action = BetPhaseAction.AllIn(
+                actionId = ActionId(randomIdRepositoryImpl.generateRandomId()),
                 playerId = myPlayerId,
                 betSize = player.stack
             ),
@@ -295,6 +301,7 @@ constructor(
         val nextGame = getNextGame.invoke(
             latestGame = game,
             action = BetPhaseAction.Call(
+                actionId = ActionId(randomIdRepositoryImpl.generateRandomId()),
                 playerId = myPlayerId,
                 betSize = callSize
             ),
@@ -322,17 +329,20 @@ constructor(
             action = if (raiseSize == player.stack) {
                 // レイズサイズ == スタックサイズの場合はAllIn
                 BetPhaseAction.AllIn(
+                    actionId = ActionId(randomIdRepositoryImpl.generateRandomId()),
                     playerId = myPlayerId,
                     betSize = raiseSize
                 )
             } else {
                 if (isNotRaisedYet) {
                     BetPhaseAction.Bet(
+                        actionId = ActionId(randomIdRepositoryImpl.generateRandomId()),
                         playerId = myPlayerId,
                         betSize = raiseSize
                     )
                 } else {
                     BetPhaseAction.Raise(
+                        actionId = ActionId(randomIdRepositoryImpl.generateRandomId()),
                         playerId = myPlayerId,
                         betSize = raiseSize
                     )
