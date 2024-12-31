@@ -13,7 +13,9 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase.River
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.ShowDown
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.Standby
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.Turn
+import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
+import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
 import kotlinx.coroutines.CoroutineDispatcher
@@ -24,6 +26,7 @@ class GetNextPhaseUseCaseImpl
 @Inject
 constructor(
     private val getPlayerLastActions: GetPlayerLastActionsUseCase,
+    private val randomIdRepository: RandomIdRepository,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
 ) : GetNextPhaseUseCase {
@@ -32,15 +35,18 @@ constructor(
         phaseList: List<Phase>,
     ): Phase = withContext(dispatcher) {
         return@withContext when (val latestPhase: Phase? = phaseList.lastOrNull()) {
-            is Standby -> PreFlop(actionStateList = emptyList())
+            is Standby -> PreFlop(
+                phaseId = PhaseId(randomIdRepository.generateRandomId()),
+                actionStateList = emptyList()
+            )
             is BetPhase -> getNextPhaseStateFromBetPhase(playerOrder, phaseList, latestPhase)
-            is AllInOpen -> PotSettlement
-            is ShowDown -> PotSettlement
-            is PotSettlement -> End
-            is End -> Standby
+            is AllInOpen -> PotSettlement(phaseId = PhaseId(randomIdRepository.generateRandomId()))
+            is ShowDown -> PotSettlement(phaseId = PhaseId(randomIdRepository.generateRandomId()))
+            is PotSettlement -> End(phaseId = PhaseId(randomIdRepository.generateRandomId()))
+            is End -> Standby(phaseId = PhaseId(randomIdRepository.generateRandomId()))
             null -> {
                 // 基本無いはずだが
-                Standby
+                Standby(phaseId = PhaseId(randomIdRepository.generateRandomId()))
             }
         }
     }
@@ -59,7 +65,7 @@ constructor(
         // 降りてないプレイヤーが2人未満（基本的には、1人を除いてFoldしている状態）
         // の場合は決済フェーズへ
         if (activePlayerCount < 2) {
-            return PotSettlement
+            return PotSettlement(phaseId = PhaseId(randomIdRepository.generateRandomId()))
         }
         // AllInプレイヤー人数
         val allInPlayerCount = lastActions.count { (_, lastAction) ->
@@ -68,15 +74,24 @@ constructor(
         // AllInプレイヤーだけが残っている場合は
         if (allInPlayerCount == activePlayerCount) {
             // AllInOpenへ
-            return AllInOpen
+            return AllInOpen(phaseId = PhaseId(randomIdRepository.generateRandomId()))
         }
         // その他の場合は次のべットフェーズへ
         // (フェーズのアクションがすべて終わっている前提で、このメソッドを呼び出している想定）
         return when (latestPhase) {
-            is PreFlop -> Flop(actionStateList = emptyList())
-            is Flop -> Turn(actionStateList = emptyList())
-            is Turn -> River(actionStateList = emptyList())
-            is River -> ShowDown
+            is PreFlop -> Flop(
+                phaseId = PhaseId(randomIdRepository.generateRandomId()),
+                actionStateList = emptyList()
+            )
+            is Flop -> Turn(
+                phaseId = PhaseId(randomIdRepository.generateRandomId()),
+                actionStateList = emptyList()
+            )
+            is Turn -> River(
+                phaseId = PhaseId(randomIdRepository.generateRandomId()),
+                actionStateList = emptyList()
+            )
+            is River -> ShowDown(phaseId = PhaseId(randomIdRepository.generateRandomId()))
         }
     }
 }

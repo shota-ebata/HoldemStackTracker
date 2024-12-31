@@ -5,9 +5,11 @@ import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefau
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
+import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
 import kotlinx.coroutines.CoroutineDispatcher
@@ -20,6 +22,7 @@ class CreateNewGameUseCaseImpl
 constructor(
     private val tableRepository: TableRepository,
     private val gameRepository: GameRepository,
+    private val randomIdRepository: RandomIdRepository,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
 ) : CreateNewGameUseCase {
@@ -47,8 +50,13 @@ constructor(
             }.toSet(),
             potList = emptyList(),
             phaseList = listOfNotNull(
-                Phase.Standby,
-                if (fromPreFlop) Phase.PreFlop(emptyList()) else null
+                Phase.Standby(
+                    phaseId = PhaseId(randomIdRepository.generateRandomId())
+                ),
+                if (fromPreFlop) Phase.PreFlop(
+                    phaseId = PhaseId(randomIdRepository.generateRandomId()),
+                    actionStateList = emptyList()
+                ) else null
             ),
             updateTime = updateTime
         )

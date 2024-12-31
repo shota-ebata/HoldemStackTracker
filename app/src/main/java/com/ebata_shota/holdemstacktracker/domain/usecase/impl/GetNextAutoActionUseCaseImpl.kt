@@ -25,7 +25,7 @@ constructor(
         game: Game
     ): BetPhaseAction? {
         return when (val latestPhase = game.phaseList.lastOrNull()) {
-            Phase.Standby -> null
+            is Phase.Standby -> null
             is Phase.PreFlop -> {
                 getPreFlopAutoAction(
                     latestPhase = latestPhase,
@@ -45,10 +45,10 @@ constructor(
                 )
             }
 
-            Phase.ShowDown,
-            Phase.AllInOpen,
-            Phase.PotSettlement,
-            Phase.End,
+            is Phase.ShowDown,
+            is Phase.AllInOpen,
+            is Phase.PotSettlement,
+            is Phase.End,
             null -> null
         }
     }

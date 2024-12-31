@@ -6,6 +6,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
+import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pot
 import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType
@@ -31,6 +32,7 @@ constructor() {
         private const val POT_IS_CLOSED = "isClosed"
         private const val POT_INVOLVED_PLAYER_IDS = "involvedPlayerIds"
         private const val PHASES = "phases"
+        private const val PHASES_ID = "phasesId"
         private const val PHASE_TYPE = "phaseType"
         private const val PHASE_ACTIONS = "actions"
         private const val PHASE_ACTION_ID = "actionId"
@@ -56,17 +58,30 @@ constructor() {
     private fun mapToPhaseStateList(phases: List<*>): List<Phase> {
         return phases.map { it as Map<*, *> }.map {
             val phaseType = it[PHASE_TYPE] as String
+            val phaseId = it[PHASES_ID] as String
             val actions = it[PHASE_ACTIONS] as? List<*>
             when (PhaseType.of(phaseType)) {
-                PhaseType.Standby -> Phase.Standby
-                PhaseType.PreFlop -> Phase.PreFlop(actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty())
-                PhaseType.Flop -> Phase.Flop(actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty())
-                PhaseType.Turn -> Phase.Turn(actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty())
-                PhaseType.River ->  Phase.River(actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty())
-                PhaseType.ShowDown -> Phase.ShowDown
-                PhaseType.AllInOpen -> Phase.AllInOpen
-                PhaseType.PotSettlement -> Phase.PotSettlement
-                PhaseType.End -> Phase.End
+                PhaseType.Standby -> Phase.Standby(phaseId = PhaseId(phaseId))
+                PhaseType.PreFlop -> Phase.PreFlop(
+                    phaseId = PhaseId(phaseId),
+                    actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty()
+                )
+                PhaseType.Flop -> Phase.Flop(
+                    phaseId = PhaseId(phaseId),
+                    actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty()
+                )
+                PhaseType.Turn -> Phase.Turn(
+                    phaseId = PhaseId(phaseId),
+                    actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty()
+                )
+                PhaseType.River ->  Phase.River(
+                    phaseId = PhaseId(phaseId),
+                    actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty()
+                )
+                PhaseType.ShowDown -> Phase.ShowDown(phaseId = PhaseId(phaseId))
+                PhaseType.AllInOpen -> Phase.AllInOpen(phaseId = PhaseId(phaseId))
+                PhaseType.PotSettlement -> Phase.PotSettlement(phaseId = PhaseId(phaseId))
+                PhaseType.End -> Phase.End(phaseId = PhaseId(phaseId))
             }
 
         }
@@ -143,6 +158,7 @@ constructor() {
 
     private fun mapPhase(phase: Phase) = listOfNotNull(
         PHASE_TYPE to PhaseType.of(phase).name,
+        PHASES_ID to phase.phaseId.value,
         if (phase is Phase.BetPhase) {
             PHASE_ACTIONS to mapActions(phase.actionStateList)
         } else {

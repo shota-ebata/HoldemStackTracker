@@ -7,6 +7,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction.Blind
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction.Call
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction.Fold
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
+import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionsUseCaseImpl
@@ -54,7 +55,7 @@ class GetPlayerLastActionsUseCaseImplTest {
     fun standby() {
         // prepare
         val phaseList = listOf(
-            Phase.Standby,
+            Phase.Standby(phaseId = PhaseId("")),
         )
         val expected = mapOf<PlayerId, BetPhaseAction?>(
             PlayerId("0") to null,
@@ -68,8 +69,9 @@ class GetPlayerLastActionsUseCaseImplTest {
     fun preFlop_allCall() {
         // prepare
         val phaseLists = listOf(
-            Phase.Standby,
+            Phase.Standby(phaseId = PhaseId("")),
             Phase.PreFlop(
+                phaseId = PhaseId(""),
                 actionStateList = listOf<BetPhaseAction>(
                     Blind(actionId = ActionId(""), playerId = PlayerId("0"), betSize = 100),
                     Blind(actionId = ActionId(""), playerId = PlayerId("1"), betSize = 200),
@@ -90,8 +92,9 @@ class GetPlayerLastActionsUseCaseImplTest {
     fun preFlop_allFold() {
         // prepare
         val phaseLists = listOf(
-            Phase.Standby,
+            Phase.Standby(phaseId = PhaseId("")),
             Phase.PreFlop(
+                phaseId = PhaseId(""),
                 actionStateList = listOf(
                     Blind(actionId = ActionId(""), playerId = PlayerId("0"), betSize = 100),
                     Blind(actionId = ActionId(""), playerId = PlayerId("1"), betSize = 200),
@@ -112,8 +115,9 @@ class GetPlayerLastActionsUseCaseImplTest {
     fun preFlop_2AllIn_1Fold() {
         // prepare
         val phaseLists = listOf(
-            Phase.Standby,
+            Phase.Standby(phaseId = PhaseId("")),
             Phase.PreFlop(
+                phaseId = PhaseId(""),
                 actionStateList = listOf(
                     Blind(actionId = ActionId(""), playerId = PlayerId("0"), betSize = 100),
                     Blind(actionId = ActionId(""), playerId = PlayerId("1"), betSize = 200),

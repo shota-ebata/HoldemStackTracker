@@ -4,6 +4,7 @@ import com.ebata_shota.holdemstacktracker.createDummyGame
 import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
+import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMinRaiseSizeUseCaseImpl
@@ -33,8 +34,9 @@ class GetMinRaiseSizeUseCaseImplTest {
     fun test_preFlop_open_min() {
         val game = createDummyGame(
             phaseList = listOf(
-                Phase.Standby,
+                Phase.Standby(phaseId = PhaseId("")),
                 Phase.PreFlop(
+                    phaseId = PhaseId(""),
                     actionStateList = listOf(
                         BetPhaseAction.Blind(
                             actionId = ActionId(""),
@@ -64,8 +66,9 @@ class GetMinRaiseSizeUseCaseImplTest {
     fun test_preFlop_reRaise_min() {
         val game = createDummyGame(
             phaseList = listOf(
-                Phase.Standby,
+                Phase.Standby(phaseId = PhaseId("")),
                 Phase.PreFlop(
+                    phaseId = PhaseId(""),
                     actionStateList = listOf(
                         BetPhaseAction.Blind(
                             actionId = ActionId(""),
@@ -100,8 +103,9 @@ class GetMinRaiseSizeUseCaseImplTest {
     fun test_preFlop_reRaise_min_after_small_allin() {
         val game = createDummyGame(
             phaseList = listOf(
-                Phase.Standby,
+                Phase.Standby(phaseId = PhaseId("")),
                 Phase.PreFlop(
+                    phaseId = PhaseId(""),
                     actionStateList = listOf(
                         BetPhaseAction.Blind(
                             actionId = ActionId(""),
@@ -141,8 +145,9 @@ class GetMinRaiseSizeUseCaseImplTest {
     fun test_flop() {
         val game = createDummyGame(
             phaseList = listOf(
-                Phase.Standby,
+                Phase.Standby(phaseId = PhaseId("")),
                 Phase.Flop(
+                    phaseId = PhaseId(""),
                     actionStateList = listOf()
                 )
             )
@@ -161,8 +166,9 @@ class GetMinRaiseSizeUseCaseImplTest {
     fun test_flop_open() {
         val game = createDummyGame(
             phaseList = listOf(
-                Phase.Standby,
+                Phase.Standby(phaseId = PhaseId(""),),
                 Phase.Flop(
+                    phaseId = PhaseId(""),
                     actionStateList = listOf(
                         BetPhaseAction.Bet(
                             actionId = ActionId(""),
@@ -187,8 +193,9 @@ class GetMinRaiseSizeUseCaseImplTest {
     fun test_flop_open5() {
         val game = createDummyGame(
             phaseList = listOf(
-                Phase.Standby,
+                Phase.Standby(phaseId = PhaseId("")),
                 Phase.Flop(
+                    phaseId = PhaseId(""),
                     actionStateList = listOf(
                         BetPhaseAction.Bet(
                             actionId = ActionId(""),

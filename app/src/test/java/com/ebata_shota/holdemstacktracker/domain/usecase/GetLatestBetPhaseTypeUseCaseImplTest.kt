@@ -2,6 +2,7 @@ package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.createDummyGame
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
+import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -24,7 +25,7 @@ class GetLatestBetPhaseTypeUseCaseImplTest {
     fun getLatestBet_Standby() {
         val game = createDummyGame(
             phaseList = listOf(
-                Phase.Standby
+                Phase.Standby(phaseId = PhaseId(""))
             )
         )
         assertThrows(IllegalStateException::class.java) {
@@ -38,8 +39,8 @@ class GetLatestBetPhaseTypeUseCaseImplTest {
     fun getLatestBet_PreFlop() {
         val game = createDummyGame(
             phaseList = listOf(
-                Phase.Standby,
-                Phase.PreFlop(actionStateList = emptyList())
+                Phase.Standby(phaseId = PhaseId("")),
+                Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList())
             )
         )
         runTest(dispatcher) {
@@ -52,9 +53,9 @@ class GetLatestBetPhaseTypeUseCaseImplTest {
     fun getLatestBet_Flop() {
         val game = createDummyGame(
             phaseList = listOf(
-                Phase.Standby,
-                Phase.PreFlop(actionStateList = emptyList()),
-                Phase.Flop(actionStateList = emptyList())
+                Phase.Standby(phaseId = PhaseId("")),
+                Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList()),
+                Phase.Flop(phaseId = PhaseId(""), actionStateList = emptyList())
             )
         )
 
@@ -68,10 +69,10 @@ class GetLatestBetPhaseTypeUseCaseImplTest {
     fun getLatestBet_Turn() {
         val game = createDummyGame(
             phaseList = listOf(
-                Phase.Standby,
-                Phase.PreFlop(actionStateList = emptyList()),
-                Phase.Flop(actionStateList = emptyList()),
-                Phase.Turn(actionStateList = emptyList()),
+                Phase.Standby(phaseId = PhaseId("")),
+                Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList()),
+                Phase.Flop(phaseId = PhaseId(""), actionStateList = emptyList()),
+                Phase.Turn(phaseId = PhaseId(""),actionStateList = emptyList()),
             )
         )
         runTest(dispatcher) {
@@ -84,11 +85,11 @@ class GetLatestBetPhaseTypeUseCaseImplTest {
     fun getLatestBet_River() {
         val game = createDummyGame(
             phaseList = listOf(
-                Phase.Standby,
-                Phase.PreFlop(actionStateList = emptyList()),
-                Phase.Flop(actionStateList = emptyList()),
-                Phase.Turn(actionStateList = emptyList()),
-                Phase.River(actionStateList = emptyList()),
+                Phase.Standby(phaseId = PhaseId("")),
+                Phase.PreFlop(phaseId = PhaseId(""),actionStateList = emptyList()),
+                Phase.Flop(phaseId = PhaseId(""), actionStateList = emptyList()),
+                Phase.Turn(phaseId = PhaseId(""), actionStateList = emptyList()),
+                Phase.River(phaseId = PhaseId(""), actionStateList = emptyList()),
             )
         )
         runTest(dispatcher) {
@@ -101,12 +102,12 @@ class GetLatestBetPhaseTypeUseCaseImplTest {
     fun getLatestBet_ShowDown() {
         val game = createDummyGame(
             phaseList = listOf(
-                Phase.Standby,
-                Phase.PreFlop(actionStateList = emptyList()),
-                Phase.Flop(actionStateList = emptyList()),
-                Phase.Turn(actionStateList = emptyList()),
-                Phase.River(actionStateList = emptyList()),
-                Phase.ShowDown,
+                Phase.Standby(phaseId = PhaseId("")),
+                Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList()),
+                Phase.Flop(phaseId = PhaseId(""), actionStateList = emptyList()),
+                Phase.Turn(phaseId = PhaseId(""), actionStateList = emptyList()),
+                Phase.River(phaseId = PhaseId(""), actionStateList = emptyList()),
+                Phase.ShowDown(phaseId = PhaseId("")),
             )
         )
         assertThrows(IllegalStateException::class.java) {
@@ -120,13 +121,13 @@ class GetLatestBetPhaseTypeUseCaseImplTest {
     fun getLatestBet_PotSettlement() {
         val game = createDummyGame(
             phaseList = listOf(
-                Phase.Standby,
-                Phase.PreFlop(actionStateList = emptyList()),
-                Phase.Flop(actionStateList = emptyList()),
-                Phase.Turn(actionStateList = emptyList()),
-                Phase.River(actionStateList = emptyList()),
-                Phase.ShowDown,
-                Phase.PotSettlement,
+                Phase.Standby(phaseId = PhaseId("")),
+                Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList()),
+                Phase.Flop(phaseId = PhaseId(""), actionStateList = emptyList()),
+                Phase.Turn(phaseId = PhaseId(""), actionStateList = emptyList()),
+                Phase.River(phaseId = PhaseId(""), actionStateList = emptyList()),
+                Phase.ShowDown(phaseId = PhaseId("")),
+                Phase.PotSettlement(phaseId = PhaseId("")),
             )
         )
         assertThrows(IllegalStateException::class.java) {
@@ -140,14 +141,14 @@ class GetLatestBetPhaseTypeUseCaseImplTest {
     fun getLatestBet_End() {
         val game = createDummyGame(
             phaseList = listOf(
-                Phase.Standby,
-                Phase.PreFlop(actionStateList = emptyList()),
-                Phase.Flop(actionStateList = emptyList()),
-                Phase.Turn(actionStateList = emptyList()),
-                Phase.River(actionStateList = emptyList()),
-                Phase.ShowDown,
-                Phase.PotSettlement,
-                Phase.End,
+                Phase.Standby(phaseId = PhaseId("")),
+                Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList()),
+                Phase.Flop(phaseId = PhaseId(""), actionStateList = emptyList()),
+                Phase.Turn(phaseId = PhaseId(""), actionStateList = emptyList()),
+                Phase.River(phaseId = PhaseId(""), actionStateList = emptyList()),
+                Phase.ShowDown(phaseId = PhaseId("")),
+                Phase.PotSettlement(phaseId = PhaseId("")),
+                Phase.End(phaseId = PhaseId("")),
             )
         )
         assertThrows(IllegalStateException::class.java) {

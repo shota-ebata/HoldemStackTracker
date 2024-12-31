@@ -1,39 +1,54 @@
 package com.ebata_shota.holdemstacktracker.domain.model
 
 sealed interface Phase {
+    val phaseId: PhaseId
 
     sealed interface BetPhase : Phase {
         val actionStateList: List<BetPhaseAction>
     }
 
-    data object Standby : Phase
+    data class Standby(
+        override val phaseId: PhaseId,
+    ) : Phase
 
     data class PreFlop(
-        override val actionStateList: List<BetPhaseAction>
+        override val phaseId: PhaseId,
+        override val actionStateList: List<BetPhaseAction>,
     ) : BetPhase
 
     data class Flop(
-        override val actionStateList: List<BetPhaseAction>
+        override val phaseId: PhaseId,
+        override val actionStateList: List<BetPhaseAction>,
     ) : BetPhase
 
     data class Turn(
-        override val actionStateList: List<BetPhaseAction>
+        override val phaseId: PhaseId,
+        override val actionStateList: List<BetPhaseAction>,
     ) : BetPhase
 
     data class River(
-        override val actionStateList: List<BetPhaseAction>
+        override val phaseId: PhaseId,
+        override val actionStateList: List<BetPhaseAction>,
     ) : BetPhase
 
-    data object ShowDown : Phase
+    data class ShowDown(
+        override val phaseId: PhaseId,
+    ) : Phase
 
-    data object AllInOpen : Phase
+    data class AllInOpen(
+        override val phaseId: PhaseId,
+    ) : Phase
 
     /**
      * ポット決済フェーズ
      */
-    data object PotSettlement : Phase
+    data class PotSettlement(
+        override val phaseId: PhaseId,
+    ) : Phase
 
-    data object End : Phase
+    data class End(
+        override val phaseId: PhaseId,
+    ) : Phase
 
 }
 

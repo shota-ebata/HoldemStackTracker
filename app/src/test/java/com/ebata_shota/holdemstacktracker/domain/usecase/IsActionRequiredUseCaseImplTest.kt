@@ -4,6 +4,7 @@ import com.ebata_shota.holdemstacktracker.createDummyGame
 import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
+import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetPerPlayerUseCaseImpl
@@ -70,8 +71,11 @@ class IsActionRequiredUseCaseImplTest {
         )
         val latestGame = createDummyGame()
         val actionStateList = listOf<BetPhaseAction>()
-        coEvery { getLatestBetPhaseUseCase.invoke(latestGame) } returns Phase.PreFlop(
-            actionStateList = actionStateList
+        coEvery { getLatestBetPhaseUseCase.invoke(latestGame) } returns (
+                Phase.PreFlop(
+                    phaseId = PhaseId(""),
+                    actionStateList = actionStateList
+                )
         )
         coEvery { getMaxBetSizeUseCase.invoke(any()) } returns 0
 
