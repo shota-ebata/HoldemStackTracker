@@ -1,7 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
-import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByPotSlider
 import kotlinx.coroutines.CoroutineDispatcher

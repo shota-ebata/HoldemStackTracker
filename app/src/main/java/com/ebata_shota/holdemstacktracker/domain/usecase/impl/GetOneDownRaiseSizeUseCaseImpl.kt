@@ -1,19 +1,25 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
+import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneDownRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.util.getDigitCount
 import com.ebata_shota.holdemstacktracker.domain.util.getMinNumberForDigits
 import com.ebata_shota.holdemstacktracker.domain.util.roundDownToDigit
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class GetOneDownRaiseSizeUseCaseImpl
 @Inject
-constructor() : GetOneDownRaiseSizeUseCase {
+constructor(
+    @CoroutineDispatcherDefault
+    private val dispatcher: CoroutineDispatcher,
+) : GetOneDownRaiseSizeUseCase {
 
     override suspend fun invoke(
         currentRaiseSize: Int,
         minRaiseSize: Int,
-    ): Int {
+    ): Int = withContext(dispatcher) {
         val currentDigitCount = getDigitCount(currentRaiseSize)
         val changeDigit = if (currentDigitCount - 1 > 0) {
             currentDigitCount - 1
@@ -39,7 +45,7 @@ constructor() : GetOneDownRaiseSizeUseCase {
             }
         }
 
-        return if (nextRaiseSize < minRaiseSize) {
+        return@withContext if (nextRaiseSize < minRaiseSize) {
             minRaiseSize
         } else {
             nextRaiseSize

@@ -26,8 +26,6 @@ constructor(
     ): Int = withContext(dispatcher) {
         // Raiseサイズ
         val raiseSize = ((stackSize + myPendingBetSize) * sliderPosition).roundToInt()
-        // 最低の引き上げ幅
-//        val minRiseUpSize = minRaiseSize - myPendingBetSize
         return@withContext if (raiseSize >= minRaiseSize) {
             // Raiseサイズが最低を超えている場合は
             raiseSize

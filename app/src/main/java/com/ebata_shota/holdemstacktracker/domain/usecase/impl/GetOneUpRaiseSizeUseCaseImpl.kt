@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
+import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
@@ -9,7 +10,9 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSizeUseCas
 import com.ebata_shota.holdemstacktracker.domain.util.getDigitCount
 import com.ebata_shota.holdemstacktracker.domain.util.getMinNumberForDigits
 import com.ebata_shota.holdemstacktracker.domain.util.roundUpToDigit
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class GetOneUpRaiseSizeUseCaseImpl
@@ -18,13 +21,15 @@ constructor(
     private val getPendingBetSize: GetPendingBetSizeUseCase,
     private val getLatestBetPhase: GetLatestBetPhaseUseCase,
     private val firebaseAuthRepository: FirebaseAuthRepository,
+    @CoroutineDispatcherDefault
+    private val dispatcher: CoroutineDispatcher,
 ) : GetOneUpRaiseSizeUseCase {
 
     override suspend fun invoke(
         currentRaiseSize: Int,
         game: Game,
         playerOrder: List<PlayerId>,
-    ): Int {
+    ): Int = withContext(dispatcher) {
         val currentDigitCount = getDigitCount(currentRaiseSize)
         val changeDigit = if (currentDigitCount - 1 > 0) {
             currentDigitCount - 1
@@ -52,7 +57,7 @@ constructor(
             playerOrder = playerOrder,
             playerId = myPlayerId
         )
-        return if (nextRaiseSize > stackSize + myPendingBetSize) {
+        return@withContext if (nextRaiseSize > stackSize + myPendingBetSize) {
             stackSize
         } else {
             nextRaiseSize
