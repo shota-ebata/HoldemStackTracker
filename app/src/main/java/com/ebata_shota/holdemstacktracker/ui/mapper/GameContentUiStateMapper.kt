@@ -11,11 +11,11 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastBetPhaseActionTypeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.infra.extension.blindText
 import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType
@@ -52,7 +52,7 @@ constructor(
     private val getMaxBetSize: GetMaxBetSizeUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
     private val isNotRaisedYet: IsNotRaisedYetUseCase,
-    private val getPlayerLastAction: GetPlayerLastActionUseCase,
+    private val getBetPhaseActionType: GetLastBetPhaseActionTypeUseCase,
     private val prefRepository: PrefRepository,
 ) {
 
@@ -99,13 +99,10 @@ constructor(
             val pendingBetSize = pendingBetPerPlayer[playerId]
             val actionType: BetPhaseActionType? = if (playerId != currentPlayerId) {
                 // 自分のターン以外で、アクションを表示する
-                val playerLastAction = getPlayerLastAction.invoke(
-                    playerId = playerId,
-                    phaseList = game.phaseList
+                getBetPhaseActionType.invoke(
+                    game = game,
+                    playerId = playerId
                 )
-                playerLastAction?.let {
-                    BetPhaseActionType.of(it)
-                }
             } else {
                 null
             }
