@@ -11,8 +11,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastBetPhaseActionTypeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastBetPhaseActionTypeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
@@ -170,7 +170,8 @@ constructor(
                 totalPotSize = totalPotSize,
                 table = table,
                 betPhase = betPhase,
-                isEnableRaiseSizeButtons = isCurrentPlayer
+                isEnableRaiseSizeButtons = isCurrentPlayer,
+                stackSize = game.players.find { it.id == myPlayerId }!!.stack
             )
         val isEnableMinusButton: Boolean
         val isEnablePlusButton: Boolean
@@ -333,63 +334,72 @@ constructor(
         totalPotSize: Int,
         table: Table,
         betPhase: BetPhase?,
-        isEnableRaiseSizeButtons: Boolean
+        isEnableRaiseSizeButtons: Boolean,
+        stackSize: Int,
     ): List<RaiseSizeChangeButtonUiState> = if (isNotRaisedYet) {
         // まだベットされていない
         if (isExistPot) {
             //  ポッドがある
+            val potSizeQuarter = (totalPotSize * 0.25).roundToInt()
+            val potSizeThird = (totalPotSize / 3.0).roundToInt()
+            val potSizeHalf = (totalPotSize * 0.5).roundToInt()
+            val potSizeTwoThird = ((totalPotSize * 2) / 3.0).roundToInt()
             listOf(
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("1/4"),
-                    raiseSize = (totalPotSize * 0.25).roundToInt(), // TODO: 丸め注意
-                    isEnable = isEnableRaiseSizeButtons
+                    raiseSize = potSizeQuarter,
+                    isEnable = isEnableRaiseSizeButtons && potSizeQuarter <= stackSize
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("1/3"),
-                    raiseSize = (totalPotSize / 3.0).roundToInt(), // TODO: 丸め注意
-                    isEnable = isEnableRaiseSizeButtons
+                    raiseSize = potSizeThird,
+                    isEnable = isEnableRaiseSizeButtons && potSizeThird <= stackSize
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("1/2"),
-                    raiseSize = (totalPotSize * 0.5).roundToInt(), // TODO: 丸め注意
-                    isEnable = isEnableRaiseSizeButtons
+                    raiseSize = potSizeHalf,
+                    isEnable = isEnableRaiseSizeButtons && potSizeHalf <= stackSize
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("2/3"),
-                    raiseSize = ((totalPotSize * 2) / 3.0).roundToInt(), // TODO: 丸め注意
-                    isEnable = isEnableRaiseSizeButtons
+                    raiseSize = potSizeTwoThird,
+                    isEnable = isEnableRaiseSizeButtons && potSizeTwoThird <= stackSize
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("Pot"),
                     raiseSize = totalPotSize,
-                    isEnable = isEnableRaiseSizeButtons
+                    isEnable = isEnableRaiseSizeButtons && totalPotSize <= stackSize
                 ),
             )
         } else {
             // ポッドない
+            val betSizeDouble = table.rule.minBetSize * 2
+            val betSizeTwoPointFive = (table.rule.minBetSize * 2.5).roundToInt()
+            val betSizeTriple = table.rule.minBetSize * 3
+            val betSizeQuadruple = table.rule.minBetSize * 4
             listOf(
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource(R.string.raise_size_button_label_bb, "2"),
-                    raiseSize = table.rule.minBetSize * 2, // FIXME: BBを使うのに、minBetSizeを使っているのが
-                    isEnable = isEnableRaiseSizeButtons
+                    raiseSize = betSizeDouble,
+                    isEnable = isEnableRaiseSizeButtons && betSizeDouble <= stackSize
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource(
                         R.string.raise_size_button_label_bb,
                         "2.5"
                     ),
-                    raiseSize = (table.rule.minBetSize * 2.5).roundToInt(), // TODO: 丸め注意
-                    isEnable = isEnableRaiseSizeButtons
+                    raiseSize = betSizeTwoPointFive,
+                    isEnable = isEnableRaiseSizeButtons && betSizeTwoPointFive <= stackSize
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource(R.string.raise_size_button_label_bb, "3"),
-                    raiseSize = table.rule.minBetSize * 3,
-                    isEnable = isEnableRaiseSizeButtons
+                    raiseSize = betSizeTriple,
+                    isEnable = isEnableRaiseSizeButtons && betSizeTriple <= stackSize
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource(R.string.raise_size_button_label_bb, "4"),
-                    raiseSize = table.rule.minBetSize * 4,
-                    isEnable = isEnableRaiseSizeButtons
+                    raiseSize = betSizeQuadruple,
+                    isEnable = isEnableRaiseSizeButtons && betSizeQuadruple <= stackSize
                 ),
             )
         }
@@ -398,26 +408,30 @@ constructor(
         val lastBetAction = betPhase?.actionStateList?.filterIsInstance<BetPhaseAction.BetAction>()
             ?.lastOrNull()
         val betSize = lastBetAction?.betSize ?: 0
+        val betSizeDouble =  betSize * 2
+        val betSizeTwoPointFive =(betSize * 2.5).roundToInt()
+        val betSizeTriple = betSize * 3
+        val betSizeQuadruple = betSize * 4
         listOf(
             RaiseSizeChangeButtonUiState(
                 labelStringSource = StringSource(R.string.raise_size_button_label_x, "2"),
-                raiseSize = betSize * 2,
-                isEnable = isEnableRaiseSizeButtons
+                raiseSize = betSizeDouble,
+                isEnable = isEnableRaiseSizeButtons && betSizeDouble <= stackSize
             ),
             RaiseSizeChangeButtonUiState(
                 labelStringSource = StringSource(R.string.raise_size_button_label_x, "2.5"),
-                raiseSize = (betSize * 2.5).roundToInt(),
-                isEnable = isEnableRaiseSizeButtons
+                raiseSize = betSizeTwoPointFive,
+                isEnable = isEnableRaiseSizeButtons && betSizeTwoPointFive <= stackSize
             ),
             RaiseSizeChangeButtonUiState(
                 labelStringSource = StringSource(R.string.raise_size_button_label_x, "3"),
-                raiseSize = betSize * 3,
-                isEnable = isEnableRaiseSizeButtons
+                raiseSize = betSizeTriple,
+                isEnable = isEnableRaiseSizeButtons && betSizeTriple <= stackSize
             ),
             RaiseSizeChangeButtonUiState(
                 labelStringSource = StringSource(R.string.raise_size_button_label_x, "4"),
-                raiseSize = betSize * 4,
-                isEnable = isEnableRaiseSizeButtons
+                raiseSize = betSizeQuadruple,
+                isEnable = isEnableRaiseSizeButtons && betSizeQuadruple <= stackSize
             ),
         )
     }

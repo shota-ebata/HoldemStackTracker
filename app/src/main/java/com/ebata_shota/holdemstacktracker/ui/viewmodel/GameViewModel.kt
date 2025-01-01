@@ -472,7 +472,7 @@ constructor(
     }
 
     /**
-     * Raiseボタン
+     * Raiseサイズ変更ボタン
      */
     fun onClickRaiseSizeButton(value: Int) {
         viewModelScope.launch {
