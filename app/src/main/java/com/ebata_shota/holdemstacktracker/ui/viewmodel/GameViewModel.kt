@@ -15,6 +15,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
@@ -63,7 +64,7 @@ constructor(
     private val renameTablePlayer: RenameTablePlayerUseCase,
     private val getNextPhase: GetNextPhaseUseCase,
     private val firebaseAuthRepository: FirebaseAuthRepository,
-    private val randomIdRepositoryImpl: RandomIdRepositoryImpl,
+    private val randomIdRepository: RandomIdRepository,
     private val getNextGame: GetNextGameUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
     private val getNextAutoAction: GetNextAutoActionUseCase,
@@ -71,7 +72,6 @@ constructor(
     private val getMaxBetSize: GetMaxBetSizeUseCase,
     private val getMinRaiseSize: GetMinRaiseSizeUseCase,
     private val isNotRaisedYet: IsNotRaisedYetUseCase,
-    private val getRaiseSizeByPotSlider: GetRaiseSizeByPotSlider,
     private val getRaiseSizeByStackSlider: GetRaiseSizeByStackSlider,
     private val getPendingBetSize: GetPendingBetSizeUseCase,
     private val getOneDownRaiseSize: GetOneDownRaiseSizeUseCase,
@@ -234,7 +234,7 @@ constructor(
         val nextGame = getNextGame.invoke(
             latestGame = game,
             action = BetPhaseAction.Fold(
-                actionId = ActionId(randomIdRepositoryImpl.generateRandomId()),
+                actionId = ActionId(randomIdRepository.generateRandomId()),
                 playerId = myPlayerId
             ),
             playerOrder = playerOrder,
@@ -253,7 +253,7 @@ constructor(
         val nextGame = getNextGame.invoke(
             latestGame = game,
             action = BetPhaseAction.Check(
-                actionId = ActionId(randomIdRepositoryImpl.generateRandomId()),
+                actionId = ActionId(randomIdRepository.generateRandomId()),
                 playerId = myPlayerId
             ),
             playerOrder = playerOrder,
@@ -273,7 +273,7 @@ constructor(
         val nextGame = getNextGame.invoke(
             latestGame = game,
             action = BetPhaseAction.AllIn(
-                actionId = ActionId(randomIdRepositoryImpl.generateRandomId()),
+                actionId = ActionId(randomIdRepository.generateRandomId()),
                 playerId = myPlayerId,
                 betSize = player.stack
             ),
@@ -299,7 +299,7 @@ constructor(
         val nextGame = getNextGame.invoke(
             latestGame = game,
             action = BetPhaseAction.Call(
-                actionId = ActionId(randomIdRepositoryImpl.generateRandomId()),
+                actionId = ActionId(randomIdRepository.generateRandomId()),
                 playerId = myPlayerId,
                 betSize = callSize
             ),
@@ -327,20 +327,20 @@ constructor(
             action = if (raiseSize == player.stack) {
                 // レイズサイズ == スタックサイズの場合はAllIn
                 BetPhaseAction.AllIn(
-                    actionId = ActionId(randomIdRepositoryImpl.generateRandomId()),
+                    actionId = ActionId(randomIdRepository.generateRandomId()),
                     playerId = myPlayerId,
                     betSize = raiseSize
                 )
             } else {
                 if (isNotRaisedYet) {
                     BetPhaseAction.Bet(
-                        actionId = ActionId(randomIdRepositoryImpl.generateRandomId()),
+                        actionId = ActionId(randomIdRepository.generateRandomId()),
                         playerId = myPlayerId,
                         betSize = raiseSize
                     )
                 } else {
                     BetPhaseAction.Raise(
-                        actionId = ActionId(randomIdRepositoryImpl.generateRandomId()),
+                        actionId = ActionId(randomIdRepository.generateRandomId()),
                         playerId = myPlayerId,
                         betSize = raiseSize
                     )
