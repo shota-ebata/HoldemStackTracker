@@ -12,6 +12,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.domain.repository.ActionHistoryRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
@@ -65,6 +66,7 @@ constructor(
     private val getNextPhase: GetNextPhaseUseCase,
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val randomIdRepository: RandomIdRepository,
+    private val actionHistoryRepository: ActionHistoryRepository,
     private val getNextGame: GetNextGameUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
     private val getNextAutoAction: GetNextAutoActionUseCase,
@@ -529,6 +531,15 @@ constructor(
     ) {
         viewModelScope.launch {
             prefRepository.saveEnableRaiseUpSliderStep(value)
+        }
+    }
+
+    fun sawAction(actionId: ActionId) {
+        viewModelScope.launch {
+            actionHistoryRepository.sawAction(
+                tableId = tableId,
+                actionId = actionId
+            )
         }
     }
 
