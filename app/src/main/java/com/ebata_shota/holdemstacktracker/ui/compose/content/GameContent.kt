@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,7 +35,6 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.AbsoluteAlignment
@@ -43,7 +42,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -78,7 +76,7 @@ fun GameContent(
     onClickRaiseSizeButton: (Int) -> Unit,
     onClickMinusButton: () -> Unit,
     onClickPlusButton: () -> Unit,
-    onClickSliderTypeButton: () -> Unit,
+    onClickSettingButton: () -> Unit,
     onClickPlayerCard: () -> Unit,
     onChangeSlider: (Float) -> Unit,
     onClickSliderStepSwitch: (Boolean) -> Unit,
@@ -353,16 +351,7 @@ fun GameContent(
                             onValueChange = onChangeSlider,
                             // FIXME: マジックナンバーを解消
                             steps = if (uiState.isEnableSliderStep) {
-                                when (uiState.sliderTypeButtonLabelUiState) {
-                                    is GameContentUiState.SliderTypeButtonLabelUiState.Stack -> {
-                                        9
-                                    }
-
-                                    is GameContentUiState.SliderTypeButtonLabelUiState.Pot -> {
-                                        19
-                                    }
-                                }
-
+                                19
                             } else {
                                 0
                             },
@@ -377,27 +366,35 @@ fun GameContent(
                                                 .sizeIn(45.dp, 25.dp)
                                                 .wrapContentWidth()
                                         ) {
-                                            Column(
-                                                modifier = Modifier
-                                                    .widthIn(min = 50.dp),
-                                                horizontalAlignment = Alignment.CenterHorizontally
+                                            Row(
+                                                horizontalArrangement = Arrangement.spacedBy(4.dp)
                                             ) {
-                                                Text(
-                                                    text = stringResource(R.string.label_stack),
-                                                    style = MaterialTheme.typography.bodySmall
-                                                )
-                                                Text(
-                                                    text = uiState.stackRatioText.getString(),
-                                                    style = MaterialTheme.typography.titleSmall
-                                                )
-                                                Text(
-                                                    text = stringResource(R.string.label_pot),
-                                                    style = MaterialTheme.typography.bodySmall
-                                                )
-                                                Text(
-                                                    text = uiState.potRatioText.getString(),
-                                                    style = MaterialTheme.typography.titleSmall
-                                                )
+                                                Column(
+                                                    modifier = Modifier.widthIn(min = 50.dp),
+                                                    horizontalAlignment = Alignment.CenterHorizontally
+                                                ) {
+                                                    Text(
+                                                        text = stringResource(R.string.label_stack),
+                                                        style = MaterialTheme.typography.bodySmall
+                                                    )
+                                                    Text(
+                                                        text = uiState.stackRatioText.getString(),
+                                                        style = MaterialTheme.typography.titleSmall
+                                                    )
+                                                }
+                                                Column(
+                                                    modifier = Modifier.widthIn(min = 50.dp),
+                                                    horizontalAlignment = Alignment.CenterHorizontally
+                                                ) {
+                                                    Text(
+                                                        text = stringResource(R.string.label_pot),
+                                                        style = MaterialTheme.typography.bodySmall
+                                                    )
+                                                    Text(
+                                                        text = uiState.potRatioText.getString(),
+                                                        style = MaterialTheme.typography.titleSmall
+                                                    )
+                                                }
                                             }
                                         }
                                     },
@@ -425,84 +422,82 @@ fun GameContent(
                         )
                     }
                 }
-                Row(
+
+                Box(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    TextButton(
-                        onClick = {
-                            onClickSliderTypeButton()
-                        },
-                        enabled = uiState.isEnableSliderTypeButton
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val sliderTypeButtonLabelUiState = uiState.sliderTypeButtonLabelUiState
-                        Text(
-                            textAlign = TextAlign.Center,
-                            text = when (sliderTypeButtonLabelUiState) {
-                                is GameContentUiState.SliderTypeButtonLabelUiState.Stack -> {
-                                    stringResource(sliderTypeButtonLabelUiState.labelResId)
-                                }
 
-                                is GameContentUiState.SliderTypeButtonLabelUiState.Pot -> {
-                                    stringResource(
-                                        sliderTypeButtonLabelUiState.labelResId,
-                                        sliderTypeButtonLabelUiState.potSliderMaxRatio
-                                    )
+                        IconButton(
+                            onClick = {
+                                dropUselessDouble(delayState) {
+                                    onClickSettingButton()
                                 }
                             }
-                        )
-                        Icon(
-                            imageVector = Icons.Filled.ArrowDropDown,
-                            contentDescription = "arrowDropDown"
-                        )
-                    }
-
-                    Row {
-                        Column(
-                            modifier = Modifier
-                                .widthIn(min = 50.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text(
-                                text = stringResource(R.string.label_stack),
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                            Text(
-                                text = uiState.stackRatioText.getString(),
-                                style = MaterialTheme.typography.titleSmall
+                            Icon(
+                                imageVector = Icons.Filled.Settings,
+                                contentDescription = "setting"
                             )
                         }
 
-                        Column(
+                        Switch(
                             modifier = Modifier
-                                .widthIn(min = 50.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            Text(
-                                text = stringResource(R.string.label_pot),
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                            Text(
-                                text = uiState.potRatioText.getString(),
-                                style = MaterialTheme.typography.titleSmall
-                            )
-                        }
+                                .padding(
+                                    start = 24.dp,
+                                    end = 4.dp
+                                ),
+                            checked = uiState.isEnableSliderStep,
+                            onCheckedChange = {
+                                onClickSliderStepSwitch(it)
+                            },
+                            enabled = uiState.isEnableSlider
+                        )
                     }
 
-                    Switch(
+                    Box(
                         modifier = Modifier
-                            .padding(
-                                start = 24.dp,
-                                end = 4.dp
-                            ),
-                        checked = uiState.isEnableSliderStep,
-                        onCheckedChange = {
-                            onClickSliderStepSwitch(it)
-                        },
-                        enabled = uiState.isEnableSlider
-                    )
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row {
+                            Column(
+                                modifier = Modifier
+                                    .widthIn(min = 50.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.label_stack),
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                                Text(
+                                    text = uiState.stackRatioText.getString(),
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                            }
+
+                            Column(
+                                modifier = Modifier
+                                    .widthIn(min = 50.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.label_pot),
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                                Text(
+                                    text = uiState.potRatioText.getString(),
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -534,9 +529,6 @@ data class GameContentUiState(
     val raiseUpSizeText: String,
     // RaiseSizeButton
     val raiseSizeButtonUiStates: List<RaiseSizeChangeButtonUiState>,
-    // SliderButton
-    val isEnableSliderTypeButton: Boolean,
-    val sliderTypeButtonLabelUiState: SliderTypeButtonLabelUiState,
     // MinusButton
     val isEnableMinusButton: Boolean,
     // Slider
@@ -548,19 +540,7 @@ data class GameContentUiState(
     val isEnablePlusButton: Boolean,
     // StepSwitch
     val isEnableSliderStep: Boolean,
-) {
-    sealed interface SliderTypeButtonLabelUiState {
-        data object Stack : SliderTypeButtonLabelUiState {
-            val labelResId = R.string.label_slider_type_stack
-        }
-
-        data class Pot(
-            val potSliderMaxRatio: Int,
-        ) : SliderTypeButtonLabelUiState {
-            val labelResId = R.string.label_slider_type_pot
-        }
-    }
-}
+)
 
 private class GameContentUiStatePreviewParam :
     PreviewParameterProvider<GameContentUiState> {
@@ -733,8 +713,6 @@ private class GameContentUiStatePreviewParam :
                     isEnable = true,
                 ),
             ),
-            isEnableSliderTypeButton = true,
-            sliderTypeButtonLabelUiState = GameContentUiState.SliderTypeButtonLabelUiState.Stack,
             isEnableMinusButton = true,
             isEnablePlusButton = true,
             isEnableSlider = true,
@@ -777,7 +755,7 @@ private fun GameContentPreview(
             onClickRaiseSizeButton = {},
             onClickMinusButton = {},
             onClickPlusButton = {},
-            onClickSliderTypeButton = {},
+            onClickSettingButton = {},
             onClickPlayerCard = {},
             onChangeSlider = {},
             onClickSliderStepSwitch = {}

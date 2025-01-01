@@ -35,7 +35,6 @@ import com.ebata_shota.holdemstacktracker.infra.repository.RandomIdRepositoryImp
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
 import com.ebata_shota.holdemstacktracker.ui.mapper.GameContentUiStateMapper
-import com.ebata_shota.holdemstacktracker.ui.model.SliderType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -118,8 +117,6 @@ constructor(
         replay = 1
     )
 
-    private val sliderTypeStateFlow = MutableStateFlow(SliderType.Stack)
-
     init {
         // テーブル監視開始
         tableRepository.startCollectTableFlow(tableId)
@@ -134,7 +131,6 @@ constructor(
                 gameStateFlow.filterNotNull(),
                 raiseSizeStateFlow,
                 minRaiseSizeFlow,
-                sliderTypeStateFlow,
                 prefRepository.isEnableRaiseUpSliderStep,
                 prefRepository.defaultBetViewMode, // FIXME: 引数を減らすために、PrefRepository系をまとめてもいいかも
                 transform = ::observer
@@ -177,7 +173,6 @@ constructor(
         game: Game,
         raiseSize: Int?,
         minRaiseSize: Int,
-        sliderType: SliderType,
         isEnableSliderStep: Boolean,
         betViewMode: BetViewMode,
     ) {
@@ -220,7 +215,6 @@ constructor(
                     raiseSize = raiseSize ?: minRaiseSize,
                     minRaiseSize = minRaiseSize,
                     isEnableSliderStep = isEnableSliderStep,
-                    sliderType = sliderType,
                     betViewMode = betViewMode
                 )
             )
@@ -375,26 +369,12 @@ constructor(
             playerId = myPlayerId
         )
 
-        val raiseSize: Int = when (sliderTypeStateFlow.value) {
-            SliderType.Stack -> {
-                getRaiseSizeByStackSlider.invoke(
-                    stackSize = stackSize,
-                    minRaiseSize = minRaiseSize,
-                    myPendingBetSize = myPendingBetSize,
-                    sliderPosition = sliderPosition,
-                )
-            }
-
-            SliderType.Pot -> {
-                getRaiseSizeByPotSlider.invoke(
-                    totalPotSize = game.potList.sumOf { it.potSize },
-                    stackSize = stackSize,
-                    pendingBetSize = myPendingBetSize,
-                    minRaiseSize = minRaiseSize,
-                    sliderPosition = sliderPosition
-                )
-            }
-        }
+        val raiseSize: Int = getRaiseSizeByStackSlider.invoke(
+            stackSize = stackSize,
+            minRaiseSize = minRaiseSize,
+            myPendingBetSize = myPendingBetSize,
+            sliderPosition = sliderPosition,
+        )
         return raiseSize
     }
 
@@ -511,16 +491,9 @@ constructor(
         }
     }
 
-    fun onClickSliderTypeButton() {
+    fun onClickSettingButton() {
         viewModelScope.launch {
-            sliderTypeStateFlow.update {
-                when (it) {
-                    SliderType.Stack -> SliderType.Pot
-                    SliderType.Pot -> SliderType.Stack
-                }
-            }
-            // スライダータイプを変更するたび最小Raiseサイズにする
-            raiseSizeStateFlow.update { minRaiseSizeFlow.first() }
+            // TODO: Settingボタン押下時の処理
         }
     }
 

@@ -33,17 +33,14 @@ import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType.FoldSki
 import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType.Raise
 import com.ebata_shota.holdemstacktracker.ui.compose.content.CenterPanelContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState.SliderTypeButtonLabelUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.RaiseSizeChangeButtonUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.BOTTOM
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.LEFT
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.RIGHT
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.TOP
-import com.ebata_shota.holdemstacktracker.ui.model.SliderType
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.roundToInt
@@ -70,7 +67,6 @@ constructor(
         raiseSize: Int,
         minRaiseSize: Int,
         isEnableSliderStep: Boolean,
-        sliderType: SliderType,
         betViewMode: BetViewMode,
     ): GameContentUiState = withContext(dispatcher) {
         val tableId = table.id
@@ -210,12 +206,6 @@ constructor(
         val isEnableMinusButton: Boolean
         val isEnablePlusButton: Boolean
         val isEnableSlider: Boolean
-        val sliderTypeButtonLabelUiState = when (sliderType) {
-            SliderType.Stack -> SliderTypeButtonLabelUiState.Stack
-            SliderType.Pot -> SliderTypeButtonLabelUiState.Pot(
-                potSliderMaxRatio = prefRepository.potSliderMaxRatio.first()
-            )
-        }
         val sliderPosition: Float
         val sliderLabelStackBody: StringSource
         val sliderLabelPotBody: StringSource
@@ -319,20 +309,8 @@ constructor(
             }
 
             // Slider
-            sliderPosition = when (sliderType) {
-                SliderType.Stack -> {
-                    // (スタック)に対する(レイズしたあと場に出ている額)の比率
-                    (raiseSize.toFloat() / (gamePlayer.stack + myPendingBetSize).toFloat())
-                }
-
-                SliderType.Pot -> {
-                    if (totalPotSize != 0) {
-                        (raiseSize.toFloat() / totalPotSize.toFloat()) / prefRepository.potSliderMaxRatio.first().toFloat()
-                    } else {
-                        0.0f
-                    }
-                }
-            }
+            // (スタック)に対する(レイズしたあと場に出ている額)の比率
+            sliderPosition = (raiseSize.toFloat() / (gamePlayer.stack + myPendingBetSize).toFloat())
 
             // MinusButton
             isEnableMinusButton = raiseSize > minRaiseSize
@@ -416,8 +394,6 @@ constructor(
             raiseButtonMainLabelResId = raiseButtonMainLabelResId,
             raiseButtonSubText = raiseButtonSubText,
             raiseSizeButtonUiStates = raiseSizeButtonUiStates,
-            isEnableSliderTypeButton = isEnableSlider,
-            sliderTypeButtonLabelUiState = sliderTypeButtonLabelUiState,
             isEnableMinusButton = isEnableMinusButton,
             isEnablePlusButton = isEnablePlusButton,
             isEnableSlider = isEnableSlider,

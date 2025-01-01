@@ -53,9 +53,6 @@
     <string name="button_label_bet">Bet</string>
     <string name="button_label_size">Size</string>
 
-    <string name="label_slider_type_stack">Stack</string>
-    <string name="label_slider_type_pot">%1$d Pot</string>
-
     <string name="suffix_bb">%1$s BB</string>
     <string name="raise_size_button_label_x">×%1$s</string>
 
