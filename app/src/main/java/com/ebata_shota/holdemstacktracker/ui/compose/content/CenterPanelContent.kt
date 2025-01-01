@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
+import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
 
@@ -60,7 +62,7 @@ fun CenterPanelContent(
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = uiState.totalPot,
+                    text = uiState.totalPot.getString(),
                     style = MaterialTheme.typography.titleLarge
                 )
             }
@@ -82,7 +84,7 @@ fun CenterPanelContent(
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = uiState.pendingTotalBetSize,
+                    text = uiState.pendingTotalBetSize.getString(),
                     style = MaterialTheme.typography.titleLarge
                 )
             }
@@ -92,8 +94,8 @@ fun CenterPanelContent(
 
 data class CenterPanelContentUiState(
     val betPhaseTextResId: Int?,
-    val totalPot: String,
-    val pendingTotalBetSize: String,
+    val totalPot: StringSource,
+    val pendingTotalBetSize: StringSource,
 )
 
 @Preview(showBackground = true, showSystemUi = false, name = "Light Mode")
@@ -107,10 +109,12 @@ data class CenterPanelContentUiState(
 private fun CenterPanelContentPreview() {
     HoldemStackTrackerTheme {
         CenterPanelContent(
+            modifier = Modifier
+                .width(150.dp),
             uiState = CenterPanelContentUiState(
                 betPhaseTextResId = R.string.label_pre_flop,
-                totalPot = "400",
-                pendingTotalBetSize = "100"
+                totalPot = StringSource("400"),
+                pendingTotalBetSize = StringSource("100")
             )
         )
     }

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
+import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -135,6 +136,7 @@ constructor(
                 minRaiseSizeFlow,
                 sliderTypeStateFlow,
                 prefRepository.isEnableRaiseUpSliderStep,
+                prefRepository.defaultBetViewMode, // FIXME: 引数を減らすために、PrefRepository系をまとめてもいいかも
                 transform = ::observer
             ) .collect()
         }
@@ -177,6 +179,7 @@ constructor(
         minRaiseSize: Int,
         sliderType: SliderType,
         isEnableSliderStep: Boolean,
+        betViewMode: BetViewMode,
     ) {
         // FIXME: combine内部での問題が検知しづらい
         val currentPlayerId = getCurrentPlayerId.invoke(
@@ -218,6 +221,7 @@ constructor(
                     minRaiseSize = minRaiseSize,
                     isEnableSliderStep = isEnableSliderStep,
                     sliderType = sliderType,
+                    betViewMode = betViewMode
                 )
             )
             // TODO: フェーズが進んだことを検知したい
@@ -517,6 +521,17 @@ constructor(
             }
             // スライダータイプを変更するたび最小Raiseサイズにする
             raiseSizeStateFlow.update { minRaiseSizeFlow.first() }
+        }
+    }
+
+    fun onClickPlayerCard() {
+        viewModelScope.launch {
+            prefRepository.saveDefaultBetViewMode(
+                when (prefRepository.defaultBetViewMode.first()) {
+                    BetViewMode.Number -> BetViewMode.BB
+                    BetViewMode.BB -> BetViewMode.Number
+                }
+            )
         }
     }
 

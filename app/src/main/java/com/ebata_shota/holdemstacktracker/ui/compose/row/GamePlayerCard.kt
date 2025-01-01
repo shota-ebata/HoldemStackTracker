@@ -36,6 +36,7 @@ import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
 @Composable
 fun GamePlayerCard(
     uiState: GamePlayerUiState,
+    onClickCard: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (uiState.betTextPosition) {
@@ -51,7 +52,8 @@ fun GamePlayerCard(
                     uiState = uiState
                 )
                 PlayerCard(
-                    uiState = uiState
+                    uiState = uiState,
+                    onClickCard = onClickCard,
                 )
             }
         }
@@ -62,7 +64,8 @@ fun GamePlayerCard(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 PlayerCard(
-                    uiState = uiState
+                    uiState = uiState,
+                    onClickCard = onClickCard,
                 )
                 Position(
                     uiState = uiState
@@ -144,7 +147,7 @@ private fun BetSize(
             Text(
                 modifier = Modifier
                     .padding(start = 8.dp),
-                text = uiState.pendingBetSize,
+                text = uiState.pendingBetSize.getString(),
                 style = MaterialTheme.typography.titleLarge
             )
         }
@@ -154,6 +157,7 @@ private fun BetSize(
 @Composable
 private fun PlayerCard(
     uiState: GamePlayerUiState,
+    onClickCard: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -165,7 +169,8 @@ private fun PlayerCard(
                 Color.Unspecified
             }
         ),
-        shape = RoundedCornerShape(4.dp),
+        onClick = onClickCard,
+        shape = RoundedCornerShape(8.dp),
     ) {
         Column(
             modifier = Modifier
@@ -174,7 +179,7 @@ private fun PlayerCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = uiState.stack,
+                text = uiState.stack.getString(),
                 style = MaterialTheme.typography.titleMedium
             )
             Row(
@@ -194,9 +199,9 @@ private fun PlayerCard(
 
 data class GamePlayerUiState(
     val playerName: String,
-    val stack: String,
+    val stack: StringSource,
     val playerPosition: PlayerPosition,
-    val pendingBetSize: String?,
+    val pendingBetSize: StringSource?,
     val isLeaved: Boolean,
     val isMine: Boolean,
     val isCurrentPlayer: Boolean,
@@ -227,9 +232,9 @@ private class GamePlayerCardPreviewParam :
     override val values: Sequence<GamePlayerUiState> = sequenceOf(
         GamePlayerUiState(
             playerName = "PlayerName",
-            stack = "198",
+            stack = StringSource("198"),
             playerPosition = GamePlayerUiState.PlayerPosition.TOP,
-            pendingBetSize = "2",
+            pendingBetSize = StringSource("2"),
             isLeaved = false,
             isMine = false,
             isCurrentPlayer = false,
@@ -239,9 +244,9 @@ private class GamePlayerCardPreviewParam :
         ),
         GamePlayerUiState(
             playerName = "PlayerName",
-            stack = "198",
+            stack = StringSource("198"),
             playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
-            pendingBetSize = "2",
+            pendingBetSize = StringSource("2"),
             isLeaved = false,
             isMine = false,
             isCurrentPlayer = true,
@@ -251,7 +256,7 @@ private class GamePlayerCardPreviewParam :
         ),
         GamePlayerUiState(
             playerName = "Player123456789",
-            stack = "200",
+            stack = StringSource("200"),
             playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
             pendingBetSize = null,
             isLeaved = false,
@@ -278,7 +283,8 @@ private fun GamePlayerCardPreview(
 ) {
     HoldemStackTrackerTheme {
         GamePlayerCard(
-            uiState = uiState
+            uiState = uiState,
+            onClickCard = {}
         )
     }
 }

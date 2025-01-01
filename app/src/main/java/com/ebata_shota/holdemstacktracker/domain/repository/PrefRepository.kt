@@ -27,7 +27,7 @@ interface PrefRepository {
     suspend fun saveDefaultSizeOfBb(value: Int)
 
     /**
-     * デフォルトスタックサイズ（Numberモード）
+     * デフォルトスタックサイズ
      */
     val defaultStackSize: Flow<Int>
     suspend fun saveDefaultStackSize(value: Int)

@@ -15,7 +15,14 @@ private constructor(
     fun getString(): String = when {
         id != null -> {
             if (formatArgs != null) {
-                stringResource(id, *formatArgs)
+                val remap = formatArgs.map {
+                    if (it is StringSource) {
+                        it.getString()
+                    } else {
+                        it
+                    }
+                }.toTypedArray()
+                stringResource(id, *remap)
             } else {
                 stringResource(id)
             }

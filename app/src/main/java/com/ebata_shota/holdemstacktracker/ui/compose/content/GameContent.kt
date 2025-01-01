@@ -79,6 +79,7 @@ fun GameContent(
     onClickMinusButton: () -> Unit,
     onClickPlusButton: () -> Unit,
     onClickSliderTypeButton: () -> Unit,
+    onClickPlayerCard: () -> Unit,
     onChangeSlider: (Float) -> Unit,
     onClickSliderStepSwitch: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -102,7 +103,8 @@ fun GameContent(
                     .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.TOP }
                     .forEach { playerUiState ->
                         GamePlayerCard(
-                            uiState = playerUiState
+                            uiState = playerUiState,
+                            onClickCard = onClickPlayerCard,
                         )
                     }
             }
@@ -123,7 +125,8 @@ fun GameContent(
                         .reversed()
                         .forEach { playerUiState ->
                             GamePlayerCard(
-                                uiState = playerUiState
+                                uiState = playerUiState,
+                                onClickCard = onClickPlayerCard,
                             )
                         }
                 }
@@ -153,7 +156,8 @@ fun GameContent(
                             .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.BOTTOM }
                             .forEach { playerUiState ->
                                 GamePlayerCard(
-                                    uiState = playerUiState
+                                    uiState = playerUiState,
+                                    onClickCard = onClickPlayerCard,
                                 )
                             }
                     }
@@ -170,7 +174,8 @@ fun GameContent(
                         .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.RIGHT }
                         .forEach { playerUiState ->
                             GamePlayerCard(
-                                uiState = playerUiState
+                                uiState = playerUiState,
+                                onClickCard = onClickPlayerCard,
                             )
                         }
                 }
@@ -288,7 +293,7 @@ fun GameContent(
                                 text = stringResource(R.string.button_label_call),
                                 style = MaterialTheme.typography.titleMedium
                             )
-                            Text(text = uiState.callButtonSubText)
+                            Text(text = uiState.callButtonSubText.getString())
                         }
                     }
                     Button(
@@ -308,7 +313,7 @@ fun GameContent(
                                 text = stringResource(uiState.raiseButtonMainLabelResId),
                                 style = MaterialTheme.typography.titleMedium
                             )
-                            Text(text = uiState.raiseButtonSubText)
+                            Text(text = uiState.raiseButtonSubText.getString())
                         }
                     }
                 }
@@ -518,12 +523,12 @@ data class GameContentUiState(
     val isEnableAllInButton: Boolean,
     // Call
     val isEnableCallButton: Boolean,
-    val callButtonSubText: String,
+    val callButtonSubText: StringSource,
     // Raise
     val isEnableRaiseButton: Boolean,
     @StringRes
     val raiseButtonMainLabelResId: Int,
-    val raiseButtonSubText: String,
+    val raiseButtonSubText: StringSource,
     // RaiseUp
     val isEnableRaiseUpSizeButton: Boolean,
     val raiseUpSizeText: String,
@@ -573,9 +578,9 @@ private class GameContentUiStatePreviewParam :
             players = listOf(
                 GamePlayerUiState(
                     playerName = "PlayerName",
-                    stack = "198",
+                    stack = StringSource("198"),
                     playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
-                    pendingBetSize = "2",
+                    pendingBetSize = StringSource("2"),
                     isLeaved = false,
                     isMine = false,
                     isCurrentPlayer = true,
@@ -585,9 +590,9 @@ private class GameContentUiStatePreviewParam :
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
-                    stack = "198",
+                    stack = StringSource("198"),
                     playerPosition = GamePlayerUiState.PlayerPosition.LEFT,
-                    pendingBetSize = "2",
+                    pendingBetSize = StringSource("2"),
                     isLeaved = false,
                     isMine = false,
                     isCurrentPlayer = false,
@@ -597,9 +602,9 @@ private class GameContentUiStatePreviewParam :
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
-                    stack = "198",
+                    stack = StringSource("198"),
                     playerPosition = GamePlayerUiState.PlayerPosition.LEFT,
-                    pendingBetSize = "2",
+                    pendingBetSize = StringSource("2"),
                     isLeaved = false,
                     isMine = false,
                     isCurrentPlayer = false,
@@ -609,9 +614,9 @@ private class GameContentUiStatePreviewParam :
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
-                    stack = "198",
+                    stack = StringSource("198"),
                     playerPosition = GamePlayerUiState.PlayerPosition.LEFT,
-                    pendingBetSize = "2",
+                    pendingBetSize = StringSource("2"),
                     isLeaved = false,
                     isMine = false,
                     isCurrentPlayer = false,
@@ -621,9 +626,9 @@ private class GameContentUiStatePreviewParam :
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
-                    stack = "198",
+                    stack = StringSource("198"),
                     playerPosition = GamePlayerUiState.PlayerPosition.TOP,
-                    pendingBetSize = "2",
+                    pendingBetSize = StringSource("2"),
                     isLeaved = false,
                     isMine = false,
                     isCurrentPlayer = false,
@@ -633,9 +638,9 @@ private class GameContentUiStatePreviewParam :
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
-                    stack = "198",
+                    stack = StringSource("198"),
                     playerPosition = GamePlayerUiState.PlayerPosition.TOP,
-                    pendingBetSize = "2",
+                    pendingBetSize = StringSource("2"),
                     isLeaved = false,
                     isMine = false,
                     isCurrentPlayer = false,
@@ -645,9 +650,9 @@ private class GameContentUiStatePreviewParam :
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
-                    stack = "198",
+                    stack = StringSource("198"),
                     playerPosition = GamePlayerUiState.PlayerPosition.TOP,
-                    pendingBetSize = "2",
+                    pendingBetSize = StringSource("2"),
                     isLeaved = false,
                     isMine = false,
                     isCurrentPlayer = false,
@@ -657,9 +662,9 @@ private class GameContentUiStatePreviewParam :
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
-                    stack = "198",
+                    stack = StringSource("198"),
                     playerPosition = GamePlayerUiState.PlayerPosition.RIGHT,
-                    pendingBetSize = "2",
+                    pendingBetSize = StringSource("2"),
                     isLeaved = false,
                     isMine = false,
                     isCurrentPlayer = false,
@@ -669,9 +674,9 @@ private class GameContentUiStatePreviewParam :
                 ),
                 GamePlayerUiState(
                     playerName = "Player123456789",
-                    stack = "198",
+                    stack = StringSource("198"),
                     playerPosition = GamePlayerUiState.PlayerPosition.RIGHT,
-                    pendingBetSize = "2",
+                    pendingBetSize = StringSource("2"),
                     isLeaved = false,
                     isMine = false,
                     isCurrentPlayer = false,
@@ -681,9 +686,9 @@ private class GameContentUiStatePreviewParam :
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
-                    stack = "198",
+                    stack = StringSource("198"),
                     playerPosition = GamePlayerUiState.PlayerPosition.RIGHT,
-                    pendingBetSize = "2",
+                    pendingBetSize = StringSource("2"),
                     isLeaved = false,
                     isMine = false,
                     isCurrentPlayer = false,
@@ -694,18 +699,18 @@ private class GameContentUiStatePreviewParam :
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
                 betPhaseTextResId = R.string.label_pre_flop,
-                totalPot = "0",
-                pendingTotalBetSize = "2"
+                totalPot = StringSource("0"),
+                pendingTotalBetSize = StringSource("2")
             ),
             blindText = "100/200",
             isEnableFoldButton = true,
             isEnableCheckButton = true,
             isEnableAllInButton = true,
             isEnableCallButton = true,
-            callButtonSubText = "+1",
+            callButtonSubText = StringSource("0 → 200"),
             isEnableRaiseButton = true,
             raiseButtonMainLabelResId = R.string.button_label_raise,
-            raiseButtonSubText = "+100（=102)",
+            raiseButtonSubText = StringSource("0 → 400"),
             raiseSizeButtonUiStates = listOf(
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("2 BB"),
@@ -773,6 +778,7 @@ private fun GameContentPreview(
             onClickMinusButton = {},
             onClickPlusButton = {},
             onClickSliderTypeButton = {},
+            onClickPlayerCard = {},
             onChangeSlider = {},
             onClickSliderStepSwitch = {}
         )

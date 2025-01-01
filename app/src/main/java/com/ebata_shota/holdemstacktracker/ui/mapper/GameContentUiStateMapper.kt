@@ -2,8 +2,11 @@ package com.ebata_shota.holdemstacktracker.ui.mapper
 
 import androidx.annotation.StringRes
 import com.ebata_shota.holdemstacktracker.R
+import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.extension.rearrangeListFromIndex
+import com.ebata_shota.holdemstacktracker.domain.extension.roundDigit
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
+import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
@@ -39,7 +42,9 @@ import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.Playe
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.TOP
 import com.ebata_shota.holdemstacktracker.ui.model.SliderType
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -54,6 +59,8 @@ constructor(
     private val isNotRaisedYet: IsNotRaisedYetUseCase,
     private val getBetPhaseActionType: GetLastBetPhaseActionTypeUseCase,
     private val prefRepository: PrefRepository,
+    @CoroutineDispatcherDefault
+    private val dispatcher: CoroutineDispatcher,
 ) {
 
     suspend fun createUiState(
@@ -64,7 +71,8 @@ constructor(
         minRaiseSize: Int,
         isEnableSliderStep: Boolean,
         sliderType: SliderType,
-    ): GameContentUiState {
+        betViewMode: BetViewMode,
+    ): GameContentUiState = withContext(dispatcher) {
         val tableId = table.id
         val startIndex = table.playerOrder.indexOf(myPlayerId)
         val sortedPlayerOrder = table.playerOrder.rearrangeListFromIndex(startIndex = startIndex)
@@ -109,9 +117,35 @@ constructor(
 
             GamePlayerUiState(
                 playerName = basePlayer.name,
-                stack = "%,d".format(gamePlayer.stack),
+                stack = when (betViewMode) {
+                    BetViewMode.Number -> {
+                        StringSource("%,d".format(gamePlayer.stack))
+                    }
+
+                    BetViewMode.BB -> {
+                        StringSource(
+                            R.string.suffix_bb,
+                            (gamePlayer.stack.toFloat() / table.rule.minBetSize.toFloat())
+                                .roundDigit(2).toString()
+                        )
+                    }
+                },
                 playerPosition = positions[index],
-                pendingBetSize = pendingBetSize?.let { "%,d".format(it) },
+                pendingBetSize = pendingBetSize?.let {
+                    when (betViewMode) {
+                        BetViewMode.Number -> {
+                            StringSource("%,d".format(it))
+                        }
+
+                        BetViewMode.BB -> {
+                            StringSource(
+                                R.string.suffix_bb,
+                                (it.toFloat() / table.rule.minBetSize)
+                                    .roundDigit(2).toString()
+                            )
+                        }
+                    }
+                },
                 isLeaved = gamePlayer.isLeaved,
                 isMine = playerId == myPlayerId,
                 isCurrentPlayer = playerId == currentPlayerId,
@@ -147,7 +181,7 @@ constructor(
         val isEnableCheckButton: Boolean
         val isEnableAllInButton: Boolean
         val isEnableCallButton: Boolean
-        val callButtonSubText: String
+        val callButtonSubText: StringSource
         val isEnableRaiseButton: Boolean
 
         val totalPotSize: Int = game.potList.sumOf { it.potSize }
@@ -161,7 +195,7 @@ constructor(
         } else {
             R.string.button_label_raise
         }
-        val raiseButtonSubText: String
+        val raiseButtonSubText: StringSource
 
         val raiseSizeButtonUiStates: List<RaiseSizeChangeButtonUiState> =
             createRaiseSizeChangeButtonUiStates(
@@ -210,7 +244,6 @@ constructor(
             // All-Inボタン
             isEnableAllInButton = true
 
-            val myPendingBetSizeText = "${"%,d".format(myPendingBetSize)} → "
             // Callボタン
             val callSize: Int = maxBetSize
             // 現在ベットされている最高額より自分がベットしてる額が少ない
@@ -218,9 +251,35 @@ constructor(
             isEnableCallButton = maxBetSize > myPendingBetSize
                     && gamePlayer.stack > callSize
             callButtonSubText = if (isEnableCallButton) {
-                "$myPendingBetSizeText${"%,d".format(callSize)}"
+                when (betViewMode) {
+                    BetViewMode.Number -> {
+                        StringSource(
+                            R.string.call_raise_button_sub_text,
+                            "%,d".format(myPendingBetSize),
+                            "%,d".format(callSize)
+                        )
+                    }
+
+                    BetViewMode.BB -> {
+                        StringSource(
+                            R.string.call_raise_button_sub_text,
+                            StringSource(
+                                R.string.suffix_bb,
+                                (myPendingBetSize.toFloat() / table.rule.minBetSize.toFloat()).roundDigit(
+                                    2
+                                ).toString()
+                            ),
+                            StringSource(
+                                R.string.suffix_bb,
+                                (callSize.toFloat() / table.rule.minBetSize.toFloat()).roundDigit(2)
+                                    .toString()
+                            )
+                        )
+                    }
+                }
+
             } else {
-                ""
+                StringSource("")
             }
 
             // Raiseボタン
@@ -229,9 +288,34 @@ constructor(
             // 最低レイズ額に足りている場合
             isEnableRaiseButton = gamePlayer.stack >= raiseUpSize
             raiseButtonSubText = if (isEnableRaiseButton) {
-                "$myPendingBetSizeText ${"%,d".format(raiseSize)}"
+                when (betViewMode) {
+                    BetViewMode.Number -> {
+                        StringSource(
+                            R.string.call_raise_button_sub_text,
+                            "%,d".format(myPendingBetSize),
+                            "%,d".format(raiseSize)
+                        )
+                    }
+
+                    BetViewMode.BB -> {
+                        StringSource(
+                            R.string.call_raise_button_sub_text,
+                            StringSource(
+                                R.string.suffix_bb,
+                                (myPendingBetSize.toFloat() / table.rule.minBetSize.toFloat()).roundDigit(
+                                    2
+                                ).toString()
+                            ),
+                            StringSource(
+                                R.string.suffix_bb,
+                                (raiseSize.toFloat() / table.rule.minBetSize.toFloat()).roundDigit(2)
+                                    .toString()
+                            )
+                        )
+                    }
+                }
             } else {
-                ""
+                StringSource("")
             }
 
             // Slider
@@ -274,9 +358,9 @@ constructor(
             isEnableCheckButton = false
             isEnableAllInButton = false
             isEnableCallButton = false
-            callButtonSubText = ""
+            callButtonSubText = StringSource("")
             isEnableRaiseButton = false
-            raiseButtonSubText = ""
+            raiseButtonSubText = StringSource("")
             isEnableMinusButton = false
             isEnableSlider = false
             isEnablePlusButton = false
@@ -287,7 +371,7 @@ constructor(
             raiseUpSizeText = ""
         }
 
-        return GameContentUiState(
+        return@withContext GameContentUiState(
             tableId = tableId,
             game = game,
             players = players,
@@ -299,10 +383,28 @@ constructor(
                     is Phase.River -> R.string.label_river
                     null -> null
                 },
-                totalPot = "%,d".format(
-                    game.potList.sumOf { it.potSize }
-                ),
-                pendingTotalBetSize = "%,d".format(pendingBetPerPlayer.map { it.value }.sum())
+                totalPot = when (betViewMode) {
+                    BetViewMode.Number -> {
+                        StringSource("%,d".format(game.potList.sumOf { it.potSize }))
+                    }
+
+                    BetViewMode.BB -> {
+                        val bb = (game.potList.sumOf { it.potSize }
+                            .toFloat() / table.rule.minBetSize.toFloat())
+                        StringSource(R.string.suffix_bb, bb.roundDigit(2))
+                    }
+                },
+                pendingTotalBetSize = when (betViewMode) {
+                    BetViewMode.Number -> {
+                        StringSource("%,d".format(pendingBetPerPlayer.map { it.value }.sum()))
+                    }
+
+                    BetViewMode.BB -> {
+                        val bb = (pendingBetPerPlayer.map { it.value }.sum()
+                            .toFloat() / table.rule.minBetSize.toFloat())
+                        StringSource(R.string.suffix_bb, bb.roundDigit(2))
+                    }
+                }
             ),
             blindText = table.rule.blindText(),
             isEnableFoldButton = isEnableFoldButton,
@@ -339,7 +441,7 @@ constructor(
     ): List<RaiseSizeChangeButtonUiState> = if (isNotRaisedYet) {
         // まだベットされていない
         if (isExistPot) {
-            //  ポッドがある
+            //  ポッドがある「Pot表記」
             val potSizeQuarter = (totalPotSize * 0.25).roundToInt()
             val potSizeThird = (totalPotSize / 3.0).roundToInt()
             val potSizeHalf = (totalPotSize * 0.5).roundToInt()
@@ -372,39 +474,39 @@ constructor(
                 ),
             )
         } else {
-            // ポッドない
+            // ポッドない「BB表記」// FIXME: BBサイズをminBetSizeから取得しているのが若干違和感。
             val betSizeDouble = table.rule.minBetSize * 2
             val betSizeTwoPointFive = (table.rule.minBetSize * 2.5).roundToInt()
             val betSizeTriple = table.rule.minBetSize * 3
             val betSizeQuadruple = table.rule.minBetSize * 4
             listOf(
                 RaiseSizeChangeButtonUiState(
-                    labelStringSource = StringSource(R.string.raise_size_button_label_bb, "2"),
+                    labelStringSource = StringSource(R.string.suffix_bb, "2"),
                     raiseSize = betSizeDouble,
                     isEnable = isEnableRaiseSizeButtons && betSizeDouble <= stackSize
                 ),
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource(
-                        R.string.raise_size_button_label_bb,
+                        R.string.suffix_bb,
                         "2.5"
                     ),
                     raiseSize = betSizeTwoPointFive,
                     isEnable = isEnableRaiseSizeButtons && betSizeTwoPointFive <= stackSize
                 ),
                 RaiseSizeChangeButtonUiState(
-                    labelStringSource = StringSource(R.string.raise_size_button_label_bb, "3"),
+                    labelStringSource = StringSource(R.string.suffix_bb, "3"),
                     raiseSize = betSizeTriple,
                     isEnable = isEnableRaiseSizeButtons && betSizeTriple <= stackSize
                 ),
                 RaiseSizeChangeButtonUiState(
-                    labelStringSource = StringSource(R.string.raise_size_button_label_bb, "4"),
+                    labelStringSource = StringSource(R.string.suffix_bb, "4"),
                     raiseSize = betSizeQuadruple,
                     isEnable = isEnableRaiseSizeButtons && betSizeQuadruple <= stackSize
                 ),
             )
         }
     } else {
-        // 誰かがベットしてる
+        // 誰かがベットしてる「x表記」
         val lastBetAction = betPhase?.actionStateList?.filterIsInstance<BetPhaseAction.BetAction>()
             ?.lastOrNull()
         val betSize = lastBetAction?.betSize ?: 0
