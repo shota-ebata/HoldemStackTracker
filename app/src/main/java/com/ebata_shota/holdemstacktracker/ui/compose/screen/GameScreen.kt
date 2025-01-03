@@ -7,6 +7,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialog
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.GameViewModel
 
 @Composable
@@ -14,6 +16,7 @@ fun GameScreen(
     viewModel: GameViewModel = hiltViewModel()
 ) {
     val screenUiState: GameScreenUiState by viewModel.screenUiState.collectAsStateWithLifecycle()
+    val gameSettingDialogUiState: GameSettingsDialogUiState? by viewModel.gameSettingsDialogUiState.collectAsStateWithLifecycle()
 
     when (val uiState = screenUiState) {
         GameScreenUiState.Loading -> LoadingContent()
@@ -33,6 +36,13 @@ fun GameScreen(
                 onChangeSlider = viewModel::onChangeSlider,
                 onClickSliderStepSwitch = viewModel::onClickSliderStepSwitch,
             )
+
+            gameSettingDialogUiState?.let {
+                GameSettingsDialog(
+                    uiState = it,
+                    event = viewModel
+                )
+            }
         }
     }
 }

@@ -44,4 +44,10 @@ interface PrefRepository {
      */
     val potSliderMaxRatio: Flow<Int>
     suspend fun savePotSliderMaxRatio(value: Int)
+
+    /**
+     * ゲーム中の画面スリープをしないモード
+     */
+    val isKeepScreenOn: Flow<Boolean>
+    suspend fun saveKeepScreenOn(value: Boolean)
 }

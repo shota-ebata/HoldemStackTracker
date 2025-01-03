@@ -28,16 +28,18 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneDownRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneUpRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSizeUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByPotSlider
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlider
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.util.combine
-import com.ebata_shota.holdemstacktracker.infra.repository.RandomIdRepositoryImpl
+import com.ebata_shota.holdemstacktracker.ui.compose.content.GameSettingsContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogEvent
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
 import com.ebata_shota.holdemstacktracker.ui.mapper.GameContentUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -79,7 +81,7 @@ constructor(
     private val getOneDownRaiseSize: GetOneDownRaiseSizeUseCase,
     private val getOneUpRaiseSize: GetOneUpRaiseSizeUseCase,
     private val uiStateMapper: GameContentUiStateMapper,
-) : ViewModel() {
+) : ViewModel(), GameSettingsDialogEvent {
     private val tableId: TableId by savedStateHandle.param()
 
     private val _screenUiState = MutableStateFlow<GameScreenUiState>(GameScreenUiState.Loading)
@@ -117,6 +119,27 @@ constructor(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
         replay = 1
+    )
+
+    val isKeepScreenOn: Flow<Boolean> = prefRepository.isKeepScreenOn
+    private val shouldShowGameSettingDialog = MutableStateFlow(false)
+    val gameSettingsDialogUiState: StateFlow<GameSettingsDialogUiState?> = combine(
+        shouldShowGameSettingDialog,
+        prefRepository.isKeepScreenOn,
+    ) { shouldShow, isKeepScreenOn ->
+        if (shouldShow) {
+            GameSettingsDialogUiState(
+                GameSettingsContentUiState(
+                    isKeepScreenOn = isKeepScreenOn
+                )
+            )
+        } else {
+            null
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = null
     )
 
     init {
@@ -495,7 +518,7 @@ constructor(
 
     fun onClickSettingButton() {
         viewModelScope.launch {
-            // TODO: Settingボタン押下時の処理
+            shouldShowGameSettingDialog.update { true }
         }
     }
 
@@ -540,6 +563,18 @@ constructor(
                 tableId = tableId,
                 actionId = actionId
             )
+        }
+    }
+
+    override fun onClickKeepScreenSwitch(isChecked: Boolean) {
+        viewModelScope.launch {
+            prefRepository.saveKeepScreenOn(isChecked)
+        }
+    }
+
+    override fun onDismissGameSettingsDialogRequest() {
+        viewModelScope.launch {
+            shouldShowGameSettingDialog.update { false }
         }
     }
 

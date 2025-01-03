@@ -10,6 +10,7 @@ import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultSizeOf
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultSizeOfSb
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultStackSize
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.EnableRaiseUpSliderStep
+import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.KeepScreenOn
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.MyName
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.PotSliderMaxRatio
 import com.ebata_shota.holdemstacktracker.infra.extension.prefFlow
@@ -88,5 +89,14 @@ constructor(
 
     override suspend fun savePotSliderMaxRatio(value: Int) {
         dataStore.setPrefValue(PotSliderMaxRatio, value)
+    }
+
+    override val isKeepScreenOn: Flow<Boolean> by dataStore.prefFlow(
+        key = KeepScreenOn,
+        defaultValue = { false }
+    )
+
+    override suspend fun saveKeepScreenOn(value: Boolean) {
+        dataStore.setPrefValue(KeepScreenOn, value)
     }
 }
