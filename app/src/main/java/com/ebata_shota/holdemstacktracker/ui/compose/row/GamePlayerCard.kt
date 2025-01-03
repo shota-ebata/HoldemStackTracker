@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
+import com.ebata_shota.holdemstacktracker.ui.compose.parts.ChipSizeText
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
 
@@ -144,11 +145,13 @@ private fun BetSize(
                 painter = painterResource(R.drawable.chip_icon),
                 contentDescription = "chip"
             )
-            Text(
+            ChipSizeText(
                 modifier = Modifier
                     .padding(start = 8.dp),
-                text = uiState.pendingBetSize.getString(),
-                style = MaterialTheme.typography.titleLarge
+                textStringSource = uiState.pendingBetSize,
+                shouldShowBBSuffix = uiState.shouldShowBBSuffix,
+                style = MaterialTheme.typography.titleLarge,
+                suffixFontSize = MaterialTheme.typography.bodyMedium.fontSize,
             )
         }
     }
@@ -178,9 +181,11 @@ private fun PlayerCard(
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = uiState.stack.getString(),
-                style = MaterialTheme.typography.titleMedium
+            ChipSizeText(
+                textStringSource = uiState.stack,
+                shouldShowBBSuffix = uiState.shouldShowBBSuffix,
+                style = MaterialTheme.typography.titleMedium,
+                suffixFontSize = MaterialTheme.typography.bodySmall.fontSize,
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -192,7 +197,6 @@ private fun PlayerCard(
                     style = MaterialTheme.typography.bodySmall
                 )
             }
-
         }
     }
 }
@@ -200,6 +204,7 @@ private fun PlayerCard(
 data class GamePlayerUiState(
     val playerName: String,
     val stack: StringSource,
+    val shouldShowBBSuffix: Boolean,
     val playerPosition: PlayerPosition,
     val pendingBetSize: StringSource?,
     val isLeaved: Boolean,
@@ -233,6 +238,7 @@ private class GamePlayerCardPreviewParam :
         GamePlayerUiState(
             playerName = "PlayerName",
             stack = StringSource("198"),
+            shouldShowBBSuffix = false,
             playerPosition = GamePlayerUiState.PlayerPosition.TOP,
             pendingBetSize = StringSource("2"),
             isLeaved = false,
@@ -245,6 +251,7 @@ private class GamePlayerCardPreviewParam :
         GamePlayerUiState(
             playerName = "PlayerName",
             stack = StringSource("198"),
+            shouldShowBBSuffix = false,
             playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
             pendingBetSize = StringSource("2"),
             isLeaved = false,
@@ -256,7 +263,8 @@ private class GamePlayerCardPreviewParam :
         ),
         GamePlayerUiState(
             playerName = "Player123456789",
-            stack = StringSource("200"),
+            stack = StringSource("200.0"),
+            shouldShowBBSuffix = true,
             playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
             pendingBetSize = null,
             isLeaved = false,

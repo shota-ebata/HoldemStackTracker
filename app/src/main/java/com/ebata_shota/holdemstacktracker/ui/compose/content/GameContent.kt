@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -59,6 +60,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerCard
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.util.DelayState
 import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
+import com.ebata_shota.holdemstacktracker.ui.compose.util.getChipString
 import com.ebata_shota.holdemstacktracker.ui.compose.util.rememberDelayState
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
@@ -274,6 +276,8 @@ fun GameContent(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
+                    val myPendingBetSizeStringSource =
+                        uiState.myPendingBetSizeStringSource ?: StringSource("")
                     Button(
                         modifier = Modifier
                             .weight(1.0f),
@@ -291,7 +295,34 @@ fun GameContent(
                                 text = stringResource(R.string.button_label_call),
                                 style = MaterialTheme.typography.titleMedium
                             )
-                            Text(text = uiState.callButtonSubText.getString())
+                            val callSizeStringSource =
+                                uiState.callSizeStringSource ?: StringSource("")
+                            Text(
+                                text = buildAnnotatedString {
+                                    if (uiState.isEnableCallButton) {
+                                        append(
+                                            getChipString(
+                                                textStringSource = myPendingBetSizeStringSource,
+                                                shouldShowBBSuffix = uiState.shouldShowBBSuffix,
+                                                suffixFontSize = MaterialTheme.typography.bodySmall.fontSize,
+                                            )
+                                        )
+                                        append(" ")
+                                        append(stringResource(R.string.left_arrow))
+                                        append(" ")
+                                        append(
+                                            getChipString(
+                                                textStringSource = callSizeStringSource,
+                                                shouldShowBBSuffix = uiState.shouldShowBBSuffix,
+                                                suffixFontSize = MaterialTheme.typography.bodySmall.fontSize,
+                                            )
+                                        )
+                                    } else {
+                                        append("")
+                                    }
+                                },
+                                style = MaterialTheme.typography.titleMedium
+                            )
                         }
                     }
                     Button(
@@ -311,7 +342,33 @@ fun GameContent(
                                 text = stringResource(uiState.raiseButtonMainLabelResId),
                                 style = MaterialTheme.typography.titleMedium
                             )
-                            Text(text = uiState.raiseButtonSubText.getString())
+                            Text(
+                                text = buildAnnotatedString {
+                                    if (uiState.isEnableRaiseButton) {
+                                        append(
+                                            getChipString(
+                                                textStringSource = myPendingBetSizeStringSource,
+                                                shouldShowBBSuffix = uiState.shouldShowBBSuffix,
+                                                suffixFontSize = MaterialTheme.typography.bodySmall.fontSize,
+                                            )
+                                        )
+                                        append(" ")
+                                        append(stringResource(R.string.left_arrow))
+                                        append(" ")
+                                        append(
+                                            getChipString(
+                                                textStringSource = uiState.raiseSizeStringSource
+                                                    ?: StringSource(""),
+                                                shouldShowBBSuffix = uiState.shouldShowBBSuffix,
+                                                suffixFontSize = MaterialTheme.typography.bodySmall.fontSize,
+                                            )
+                                        )
+                                    } else {
+                                        StringSource("")
+                                    }
+                                },
+                                style = MaterialTheme.typography.titleMedium
+                            )
                         }
                     }
                 }
@@ -510,20 +567,22 @@ data class GameContentUiState(
     val players: List<GamePlayerUiState>,
     val centerPanelContentUiState: CenterPanelContentUiState,
     val blindText: String,
+    val shouldShowBBSuffix: Boolean,
     // Fold
     val isEnableFoldButton: Boolean,
     // Check
     val isEnableCheckButton: Boolean,
     // AllIn
     val isEnableAllInButton: Boolean,
+    val myPendingBetSizeStringSource: StringSource?,
     // Call
     val isEnableCallButton: Boolean,
-    val callButtonSubText: StringSource,
+    val callSizeStringSource: StringSource?,
     // Raise
     val isEnableRaiseButton: Boolean,
     @StringRes
     val raiseButtonMainLabelResId: Int,
-    val raiseButtonSubText: StringSource,
+    val raiseSizeStringSource: StringSource?,
     // RaiseUp
     val isEnableRaiseUpSizeButton: Boolean,
     val raiseUpSizeText: String,
@@ -559,6 +618,7 @@ private class GameContentUiStatePreviewParam :
                 GamePlayerUiState(
                     playerName = "PlayerName",
                     stack = StringSource("198"),
+                    shouldShowBBSuffix = false,
                     playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
                     pendingBetSize = StringSource("2"),
                     isLeaved = false,
@@ -571,6 +631,7 @@ private class GameContentUiStatePreviewParam :
                 GamePlayerUiState(
                     playerName = "PlayerName",
                     stack = StringSource("198"),
+                    shouldShowBBSuffix = false,
                     playerPosition = GamePlayerUiState.PlayerPosition.LEFT,
                     pendingBetSize = StringSource("2"),
                     isLeaved = false,
@@ -583,6 +644,7 @@ private class GameContentUiStatePreviewParam :
                 GamePlayerUiState(
                     playerName = "PlayerName",
                     stack = StringSource("198"),
+                    shouldShowBBSuffix = false,
                     playerPosition = GamePlayerUiState.PlayerPosition.LEFT,
                     pendingBetSize = StringSource("2"),
                     isLeaved = false,
@@ -595,6 +657,7 @@ private class GameContentUiStatePreviewParam :
                 GamePlayerUiState(
                     playerName = "PlayerName",
                     stack = StringSource("198"),
+                    shouldShowBBSuffix = false,
                     playerPosition = GamePlayerUiState.PlayerPosition.LEFT,
                     pendingBetSize = StringSource("2"),
                     isLeaved = false,
@@ -607,6 +670,7 @@ private class GameContentUiStatePreviewParam :
                 GamePlayerUiState(
                     playerName = "PlayerName",
                     stack = StringSource("198"),
+                    shouldShowBBSuffix = false,
                     playerPosition = GamePlayerUiState.PlayerPosition.TOP,
                     pendingBetSize = StringSource("2"),
                     isLeaved = false,
@@ -619,6 +683,7 @@ private class GameContentUiStatePreviewParam :
                 GamePlayerUiState(
                     playerName = "PlayerName",
                     stack = StringSource("198"),
+                    shouldShowBBSuffix = false,
                     playerPosition = GamePlayerUiState.PlayerPosition.TOP,
                     pendingBetSize = StringSource("2"),
                     isLeaved = false,
@@ -631,6 +696,7 @@ private class GameContentUiStatePreviewParam :
                 GamePlayerUiState(
                     playerName = "PlayerName",
                     stack = StringSource("198"),
+                    shouldShowBBSuffix = false,
                     playerPosition = GamePlayerUiState.PlayerPosition.TOP,
                     pendingBetSize = StringSource("2"),
                     isLeaved = false,
@@ -643,6 +709,7 @@ private class GameContentUiStatePreviewParam :
                 GamePlayerUiState(
                     playerName = "PlayerName",
                     stack = StringSource("198"),
+                    shouldShowBBSuffix = false,
                     playerPosition = GamePlayerUiState.PlayerPosition.RIGHT,
                     pendingBetSize = StringSource("2"),
                     isLeaved = false,
@@ -655,6 +722,7 @@ private class GameContentUiStatePreviewParam :
                 GamePlayerUiState(
                     playerName = "Player123456789",
                     stack = StringSource("198"),
+                    shouldShowBBSuffix = false,
                     playerPosition = GamePlayerUiState.PlayerPosition.RIGHT,
                     pendingBetSize = StringSource("2"),
                     isLeaved = false,
@@ -667,6 +735,7 @@ private class GameContentUiStatePreviewParam :
                 GamePlayerUiState(
                     playerName = "PlayerName",
                     stack = StringSource("198"),
+                    shouldShowBBSuffix = false,
                     playerPosition = GamePlayerUiState.PlayerPosition.RIGHT,
                     pendingBetSize = StringSource("2"),
                     isLeaved = false,
@@ -680,17 +749,20 @@ private class GameContentUiStatePreviewParam :
             centerPanelContentUiState = CenterPanelContentUiState(
                 betPhaseTextResId = R.string.label_pre_flop,
                 totalPot = StringSource("0"),
-                pendingTotalBetSize = StringSource("2")
+                pendingTotalBetSize = StringSource("2"),
+                shouldShowBBSuffix = false
             ),
             blindText = "100/200",
+            shouldShowBBSuffix = false,
             isEnableFoldButton = true,
             isEnableCheckButton = true,
             isEnableAllInButton = true,
+            myPendingBetSizeStringSource = StringSource("0"),
             isEnableCallButton = true,
-            callButtonSubText = StringSource("0 → 200"),
+            callSizeStringSource = StringSource("200"),
             isEnableRaiseButton = true,
             raiseButtonMainLabelResId = R.string.button_label_raise,
-            raiseButtonSubText = StringSource("0 → 400"),
+            raiseSizeStringSource = StringSource("400"),
             raiseSizeButtonUiStates = listOf(
                 RaiseSizeChangeButtonUiState(
                     labelStringSource = StringSource("2 BB"),

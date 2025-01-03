@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
+import com.ebata_shota.holdemstacktracker.ui.compose.parts.ChipSizeText
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
 
@@ -61,9 +62,11 @@ fun CenterPanelContent(
                     text = stringResource(R.string.label_pot),
                     style = MaterialTheme.typography.bodySmall
                 )
-                Text(
-                    text = uiState.totalPot.getString(),
-                    style = MaterialTheme.typography.titleLarge
+                ChipSizeText(
+                    textStringSource = uiState.totalPot,
+                    shouldShowBBSuffix = uiState.shouldShowBBSuffix,
+                    style = MaterialTheme.typography.titleLarge,
+                    suffixFontSize = MaterialTheme.typography.bodyMedium.fontSize,
                 )
             }
 
@@ -83,9 +86,11 @@ fun CenterPanelContent(
                     text = stringResource(R.string.label_bet),
                     style = MaterialTheme.typography.bodySmall
                 )
-                Text(
-                    text = uiState.pendingTotalBetSize.getString(),
-                    style = MaterialTheme.typography.titleLarge
+                ChipSizeText(
+                    textStringSource = uiState.pendingTotalBetSize,
+                    shouldShowBBSuffix = uiState.shouldShowBBSuffix,
+                    style = MaterialTheme.typography.titleLarge,
+                    suffixFontSize = MaterialTheme.typography.bodyMedium.fontSize,
                 )
             }
         }
@@ -96,6 +101,7 @@ data class CenterPanelContentUiState(
     val betPhaseTextResId: Int?,
     val totalPot: StringSource,
     val pendingTotalBetSize: StringSource,
+    val shouldShowBBSuffix: Boolean,
 )
 
 @Preview(showBackground = true, showSystemUi = false, name = "Light Mode")
@@ -114,7 +120,8 @@ private fun CenterPanelContentPreview() {
             uiState = CenterPanelContentUiState(
                 betPhaseTextResId = R.string.label_pre_flop,
                 totalPot = StringSource("400"),
-                pendingTotalBetSize = StringSource("100")
+                pendingTotalBetSize = StringSource("100"),
+                shouldShowBBSuffix = false
             )
         )
     }

@@ -54,6 +54,7 @@
     <string name="button_label_size">Size</string>
 
     <string name="suffix_bb">%1$s BB</string>
+    <string name="label_bb">BB</string>
     <string name="raise_size_button_label_x">×%1$s</string>
 
     <string name="position_label_sb">SB</string>
@@ -70,7 +71,8 @@
     <string name="text_hyphen">-</string>
     <string name="text_ratio">%1$d%%</string>
 
-    <string name="call_raise_button_sub_text">%1$s → %2$s</string>
+<!--    <string name="call_raise_button_sub_text">%1$s → %2$s</string>-->
+    <string name="left_arrow">→</string>
 
     <string name="setting_keep_screen_on">ゲーム中、画面をオンのままにする</string>
 

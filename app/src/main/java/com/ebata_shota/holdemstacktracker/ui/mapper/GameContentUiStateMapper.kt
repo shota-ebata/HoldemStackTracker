@@ -120,12 +120,12 @@ constructor(
 
                     BetViewMode.BB -> {
                         StringSource(
-                            R.string.suffix_bb,
                             (gamePlayer.stack.toFloat() / table.rule.minBetSize.toFloat())
                                 .roundDigit(2).toString()
                         )
                     }
                 },
+                shouldShowBBSuffix = betViewMode == BetViewMode.BB,
                 playerPosition = positions[index],
                 pendingBetSize = pendingBetSize?.let {
                     when (betViewMode) {
@@ -135,7 +135,6 @@ constructor(
 
                         BetViewMode.BB -> {
                             StringSource(
-                                R.string.suffix_bb,
                                 (it.toFloat() / table.rule.minBetSize)
                                     .roundDigit(2).toString()
                             )
@@ -177,7 +176,8 @@ constructor(
         val isEnableCheckButton: Boolean
         val isEnableAllInButton: Boolean
         val isEnableCallButton: Boolean
-        val callButtonSubText: StringSource
+        val myPendingBetSizeStringSource: StringSource?
+        val callSizeStringSource: StringSource?
         val isEnableRaiseButton: Boolean
 
         val totalPotSize: Int = game.potList.sumOf { it.potSize }
@@ -191,7 +191,7 @@ constructor(
         } else {
             R.string.button_label_raise
         }
-        val raiseButtonSubText: StringSource
+        val raiseSizeStringSource: StringSource?
 
         val raiseSizeButtonUiStates: List<RaiseSizeChangeButtonUiState> =
             createRaiseSizeChangeButtonUiStates(
@@ -235,41 +235,40 @@ constructor(
             isEnableAllInButton = true
 
             // Callボタン
+            myPendingBetSizeStringSource = when (betViewMode) {
+                BetViewMode.Number -> {
+                    StringSource("%,d".format(myPendingBetSize))
+                }
+
+                BetViewMode.BB -> {
+                    StringSource(
+                        (myPendingBetSize.toFloat() / table.rule.minBetSize.toFloat()).roundDigit(
+                            decimalPlace = 2
+                        ).toString()
+                    )
+                }
+            }
             val callSize: Int = maxBetSize
             // 現在ベットされている最高額より自分がベットしてる額が少ない
             // コールしてもAll-Inにならない場合
             isEnableCallButton = maxBetSize > myPendingBetSize
                     && gamePlayer.stack > callSize
-            callButtonSubText = if (isEnableCallButton) {
+            callSizeStringSource = if (isEnableCallButton) {
                 when (betViewMode) {
                     BetViewMode.Number -> {
-                        StringSource(
-                            R.string.call_raise_button_sub_text,
-                            "%,d".format(myPendingBetSize),
-                            "%,d".format(callSize)
-                        )
+                        StringSource("%,d".format(callSize))
                     }
 
                     BetViewMode.BB -> {
                         StringSource(
-                            R.string.call_raise_button_sub_text,
-                            StringSource(
-                                R.string.suffix_bb,
-                                (myPendingBetSize.toFloat() / table.rule.minBetSize.toFloat()).roundDigit(
-                                    2
-                                ).toString()
-                            ),
-                            StringSource(
-                                R.string.suffix_bb,
-                                (callSize.toFloat() / table.rule.minBetSize.toFloat()).roundDigit(2)
-                                    .toString()
-                            )
+                            (callSize.toFloat() / table.rule.minBetSize.toFloat()).roundDigit(
+                                decimalPlace = 2
+                            ).toString()
                         )
                     }
                 }
-
             } else {
-                StringSource("")
+                null
             }
 
             // Raiseボタン
@@ -277,35 +276,21 @@ constructor(
             val raiseUpSize = raiseSize - myPendingBetSize
             // 最低レイズ額に足りている場合
             isEnableRaiseButton = gamePlayer.stack >= raiseUpSize
-            raiseButtonSubText = if (isEnableRaiseButton) {
+            raiseSizeStringSource = if (isEnableRaiseButton) {
                 when (betViewMode) {
                     BetViewMode.Number -> {
-                        StringSource(
-                            R.string.call_raise_button_sub_text,
-                            "%,d".format(myPendingBetSize),
-                            "%,d".format(raiseSize)
-                        )
+                        StringSource("%,d".format(raiseSize))
                     }
 
                     BetViewMode.BB -> {
                         StringSource(
-                            R.string.call_raise_button_sub_text,
-                            StringSource(
-                                R.string.suffix_bb,
-                                (myPendingBetSize.toFloat() / table.rule.minBetSize.toFloat()).roundDigit(
-                                    2
-                                ).toString()
-                            ),
-                            StringSource(
-                                R.string.suffix_bb,
-                                (raiseSize.toFloat() / table.rule.minBetSize.toFloat()).roundDigit(2)
-                                    .toString()
-                            )
+                            (raiseSize.toFloat() / table.rule.minBetSize.toFloat()).roundDigit(2)
+                                .toString()
                         )
                     }
                 }
             } else {
-                StringSource("")
+                null
             }
 
             // Slider
@@ -335,10 +320,11 @@ constructor(
             isEnableFoldButton = false
             isEnableCheckButton = false
             isEnableAllInButton = false
+            myPendingBetSizeStringSource = null
             isEnableCallButton = false
-            callButtonSubText = StringSource("")
+            callSizeStringSource = null
             isEnableRaiseButton = false
-            raiseButtonSubText = StringSource("")
+            raiseSizeStringSource = null
             isEnableMinusButton = false
             isEnableSlider = false
             isEnablePlusButton = false
@@ -369,7 +355,7 @@ constructor(
                     BetViewMode.BB -> {
                         val bb = (game.potList.sumOf { it.potSize }
                             .toFloat() / table.rule.minBetSize.toFloat())
-                        StringSource(R.string.suffix_bb, bb.roundDigit(2))
+                        StringSource(bb.roundDigit(2).toString())
                     }
                 },
                 pendingTotalBetSize = when (betViewMode) {
@@ -380,19 +366,22 @@ constructor(
                     BetViewMode.BB -> {
                         val bb = (pendingBetPerPlayer.map { it.value }.sum()
                             .toFloat() / table.rule.minBetSize.toFloat())
-                        StringSource(R.string.suffix_bb, bb.roundDigit(2))
+                        StringSource(bb.roundDigit(2).toString())
                     }
-                }
+                },
+                shouldShowBBSuffix = betViewMode == BetViewMode.BB
             ),
             blindText = table.rule.blindText(),
+            shouldShowBBSuffix = betViewMode == BetViewMode.BB,
             isEnableFoldButton = isEnableFoldButton,
             isEnableCheckButton = isEnableCheckButton,
             isEnableAllInButton = isEnableAllInButton,
+            myPendingBetSizeStringSource = myPendingBetSizeStringSource,
             isEnableCallButton = isEnableCallButton,
-            callButtonSubText = callButtonSubText,
+            callSizeStringSource = callSizeStringSource,
             isEnableRaiseButton = isEnableRaiseButton,
             raiseButtonMainLabelResId = raiseButtonMainLabelResId,
-            raiseButtonSubText = raiseButtonSubText,
+            raiseSizeStringSource = raiseSizeStringSource,
             raiseSizeButtonUiStates = raiseSizeButtonUiStates,
             isEnableMinusButton = isEnableMinusButton,
             isEnablePlusButton = isEnablePlusButton,
