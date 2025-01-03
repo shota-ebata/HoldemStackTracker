@@ -5,13 +5,12 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.ebata_shota.holdemstacktracker.domain.model.ActionHistory
 import com.ebata_shota.holdemstacktracker.infra.db.entity.ActionHistoryEntity
-import com.ebata_shota.holdemstacktracker.infra.db.entity.TableSummaryEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ActionHistoryDao {
+
     @Query("SELECT * FROM action_history_entities ORDER BY timestamp DESC")
     fun getAllFlow(): Flow<List<ActionHistoryEntity>>
 

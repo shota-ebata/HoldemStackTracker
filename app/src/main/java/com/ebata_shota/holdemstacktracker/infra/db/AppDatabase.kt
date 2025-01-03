@@ -5,14 +5,17 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.ebata_shota.holdemstacktracker.infra.db.convert.InstantConverter
 import com.ebata_shota.holdemstacktracker.infra.db.dao.ActionHistoryDao
+import com.ebata_shota.holdemstacktracker.infra.db.dao.PhaseHistoryDao
 import com.ebata_shota.holdemstacktracker.infra.db.dao.TableSummaryDao
 import com.ebata_shota.holdemstacktracker.infra.db.entity.ActionHistoryEntity
+import com.ebata_shota.holdemstacktracker.infra.db.entity.PhaseHistoryEntity
 import com.ebata_shota.holdemstacktracker.infra.db.entity.TableSummaryEntity
 
 @Database(
     entities = [
         TableSummaryEntity::class,
-        ActionHistoryEntity::class
+        ActionHistoryEntity::class,
+        PhaseHistoryEntity::class,
     ],
     version = 1
 )
@@ -21,5 +24,6 @@ import com.ebata_shota.holdemstacktracker.infra.db.entity.TableSummaryEntity
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun tableSummaryDao(): TableSummaryDao
-    abstract fun actionDao(): ActionHistoryDao
+    abstract fun phaseHistoryDao(): PhaseHistoryDao
+    abstract fun actionHistoryDao(): ActionHistoryDao
 }

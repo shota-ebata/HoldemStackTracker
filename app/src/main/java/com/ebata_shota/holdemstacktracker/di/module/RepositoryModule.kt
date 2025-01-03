@@ -5,6 +5,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRuleStateOfRi
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GmsBarcodeScannerRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.PhaseHistoryRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
@@ -15,6 +16,7 @@ import com.ebata_shota.holdemstacktracker.infra.repository.DefaultRuleStateOfRin
 import com.ebata_shota.holdemstacktracker.infra.repository.FirebaseAuthRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.GameRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.GmsBarcodeScannerRepositoryImpl
+import com.ebata_shota.holdemstacktracker.infra.repository.PhaseHistoryRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.PrefRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.QrBitmapRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.RandomIdRepositoryImpl
@@ -69,4 +71,8 @@ interface RepositoryModule {
     @Singleton
     @Binds
     fun bindActionHistoryRepository(repo: ActionHistoryRepositoryImpl): ActionHistoryRepository
+
+    @Singleton
+    @Binds
+    fun bindPhaseHistoryRepository(repo: PhaseHistoryRepositoryImpl): PhaseHistoryRepository
 }

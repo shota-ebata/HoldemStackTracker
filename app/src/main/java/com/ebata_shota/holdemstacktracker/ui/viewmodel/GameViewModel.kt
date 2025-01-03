@@ -9,12 +9,14 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
+import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.ActionHistoryRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.PhaseHistoryRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
@@ -69,6 +71,7 @@ constructor(
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val randomIdRepository: RandomIdRepository,
     private val actionHistoryRepository: ActionHistoryRepository,
+    private val phaseHistoryRepository: PhaseHistoryRepository,
     private val getNextGame: GetNextGameUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
     private val getNextAutoAction: GetNextAutoActionUseCase,
@@ -562,6 +565,15 @@ constructor(
             actionHistoryRepository.sawAction(
                 tableId = tableId,
                 actionId = actionId
+            )
+        }
+    }
+
+    fun finishedPhase(phaseId: PhaseId) {
+        viewModelScope.launch {
+            phaseHistoryRepository.saveFinishPhase(
+                tableId = tableId,
+                phaseId = phaseId
             )
         }
     }

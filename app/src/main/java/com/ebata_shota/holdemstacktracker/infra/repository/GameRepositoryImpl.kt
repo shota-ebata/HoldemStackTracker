@@ -1,19 +1,23 @@
 package com.ebata_shota.holdemstacktracker.infra.repository
 
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
+import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherIO
 import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundGameException
 import com.ebata_shota.holdemstacktracker.domain.model.ActionHistory
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
+import com.ebata_shota.holdemstacktracker.domain.model.PhaseHistory
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.ActionHistoryRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.PhaseHistoryRepository
 import com.ebata_shota.holdemstacktracker.infra.mapper.GameMapper
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
@@ -24,6 +28,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class GameRepositoryImpl
@@ -31,9 +36,12 @@ class GameRepositoryImpl
 constructor(
     firebaseDatabase: FirebaseDatabase,
     private val gameMapper: GameMapper,
+    private val phaseHistoryRepository: PhaseHistoryRepository,
     private val actionHistoryRepository: ActionHistoryRepository,
     @ApplicationScope
     private val appCoroutineScope: CoroutineScope,
+    @CoroutineDispatcherIO
+    private val dispatcher: CoroutineDispatcher,
 ) : GameRepository {
 
     private val gamesRef: DatabaseReference = firebaseDatabase.getReference(
@@ -70,8 +78,24 @@ constructor(
     private suspend fun saveActionIfNeed(
         tableId: TableId,
         gameResult: Result<Game>,
-    ) {
+    ) = withContext(dispatcher) {
         gameResult.getOrNull()?.let { game ->
+            game.phaseList.forEach { phase ->
+                val phaseHistory = phaseHistoryRepository.getPhaseHistory(
+                    tableId = tableId,
+                    phaseId = phase.phaseId
+                )
+                if (phaseHistory == null) {
+                    phaseHistoryRepository.savePhaseHistory(
+                        phaseHistory = PhaseHistory(
+                            tableId = tableId,
+                            phaseId = phase.phaseId,
+                            isFinished = false,
+                            timestamp = game.updateTime
+                        )
+                    )
+                }
+            }
             game.phaseList.lastOrNull()?.let { phase ->
                 if (phase is Phase.BetPhase) {
                     phase.actionStateList.lastOrNull()?.let { action ->
