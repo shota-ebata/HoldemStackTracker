@@ -24,12 +24,10 @@ class GetCurrentPlayerIdUseCaseImpl
     override suspend fun invoke(
         btnPlayerId: PlayerId,
         playerOrder: List<PlayerId>,
-        phaseList: List<Phase>
+        currentBetPhase: Phase.BetPhase
     ): PlayerId = withContext(dispatcher) {
         // 全員の最後のアクションを一つづつ取得
-        val latestBetPhase = getLastPhaseAsBetPhase.invoke(phaseList)
-        // 全員の最後のアクションを一つづつ取得
-        val actionStateList = latestBetPhase.actionStateList
+        val actionStateList = currentBetPhase.actionStateList
         // 最後にアクションしたプレイヤーIDを取得（アクションがない場合はBTN）
         val latestActionPlayerId = actionStateList.lastOrNull()?.playerId ?: btnPlayerId
         // 最後にアクションしたプレイヤーIDのindexを取得
@@ -37,7 +35,7 @@ class GetCurrentPlayerIdUseCaseImpl
         val nextPlayerIndex: Int = if (
             playerOrder.size == 2
             && actionStateList.isEmpty()
-            && latestBetPhase is Phase.PreFlop
+            && currentBetPhase is Phase.PreFlop
         ) {
             // 2人しかいない
             // かつ、まだ誰もアクションしていない

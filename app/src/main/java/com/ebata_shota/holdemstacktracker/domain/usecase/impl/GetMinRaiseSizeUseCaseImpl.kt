@@ -2,7 +2,7 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
-import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
 import kotlinx.coroutines.CoroutineDispatcher
@@ -17,12 +17,11 @@ constructor(
     private val dispatcher: CoroutineDispatcher
 ) : GetMinRaiseSizeUseCase {
 
-    // FIXME: 引数をgameではなくphaseListにしたい
     override suspend fun invoke(
-        game: Game,
-        minBetSize: Int
+        phaseList: List<Phase>,
+        minBetSize: Int,
     ): Int = withContext(dispatcher) {
-        val betPhase = getLastPhaseAsBetPhase.invoke(game.phaseList)
+        val betPhase = getLastPhaseAsBetPhase.invoke(phaseList)
         // 最低引き上げ額
         var minUpliftSize: Int = minBetSize
         // 最高Bet額

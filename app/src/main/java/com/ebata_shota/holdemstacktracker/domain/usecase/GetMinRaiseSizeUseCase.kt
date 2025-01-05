@@ -1,10 +1,10 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
-import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.Phase
 
 interface GetMinRaiseSizeUseCase {
     suspend fun invoke(
-        game: Game,
-        minBetSize: Int
+        phaseList: List<Phase>,
+        minBetSize: Int,
     ): Int
 }

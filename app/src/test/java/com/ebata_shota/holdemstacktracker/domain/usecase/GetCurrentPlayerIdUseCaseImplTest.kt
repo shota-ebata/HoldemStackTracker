@@ -35,90 +35,21 @@ class GetCurrentPlayerIdUseCaseImplTest {
         )
     }
 
-    @Test
-    fun getCurrentPlayerId_call_getLastPhaseAsBetPhase() {
-        val getLastPhaseAsBetPhaseMock = mockk<GetLastPhaseAsBetPhaseUseCaseImpl>()
-        coEvery { getLastPhaseAsBetPhaseMock.invoke(any()) } returns (
-                Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList())
-        )
-        useCase = GetCurrentPlayerIdUseCaseImpl(
-            getLastPhaseAsBetPhase = getLastPhaseAsBetPhaseMock,
-            dispatcher = dispatcher,
-        )
-
-        val game = createDummyGame(
-            players = setOf(
-                GamePlayer(
-                    id = PlayerId("PlayerId0"),
-                    stack = 1000,
-                    isLeaved = false
-                ),
-                GamePlayer(
-                    id = PlayerId("PlayerId1"),
-                    stack = 1000,
-                    isLeaved = false
-                ),
-                GamePlayer(
-                    id = PlayerId("PlayerId2"),
-                    stack = 1000,
-                    isLeaved = false
-                )
-            )
-        )
-        val playerOrder = listOf(
-            PlayerId("PlayerId0"),
-            PlayerId("PlayerId1"),
-            PlayerId("PlayerId2")
-        )
-        runTest(dispatcher) {
-            useCase.invoke(
-                btnPlayerId = PlayerId("PlayerId0"),
-                playerOrder = playerOrder,
-                phaseList = game.phaseList
-            )
-        }
-        coVerify(exactly = 1) { getLastPhaseAsBetPhaseMock.invoke(game.phaseList) }
-    }
-
     private fun executeAndAssert(
         actionStateList: List<BetPhaseAction>,
         btnPlayerId: PlayerId,
         playerOrder: List<PlayerId>,
         expected: PlayerId
     ) {
-        val game = createDummyGame(
-            players = setOf(
-                GamePlayer(
-                    id = PlayerId("PlayerId0"),
-                    stack = 1000,
-                    isLeaved = false
-                ),
-                GamePlayer(
-                    id = PlayerId("PlayerId1"),
-                    stack = 1000,
-                    isLeaved = false
-                ),
-                GamePlayer(
-                    id = PlayerId("PlayerId2"),
-                    stack = 1000,
-                    isLeaved = false
-                )
-            ),
-            phaseList = listOf(
-                Phase.Standby(
-                    phaseId = PhaseId("")
-                ),
-                Phase.PreFlop(
-                    phaseId = PhaseId(""),
-                    actionStateList = actionStateList
-                )
-            )
+        val currentBetPhase = Phase.PreFlop(
+            phaseId = PhaseId(""),
+            actionStateList = actionStateList
         )
         runTest(dispatcher) {
             val actual = useCase.invoke(
                 btnPlayerId = btnPlayerId,
                 playerOrder = playerOrder,
-                phaseList = game.phaseList
+                currentBetPhase = currentBetPhase
             )
             assertEquals(expected, actual)
         }

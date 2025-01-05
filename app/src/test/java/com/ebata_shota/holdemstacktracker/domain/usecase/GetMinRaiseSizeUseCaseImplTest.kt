@@ -32,29 +32,27 @@ class GetMinRaiseSizeUseCaseImplTest {
 
     @Test
     fun test_preFlop_open_min() {
-        val game = createDummyGame(
-            phaseList = listOf(
-                Phase.Standby(phaseId = PhaseId("")),
-                Phase.PreFlop(
-                    phaseId = PhaseId(""),
-                    actionStateList = listOf(
-                        BetPhaseAction.Blind(
-                            actionId = ActionId(""),
-                            playerId = PlayerId("PlayerId1"),
-                            betSize = 1
-                        ),
-                        BetPhaseAction.Blind(
-                            actionId = ActionId(""),
-                            playerId = PlayerId("PlayerId2"),
-                            betSize = 2
-                        )
+        val phaseList = listOf(
+            Phase.Standby(phaseId = PhaseId("")),
+            Phase.PreFlop(
+                phaseId = PhaseId(""),
+                actionStateList = listOf(
+                    BetPhaseAction.Blind(
+                        actionId = ActionId(""),
+                        playerId = PlayerId("PlayerId1"),
+                        betSize = 1
+                    ),
+                    BetPhaseAction.Blind(
+                        actionId = ActionId(""),
+                        playerId = PlayerId("PlayerId2"),
+                        betSize = 2
                     )
                 )
             )
         )
         runTest(dispatcher) {
             val actual: Int = useCase.invoke(
-                game = game,
+                phaseList = phaseList,
                 minBetSize = 2
             )
             val expected = 4
@@ -64,34 +62,32 @@ class GetMinRaiseSizeUseCaseImplTest {
 
     @Test
     fun test_preFlop_reRaise_min() {
-        val game = createDummyGame(
-            phaseList = listOf(
-                Phase.Standby(phaseId = PhaseId("")),
-                Phase.PreFlop(
-                    phaseId = PhaseId(""),
-                    actionStateList = listOf(
-                        BetPhaseAction.Blind(
-                            actionId = ActionId(""),
-                            playerId = PlayerId("PlayerId1"),
-                            betSize = 1
-                        ),
-                        BetPhaseAction.Bet(
-                            actionId = ActionId(""),
-                            playerId = PlayerId("PlayerId2"),
-                            betSize = 2
-                        ),
-                        BetPhaseAction.Blind(
-                            actionId = ActionId(""),
-                            playerId = PlayerId("PlayerId3"),
-                            betSize = 5
-                        )
+        val phaseList = listOf(
+            Phase.Standby(phaseId = PhaseId("")),
+            Phase.PreFlop(
+                phaseId = PhaseId(""),
+                actionStateList = listOf(
+                    BetPhaseAction.Blind(
+                        actionId = ActionId(""),
+                        playerId = PlayerId("PlayerId1"),
+                        betSize = 1
+                    ),
+                    BetPhaseAction.Bet(
+                        actionId = ActionId(""),
+                        playerId = PlayerId("PlayerId2"),
+                        betSize = 2
+                    ),
+                    BetPhaseAction.Blind(
+                        actionId = ActionId(""),
+                        playerId = PlayerId("PlayerId3"),
+                        betSize = 5
                     )
                 )
             )
         )
         runTest(dispatcher) {
             val actual: Int = useCase.invoke(
-                game = game,
+                phaseList = phaseList,
                 minBetSize = 2
             )
             val expected = 8
@@ -101,39 +97,37 @@ class GetMinRaiseSizeUseCaseImplTest {
 
     @Test
     fun test_preFlop_reRaise_min_after_small_allin() {
-        val game = createDummyGame(
-            phaseList = listOf(
-                Phase.Standby(phaseId = PhaseId("")),
-                Phase.PreFlop(
-                    phaseId = PhaseId(""),
-                    actionStateList = listOf(
-                        BetPhaseAction.Blind(
-                            actionId = ActionId(""),
-                            playerId = PlayerId("PlayerId1"),
-                            betSize = 1
-                        ),
-                        BetPhaseAction.Blind(
-                            actionId = ActionId(""),
-                            playerId = PlayerId("PlayerId2"),
-                            betSize = 2
-                        ),
-                        BetPhaseAction.Bet(
-                            actionId = ActionId(""),
-                            playerId = PlayerId("PlayerId3"),
-                            betSize = 5
-                        ),
-                        BetPhaseAction.AllIn(
-                            actionId = ActionId(""),
-                            playerId = PlayerId("PlayerId4"),
-                            betSize = 3
-                        )
+        val phaseList = listOf(
+            Phase.Standby(phaseId = PhaseId("")),
+            Phase.PreFlop(
+                phaseId = PhaseId(""),
+                actionStateList = listOf(
+                    BetPhaseAction.Blind(
+                        actionId = ActionId(""),
+                        playerId = PlayerId("PlayerId1"),
+                        betSize = 1
+                    ),
+                    BetPhaseAction.Blind(
+                        actionId = ActionId(""),
+                        playerId = PlayerId("PlayerId2"),
+                        betSize = 2
+                    ),
+                    BetPhaseAction.Bet(
+                        actionId = ActionId(""),
+                        playerId = PlayerId("PlayerId3"),
+                        betSize = 5
+                    ),
+                    BetPhaseAction.AllIn(
+                        actionId = ActionId(""),
+                        playerId = PlayerId("PlayerId4"),
+                        betSize = 3
                     )
                 )
             )
         )
         runTest(dispatcher) {
             val actual: Int = useCase.invoke(
-                game = game,
+                phaseList = phaseList,
                 minBetSize = 2
             )
             val expected = 8
@@ -143,18 +137,16 @@ class GetMinRaiseSizeUseCaseImplTest {
 
     @Test
     fun test_flop() {
-        val game = createDummyGame(
-            phaseList = listOf(
-                Phase.Standby(phaseId = PhaseId("")),
-                Phase.Flop(
-                    phaseId = PhaseId(""),
-                    actionStateList = listOf()
-                )
+        val phaseList = listOf(
+            Phase.Standby(phaseId = PhaseId("")),
+            Phase.Flop(
+                phaseId = PhaseId(""),
+                actionStateList = listOf()
             )
         )
         runTest(dispatcher) {
             val actual: Int = useCase.invoke(
-                game = game,
+                phaseList = phaseList,
                 minBetSize = 2
             )
             val expected = 2
@@ -164,24 +156,22 @@ class GetMinRaiseSizeUseCaseImplTest {
 
     @Test
     fun test_flop_open() {
-        val game = createDummyGame(
-            phaseList = listOf(
-                Phase.Standby(phaseId = PhaseId(""),),
-                Phase.Flop(
-                    phaseId = PhaseId(""),
-                    actionStateList = listOf(
-                        BetPhaseAction.Bet(
-                            actionId = ActionId(""),
-                            playerId = PlayerId("PlayerId1"),
-                            betSize = 2
-                        ),
-                    )
+        val phaseList = listOf(
+            Phase.Standby(phaseId = PhaseId(""),),
+            Phase.Flop(
+                phaseId = PhaseId(""),
+                actionStateList = listOf(
+                    BetPhaseAction.Bet(
+                        actionId = ActionId(""),
+                        playerId = PlayerId("PlayerId1"),
+                        betSize = 2
+                    ),
                 )
             )
         )
         runTest(dispatcher) {
             val actual: Int = useCase.invoke(
-                game = game,
+                phaseList = phaseList,
                 minBetSize = 2
             )
             val expected = 4
@@ -191,24 +181,22 @@ class GetMinRaiseSizeUseCaseImplTest {
 
     @Test
     fun test_flop_open5() {
-        val game = createDummyGame(
-            phaseList = listOf(
-                Phase.Standby(phaseId = PhaseId("")),
-                Phase.Flop(
-                    phaseId = PhaseId(""),
-                    actionStateList = listOf(
-                        BetPhaseAction.Bet(
-                            actionId = ActionId(""),
-                            playerId = PlayerId("PlayerId1"),
-                            betSize = 5
-                        ),
-                    )
+        val phaseList = listOf(
+            Phase.Standby(phaseId = PhaseId("")),
+            Phase.Flop(
+                phaseId = PhaseId(""),
+                actionStateList = listOf(
+                    BetPhaseAction.Bet(
+                        actionId = ActionId(""),
+                        playerId = PlayerId("PlayerId1"),
+                        betSize = 5
+                    ),
                 )
             )
         )
         runTest(dispatcher) {
             val actual: Int = useCase.invoke(
-                game = game,
+                phaseList = phaseList,
                 minBetSize = 2
             )
             val expected = 10

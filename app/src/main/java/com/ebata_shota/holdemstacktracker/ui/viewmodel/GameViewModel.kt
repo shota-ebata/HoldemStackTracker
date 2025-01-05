@@ -34,6 +34,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlid
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.util.combine
+import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameSettingsContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogUiState
@@ -114,8 +115,9 @@ constructor(
         tableStateFlow.filterNotNull(),
         gameStateFlow.filterNotNull()
     ) { table, game ->
+        // TODO: BetPhase以外が考慮されていない
         getMinRaiseSize.invoke(
-            game = game,
+            phaseList = game.phaseList,
             minBetSize = table.rule.minBetSize
         )
     }.shareIn(
@@ -205,11 +207,18 @@ constructor(
         betViewMode: BetViewMode,
     ) {
         // FIXME: combine内部での問題が検知しづらい
-        val currentPlayerId = getCurrentPlayerId.invoke(
-            btnPlayerId = table.btnPlayerId,
-            playerOrder = table.playerOrder,
-            phaseList = game.phaseList
-        )
+        val currentBetPhase = try {
+            getLastPhaseAsBetPhase.invoke(game.phaseList)
+        } catch (e: IllegalStateException) {
+            null
+        }
+        val currentPlayerId = currentBetPhase?.let {
+            getCurrentPlayerId.invoke(
+                btnPlayerId = table.btnPlayerId,
+                playerOrder = table.playerOrder,
+                currentBetPhase = currentBetPhase
+            )
+        }
         val isCurrentPlayer: Boolean = myPlayerId == currentPlayerId
         val autoAction: BetPhaseAction? = if (isCurrentPlayer) {
             getNextAutoAction.invoke(
@@ -235,19 +244,26 @@ constructor(
             )
         } else {
             // オートアクションがない場合だけ、UiStateを更新する
+            val contentUiState: GameContentUiState? = uiStateMapper.createUiState(
+                game = game,
+                table = table,
+                myPlayerId = myPlayerId,
+                raiseSize = raiseSize ?: minRaiseSize,
+                minRaiseSize = minRaiseSize,
+                isEnableSliderStep = isEnableSliderStep,
+                betViewMode = betViewMode
+            )
+            if (contentUiState == null) {
+                // contentUiStateが何かしらの理由で作成されなかった場合は
+                // screenUiStateの更新を行わない
+                return
+            }
             val content = GameScreenUiState.Content(
-                contentUiState = uiStateMapper.createUiState(
-                    game = game,
-                    table = table,
-                    myPlayerId = myPlayerId,
-                    raiseSize = raiseSize ?: minRaiseSize,
-                    minRaiseSize = minRaiseSize,
-                    isEnableSliderStep = isEnableSliderStep,
-                    betViewMode = betViewMode
-                )
+                contentUiState = contentUiState
             )
             // TODO: フェーズが進んだことを検知したい
             //   たとえば、Raiseサイズをフェーズが進んだタイミングで最低にしたい。
+
             _screenUiState.update {
                 content
             }

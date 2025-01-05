@@ -68,21 +68,30 @@ constructor(
         minRaiseSize: Int,
         isEnableSliderStep: Boolean,
         betViewMode: BetViewMode,
-    ): GameContentUiState = withContext(dispatcher) {
+    ): GameContentUiState? = withContext(dispatcher) {
         val tableId = table.id
         val startIndex = table.playerOrder.indexOf(myPlayerId)
         val sortedPlayerOrder = table.playerOrder.rearrangeListFromIndex(startIndex = startIndex)
         val positions: List<GamePlayerUiState.PlayerPosition> =
             playerPositionsMap[sortedPlayerOrder.size]!!
+        val betPhase: BetPhase? = try{
+            getLastPhaseAsBetPhase.invoke(game.phaseList)
+        } catch (e: IllegalStateException) {
+            return@withContext null
+        }
+        if (betPhase == null) {
+            // 現在がBetPhaseでないなら、UiStateの生成をしない
+            // FIXME: BetPhase以外でもUiStateを生成したい場合、専用の分岐が必要
+            return@withContext null
+        }
         val pendingBetPerPlayer = getPendingBetPerPlayer.invoke(
             playerOrder = table.playerOrder,
-            actionStateList = getLastPhaseAsBetPhase.invoke(game.phaseList).actionStateList
+            actionStateList = betPhase.actionStateList
         )
-        // TODO: BetPhase以外が考慮されていないので修正する
         val currentPlayerId = getCurrentPlayerId.invoke(
             btnPlayerId = table.btnPlayerId,
             playerOrder = table.playerOrder,
-            phaseList = game.phaseList
+            currentBetPhase = betPhase,
         )
         val btnPlayerIndex = table.playerOrder.indexOf(table.btnPlayerId)
         val sbIndex = if (table.playerOrder.size > 2) {
@@ -165,13 +174,8 @@ constructor(
                 }
             )
         }
-        val betPhase: BetPhase? = try {
-            getLastPhaseAsBetPhase.invoke(game.phaseList)
-        } catch (e: IllegalStateException) {
-            null
-        }
         //  私のターンか
-        val isCurrentPlayer = myPlayerId == currentPlayerId && betPhase != null
+        val isCurrentPlayer = myPlayerId == currentPlayerId
 
         val isEnableFoldButton: Boolean
         val isEnableCheckButton: Boolean
