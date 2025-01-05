@@ -2,10 +2,10 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
-import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastBetPhaseActionTypeUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionTypeInLastPhaseAsBetPhaseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionInPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionUseCase
 import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType
@@ -13,22 +13,26 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class GetLastBetPhaseLastActionTypeUseCaseImpl
+class GetActionTypeInLastPhaseAsBetPhaseUseCaseImpl
 @Inject
 constructor(
-    private val getLatestBetPhase: GetLatestBetPhaseUseCase,
+    private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
     private val getPlayerLastAction: GetPlayerLastActionUseCase,
     private val getPlayerLastActionInPhase: GetPlayerLastActionInPhaseUseCase,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
-) : GetLastBetPhaseActionTypeUseCase {
+) : GetActionTypeInLastPhaseAsBetPhaseUseCase {
 
+    /**
+     * 最後のフェーズ as BetPhase の
+     * 最終BetPhaseのActionTypeを取得する
+     */
     override suspend fun invoke(
-        game: Game,
+        phaseList: List<Phase>,
         playerId: PlayerId,
     ): BetPhaseActionType? = withContext(dispatcher) {
         val lastBetPhase = try {
-            getLatestBetPhase.invoke(game)
+            getLastPhaseAsBetPhase.invoke(phaseList)
         } catch (e: IllegalStateException) {
             null
         }
@@ -46,7 +50,7 @@ constructor(
                 // 過去のフェーズでのFoldやAllInを見てみる
                 val playerLastAction = getPlayerLastAction.invoke(
                     playerId = playerId,
-                    phaseList = game.phaseList
+                    phaseList = phaseList
                 )
                 when (playerLastAction) {
                     is BetPhaseAction.AllInSkip,

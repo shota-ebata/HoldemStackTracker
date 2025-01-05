@@ -4,7 +4,7 @@ import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefau
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneUpRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.util.getDigitCount
@@ -19,7 +19,7 @@ class GetOneUpRaiseSizeUseCaseImpl
 @Inject
 constructor(
     private val getPendingBetSize: GetPendingBetSizeUseCase,
-    private val getLatestBetPhase: GetLatestBetPhaseUseCase,
+    private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
     private val firebaseAuthRepository: FirebaseAuthRepository,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
@@ -53,7 +53,7 @@ constructor(
         val stackSize = player.stack
 
         val myPendingBetSize = getPendingBetSize.invoke(
-            actionList = getLatestBetPhase.invoke(game).actionStateList,
+            actionList = getLastPhaseAsBetPhase.invoke(game.phaseList).actionStateList,
             playerOrder = playerOrder,
             playerId = myPlayerId
         )

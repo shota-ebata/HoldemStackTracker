@@ -1,13 +1,13 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
-import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType
 
-interface GetLastBetPhaseActionTypeUseCase {
+interface GetActionTypeInLastPhaseAsBetPhaseUseCase {
 
     suspend fun invoke(
-        game: Game,
+        phaseList: List<Phase>,
         playerId: PlayerId,
     ): BetPhaseActionType?
 }

@@ -6,7 +6,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLastPhaseAsBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMinRaiseSizeUseCaseImpl
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -23,7 +23,7 @@ class GetMinRaiseSizeUseCaseImplTest {
     @Before
     fun setup() {
         useCase = GetMinRaiseSizeUseCaseImpl(
-            getLatestBetPhase = GetLatestBetPhaseUseCaseImpl(
+            getLastPhaseAsBetPhase = GetLastPhaseAsBetPhaseUseCaseImpl(
                 dispatcher = dispatcher
             ),
             dispatcher = dispatcher,

@@ -10,7 +10,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLastPhaseAsBetPhaseUseCaseImpl
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -28,7 +28,7 @@ class GetCurrentPlayerIdUseCaseImplTest {
     @Before
     fun setup() {
         useCase = GetCurrentPlayerIdUseCaseImpl(
-            getLatestBetPhase = GetLatestBetPhaseUseCaseImpl(
+            getLastPhaseAsBetPhase = GetLastPhaseAsBetPhaseUseCaseImpl(
                 dispatcher = dispatcher
             ),
             dispatcher = dispatcher,
@@ -36,13 +36,13 @@ class GetCurrentPlayerIdUseCaseImplTest {
     }
 
     @Test
-    fun getCurrentPlayerId_call_getLatestBetPhase() {
-        val getLatestBetPhaseMock = mockk<GetLatestBetPhaseUseCaseImpl>()
-        coEvery { getLatestBetPhaseMock.invoke(any()) } returns (
+    fun getCurrentPlayerId_call_getLastPhaseAsBetPhase() {
+        val getLastPhaseAsBetPhaseMock = mockk<GetLastPhaseAsBetPhaseUseCaseImpl>()
+        coEvery { getLastPhaseAsBetPhaseMock.invoke(any()) } returns (
                 Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList())
         )
         useCase = GetCurrentPlayerIdUseCaseImpl(
-            getLatestBetPhase = getLatestBetPhaseMock,
+            getLastPhaseAsBetPhase = getLastPhaseAsBetPhaseMock,
             dispatcher = dispatcher,
         )
 
@@ -74,10 +74,10 @@ class GetCurrentPlayerIdUseCaseImplTest {
             useCase.invoke(
                 btnPlayerId = PlayerId("PlayerId0"),
                 playerOrder = playerOrder,
-                game = game
+                phaseList = game.phaseList
             )
         }
-        coVerify(exactly = 1) { getLatestBetPhaseMock.invoke(game) }
+        coVerify(exactly = 1) { getLastPhaseAsBetPhaseMock.invoke(game.phaseList) }
     }
 
     private fun executeAndAssert(
@@ -118,7 +118,7 @@ class GetCurrentPlayerIdUseCaseImplTest {
             val actual = useCase.invoke(
                 btnPlayerId = btnPlayerId,
                 playerOrder = playerOrder,
-                game = game
+                phaseList = game.phaseList
             )
             assertEquals(expected, actual)
         }

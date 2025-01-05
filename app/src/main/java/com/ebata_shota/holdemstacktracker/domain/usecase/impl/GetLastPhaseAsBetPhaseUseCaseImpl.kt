@@ -3,21 +3,21 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
-import com.ebata_shota.holdemstacktracker.domain.model.Game
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class GetLatestBetPhaseUseCaseImpl
+class GetLastPhaseAsBetPhaseUseCaseImpl
 @Inject constructor(
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher
-) : GetLatestBetPhaseUseCase {
+) : GetLastPhaseAsBetPhaseUseCase {
 
-    // FIXME: 引数phaseListにしたい
-    override suspend fun invoke(latestGame: Game): BetPhase = withContext(dispatcher) {
-        val latestPhase: Phase? = latestGame.phaseList.lastOrNull()
+    override suspend fun invoke(
+        phaseList: List<Phase>,
+    ): BetPhase = withContext(dispatcher) {
+        val latestPhase: Phase? = phaseList.lastOrNull()
         if (latestPhase == null || latestPhase !is BetPhase) {
             throw IllegalStateException("BetPhase以外は想定外")
         }

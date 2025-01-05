@@ -15,8 +15,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastBetPhaseActionTypeUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionTypeInLastPhaseAsBetPhaseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
@@ -50,11 +50,11 @@ class GameContentUiStateMapper
 @Inject
 constructor(
     private val getPendingBetPerPlayer: GetPendingBetPerPlayerUseCase,
-    private val getLatestBetPhase: GetLatestBetPhaseUseCase,
+    private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
     private val getMaxBetSize: GetMaxBetSizeUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
     private val isNotRaisedYet: IsNotRaisedYetUseCase,
-    private val getBetPhaseActionType: GetLastBetPhaseActionTypeUseCase,
+    private val getActionTypeInLastPhaseAsBetPhase: GetActionTypeInLastPhaseAsBetPhaseUseCase,
     private val prefRepository: PrefRepository,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
@@ -76,12 +76,13 @@ constructor(
             playerPositionsMap[sortedPlayerOrder.size]!!
         val pendingBetPerPlayer = getPendingBetPerPlayer.invoke(
             playerOrder = table.playerOrder,
-            actionStateList = getLatestBetPhase.invoke(game).actionStateList
+            actionStateList = getLastPhaseAsBetPhase.invoke(game.phaseList).actionStateList
         )
+        // TODO: BetPhase以外が考慮されていないので修正する
         val currentPlayerId = getCurrentPlayerId.invoke(
             btnPlayerId = table.btnPlayerId,
             playerOrder = table.playerOrder,
-            game = game
+            phaseList = game.phaseList
         )
         val btnPlayerIndex = table.playerOrder.indexOf(table.btnPlayerId)
         val sbIndex = if (table.playerOrder.size > 2) {
@@ -103,8 +104,8 @@ constructor(
             val pendingBetSize = pendingBetPerPlayer[playerId]
             val actionType: BetPhaseActionType? = if (playerId != currentPlayerId) {
                 // 自分のターン以外で、アクションを表示する
-                getBetPhaseActionType.invoke(
-                    game = game,
+                getActionTypeInLastPhaseAsBetPhase.invoke(
+                    phaseList = game.phaseList,
                     playerId = playerId
                 )
             } else {
@@ -165,7 +166,7 @@ constructor(
             )
         }
         val betPhase: BetPhase? = try {
-            getLatestBetPhase.invoke(game)
+            getLastPhaseAsBetPhase.invoke(game.phaseList)
         } catch (e: IllegalStateException) {
             null
         }

@@ -5,14 +5,14 @@ import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class GetCurrentPlayerIdUseCaseImpl
 @Inject constructor(
-    private val getLatestBetPhase: GetLatestBetPhaseUseCase,
+    private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
 ) : GetCurrentPlayerIdUseCase {
@@ -24,10 +24,10 @@ class GetCurrentPlayerIdUseCaseImpl
     override suspend fun invoke(
         btnPlayerId: PlayerId,
         playerOrder: List<PlayerId>,
-        game: Game
+        phaseList: List<Phase>
     ): PlayerId = withContext(dispatcher) {
         // 全員の最後のアクションを一つづつ取得
-        val latestBetPhase = getLatestBetPhase.invoke(game)
+        val latestBetPhase = getLastPhaseAsBetPhase.invoke(phaseList)
         // 全員の最後のアクションを一つづつ取得
         val actionStateList = latestBetPhase.actionStateList
         // 最後にアクションしたプレイヤーIDを取得（アクションがない場合はBTN）

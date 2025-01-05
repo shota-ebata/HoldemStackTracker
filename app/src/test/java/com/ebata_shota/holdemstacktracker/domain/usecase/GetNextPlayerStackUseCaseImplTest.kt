@@ -8,7 +8,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLastPhaseAsBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextGamePlayerStateListUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextPlayerStackUseCaseImpl
@@ -32,7 +32,7 @@ class GetNextPlayerStackUseCaseImplTest {
     fun setup() {
         // TODO: hilt
         useCase = GetNextPlayerStackUseCaseImpl(
-            getLatestBetPhase = GetLatestBetPhaseUseCaseImpl(StandardTestDispatcher()),
+            getLastPhaseAsBetPhase = GetLastPhaseAsBetPhaseUseCaseImpl(StandardTestDispatcher()),
             getPendingBetPerPlayer = GetPendingBetPerPlayerUseCaseImpl(
                 getMaxBetSize = GetMaxBetSizeUseCaseImpl(
                     dispatcher = dispatcher
@@ -53,12 +53,12 @@ class GetNextPlayerStackUseCaseImplTest {
      */
     @Test
     fun call_mock() {
-        val getLatestBetPhaseUseCase: GetLatestBetPhaseUseCaseImpl = mockk()
+        val getLastPhaseAsBetPhaseUseCase: GetLastPhaseAsBetPhaseUseCaseImpl = mockk()
         val getPendingBetPerPlayerUseCase: GetPendingBetPerPlayerUseCaseImpl = mockk()
         val getNextGamePlayerStateListUseCase: GetNextGamePlayerStateListUseCaseImpl = mockk()
 
         useCase = GetNextPlayerStackUseCaseImpl(
-            getLatestBetPhase = getLatestBetPhaseUseCase,
+            getLastPhaseAsBetPhase = getLastPhaseAsBetPhaseUseCase,
             getPendingBetPerPlayer = getPendingBetPerPlayerUseCase,
             getNextPlayerStateList = getNextGamePlayerStateListUseCase,
             dispatcher = dispatcher,
@@ -77,7 +77,7 @@ class GetNextPlayerStackUseCaseImplTest {
             phaseId = PhaseId(""),
             actionStateList = listOf<BetPhaseAction>()
         )
-        coEvery { getLatestBetPhaseUseCase.invoke(any()) } returns mockLatestBetPhaseResult
+        coEvery { getLastPhaseAsBetPhaseUseCase.invoke(any()) } returns mockLatestBetPhaseResult
 
         val mockPendingBetPerPlayerResult = mapOf<PlayerId, Int>(
             PlayerId("0") to 100,
@@ -107,7 +107,7 @@ class GetNextPlayerStackUseCaseImplTest {
 
             // assert
             coVerify(exactly = 1) {
-                getLatestBetPhaseUseCase.invoke(latestGame)
+                getLastPhaseAsBetPhaseUseCase.invoke(latestGame.phaseList)
             }
             coVerify(exactly = 1) {
                 getPendingBetPerPlayerUseCase.invoke(

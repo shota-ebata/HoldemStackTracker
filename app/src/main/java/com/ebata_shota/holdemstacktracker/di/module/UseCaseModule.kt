@@ -1,9 +1,9 @@
 package com.ebata_shota.holdemstacktracker.di.module
 
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastBetPhaseActionTypeUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionTypeInLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCase
@@ -28,9 +28,9 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.CreateNewGameUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLastBetPhaseLastActionTypeUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActionTypeInLastPhaseAsBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLatestBetPhaseUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLastPhaseAsBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMinRaiseSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextAutoActionUseCaseImpl
@@ -63,7 +63,7 @@ import dagger.hilt.android.components.ViewModelComponent
 @InstallIn(ViewModelComponent::class)
 interface UseCaseModule {
     @Binds
-    fun bindGetLatestBetPhaseUseCase(useCase: GetLatestBetPhaseUseCaseImpl): GetLatestBetPhaseUseCase
+    fun bindGetLastPhaseAsBetPhaseUseCase(useCase: GetLastPhaseAsBetPhaseUseCaseImpl): GetLastPhaseAsBetPhaseUseCase
 
     @Binds
     fun bindGetMaxBetSizeUseCase(useCase: GetMaxBetSizeUseCaseImpl): GetMaxBetSizeUseCase
@@ -141,5 +141,5 @@ interface UseCaseModule {
     fun bindGetPlayerLastActionInPhaseUseCase(useCase: GetPlayerLastActionInPhaseUseCaseImpl): GetPlayerLastActionInPhaseUseCase
 
     @Binds
-    fun bindGetLastBetPhaseActionTypeUseCase(useCase: GetLastBetPhaseLastActionTypeUseCaseImpl): GetLastBetPhaseActionTypeUseCase
+    fun bindGetActionTypeInLastPhaseAsBetPhaseUseCase(useCase: GetActionTypeInLastPhaseAsBetPhaseUseCaseImpl): GetActionTypeInLastPhaseAsBetPhaseUseCase
 }

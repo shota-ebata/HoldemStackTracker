@@ -21,7 +21,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCase
@@ -75,7 +75,7 @@ constructor(
     private val getNextGame: GetNextGameUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
     private val getNextAutoAction: GetNextAutoActionUseCase,
-    private val getLatestBetPhase: GetLatestBetPhaseUseCase,
+    private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
     private val getMaxBetSize: GetMaxBetSizeUseCase,
     private val getMinRaiseSize: GetMinRaiseSizeUseCase,
     private val isNotRaisedYet: IsNotRaisedYetUseCase,
@@ -208,7 +208,7 @@ constructor(
         val currentPlayerId = getCurrentPlayerId.invoke(
             btnPlayerId = table.btnPlayerId,
             playerOrder = table.playerOrder,
-            game = game
+            phaseList = game.phaseList
         )
         val isCurrentPlayer: Boolean = myPlayerId == currentPlayerId
         val autoAction: BetPhaseAction? = if (isCurrentPlayer) {
@@ -319,7 +319,7 @@ constructor(
         myPlayerId: PlayerId,
     ) {
         val betPhase: BetPhase = try {
-            getLatestBetPhase.invoke(game)
+            getLastPhaseAsBetPhase.invoke(game.phaseList)
         } catch (e: IllegalStateException) {
             return
         }
@@ -346,7 +346,7 @@ constructor(
         raiseSize: Int,
     ) {
         val player = game.players.find { it.id == myPlayerId }!!
-        val betPhase = getLatestBetPhase.invoke(game)
+        val betPhase = getLastPhaseAsBetPhase.invoke(game.phaseList)
         val actionStateList = betPhase.actionStateList
         // このフェーズ中、まだBetやAllInをしていない(オープンアクション)
         val isNotRaisedYet = isNotRaisedYet.invoke(actionStateList)
@@ -392,7 +392,7 @@ constructor(
         val stackSize = player.stack
         val minRaiseSize = minRaiseSizeFlow.first()
         val myPendingBetSize = getPendingBetSize.invoke(
-            actionList = getLatestBetPhase.invoke(game).actionStateList,
+            actionList = getLastPhaseAsBetPhase.invoke(game.phaseList).actionStateList,
             playerOrder = table.playerOrder,
             playerId = myPlayerId
         )

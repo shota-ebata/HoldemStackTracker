@@ -48,7 +48,7 @@ class IsActionRequiredUseCaseImplTest {
     @Test
     fun call_getMaxBetSizeUseCase() {
         // prepare
-        val getLatestBetPhaseUseCase: GetLatestBetPhaseUseCase = mockk()
+        val getLastPhaseAsBetPhaseUseCase: GetLastPhaseAsBetPhaseUseCase = mockk()
         val getMaxBetSizeUseCase: GetMaxBetSizeUseCase = mockk()
         // TODO: Hilt
         useCase = IsActionRequiredUseCaseImpl(
@@ -71,7 +71,7 @@ class IsActionRequiredUseCaseImplTest {
         )
         val latestGame = createDummyGame()
         val actionStateList = listOf<BetPhaseAction>()
-        coEvery { getLatestBetPhaseUseCase.invoke(latestGame) } returns (
+        coEvery { getLastPhaseAsBetPhaseUseCase.invoke(latestGame.phaseList) } returns (
                 Phase.PreFlop(
                     phaseId = PhaseId(""),
                     actionStateList = actionStateList

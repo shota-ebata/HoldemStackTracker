@@ -10,7 +10,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pot
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetLatestBetPhaseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPlayerStackUseCase
@@ -25,7 +25,7 @@ class GetNextGameUseCaseImpl
 @Inject
 constructor(
     private val isActionRequired: IsActionRequiredUseCase,
-    private val getLatestBetPhase: GetLatestBetPhaseUseCase,
+    private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
     private val getPendingBetPerPlayer: GetPendingBetPerPlayerUseCase,
     private val getPotStateList: GetPotStateListUseCase,
     private val getNextPhase: GetNextPhaseUseCase,
@@ -56,7 +56,7 @@ constructor(
         playerOrder: List<PlayerId>
     ): Game {
         // BetPhaseでしかActionはできないので
-        val latestPhase: BetPhase = getLatestBetPhase.invoke(latestGame)
+        val latestPhase: BetPhase = getLastPhaseAsBetPhase.invoke(latestGame.phaseList)
         // まずはActionを追加
         val updatedActionStateList = latestPhase.actionStateList + action
         val latestPhaseList: List<Phase> = latestGame.phaseList
