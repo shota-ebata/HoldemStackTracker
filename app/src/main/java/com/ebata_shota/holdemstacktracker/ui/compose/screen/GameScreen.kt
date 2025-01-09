@@ -23,6 +23,7 @@ fun GameScreen(
         is GameScreenUiState.Content -> {
             GameContent(
                 uiState = uiState.contentUiState,
+                onActionDisplayed = viewModel::onActionDisplayed,
                 onClickFoldButton = viewModel::onClickFoldButton,
                 onClickCheckButton = viewModel::onClickCheckButton,
                 onClickAllInButton = viewModel::onClickAllInButton,

@@ -283,10 +283,7 @@ constructor(
             ),
             playerOrder = playerOrder,
         )
-        gameRepository.sendGame(
-            tableId = tableId,
-            newGame = nextGame,
-        )
+        sendNextGame(nextGame)
     }
 
     private suspend fun doCheck(
@@ -302,10 +299,7 @@ constructor(
             ),
             playerOrder = playerOrder,
         )
-        gameRepository.sendGame(
-            tableId = tableId,
-            newGame = nextGame,
-        )
+        sendNextGame(nextGame)
     }
 
     private suspend fun doAllIn(
@@ -323,10 +317,7 @@ constructor(
             ),
             playerOrder = playerOrder,
         )
-        gameRepository.sendGame(
-            tableId = tableId,
-            newGame = nextGame,
-        )
+        sendNextGame(nextGame)
     }
 
     private suspend fun doCall(
@@ -349,10 +340,7 @@ constructor(
             ),
             playerOrder = playerOrder,
         )
-        gameRepository.sendGame(
-            tableId = tableId,
-            newGame = nextGame,
-        )
+        sendNextGame(nextGame)
     }
 
     private suspend fun doRaise(
@@ -392,6 +380,11 @@ constructor(
             },
             playerOrder = playerOrder,
         )
+        sendNextGame(nextGame)
+    }
+
+    private suspend fun sendNextGame(nextGame: Game) {
+        // displayDelayをキャンセルするイベント発火
         gameRepository.sendGame(
             tableId = tableId,
             newGame = nextGame,
@@ -576,12 +569,14 @@ constructor(
         }
     }
 
-    fun sawAction(actionId: ActionId) {
+    fun onActionDisplayed(actionId: ActionId?) {
         viewModelScope.launch {
-            actionHistoryRepository.sawAction(
-                tableId = tableId,
-                actionId = actionId
-            )
+            if (actionId != null) {
+                actionHistoryRepository.sawAction(
+                    tableId = tableId,
+                    actionId = actionId
+                )
+            }
         }
     }
 

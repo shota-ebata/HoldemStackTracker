@@ -343,6 +343,7 @@ constructor(
         return@withContext GameContentUiState(
             tableId = tableId,
             game = game,
+            currentActionId = betPhase.actionStateList.lastOrNull()?.actionId,
             players = players,
             centerPanelContentUiState = CenterPanelContentUiState(
                 betPhaseTextResId = when (betPhase) {

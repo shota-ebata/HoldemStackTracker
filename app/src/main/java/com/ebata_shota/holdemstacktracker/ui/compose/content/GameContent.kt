@@ -36,6 +36,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
@@ -48,11 +49,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.R
-import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
-import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.toStringSource
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.RaiseSizeChangeButton
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.RaiseSizeChangeButtonUiState
@@ -64,12 +63,12 @@ import com.ebata_shota.holdemstacktracker.ui.compose.util.getChipString
 import com.ebata_shota.holdemstacktracker.ui.compose.util.rememberDelayState
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
-import java.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameContent(
     uiState: GameContentUiState,
+    onActionDisplayed: (ActionId?) -> Unit,
     onClickFoldButton: () -> Unit,
     onClickCheckButton: () -> Unit,
     onClickAllInButton: () -> Unit,
@@ -85,6 +84,12 @@ fun GameContent(
     modifier: Modifier = Modifier,
 ) {
     val delayState: DelayState = rememberDelayState()
+
+    val currentActionId = uiState.currentActionId
+    LaunchedEffect(currentActionId) {
+        // ActionIDが変わるたびに、表示した扱い
+        onActionDisplayed(currentActionId)
+    }
     Surface(
         modifier = modifier.fillMaxSize()
     ) {
@@ -562,8 +567,8 @@ fun GameContent(
 }
 
 data class GameContentUiState(
-    val tableId: TableId,
-    val game: Game,
+    val tableIdString: StringSource,
+    val currentActionId: ActionId?,
     val players: List<GamePlayerUiState>,
     val centerPanelContentUiState: CenterPanelContentUiState,
     val blindText: String,
@@ -605,15 +610,8 @@ private class GameContentUiStatePreviewParam :
     PreviewParameterProvider<GameContentUiState> {
     override val values: Sequence<GameContentUiState> = sequenceOf(
         GameContentUiState(
-            tableId = TableId("tableId"),
-            game = Game(
-                version = 0,
-                appVersion = BuildConfig.VERSION_CODE.toLong(),
-                players = emptySet(),
-                potList = emptyList(),
-                phaseList = emptyList(),
-                updateTime = Instant.now()
-            ),
+            tableIdString = StringSource(R.string.table_id_prefix, "123abc"),
+            currentActionId = ActionId("actionId"),
             players = listOf(
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -819,6 +817,7 @@ private fun GameContentPreview(
     HoldemStackTrackerTheme {
         GameContent(
             uiState = uiState,
+            onActionDisplayed = {},
             onClickFoldButton = {},
             onClickCheckButton = {},
             onClickAllInButton = {},
