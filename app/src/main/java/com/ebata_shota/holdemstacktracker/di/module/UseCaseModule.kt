@@ -2,6 +2,7 @@ package com.ebata_shota.holdemstacktracker.di.module
 
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionTypeInLastPhaseAsBetPhaseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetBetPhaseActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
@@ -29,6 +30,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.CreateNewGameUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActionTypeInLastPhaseAsBetPhaseUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetBetPhaseActionUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLastPhaseAsBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
@@ -142,4 +144,7 @@ interface UseCaseModule {
 
     @Binds
     fun bindGetActionTypeInLastPhaseAsBetPhaseUseCase(useCase: GetActionTypeInLastPhaseAsBetPhaseUseCaseImpl): GetActionTypeInLastPhaseAsBetPhaseUseCase
+
+    @Binds
+    fun bindGetBetPhaseActionUseCase(useCase: GetBetPhaseActionUseCaseImpl): GetBetPhaseActionUseCase
 }
