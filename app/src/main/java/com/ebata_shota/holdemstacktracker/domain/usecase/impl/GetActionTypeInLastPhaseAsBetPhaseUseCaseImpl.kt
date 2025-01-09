@@ -6,7 +6,6 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionTypeInLastPhaseAsBetPhaseUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionInPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionUseCase
 import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType
@@ -31,12 +30,12 @@ constructor(
         phaseList: List<Phase>,
         playerId: PlayerId,
     ): BetPhaseActionType? = withContext(dispatcher) {
-        val lastBetPhase = phaseList.getLatestBetPhase()
-        val playerLastAction = if (lastBetPhase != null) {
+        val latestBetPhase = phaseList.getLatestBetPhase()
+        val playerLastAction = if (latestBetPhase != null) {
             // このフェーズでの最新アクション
             val playerLastActionInPhase = getPlayerLastActionInPhase.invoke(
                 playerId = playerId,
-                actionList = lastBetPhase.actionStateList
+                actionList = latestBetPhase.actionStateList
             )
             if (playerLastActionInPhase != null) {
                 // すでにこのフェーズでアクションしていたら、それを返す
