@@ -3,6 +3,9 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.AfterFlop
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.AfterPreFlop
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.AfterTurn
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.AllInOpen
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.End
@@ -40,6 +43,20 @@ constructor(
                 actionStateList = emptyList()
             )
             is BetPhase -> getNextPhaseStateFromBetPhase(playerOrder, phaseList, latestPhase)
+            is AfterPreFlop -> Flop(
+                phaseId = PhaseId(randomIdRepository.generateRandomId()),
+                actionStateList = emptyList()
+            )
+
+            is AfterFlop -> Turn(
+                phaseId = PhaseId(randomIdRepository.generateRandomId()),
+                actionStateList = emptyList()
+            )
+
+            is AfterTurn -> River(
+                phaseId = PhaseId(randomIdRepository.generateRandomId()),
+                actionStateList = emptyList()
+            )
             is AllInOpen -> PotSettlement(phaseId = PhaseId(randomIdRepository.generateRandomId()))
             is ShowDown -> PotSettlement(phaseId = PhaseId(randomIdRepository.generateRandomId()))
             is PotSettlement -> End(phaseId = PhaseId(randomIdRepository.generateRandomId()))
@@ -79,17 +96,16 @@ constructor(
         // その他の場合は次のべットフェーズへ
         // (フェーズのアクションがすべて終わっている前提で、このメソッドを呼び出している想定）
         return when (latestPhase) {
-            is PreFlop -> Flop(
-                phaseId = PhaseId(randomIdRepository.generateRandomId()),
-                actionStateList = emptyList()
+            is PreFlop -> AfterPreFlop(
+                phaseId = PhaseId(randomIdRepository.generateRandomId())
             )
-            is Flop -> Turn(
-                phaseId = PhaseId(randomIdRepository.generateRandomId()),
-                actionStateList = emptyList()
+
+            is Flop -> AfterFlop(
+                phaseId = PhaseId(randomIdRepository.generateRandomId())
             )
-            is Turn -> River(
-                phaseId = PhaseId(randomIdRepository.generateRandomId()),
-                actionStateList = emptyList()
+
+            is Turn -> AfterTurn(
+                phaseId = PhaseId(randomIdRepository.generateRandomId())
             )
             is River -> ShowDown(phaseId = PhaseId(randomIdRepository.generateRandomId()))
         }

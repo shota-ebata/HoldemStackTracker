@@ -34,7 +34,6 @@ constructor(
                     game = game
                 )
             }
-
             is Phase.Flop,
             is Phase.Turn,
             is Phase.River -> {
@@ -45,11 +44,15 @@ constructor(
                 )
             }
 
+            is Phase.AfterPreFlop,
+            is Phase.AfterFlop,
+            is Phase.AfterTurn,
             is Phase.ShowDown,
             is Phase.AllInOpen,
             is Phase.PotSettlement,
             is Phase.End,
             null -> null
+
         }
     }
 

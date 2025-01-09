@@ -16,15 +16,27 @@ sealed interface Phase {
         override val actionStateList: List<BetPhaseAction>,
     ) : BetPhase
 
+    data class AfterPreFlop(
+        override val phaseId: PhaseId
+    ) : Phase
+
     data class Flop(
         override val phaseId: PhaseId,
         override val actionStateList: List<BetPhaseAction>,
     ) : BetPhase
 
+    data class AfterFlop(
+        override val phaseId: PhaseId
+    ) : Phase
+
     data class Turn(
         override val phaseId: PhaseId,
         override val actionStateList: List<BetPhaseAction>,
     ) : BetPhase
+
+    data class AfterTurn(
+        override val phaseId: PhaseId
+    ) : Phase
 
     data class River(
         override val phaseId: PhaseId,

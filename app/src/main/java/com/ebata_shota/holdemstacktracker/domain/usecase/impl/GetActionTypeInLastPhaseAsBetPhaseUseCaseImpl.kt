@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
+import com.ebata_shota.holdemstacktracker.domain.exception.getLatestBetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -16,7 +17,6 @@ import javax.inject.Inject
 class GetActionTypeInLastPhaseAsBetPhaseUseCaseImpl
 @Inject
 constructor(
-    private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
     private val getPlayerLastAction: GetPlayerLastActionUseCase,
     private val getPlayerLastActionInPhase: GetPlayerLastActionInPhaseUseCase,
     @CoroutineDispatcherDefault
@@ -31,11 +31,7 @@ constructor(
         phaseList: List<Phase>,
         playerId: PlayerId,
     ): BetPhaseActionType? = withContext(dispatcher) {
-        val lastBetPhase = try {
-            getLastPhaseAsBetPhase.invoke(phaseList)
-        } catch (e: IllegalStateException) {
-            null
-        }
+        val lastBetPhase = phaseList.getLatestBetPhase()
         val playerLastAction = if (lastBetPhase != null) {
             // このフェーズでの最新アクション
             val playerLastActionInPhase = getPlayerLastActionInPhase.invoke(

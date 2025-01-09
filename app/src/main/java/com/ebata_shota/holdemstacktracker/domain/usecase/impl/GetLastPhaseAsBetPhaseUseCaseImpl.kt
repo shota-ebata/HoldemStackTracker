@@ -8,8 +8,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+/**
+ * FIXME: 拡張関数でいいかも
+ */
 class GetLastPhaseAsBetPhaseUseCaseImpl
-@Inject constructor(
+@Inject
+constructor(
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher
 ) : GetLastPhaseAsBetPhaseUseCase {

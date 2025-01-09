@@ -7,8 +7,11 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase
 enum class PhaseType {
     Standby,
     PreFlop,
+    AfterPreFlop,
     Flop,
+    AfterFlop,
     Turn,
+    AfterTurn,
     River,
     ShowDown,
     AllInOpen,
@@ -26,8 +29,11 @@ enum class PhaseType {
             return when (phase) {
                 is Phase.Standby -> Standby
                 is Phase.PreFlop -> PreFlop
+                is Phase.AfterPreFlop -> AfterPreFlop
                 is Phase.Flop -> Flop
+                is Phase.AfterFlop -> AfterFlop
                 is Phase.Turn -> Turn
+                is Phase.AfterTurn -> AfterTurn
                 is Phase.River -> River
                 is Phase.ShowDown -> ShowDown
                 is Phase.AllInOpen -> AllInOpen

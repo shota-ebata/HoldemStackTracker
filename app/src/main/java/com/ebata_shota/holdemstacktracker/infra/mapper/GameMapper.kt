@@ -66,14 +66,17 @@ constructor() {
                     phaseId = PhaseId(phaseId),
                     actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty()
                 )
+                PhaseType.AfterPreFlop -> Phase.AfterPreFlop(phaseId = PhaseId(phaseId))
                 PhaseType.Flop -> Phase.Flop(
                     phaseId = PhaseId(phaseId),
                     actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty()
                 )
+                PhaseType.AfterFlop -> Phase.AfterFlop(phaseId = PhaseId(phaseId))
                 PhaseType.Turn -> Phase.Turn(
                     phaseId = PhaseId(phaseId),
                     actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty()
                 )
+                PhaseType.AfterTurn -> Phase.AfterTurn(phaseId = PhaseId(phaseId))
                 PhaseType.River ->  Phase.River(
                     phaseId = PhaseId(phaseId),
                     actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty()

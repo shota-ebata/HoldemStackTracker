@@ -21,7 +21,11 @@ constructor(
         phaseList: List<Phase>,
         minBetSize: Int,
     ): Int = withContext(dispatcher) {
-        val betPhase = getLastPhaseAsBetPhase.invoke(phaseList)
+        val betPhase = try {
+            getLastPhaseAsBetPhase.invoke(phaseList)
+        } catch (e: IllegalStateException) {
+            return@withContext minBetSize
+        }
         // 最低引き上げ額
         var minUpliftSize: Int = minBetSize
         // 最高Bet額
