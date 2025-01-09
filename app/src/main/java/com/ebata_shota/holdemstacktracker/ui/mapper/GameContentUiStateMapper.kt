@@ -341,8 +341,7 @@ constructor(
         }
 
         return@withContext GameContentUiState(
-            tableId = tableId,
-            game = game,
+            tableIdString = StringSource(R.string.table_id_prefix, tableId.value),
             currentActionId = betPhase.actionStateList.lastOrNull()?.actionId,
             players = players,
             centerPanelContentUiState = CenterPanelContentUiState(

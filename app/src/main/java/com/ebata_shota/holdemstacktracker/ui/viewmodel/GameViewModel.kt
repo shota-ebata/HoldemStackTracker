@@ -20,6 +20,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.PhaseHistoryReposito
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetBetPhaseActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
@@ -84,6 +85,7 @@ constructor(
     private val getPendingBetSize: GetPendingBetSizeUseCase,
     private val getOneDownRaiseSize: GetOneDownRaiseSizeUseCase,
     private val getOneUpRaiseSize: GetOneUpRaiseSizeUseCase,
+    private val getBetPhaseAction: GetBetPhaseActionUseCase,
     private val uiStateMapper: GameContentUiStateMapper,
 ) : ViewModel(), GameSettingsDialogEvent {
     private val tableId: TableId by savedStateHandle.param()

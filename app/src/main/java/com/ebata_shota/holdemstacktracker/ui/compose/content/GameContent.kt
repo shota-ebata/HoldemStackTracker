@@ -186,11 +186,10 @@ fun GameContent(
                 }
             }
 
-
-            Box(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-                contentAlignment = Alignment.BottomStart
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(
                     modifier = Modifier
@@ -219,6 +218,11 @@ fun GameContent(
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
+
+                Text(
+                    modifier = Modifier.padding(start = 10.dp),
+                    text = uiState.tableIdString.getString(),
+                )
             }
 
             Column(

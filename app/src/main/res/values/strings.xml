@@ -56,6 +56,7 @@
     <string name="suffix_bb">%1$s BB</string>
     <string name="label_bb">BB</string>
     <string name="raise_size_button_label_x">×%1$s</string>
+    <string name="table_id_prefix">Table ID: %1$s</string>
 
     <string name="position_label_sb">SB</string>
     <string name="position_label_bb">BB</string>
