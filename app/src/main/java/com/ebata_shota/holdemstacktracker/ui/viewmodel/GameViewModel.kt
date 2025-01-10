@@ -117,7 +117,6 @@ constructor(
         tableStateFlow.filterNotNull(),
         gameStateFlow.filterNotNull()
     ) { table, game ->
-        // TODO: BetPhase以外が考慮されていない
         getMinRaiseSize.invoke(
             phaseList = game.phaseList,
             minBetSize = table.rule.minBetSize
