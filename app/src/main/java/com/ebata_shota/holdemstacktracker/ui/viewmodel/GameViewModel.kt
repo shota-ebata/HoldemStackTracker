@@ -4,10 +4,12 @@ import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -39,6 +41,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameSettingsContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PhaseIntervalImageDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
 import com.ebata_shota.holdemstacktracker.ui.mapper.GameContentUiStateMapper
@@ -127,7 +130,10 @@ constructor(
         replay = 1
     )
 
+    // 画面の常時点灯
     val isKeepScreenOn: Flow<Boolean> = prefRepository.isKeepScreenOn
+
+    // SettingDialog
     private val shouldShowGameSettingDialog = MutableStateFlow(false)
     val gameSettingsDialogUiState: StateFlow<GameSettingsDialogUiState?> = combine(
         shouldShowGameSettingDialog,
@@ -147,6 +153,9 @@ constructor(
         started = SharingStarted.Eagerly,
         initialValue = null
     )
+
+    // PhaseIntervalImageDialog
+    val phaseIntervalImageDialog = MutableStateFlow<PhaseIntervalImageDialogUiState?>(null)
 
     init {
         // テーブル監視開始
@@ -195,6 +204,35 @@ constructor(
                     raiseSizeStateFlow.update { minRaiseSize }
                 }
             }.collect()
+        }
+
+        viewModelScope.launch {
+            gameStateFlow.filterNotNull().collect { game ->
+                phaseIntervalImageDialog.update {
+                    // FIXME: PhaseHistoryをPhaseIdから見て、見た後であれば表示しない対応を入れたい
+                    when (game.phaseList.lastOrNull()) {
+                        is Phase.AfterPreFlop -> {
+                            PhaseIntervalImageDialogUiState(
+                                imageResId = R.drawable.flopimage
+                            )
+                        }
+
+                        is Phase.AfterFlop -> {
+                            PhaseIntervalImageDialogUiState(
+                                imageResId = R.drawable.turnimage
+                            )
+                        }
+
+                        is Phase.AfterTurn -> {
+                            PhaseIntervalImageDialogUiState(
+                                imageResId = R.drawable.riverimage
+                            )
+                        }
+
+                        else -> null
+                    }
+                }
+            }
         }
     }
 
@@ -599,6 +637,13 @@ constructor(
     override fun onDismissGameSettingsDialogRequest() {
         viewModelScope.launch {
             shouldShowGameSettingDialog.update { false }
+        }
+    }
+
+    fun onDismissSimpleImageErrorDialogRequest() {
+        viewModelScope.launch {
+            // FIXME: PhaseHistoryを保存（見た扱いにしたい）
+            phaseIntervalImageDialog.update { null }
         }
     }
 

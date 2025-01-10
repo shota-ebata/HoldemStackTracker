@@ -9,6 +9,8 @@ import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialog
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PhaseIntervalImageDialogContent
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PhaseIntervalImageDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.GameViewModel
 
 @Composable
@@ -17,6 +19,7 @@ fun GameScreen(
 ) {
     val screenUiState: GameScreenUiState by viewModel.screenUiState.collectAsStateWithLifecycle()
     val gameSettingDialogUiState: GameSettingsDialogUiState? by viewModel.gameSettingsDialogUiState.collectAsStateWithLifecycle()
+    val phaseIntervalImageDialogUiState: PhaseIntervalImageDialogUiState? by viewModel.phaseIntervalImageDialog.collectAsStateWithLifecycle()
 
     when (val uiState = screenUiState) {
         GameScreenUiState.Loading -> LoadingContent()
@@ -42,6 +45,13 @@ fun GameScreen(
                 GameSettingsDialog(
                     uiState = it,
                     event = viewModel
+                )
+            }
+
+            phaseIntervalImageDialogUiState?.let {
+                PhaseIntervalImageDialogContent(
+                    uiState = it,
+                    onDismissDialogRequest = viewModel::onDismissSimpleImageErrorDialogRequest
                 )
             }
         }
