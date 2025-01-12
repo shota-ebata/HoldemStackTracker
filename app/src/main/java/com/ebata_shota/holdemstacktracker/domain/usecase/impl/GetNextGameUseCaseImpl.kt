@@ -61,7 +61,7 @@ constructor(
         val updatedActionStateList = latestPhase.actionStateList + action
         val latestPhaseList: List<Phase> = latestGame.phaseList
         // PhaseListの最後の要素を置き換える
-        val updatedPhaseLists: MutableList<Phase> = latestPhaseList.mapAtIndex(latestPhaseList.lastIndex) {
+        val updatedPhaseList: MutableList<Phase> = latestPhaseList.mapAtIndex(latestPhaseList.lastIndex) {
             // Phaseに反映
             when (latestPhase) {
                 is Phase.PreFlop -> latestPhase.copy(actionStateList = updatedActionStateList)
@@ -87,33 +87,49 @@ constructor(
             latestGame.copy(
                 version = latestGame.version + 1L,
                 players = updatedPlayers,
-                phaseList = updatedPhaseLists
+                phaseList = updatedPhaseList
             )
         } else {
             // もし全員のベットが揃った場合、ポット更新してフェーズを進める
-            // プレイヤーごとの、まだポットに入っていないベット額
-            val pendingBetPerPlayer: Map<PlayerId, Int> = getPendingBetPerPlayer.invoke(
+            getNextGame(
                 playerOrder = playerOrder,
-                actionStateList = updatedActionStateList
-            )
-            // ベット状況をポットに反映
-            val updatedPotList: List<Pot> = getPotStateList.invoke(
-                potList = latestGame.potList,
-                pendingBetPerPlayer = pendingBetPerPlayer
-            )
-            // フェーズを進める
-            val nextPhase = getNextPhase.invoke(
-                playerOrder = playerOrder,
-                phaseList = updatedPhaseLists
-            )
-            updatedPhaseLists += nextPhase
-            // TableState更新
-            latestGame.copy(
-                version = latestGame.version + 1L,
-                players = updatedPlayers,
-                phaseList = updatedPhaseLists,
-                potList = updatedPotList,
+                latestGame = latestGame,
+                updatedPlayers = updatedPlayers,
+                updatedPhaseList = updatedPhaseList,
+                updatedActionStateList = updatedActionStateList,
             )
         }
+    }
+
+    private suspend fun getNextGame(
+        playerOrder: List<PlayerId>,
+        latestGame: Game,
+        updatedPlayers: Set<GamePlayer>,
+        updatedPhaseList: MutableList<Phase>,
+        updatedActionStateList: List<BetPhaseAction>,
+    ): Game {
+        // プレイヤーごとの、まだポットに入っていないベット額
+        val pendingBetPerPlayer: Map<PlayerId, Int> = getPendingBetPerPlayer.invoke(
+            playerOrder = playerOrder,
+            actionStateList = updatedActionStateList
+        )
+        // ベット状況をポットに反映
+        val updatedPotList: List<Pot> = getPotStateList.invoke(
+            potList = latestGame.potList,
+            pendingBetPerPlayer = pendingBetPerPlayer
+        )
+        // フェーズを進める
+        val nextPhase = getNextPhase.invoke(
+            playerOrder = playerOrder,
+            phaseList = updatedPhaseList
+        )
+        updatedPhaseList += nextPhase
+        // TableState更新
+        return latestGame.copy(
+            version = latestGame.version + 1L,
+            players = updatedPlayers,
+            phaseList = updatedPhaseList,
+            potList = updatedPotList,
+        )
     }
 }
