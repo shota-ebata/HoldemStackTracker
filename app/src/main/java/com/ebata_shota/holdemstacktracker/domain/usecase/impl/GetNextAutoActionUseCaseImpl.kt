@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
+import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherIO
 import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
@@ -10,26 +11,32 @@ import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class GetNextAutoActionUseCaseImpl
 @Inject
 constructor(
     private val getPlayerLastActions: GetPlayerLastActionsUseCase,
-    private val randomIdRepository: RandomIdRepository
+    private val randomIdRepository: RandomIdRepository,
+    @CoroutineDispatcherIO
+    private val dispatcher: CoroutineDispatcher,
 ) : GetNextAutoActionUseCase {
 
     override suspend fun invoke(
         playerId: PlayerId,
-        table: Table,
+        rule: Rule,
+        playerOrder: List<PlayerId>,
         game: Game
-    ): BetPhaseAction? {
-        return when (val latestPhase = game.phaseList.lastOrNull()) {
+    ): BetPhaseAction? = withContext(dispatcher) {
+        return@withContext when (val latestPhase = game.phaseList.lastOrNull()) {
             is Phase.Standby -> null
             is Phase.PreFlop -> {
                 getPreFlopAutoAction(
                     latestPhase = latestPhase,
-                    table = table,
+                    rule = rule,
+                    playerOrder = playerOrder,
                     playerId = playerId,
                     game = game
                 )
@@ -40,7 +47,7 @@ constructor(
                 getAutoAction(
                     game = game,
                     playerId = playerId,
-                    table = table
+                    playerOrder = playerOrder
                 )
             }
 
@@ -58,18 +65,19 @@ constructor(
 
     private suspend fun getPreFlopAutoAction(
         latestPhase: Phase.PreFlop,
-        table: Table,
+        rule: Rule,
+        playerOrder: List<PlayerId>,
         playerId: PlayerId,
         game: Game
     ): BetPhaseAction? {
-        return when (val rule = table.rule) {
+        return when (rule) {
             is Rule.RingGame -> {
                 getPreFlopRingGameAutoAction(
                     actionList = latestPhase.actionStateList,
                     playerId = playerId,
                     rule = rule,
                     game = game,
-                    table = table
+                    playerOrder = playerOrder
                 )
             }
         }
@@ -80,7 +88,7 @@ constructor(
         playerId: PlayerId,
         rule: Rule.RingGame,
         game: Game,
-        table: Table
+        playerOrder: List<PlayerId>
     ): BetPhaseAction? {
         // Betアクションのみ絞り込み
         val betActionList = actionList.filterIsInstance<BetPhaseAction.BetAction>()
@@ -94,7 +102,7 @@ constructor(
                 getAutoAction(
                     game = game,
                     playerId = playerId,
-                    table = table
+                    playerOrder = playerOrder
                 )
             }
         }
@@ -161,11 +169,11 @@ constructor(
     private suspend fun getAutoAction(
         game: Game,
         playerId: PlayerId,
-        table: Table
+        playerOrder: List<PlayerId>
     ): BetPhaseAction? {
         val lastActions: Map<PlayerId, BetPhaseAction?> =
             getPlayerLastActions.invoke(
-                playerOrder = table.playerOrder,
+                playerOrder = playerOrder,
                 phaseList = game.phaseList
             )
         // プレイヤーが最後にやったアクションに応じて

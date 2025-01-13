@@ -247,67 +247,29 @@ constructor(
         isEnableSliderStep: Boolean,
         betViewMode: BetViewMode,
     ) {
-        // FIXME: combine内部での問題が検知しづらい
-        val currentBetPhase = try {
-            getLastPhaseAsBetPhase.invoke(game.phaseList)
-        } catch (e: IllegalStateException) {
-            null
+        // オートアクションがない場合だけ、UiStateを更新する
+        val contentUiState: GameContentUiState? = uiStateMapper.createUiState(
+            game = game,
+            table = table,
+            myPlayerId = myPlayerId,
+            raiseSize = raiseSize ?: minRaiseSize,
+            minRaiseSize = minRaiseSize,
+            isEnableSliderStep = isEnableSliderStep,
+            betViewMode = betViewMode
+        )
+        if (contentUiState == null) {
+            // contentUiStateが何かしらの理由で作成されなかった場合は
+            // screenUiStateの更新を行わない
+            return
         }
-        val currentPlayerId = currentBetPhase?.let {
-            getCurrentPlayerId.invoke(
-                btnPlayerId = table.btnPlayerId,
-                playerOrder = table.playerOrder,
-                currentBetPhase = currentBetPhase
-            )
-        }
-        val isCurrentPlayer: Boolean = myPlayerId == currentPlayerId
-        val autoAction: BetPhaseAction? = if (isCurrentPlayer) {
-            getNextAutoAction.invoke(
-                playerId = myPlayerId,
-                table = table,
-                game = game
-            )
-        } else {
-            null
-        }
+        val content = GameScreenUiState.Content(
+            contentUiState = contentUiState
+        )
+        // TODO: フェーズが進んだことを検知したい
+        //   たとえば、Raiseサイズをフェーズが進んだタイミングで最低にしたい。
 
-        if (autoAction != null) {
-            // オートアクションがあるなら、それを使って新しいGameを生成
-            val updatedGame = getNextGame.invoke(
-                latestGame = game,
-                action = autoAction,
-                playerOrder = table.playerOrder
-            )
-            // 更新実行
-            gameRepository.sendGame(
-                tableId = tableId,
-                newGame = updatedGame
-            )
-        } else {
-            // オートアクションがない場合だけ、UiStateを更新する
-            val contentUiState: GameContentUiState? = uiStateMapper.createUiState(
-                game = game,
-                table = table,
-                myPlayerId = myPlayerId,
-                raiseSize = raiseSize ?: minRaiseSize,
-                minRaiseSize = minRaiseSize,
-                isEnableSliderStep = isEnableSliderStep,
-                betViewMode = betViewMode
-            )
-            if (contentUiState == null) {
-                // contentUiStateが何かしらの理由で作成されなかった場合は
-                // screenUiStateの更新を行わない
-                return
-            }
-            val content = GameScreenUiState.Content(
-                contentUiState = contentUiState
-            )
-            // TODO: フェーズが進んだことを検知したい
-            //   たとえば、Raiseサイズをフェーズが進んだタイミングで最低にしたい。
-
-            _screenUiState.update {
-                content
-            }
+        _screenUiState.update {
+            content
         }
     }
 
