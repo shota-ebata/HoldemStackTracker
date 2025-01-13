@@ -33,6 +33,7 @@ constructor(
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
 ) : GetNextPhaseUseCase {
+
     override suspend fun invoke(
         playerOrder: List<PlayerId>,
         phaseList: List<Phase>,

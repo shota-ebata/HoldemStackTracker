@@ -24,6 +24,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetBetPhaseActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetFirstActionPlayerIdOfNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
@@ -89,6 +90,7 @@ constructor(
     private val getOneDownRaiseSize: GetOneDownRaiseSizeUseCase,
     private val getOneUpRaiseSize: GetOneUpRaiseSizeUseCase,
     private val getBetPhaseAction: GetBetPhaseActionUseCase,
+    private val getNextPlayerIdOfNextPhase: GetFirstActionPlayerIdOfNextPhaseUseCase,
     private val uiStateMapper: GameContentUiStateMapper,
 ) : ViewModel(), GameSettingsDialogEvent {
     private val tableId: TableId by savedStateHandle.param()
@@ -423,7 +425,7 @@ constructor(
     }
 
     private suspend fun sendNextGame(nextGame: Game) {
-        // displayDelayをキャンセルするイベント発火
+        // FIXME: あのータイムスタンプの更新をしたいです
         gameRepository.sendGame(
             tableId = tableId,
             newGame = nextGame,
@@ -644,6 +646,25 @@ constructor(
         viewModelScope.launch {
             // FIXME: PhaseHistoryを保存（見た扱いにしたい）
             phaseIntervalImageDialog.update { null }
+            //
+            val table = tableStateFlow.value ?: return@launch
+            val game = gameStateFlow.value ?: return@launch
+            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+            val nextPlayerId = getNextPlayerIdOfNextPhase.invoke(
+                btnPlayerId = table.btnPlayerId,
+                playerOrder = table.playerOrder,
+                currentGame = game,
+            )
+            if (myPlayerId == nextPlayerId) {
+                val nextPhase = getNextPhase.invoke(
+                    playerOrder = table.playerOrder,
+                    phaseList = game.phaseList,
+                )
+                val nextGame = game.copy(
+                    phaseList = game.phaseList + nextPhase
+                )
+                sendNextGame(nextGame = nextGame)
+            }
         }
     }
 
