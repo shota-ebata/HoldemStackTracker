@@ -51,7 +51,7 @@ fun GameScreen(
             phaseIntervalImageDialogUiState?.let {
                 PhaseIntervalImageDialogContent(
                     uiState = it,
-                    onDismissDialogRequest = viewModel::onDismissSimpleImageErrorDialogRequest
+                    onDismissDialogRequest = viewModel::onDismissPhaseIntervalImageDialogRequest
                 )
             }
         }

@@ -640,7 +640,7 @@ constructor(
         }
     }
 
-    fun onDismissSimpleImageErrorDialogRequest() {
+    fun onDismissPhaseIntervalImageDialogRequest() {
         viewModelScope.launch {
             // FIXME: PhaseHistoryを保存（見た扱いにしたい）
             phaseIntervalImageDialog.update { null }
