@@ -410,15 +410,10 @@ constructor(
             ?: return@mapIndexedNotNull null
         val playerPosition: GamePlayerUiState.PlayerPosition = positions[index]
         val pendingBetSize = pendingBetPerPlayer[playerId]
-        val actionType: BetPhaseActionType? = if (playerId != currentPlayerId) {
-            // 自分のターン以外で、アクションを表示する
-            getActionTypeInLastPhaseAsBetPhase.invoke(
-                phaseList = phaseList,
-                playerId = playerId
-            )
-        } else {
-            null
-        }
+        val actionType: BetPhaseActionType? = getActionTypeInLastPhaseAsBetPhase.invoke(
+            phaseList = phaseList,
+            playerId = playerId
+        )
 
         GamePlayerUiState(
             playerName = basePlayer.name,
@@ -461,13 +456,37 @@ constructor(
             },
             lastActionText = when (actionType) {
                 Blind -> null
-                Fold -> StringSource(R.string.action_label_fold)
-                Check -> StringSource(R.string.action_label_check)
-                Call -> StringSource(R.string.action_label_call)
-                Bet -> StringSource(R.string.action_label_bet)
-                Raise -> StringSource(R.string.action_label_raise)
+                Check -> if (playerId != currentPlayerId) {
+                    // 自分のターン以外で、アクションを表示する
+                    StringSource(R.string.action_label_check)
+                } else {
+                    null
+                }
+
+                Call -> if (playerId != currentPlayerId) {
+                    // 自分のターン以外で、アクションを表示する
+                    StringSource(R.string.action_label_call)
+                } else {
+                    null
+                }
+
+                Bet -> if (playerId != currentPlayerId) {
+                    // 自分のターン以外で、アクションを表示する
+                    StringSource(R.string.action_label_bet)
+                } else {
+                    null
+                }
+
+                Raise -> if (playerId != currentPlayerId) {
+                    // 自分のターン以外で、アクションを表示する
+                    StringSource(R.string.action_label_raise)
+                } else {
+                    null
+                }
+
                 AllIn -> StringSource(R.string.action_label_all_in)
                 AllInSkip -> StringSource(R.string.action_label_all_in)
+                Fold -> StringSource(R.string.action_label_fold)
                 FoldSkip -> StringSource(R.string.action_label_fold)
                 else -> null
             }
