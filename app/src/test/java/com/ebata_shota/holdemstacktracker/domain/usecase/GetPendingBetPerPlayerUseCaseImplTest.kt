@@ -124,7 +124,7 @@ class GetPendingBetPerPlayerUseCaseImplTest {
             BetPhaseAction.Blind(actionId = ActionId(""), playerId = PlayerId("0"), betSize = 100),
             BetPhaseAction.Blind(actionId = ActionId(""), playerId = PlayerId("1"), betSize = 200),
             BetPhaseAction.Call(actionId = ActionId(""), playerId = PlayerId("2"), betSize = 200),
-            BetPhaseAction.Blind(actionId = ActionId(""), playerId = PlayerId("0"), betSize = 200),
+            BetPhaseAction.Call(actionId = ActionId(""), playerId = PlayerId("0"), betSize = 200),
         )
         executeAndAssert(
             actionStateList = actionStateList,
@@ -132,6 +132,27 @@ class GetPendingBetPerPlayerUseCaseImplTest {
                 PlayerId("0") to 200,
                 PlayerId("1") to 200,
                 PlayerId("2") to 200,
+            ),
+        )
+    }
+
+    @Test
+    fun fold() {
+        // prepare
+        val actionStateList = listOf(
+            BetPhaseAction.Blind(actionId = ActionId(""), playerId = PlayerId("0"), betSize = 100),
+            BetPhaseAction.Blind(actionId = ActionId(""), playerId = PlayerId("1"), betSize = 200),
+            BetPhaseAction.Call(actionId = ActionId(""), playerId = PlayerId("2"), betSize = 200),
+            BetPhaseAction.Raise(actionId = ActionId(""), playerId = PlayerId("0"), betSize = 400),
+            BetPhaseAction.Fold(actionId = ActionId(""), playerId = PlayerId("1")),
+            BetPhaseAction.Call(actionId = ActionId(""), playerId = PlayerId("2"), betSize = 400),
+        )
+        executeAndAssert(
+            actionStateList = actionStateList,
+            expected = mapOf(
+                PlayerId("0") to 400,
+                PlayerId("1") to 200,
+                PlayerId("2") to 400,
             ),
         )
     }

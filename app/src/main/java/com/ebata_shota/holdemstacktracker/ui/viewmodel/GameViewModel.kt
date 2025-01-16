@@ -57,6 +57,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -196,7 +197,7 @@ constructor(
         viewModelScope.launch {
             combine(
                 raiseSizeStateFlow,
-                minRaiseSizeFlow
+                minRaiseSizeFlow.distinctUntilChanged()
             ) { raiseSize, minRaiseSize ->
                 if (raiseSize == null) {
                     // デフォルト状態（null）の場合は、最低額にする
@@ -209,6 +210,13 @@ constructor(
                     raiseSizeStateFlow.update { minRaiseSize }
                 }
             }.collect()
+        }
+
+        // 最低Raiseサイズの変化があった場合、最低サイズにする監視
+        viewModelScope.launch {
+            minRaiseSizeFlow.distinctUntilChanged().collect { minRaiseSize ->
+                raiseSizeStateFlow.update { minRaiseSize }
+            }
         }
 
         viewModelScope.launch {

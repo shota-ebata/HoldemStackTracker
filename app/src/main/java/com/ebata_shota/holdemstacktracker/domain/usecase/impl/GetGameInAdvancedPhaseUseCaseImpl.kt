@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
+import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
@@ -10,6 +11,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetGameInAdvancedPhaseU
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotStateListUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -22,6 +24,7 @@ constructor(
     private val getPendingBetPerPlayer: GetPendingBetPerPlayerUseCase,
     private val getPotStateList: GetPotStateListUseCase,
     private val getNextPhase: GetNextPhaseUseCase,
+    private val getPlayerLastActions: GetPlayerLastActionsUseCase,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
 ) : GetGameInAdvancedPhaseUseCase {
@@ -44,10 +47,17 @@ constructor(
             playerOrder = playerOrder,
             actionStateList = actionList
         )
+        // プレイヤーそれぞれの最後のAction
+        val lastActions: Map<PlayerId, BetPhaseAction?> = getPlayerLastActions.invoke(playerOrder, currentGame.phaseList)
+        // 降りてないプレイヤー
+        val activePlayers: List<PlayerId> = lastActions.filter { (_, lastAction) ->
+            lastAction !is BetPhaseAction.FoldSkip && lastAction !is BetPhaseAction.Fold
+        }.map { it.key }
         // ベット状況をポットに反映
         val updatedPotList: List<Pot> = getPotStateList.invoke(
             potList = currentGame.potList,
-            pendingBetPerPlayer = pendingBetPerPlayer
+            pendingBetPerPlayer = pendingBetPerPlayer,
+            activePlayerIds = activePlayers
         )
         // フェーズを進める
         val nextPhase = getNextPhase.invoke(

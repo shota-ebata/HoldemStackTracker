@@ -11,6 +11,7 @@ interface GetPotStateListUseCase {
      */
     suspend fun invoke(
         potList: List<Pot>,
-        pendingBetPerPlayer: Map<PlayerId, Int>
+        pendingBetPerPlayer: Map<PlayerId, Int>,
+        activePlayerIds: List<PlayerId>,
     ): List<Pot>
 }

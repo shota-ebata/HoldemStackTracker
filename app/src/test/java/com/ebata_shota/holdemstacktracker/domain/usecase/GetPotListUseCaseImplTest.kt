@@ -21,13 +21,15 @@ class GetPotListUseCaseImplTest {
 
     private fun executeAndAssert(
         pendingBetPerPlayer: Map<PlayerId, Int>,
-        expectedList: List<Pot>
+        expectedList: List<Pot>,
+        activePlayerIds: List<PlayerId>,
     ) {
         runTest(dispatcher) {
             // execute
             val updatedPotList: List<Pot> = useCase.invoke(
                 potList = emptyList(),
-                pendingBetPerPlayer = pendingBetPerPlayer
+                pendingBetPerPlayer = pendingBetPerPlayer,
+                activePlayerIds = activePlayerIds
             )
             // テスト用にIDを0に上書き
             val actualList = updatedPotList.map { it.copy(id = 0L) }
@@ -45,6 +47,11 @@ class GetPotListUseCaseImplTest {
             PlayerId("1") to 200,
             PlayerId("2") to 200,
         )
+        val activePlayerIds = listOf(
+            PlayerId("0"),
+            PlayerId("1"),
+            PlayerId("2"),
+        )
         val expectedList = listOf(
             Pot(
                 id = 0L,
@@ -58,7 +65,11 @@ class GetPotListUseCaseImplTest {
                 isClosed = false
             ),
         )
-        executeAndAssert(pendingBetPerPlayer, expectedList)
+        executeAndAssert(
+            pendingBetPerPlayer = pendingBetPerPlayer,
+            expectedList = expectedList,
+            activePlayerIds = activePlayerIds
+        )
     }
 
     @Test
@@ -67,6 +78,11 @@ class GetPotListUseCaseImplTest {
             PlayerId("0") to 200,
             PlayerId("1") to 200,
             PlayerId("2") to 100,
+        )
+        val activePlayerIds = listOf(
+            PlayerId("0"),
+            PlayerId("1"),
+            PlayerId("2"),
         )
         val expectedList = listOf(
             Pot(
@@ -91,7 +107,11 @@ class GetPotListUseCaseImplTest {
                 isClosed = false
             ),
         )
-        executeAndAssert(pendingBetPerPlayer, expectedList)
+        executeAndAssert(
+            pendingBetPerPlayer = pendingBetPerPlayer,
+            expectedList = expectedList,
+            activePlayerIds = activePlayerIds
+        )
     }
 
     @Test
@@ -100,6 +120,11 @@ class GetPotListUseCaseImplTest {
             PlayerId("0") to 100,
             PlayerId("1") to 200,
             PlayerId("2") to 300,
+        )
+        val activePlayerIds = listOf(
+            PlayerId("0"),
+            PlayerId("1"),
+            PlayerId("2"),
         )
         val expectedList = listOf(
             Pot(
@@ -133,6 +158,41 @@ class GetPotListUseCaseImplTest {
                 isClosed = false
             ),
         )
-        executeAndAssert(pendingBetPerPlayer, expectedList)
+        executeAndAssert(
+            pendingBetPerPlayer = pendingBetPerPlayer,
+            expectedList = expectedList,
+            activePlayerIds = activePlayerIds
+        )
+    }
+
+    @Test
+    fun fold() {
+        val pendingBetPerPlayer: Map<PlayerId, Int> = mapOf(
+            PlayerId("0") to 400,
+            PlayerId("1") to 200,
+            PlayerId("2") to 400,
+        )
+        val activePlayerIds = listOf(
+            PlayerId("0"),
+            PlayerId("2"),
+        )
+        val expectedList = listOf(
+            Pot(
+                id = 0L,
+                potNumber = 0L,
+                potSize = 1000,
+                involvedPlayerIds = listOf(
+                    PlayerId("0"),
+                    PlayerId("1"),
+                    PlayerId("2"),
+                ),
+                isClosed = false
+            ),
+        )
+        executeAndAssert(
+            pendingBetPerPlayer = pendingBetPerPlayer,
+            expectedList = expectedList,
+            activePlayerIds = activePlayerIds
+        )
     }
 }

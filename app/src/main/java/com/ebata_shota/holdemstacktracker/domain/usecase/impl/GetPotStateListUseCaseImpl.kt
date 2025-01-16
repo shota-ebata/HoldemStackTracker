@@ -19,7 +19,8 @@ constructor(
 
     override suspend fun invoke(
         potList: List<Pot>,
-        pendingBetPerPlayer: Map<PlayerId, Int>
+        pendingBetPerPlayer: Map<PlayerId, Int>,
+        activePlayerIds: List<PlayerId>,
     ): List<Pot> = withContext(dispatcher) {
         // ポットに入っていないベットが残っているプレイヤー数
         val pendingBetPlayerCount: Int = pendingBetPerPlayer.size
@@ -27,7 +28,8 @@ constructor(
             // 1人以上の場合、ポットに入れていく
             getNewPotStateList(
                 potList = potList,
-                pendingBetPerPlayer = pendingBetPerPlayer
+                pendingBetPerPlayer = pendingBetPerPlayer,
+                activePlayerIds = activePlayerIds
             )
         } else {
             // ポットに入っていないベットが残っているプレイヤー数0人の場合、ポットはそのまま。
@@ -37,7 +39,8 @@ constructor(
 
     private fun getNewPotStateList(
         potList: List<Pot>,
-        pendingBetPerPlayer: Map<PlayerId, Int>
+        pendingBetPerPlayer: Map<PlayerId, Int>,
+        activePlayerIds: List<PlayerId>,
     ): List<Pot> {
         // 最新のポットを取得
         val lastPot: Pot? = potList.lastOrNull()
@@ -52,14 +55,28 @@ constructor(
         var potSize: Int = currentPot.potSize
         val involvedPlayerIds = currentPot.involvedPlayerIds.toMutableList()
 
-        val minBetSize = pendingBetPerPlayer.map { it.value }.min()
+        // 降りてない人の最低ベットサイズを取得
+        val minBetSize = pendingBetPerPlayer.filter { (key, _) ->
+            activePlayerIds.any { it == key}
+        }.map {
+            it.value
+        }.min()
         val updatedPendingPrePlayer = pendingBetPerPlayer.mapValues { (playerId, betSize) ->
+            // ポットにいれるサイズを決める
+            val isActivePlayer = activePlayerIds.any { it == playerId }
+            val addSize = if (isActivePlayer) {
+                // 降りてないプレイヤーは一番小さいベットを一旦入れる
+                minBetSize
+            } else {
+                // 降りている人は、すべていれる
+                betSize
+            }
             // ポットに入れる
-            potSize += minBetSize
+            potSize += addSize
             // ポットの関与者になる
             involvedPlayerIds.add(playerId)
             // Potに入れた分だけ、ベットサイズから減らす
-            betSize - minBetSize
+            betSize - addSize
         }.filter { it.value > 0 } // ポットに入っていないベットが残っている人でフィルタリングする
         // まだポットに入っていないベットを持っている人がいる場合、このポットはcloseする
         val isClosed = updatedPendingPrePlayer.isNotEmpty()
@@ -82,7 +99,11 @@ constructor(
             return updatedPotStateList
         }
         // まだ残っている可能性があるので再帰
-        return getNewPotStateList(updatedPotStateList, updatedPendingPrePlayer)
+        return getNewPotStateList(
+            potList = updatedPotStateList,
+            pendingBetPerPlayer = updatedPendingPrePlayer,
+            activePlayerIds = activePlayerIds
+        )
     }
 
     private fun createPotState(potNumber: Long) = Pot(
