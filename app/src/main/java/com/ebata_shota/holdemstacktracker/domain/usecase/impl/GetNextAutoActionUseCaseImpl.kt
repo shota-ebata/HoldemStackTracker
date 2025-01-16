@@ -7,7 +7,6 @@ import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
-import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
@@ -24,6 +23,9 @@ constructor(
     private val dispatcher: CoroutineDispatcher,
 ) : GetNextAutoActionUseCase {
 
+    /**
+     * AutoActionを行う
+     */
     override suspend fun invoke(
         playerId: PlayerId,
         rule: Rule,
@@ -51,9 +53,6 @@ constructor(
                 )
             }
 
-            is Phase.AfterPreFlop,
-            is Phase.AfterFlop,
-            is Phase.AfterTurn,
             is Phase.ShowDown,
             is Phase.AllInOpen,
             is Phase.PotSettlement,

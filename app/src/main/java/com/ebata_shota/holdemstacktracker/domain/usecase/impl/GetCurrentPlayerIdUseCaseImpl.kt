@@ -24,8 +24,11 @@ class GetCurrentPlayerIdUseCaseImpl
     override suspend fun invoke(
         btnPlayerId: PlayerId,
         playerOrder: List<PlayerId>,
-        currentBetPhase: Phase.BetPhase
-    ): PlayerId = withContext(dispatcher) {
+        currentBetPhase: Phase.BetPhase,
+    ): PlayerId? = withContext(dispatcher) {
+        if (currentBetPhase.isClosed) {
+            return@withContext null
+        }
         // 全員の最後のアクションを一つづつ取得
         val actionStateList = currentBetPhase.actionStateList
         // 最後にアクションしたプレイヤーIDを取得（アクションがない場合はBTN）

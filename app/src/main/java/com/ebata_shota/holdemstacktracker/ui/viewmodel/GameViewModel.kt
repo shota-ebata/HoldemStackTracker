@@ -22,14 +22,15 @@ import com.ebata_shota.holdemstacktracker.domain.repository.PhaseHistoryReposito
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
+import com.ebata_shota.holdemstacktracker.domain.usecase.AddBetPhaseActionInToGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetBetPhaseActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetFirstActionPlayerIdOfNextPhaseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetGameInAdvancedPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneDownRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneUpRaiseSizeUseCase
@@ -47,6 +48,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
 import com.ebata_shota.holdemstacktracker.ui.mapper.GameContentUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -78,7 +80,8 @@ constructor(
     private val randomIdRepository: RandomIdRepository,
     private val actionHistoryRepository: ActionHistoryRepository,
     private val phaseHistoryRepository: PhaseHistoryRepository,
-    private val getNextGame: GetNextGameUseCase,
+    private val addBetPhaseActionInToGame: AddBetPhaseActionInToGameUseCase,
+    private val getGameInAdvancedPhase: GetGameInAdvancedPhaseUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
     private val getNextAutoAction: GetNextAutoActionUseCase,
     private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
@@ -212,23 +215,35 @@ constructor(
             gameStateFlow.filterNotNull().collect { game ->
                 phaseIntervalImageDialog.update {
                     // FIXME: PhaseHistoryをPhaseIdから見て、見た後であれば表示しない対応を入れたい
-                    when (game.phaseList.lastOrNull()) {
-                        is Phase.AfterPreFlop -> {
-                            PhaseIntervalImageDialogUiState(
-                                imageResId = R.drawable.flopimage
-                            )
+                    when (val lastPhase = game.phaseList.lastOrNull()) {
+                        is Phase.PreFlop -> {
+                            if (lastPhase.isClosed) {
+                                PhaseIntervalImageDialogUiState(
+                                    imageResId = R.drawable.flopimage
+                                )
+                            } else {
+                                null
+                            }
                         }
 
-                        is Phase.AfterFlop -> {
-                            PhaseIntervalImageDialogUiState(
-                                imageResId = R.drawable.turnimage
-                            )
+                        is Phase.Flop -> {
+                            if (lastPhase.isClosed) {
+                                PhaseIntervalImageDialogUiState(
+                                    imageResId = R.drawable.turnimage
+                                )
+                            } else {
+                                null
+                            }
                         }
 
-                        is Phase.AfterTurn -> {
-                            PhaseIntervalImageDialogUiState(
-                                imageResId = R.drawable.riverimage
-                            )
+                        is Phase.Turn -> {
+                            if (lastPhase.isClosed) {
+                                PhaseIntervalImageDialogUiState(
+                                    imageResId = R.drawable.riverimage
+                                )
+                            } else {
+                                null
+                            }
                         }
 
                         else -> null
@@ -278,9 +293,9 @@ constructor(
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        val nextGame = getNextGame.invoke(
-            latestGame = game,
-            action = BetPhaseAction.Fold(
+        val nextGame = addBetPhaseActionInToGame.invoke(
+            currentGame = game,
+            betPhaseAction = BetPhaseAction.Fold(
                 actionId = ActionId(randomIdRepository.generateRandomId()),
                 playerId = myPlayerId
             ),
@@ -294,9 +309,9 @@ constructor(
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        val nextGame = getNextGame.invoke(
-            latestGame = game,
-            action = BetPhaseAction.Check(
+        val nextGame = addBetPhaseActionInToGame.invoke(
+            currentGame = game,
+            betPhaseAction = BetPhaseAction.Check(
                 actionId = ActionId(randomIdRepository.generateRandomId()),
                 playerId = myPlayerId
             ),
@@ -311,9 +326,9 @@ constructor(
         myPlayerId: PlayerId,
     ) {
         val player = game.players.find { it.id == myPlayerId }!!
-        val nextGame = getNextGame.invoke(
-            latestGame = game,
-            action = BetPhaseAction.AllIn(
+        val nextGame = addBetPhaseActionInToGame.invoke(
+            currentGame = game,
+            betPhaseAction = BetPhaseAction.AllIn(
                 actionId = ActionId(randomIdRepository.generateRandomId()),
                 playerId = myPlayerId,
                 betSize = player.stack
@@ -334,9 +349,9 @@ constructor(
             return
         }
         val callSize = getMaxBetSize.invoke(actionStateList = betPhase.actionStateList)
-        val nextGame = getNextGame.invoke(
-            latestGame = game,
-            action = BetPhaseAction.Call(
+        val nextGame = addBetPhaseActionInToGame.invoke(
+            currentGame = game,
+            betPhaseAction = BetPhaseAction.Call(
                 actionId = ActionId(randomIdRepository.generateRandomId()),
                 playerId = myPlayerId,
                 betSize = callSize
@@ -357,9 +372,9 @@ constructor(
         val actionStateList = betPhase.actionStateList
         // このフェーズ中、まだBetやAllInをしていない(オープンアクション)
         val isNotRaisedYet = isNotRaisedYet.invoke(actionStateList)
-        val nextGame = getNextGame.invoke(
-            latestGame = game,
-            action = if (raiseSize == player.stack) {
+        val nextGame = addBetPhaseActionInToGame.invoke(
+            currentGame = game,
+            betPhaseAction = if (raiseSize == player.stack) {
                 // レイズサイズ == スタックサイズの場合はAllIn
                 BetPhaseAction.AllIn(
                     actionId = ActionId(randomIdRepository.generateRandomId()),
@@ -618,13 +633,13 @@ constructor(
                 currentGame = game,
             )
             if (myPlayerId == nextPlayerId) {
-                val nextPhase = getNextPhase.invoke(
+                val nextGame = getGameInAdvancedPhase.invoke(
                     playerOrder = table.playerOrder,
-                    phaseList = game.phaseList,
+                    currentGame = game
                 )
-                val nextGame = game.copy(
-                    phaseList = game.phaseList + nextPhase
-                )
+                // ダイアログを消してから、実際に消した扱いにするまで
+                // delayをかける
+                delay(1000L)
                 sendNextGame(nextGame = nextGame)
             }
         }

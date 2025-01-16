@@ -15,10 +15,10 @@ import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthReposito
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PhaseHistoryRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
+import com.ebata_shota.holdemstacktracker.domain.usecase.AddBetPhaseActionInToGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameUseCase
 import com.ebata_shota.holdemstacktracker.infra.mapper.GameMapper
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -52,7 +52,7 @@ constructor(
     private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
     private val getNextAutoAction: GetNextAutoActionUseCase,
-    private val getNextGame: GetNextGameUseCase,
+    private val addBetPhaseActionInToGame: AddBetPhaseActionInToGameUseCase,
     @ApplicationScope
     private val appCoroutineScope: CoroutineScope,
     @CoroutineDispatcherIO
@@ -90,9 +90,9 @@ constructor(
                     val autoAction: BetPhaseAction? = getAutoActionIfNeed(game, table)
                     if (autoAction != null) {
                         // オートアクションがあるなら、それを使って新しいGameを生成
-                        val updatedGame = getNextGame.invoke(
-                            latestGame = game,
-                            action = autoAction,
+                        val updatedGame = addBetPhaseActionInToGame.invoke(
+                            currentGame = game,
+                            betPhaseAction = autoAction,
                             playerOrder = table.playerOrder
                         )
                         // 更新実行

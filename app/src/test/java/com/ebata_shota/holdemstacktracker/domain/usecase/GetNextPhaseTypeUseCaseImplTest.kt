@@ -13,7 +13,6 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase.Standby
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.Turn
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionsUseCaseImpl
@@ -162,6 +161,24 @@ class GetNextPhaseTypeUseCaseImplTest {
                     )
                 )
             )
+            assert(actual is PreFlop)
+            assert((actual as PreFlop).isClosed)
+        }
+    }
+
+    @Test
+    fun getNextPhase_from_ClosedPreFlop() {
+        runTest(dispatcher) {
+            val actual = useCase.invoke(
+                playerOrder = listOf(PlayerId("0"), PlayerId("1"), PlayerId("2")),
+                phaseList = listOf(
+                    PreFlop(
+                        phaseId = PhaseId(""),
+                        actionStateList = listOf(),
+                        isClosed = true,
+                    )
+                )
+            )
             assert(actual is Flop)
         }
     }
@@ -172,8 +189,23 @@ class GetNextPhaseTypeUseCaseImplTest {
             val actual = useCase.invoke(
                 playerOrder = listOf(PlayerId("0"), PlayerId("1"), PlayerId("2")),
                 phaseList = listOf(
-                    PreFlop(phaseId = PhaseId(""), actionStateList = emptyList()),
+                    PreFlop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = true),
                     Flop(phaseId = PhaseId(""), actionStateList = emptyList())
+                )
+            )
+            assert(actual is Flop)
+            assert((actual as Flop).isClosed)
+        }
+    }
+
+    @Test
+    fun getNextPhase_from_ClosedFlop() {
+        runTest(dispatcher) {
+            val actual = useCase.invoke(
+                playerOrder = listOf(PlayerId("0"), PlayerId("1"), PlayerId("2")),
+                phaseList = listOf(
+                    PreFlop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = true),
+                    Flop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = true)
                 )
             )
             assert(actual is Turn)
@@ -186,9 +218,25 @@ class GetNextPhaseTypeUseCaseImplTest {
             val actual = useCase.invoke(
                 playerOrder = listOf(PlayerId("0"), PlayerId("1"), PlayerId("2")),
                 phaseList = listOf(
-                    PreFlop(phaseId = PhaseId(""), actionStateList = emptyList()),
-                    Flop(phaseId = PhaseId(""), actionStateList = emptyList()),
+                    PreFlop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = true),
+                    Flop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = true),
                     Turn(phaseId = PhaseId(""), actionStateList = emptyList())
+                )
+            )
+            assert(actual is Turn)
+            assert((actual as Turn).isClosed)
+        }
+    }
+
+    @Test
+    fun getNextPhase_from_ClosedTurn() {
+        runTest(dispatcher) {
+            val actual = useCase.invoke(
+                playerOrder = listOf(PlayerId("0"), PlayerId("1"), PlayerId("2")),
+                phaseList = listOf(
+                    PreFlop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = true),
+                    Flop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = true),
+                    Turn(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = true)
                 )
             )
             assert(actual is River)
@@ -201,9 +249,9 @@ class GetNextPhaseTypeUseCaseImplTest {
             val actual = useCase.invoke(
                 playerOrder = listOf(PlayerId("0"), PlayerId("1"), PlayerId("2")),
                 phaseList = listOf(
-                    PreFlop(phaseId = PhaseId(""), actionStateList = emptyList()),
-                    Flop(phaseId = PhaseId(""), actionStateList = emptyList()),
-                    Turn(phaseId = PhaseId(""), actionStateList = emptyList()),
+                    PreFlop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = true),
+                    Flop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = true),
+                    Turn(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = true),
                     River(phaseId = PhaseId(""), actionStateList = emptyList())
                 )
             )

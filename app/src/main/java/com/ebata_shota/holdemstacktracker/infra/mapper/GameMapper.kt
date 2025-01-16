@@ -35,6 +35,7 @@ constructor() {
         private const val PHASES_ID = "phasesId"
         private const val PHASE_TYPE = "phaseType"
         private const val PHASE_ACTIONS = "actions"
+        private const val PHASE_IS_CLOSED = "isClosed"
         private const val PHASE_ACTION_ID = "actionId"
         private const val PHASE_ACTION_PLAYER_ID = "playerId"
         private const val PHASE_ACTION_ACTION_TYPE = "actionType"
@@ -60,26 +61,28 @@ constructor() {
             val phaseType = it[PHASE_TYPE] as String
             val phaseId = it[PHASES_ID] as String
             val actions = it[PHASE_ACTIONS] as? List<*>
+            val isClosed = (it[PHASE_IS_CLOSED] as? Boolean) ?: false
             when (PhaseType.of(phaseType)) {
                 PhaseType.Standby -> Phase.Standby(phaseId = PhaseId(phaseId))
                 PhaseType.PreFlop -> Phase.PreFlop(
                     phaseId = PhaseId(phaseId),
-                    actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty()
+                    actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty(),
+                    isClosed = isClosed,
                 )
-                PhaseType.AfterPreFlop -> Phase.AfterPreFlop(phaseId = PhaseId(phaseId))
                 PhaseType.Flop -> Phase.Flop(
                     phaseId = PhaseId(phaseId),
-                    actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty()
+                    actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty(),
+                    isClosed = isClosed,
                 )
-                PhaseType.AfterFlop -> Phase.AfterFlop(phaseId = PhaseId(phaseId))
                 PhaseType.Turn -> Phase.Turn(
                     phaseId = PhaseId(phaseId),
-                    actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty()
+                    actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty(),
+                    isClosed = isClosed,
                 )
-                PhaseType.AfterTurn -> Phase.AfterTurn(phaseId = PhaseId(phaseId))
                 PhaseType.River ->  Phase.River(
                     phaseId = PhaseId(phaseId),
-                    actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty()
+                    actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty(),
+                    isClosed = isClosed,
                 )
                 PhaseType.ShowDown -> Phase.ShowDown(phaseId = PhaseId(phaseId))
                 PhaseType.AllInOpen -> Phase.AllInOpen(phaseId = PhaseId(phaseId))
@@ -164,6 +167,11 @@ constructor() {
         PHASES_ID to phase.phaseId.value,
         if (phase is Phase.BetPhase) {
             PHASE_ACTIONS to mapActions(phase.actionStateList)
+        } else {
+            null
+        },
+        if (phase is Phase.BetPhase) {
+            PHASE_IS_CLOSED to phase.isClosed
         } else {
             null
         }

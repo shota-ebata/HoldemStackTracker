@@ -3,9 +3,6 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
-import com.ebata_shota.holdemstacktracker.domain.model.Phase.AfterFlop
-import com.ebata_shota.holdemstacktracker.domain.model.Phase.AfterPreFlop
-import com.ebata_shota.holdemstacktracker.domain.model.Phase.AfterTurn
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.AllInOpen
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.End
@@ -41,23 +38,10 @@ constructor(
         return@withContext when (val latestPhase: Phase? = phaseList.lastOrNull()) {
             is Standby -> PreFlop(
                 phaseId = PhaseId(randomIdRepository.generateRandomId()),
-                actionStateList = emptyList()
+                actionStateList = emptyList(),
+                isClosed = false
             )
             is BetPhase -> getNextPhaseStateFromBetPhase(playerOrder, phaseList, latestPhase)
-            is AfterPreFlop -> Flop(
-                phaseId = PhaseId(randomIdRepository.generateRandomId()),
-                actionStateList = emptyList()
-            )
-
-            is AfterFlop -> Turn(
-                phaseId = PhaseId(randomIdRepository.generateRandomId()),
-                actionStateList = emptyList()
-            )
-
-            is AfterTurn -> River(
-                phaseId = PhaseId(randomIdRepository.generateRandomId()),
-                actionStateList = emptyList()
-            )
             is AllInOpen -> PotSettlement(phaseId = PhaseId(randomIdRepository.generateRandomId()))
             is ShowDown -> PotSettlement(phaseId = PhaseId(randomIdRepository.generateRandomId()))
             is PotSettlement -> End(phaseId = PhaseId(randomIdRepository.generateRandomId()))
@@ -97,17 +81,47 @@ constructor(
         // その他の場合は次のべットフェーズへ
         // (フェーズのアクションがすべて終わっている前提で、このメソッドを呼び出している想定）
         return when (latestPhase) {
-            is PreFlop -> AfterPreFlop(
-                phaseId = PhaseId(randomIdRepository.generateRandomId())
-            )
+            is PreFlop -> {
+                if (latestPhase.isClosed) {
+                    // 閉じているなら次のフェーズへ
+                    Flop(
+                        phaseId = PhaseId(randomIdRepository.generateRandomId()),
+                        actionStateList = emptyList(),
+                        isClosed = false,
+                    )
+                } else {
+                    // まだ閉じていない場合は閉じる
+                    latestPhase.copy(isClosed = true)
+                }
+            }
 
-            is Flop -> AfterFlop(
-                phaseId = PhaseId(randomIdRepository.generateRandomId())
-            )
+            is Flop -> {
+                if (latestPhase.isClosed) {
+                    // 閉じているなら次のフェーズへ
+                    Turn(
+                        phaseId = PhaseId(randomIdRepository.generateRandomId()),
+                        actionStateList = emptyList(),
+                        isClosed = false,
+                    )
+                } else {
+                    // まだ閉じていない場合は閉じる
+                    latestPhase.copy(isClosed = true)
+                }
+            }
 
-            is Turn -> AfterTurn(
-                phaseId = PhaseId(randomIdRepository.generateRandomId())
-            )
+            is Turn -> {
+                if (latestPhase.isClosed) {
+                    // 閉じているなら次のフェーズへ
+                    River(
+                        phaseId = PhaseId(randomIdRepository.generateRandomId()),
+                        actionStateList = emptyList(),
+                        isClosed = false,
+                    )
+                } else {
+                    // まだ閉じていない場合は閉じる
+                    latestPhase.copy(isClosed = true)
+                }
+            }
             is River -> ShowDown(phaseId = PhaseId(randomIdRepository.generateRandomId()))
         }
     }

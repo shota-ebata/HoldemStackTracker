@@ -46,9 +46,9 @@ constructor(
                 }
             }
 
-            is Phase.AfterPreFlop,
-            is Phase.AfterFlop,
-            is Phase.AfterTurn,
+            is Phase.PreFlop,
+            is Phase.Flop,
+            is Phase.Turn,
                 -> {
                 // 次のフェーズはベットフェーズなので普通に最初のプレイヤーIDを返す
                 getFirstActionPlayerId(
@@ -57,13 +57,7 @@ constructor(
                     currentGame = currentGame
                 )
             }
-
-            is Phase.PreFlop,
-            is Phase.Flop,
-            is Phase.Turn,
             is Phase.River,
-
-
             is Phase.AllInOpen,
             is Phase.ShowDown,
             is Phase.PotSettlement,

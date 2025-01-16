@@ -8,5 +8,5 @@ interface GetCurrentPlayerIdUseCase {
         btnPlayerId: PlayerId,
         playerOrder: List<PlayerId>,
         currentBetPhase: Phase.BetPhase,
-    ): PlayerId
+    ): PlayerId?
 }

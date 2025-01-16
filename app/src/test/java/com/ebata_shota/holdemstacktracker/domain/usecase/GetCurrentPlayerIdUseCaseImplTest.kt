@@ -1,19 +1,14 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
-import com.ebata_shota.holdemstacktracker.createDummyGame
 import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction.Blind
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction.Call
-import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLastPhaseAsBetPhaseUseCaseImpl
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.mockk
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -43,7 +38,8 @@ class GetCurrentPlayerIdUseCaseImplTest {
     ) {
         val currentBetPhase = Phase.PreFlop(
             phaseId = PhaseId(""),
-            actionStateList = actionStateList
+            actionStateList = actionStateList,
+            isClosed = false,
         )
         runTest(dispatcher) {
             val actual = useCase.invoke(

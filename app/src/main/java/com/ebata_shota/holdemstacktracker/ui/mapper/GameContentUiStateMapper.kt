@@ -2,7 +2,6 @@ package com.ebata_shota.holdemstacktracker.ui.mapper
 
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
-import com.ebata_shota.holdemstacktracker.domain.exception.getLatestBetPhase
 import com.ebata_shota.holdemstacktracker.domain.extension.rearrangeListFromIndex
 import com.ebata_shota.holdemstacktracker.domain.extension.roundDigit
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
@@ -98,25 +97,13 @@ constructor(
                 currentBetPhase = betPhase,
             )
         }
-        // 最新がBetフェーズじゃない場合でも、表示できる物がある場合がある
-        val viewBetPhase: BetPhase? = betPhase ?: when (phaseList.lastOrNull()) {
-            is Phase.AfterPreFlop,
-            is Phase.AfterFlop,
-            is Phase.AfterTurn,
-                -> {
-                // After系のフェーズなら、直前のBetフェーズを表示する
-                phaseList.getLatestBetPhase()
-            }
-
-            else -> null
-        }
-        if (viewBetPhase == null) {
+        if (betPhase == null) {
             // ほんとに表示するものがないなら、nullを返す
             return@withContext null
         }
 
         return@withContext createGameContentUiState(
-            betPhase = viewBetPhase,
+            betPhase = betPhase,
             playerOrder = playerOrder,
             btnPlayerId = btnPlayerId,
             myPlayerId = myPlayerId,

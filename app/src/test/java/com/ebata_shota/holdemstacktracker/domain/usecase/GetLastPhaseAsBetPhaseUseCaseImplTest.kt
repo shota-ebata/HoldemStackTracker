@@ -37,7 +37,7 @@ class GetLastPhaseAsBetPhaseUseCaseImplTest {
     fun getLatestBet_PreFlop() {
         val phaseList = listOf(
             Phase.Standby(phaseId = PhaseId("")),
-            Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList())
+            Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
         )
         runTest(dispatcher) {
             val phase = useCase.invoke(phaseList = phaseList)
@@ -49,8 +49,8 @@ class GetLastPhaseAsBetPhaseUseCaseImplTest {
     fun getLatestBet_Flop() {
         val phaseList = listOf(
             Phase.Standby(phaseId = PhaseId("")),
-            Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList()),
-            Phase.Flop(phaseId = PhaseId(""), actionStateList = emptyList())
+            Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
+            Phase.Flop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
         )
 
         runTest(dispatcher) {
@@ -63,9 +63,9 @@ class GetLastPhaseAsBetPhaseUseCaseImplTest {
     fun getLatestBet_Turn() {
         val phaseList = listOf(
             Phase.Standby(phaseId = PhaseId("")),
-            Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList()),
-            Phase.Flop(phaseId = PhaseId(""), actionStateList = emptyList()),
-            Phase.Turn(phaseId = PhaseId(""),actionStateList = emptyList()),
+            Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
+            Phase.Flop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
+            Phase.Turn(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
         )
         runTest(dispatcher) {
             val phase = useCase.invoke(phaseList = phaseList)
@@ -77,10 +77,10 @@ class GetLastPhaseAsBetPhaseUseCaseImplTest {
     fun getLatestBet_River() {
         val phaseList = listOf(
             Phase.Standby(phaseId = PhaseId("")),
-            Phase.PreFlop(phaseId = PhaseId(""),actionStateList = emptyList()),
-            Phase.Flop(phaseId = PhaseId(""), actionStateList = emptyList()),
-            Phase.Turn(phaseId = PhaseId(""), actionStateList = emptyList()),
-            Phase.River(phaseId = PhaseId(""), actionStateList = emptyList()),
+            Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
+            Phase.Flop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
+            Phase.Turn(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
+            Phase.River(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
         )
         runTest(dispatcher) {
             val phase = useCase.invoke(phaseList = phaseList)
@@ -92,10 +92,10 @@ class GetLastPhaseAsBetPhaseUseCaseImplTest {
     fun getLatestBet_ShowDown() {
         val phaseList = listOf(
             Phase.Standby(phaseId = PhaseId("")),
-            Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList()),
-            Phase.Flop(phaseId = PhaseId(""), actionStateList = emptyList()),
-            Phase.Turn(phaseId = PhaseId(""), actionStateList = emptyList()),
-            Phase.River(phaseId = PhaseId(""), actionStateList = emptyList()),
+            Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
+            Phase.Flop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
+            Phase.Turn(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
+            Phase.River(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
             Phase.ShowDown(phaseId = PhaseId("")),
         )
         assertThrows(IllegalStateException::class.java) {
@@ -110,10 +110,18 @@ class GetLastPhaseAsBetPhaseUseCaseImplTest {
         val game = createDummyGame(
             phaseList = listOf(
                 Phase.Standby(phaseId = PhaseId("")),
-                Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList()),
-                Phase.Flop(phaseId = PhaseId(""), actionStateList = emptyList()),
-                Phase.Turn(phaseId = PhaseId(""), actionStateList = emptyList()),
-                Phase.River(phaseId = PhaseId(""), actionStateList = emptyList()),
+                Phase.PreFlop(
+                    phaseId = PhaseId(""),
+                    actionStateList = emptyList(),
+                    isClosed = false,
+                ),
+                Phase.Flop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
+                Phase.Turn(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
+                Phase.River(
+                    phaseId = PhaseId(""),
+                    actionStateList = emptyList(),
+                    isClosed = false,
+                ),
                 Phase.ShowDown(phaseId = PhaseId("")),
                 Phase.PotSettlement(phaseId = PhaseId("")),
             )
@@ -129,10 +137,10 @@ class GetLastPhaseAsBetPhaseUseCaseImplTest {
     fun getLatestBet_End() {
         val phaseList = listOf(
             Phase.Standby(phaseId = PhaseId("")),
-            Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList()),
-            Phase.Flop(phaseId = PhaseId(""), actionStateList = emptyList()),
-            Phase.Turn(phaseId = PhaseId(""), actionStateList = emptyList()),
-            Phase.River(phaseId = PhaseId(""), actionStateList = emptyList()),
+            Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
+            Phase.Flop(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
+            Phase.Turn(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
+            Phase.River(phaseId = PhaseId(""), actionStateList = emptyList(), isClosed = false),
             Phase.ShowDown(phaseId = PhaseId("")),
             Phase.PotSettlement(phaseId = PhaseId("")),
             Phase.End(phaseId = PhaseId("")),
