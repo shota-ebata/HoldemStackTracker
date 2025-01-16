@@ -170,6 +170,9 @@ dependencies {
     // mockk
     testImplementation(libs.io.mockk.mockk)
 
+    // AssertJ
+    testImplementation(libs.org.assertj.core)
+
     // firebaseBom
     implementation(platform(libs.firebase.bom))
     // - analytics
