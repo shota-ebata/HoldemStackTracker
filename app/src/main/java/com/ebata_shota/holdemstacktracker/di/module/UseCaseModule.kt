@@ -3,6 +3,7 @@ package com.ebata_shota.holdemstacktracker.di.module
 import com.ebata_shota.holdemstacktracker.domain.usecase.AddBetPhaseActionInToGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionTypeInLastPhaseAsBetPhaseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetActivePlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetBetPhaseActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetFirstActionPlayerIdOfNextPhaseUseCase
@@ -34,6 +35,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCas
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.AddBetPhaseActionInToGameUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.CreateNewGameUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActionTypeInLastPhaseAsBetPhaseUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActivePlayerIdsUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetBetPhaseActionUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetFirstActionPlayerIdOfNextPhaseUseCaseImpl
@@ -162,4 +164,7 @@ interface UseCaseModule {
 
     @Binds
     fun bindGetGameInAdvancedPhaseUseCase(useCase: GetGameInAdvancedPhaseUseCaseImpl): GetGameInAdvancedPhaseUseCase
+
+    @Binds
+    fun bindGetActivePlayerIdsUseCase(useCase: GetActivePlayerIdsUseCaseImpl): GetActivePlayerIdsUseCase
 }

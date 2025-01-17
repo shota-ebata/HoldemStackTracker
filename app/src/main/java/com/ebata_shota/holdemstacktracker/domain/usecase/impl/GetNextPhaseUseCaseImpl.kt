@@ -16,6 +16,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase.Turn
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetActivePlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
 import kotlinx.coroutines.CoroutineDispatcher
@@ -25,6 +26,7 @@ import javax.inject.Inject
 class GetNextPhaseUseCaseImpl
 @Inject
 constructor(
+    private val getActivePlayerIds: GetActivePlayerIdsUseCase,
     private val getPlayerLastActions: GetPlayerLastActionsUseCase,
     private val randomIdRepository: RandomIdRepository,
     @CoroutineDispatcherDefault
@@ -61,9 +63,11 @@ constructor(
         // プレイヤーそれぞれの最後のAction
         val lastActions: Map<PlayerId, BetPhaseAction?> = getPlayerLastActions.invoke(playerOrder, phaseList)
         // 降りてないプレイヤー人数
-        val activePlayerCount = lastActions.count { (_, lastAction) ->
-            lastAction !is BetPhaseAction.FoldSkip && lastAction !is BetPhaseAction.Fold
-        }
+        val activePlayers: List<PlayerId> = getActivePlayerIds.invoke(
+            playerOrder = playerOrder,
+            phaseList = phaseList
+        )
+        val activePlayerCount = activePlayers.count()
         // 降りてないプレイヤーが2人未満（基本的には、1人を除いてFoldしている状態）
         // の場合は決済フェーズへ
         if (activePlayerCount < 2) {

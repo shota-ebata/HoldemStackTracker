@@ -7,6 +7,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pot
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetActivePlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetGameInAdvancedPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
@@ -24,7 +25,7 @@ constructor(
     private val getPendingBetPerPlayer: GetPendingBetPerPlayerUseCase,
     private val getPotStateList: GetPotStateListUseCase,
     private val getNextPhase: GetNextPhaseUseCase,
-    private val getPlayerLastActions: GetPlayerLastActionsUseCase,
+    private val getActivePlayerIds: GetActivePlayerIdsUseCase,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
 ) : GetGameInAdvancedPhaseUseCase {
@@ -47,12 +48,11 @@ constructor(
             playerOrder = playerOrder,
             actionStateList = actionList
         )
-        // プレイヤーそれぞれの最後のAction
-        val lastActions: Map<PlayerId, BetPhaseAction?> = getPlayerLastActions.invoke(playerOrder, currentGame.phaseList)
         // 降りてないプレイヤー
-        val activePlayers: List<PlayerId> = lastActions.filter { (_, lastAction) ->
-            lastAction !is BetPhaseAction.FoldSkip && lastAction !is BetPhaseAction.Fold
-        }.map { it.key }
+        val activePlayers: List<PlayerId> = getActivePlayerIds.invoke(
+            playerOrder = playerOrder,
+            phaseList = currentGame.phaseList
+        )
         // ベット状況をポットに反映
         val updatedPotList: List<Pot> = getPotStateList.invoke(
             potList = currentGame.potList,
@@ -72,4 +72,5 @@ constructor(
             phaseList = updatedPhaseList,
         )
     }
+
 }
