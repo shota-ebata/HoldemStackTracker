@@ -6,6 +6,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction.Blind
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction.Call
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
+import com.ebata_shota.holdemstacktracker.domain.model.PhaseStatus
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLastPhaseAsBetPhaseUseCaseImpl
@@ -39,7 +40,7 @@ class GetCurrentPlayerIdUseCaseImplTest {
         val currentBetPhase = Phase.PreFlop(
             phaseId = PhaseId(""),
             actionStateList = actionStateList,
-            isClosed = false,
+            phaseStatus = PhaseStatus.Active,
         )
         runTest(dispatcher) {
             val actual = useCase.invoke(

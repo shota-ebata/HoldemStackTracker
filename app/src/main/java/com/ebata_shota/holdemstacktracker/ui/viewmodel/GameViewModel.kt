@@ -12,6 +12,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
+import com.ebata_shota.holdemstacktracker.domain.model.PhaseStatus
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
@@ -23,15 +24,11 @@ import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.AddBetPhaseActionInToGameUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetBetPhaseActionUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetFirstActionPlayerIdOfNextPhaseUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetGameInAdvancedPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameFromIntervalUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneDownRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneUpRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSizeUseCase
@@ -72,19 +69,16 @@ class GameViewModel
 @Inject
 constructor(
     savedStateHandle: SavedStateHandle,
-    private val tableRepository: TableRepository,
+    tableRepository: TableRepository,
     private val gameRepository: GameRepository,
     private val prefRepository: PrefRepository,
     private val renameTablePlayer: RenameTablePlayerUseCase,
-    private val getNextPhase: GetNextPhaseUseCase,
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val randomIdRepository: RandomIdRepository,
     private val actionHistoryRepository: ActionHistoryRepository,
     private val phaseHistoryRepository: PhaseHistoryRepository,
     private val addBetPhaseActionInToGame: AddBetPhaseActionInToGameUseCase,
-    private val getGameInAdvancedPhase: GetGameInAdvancedPhaseUseCase,
-    private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
-    private val getNextAutoAction: GetNextAutoActionUseCase,
+    private val getNextGameFromInterval: GetNextGameFromIntervalUseCase,
     private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
     private val getMaxBetSize: GetMaxBetSizeUseCase,
     private val getMinRaiseSize: GetMinRaiseSizeUseCase,
@@ -93,7 +87,6 @@ constructor(
     private val getPendingBetSize: GetPendingBetSizeUseCase,
     private val getOneDownRaiseSize: GetOneDownRaiseSizeUseCase,
     private val getOneUpRaiseSize: GetOneUpRaiseSizeUseCase,
-    private val getBetPhaseAction: GetBetPhaseActionUseCase,
     private val getNextPlayerIdOfNextPhase: GetFirstActionPlayerIdOfNextPhaseUseCase,
     private val uiStateMapper: GameContentUiStateMapper,
 ) : ViewModel(), GameSettingsDialogEvent {
@@ -219,43 +212,64 @@ constructor(
             }
         }
 
+        // フェーズのインターバルダイアログ表示を関し
         viewModelScope.launch {
             gameStateFlow.filterNotNull().collect { game ->
-                phaseIntervalImageDialog.update {
-                    // FIXME: PhaseHistoryをPhaseIdから見て、見た後であれば表示しない対応を入れたい
+                // FIXME: PhaseHistoryをPhaseIdから見て、見た後であれば表示しない対応を入れたい
+                // TODO: AllInCloseのケースを実装したい
+                val phaseIntervalImageDialogUiState =
                     when (val lastPhase = game.phaseList.lastOrNull()) {
                         is Phase.PreFlop -> {
-                            if (lastPhase.isClosed) {
+                            when (lastPhase.phaseStatus) {
+                                PhaseStatus.Close -> {
                                 PhaseIntervalImageDialogUiState(
                                     imageResId = R.drawable.flopimage
                                 )
-                            } else {
-                                null
+                                }
+
+                                PhaseStatus.Active,
+                                PhaseStatus.AllInClose,
+                                    -> null
                             }
                         }
 
                         is Phase.Flop -> {
-                            if (lastPhase.isClosed) {
+                            when (lastPhase.phaseStatus) {
+                                PhaseStatus.Close -> {
                                 PhaseIntervalImageDialogUiState(
                                     imageResId = R.drawable.turnimage
                                 )
-                            } else {
-                                null
+                                }
+
+                                PhaseStatus.Active,
+                                PhaseStatus.AllInClose,
+                                    -> null
                             }
                         }
 
                         is Phase.Turn -> {
-                            if (lastPhase.isClosed) {
+                            when (lastPhase.phaseStatus) {
+                                PhaseStatus.Close -> {
                                 PhaseIntervalImageDialogUiState(
                                     imageResId = R.drawable.riverimage
                                 )
-                            } else {
-                                null
+                                }
+
+                                PhaseStatus.Active,
+                                PhaseStatus.AllInClose,
+                                    -> null
                             }
                         }
 
                         else -> null
                     }
+
+                if (phaseIntervalImageDialogUiState != null) {
+                    // ダイアログの表示の場合は1秒待つ
+                    delay(1000L)
+                }
+                phaseIntervalImageDialog.update {
+                    phaseIntervalImageDialogUiState
                 }
             }
         }
@@ -298,56 +312,63 @@ constructor(
 
     private suspend fun doFold(
         playerOrder: List<PlayerId>,
+        btnPlayerId: PlayerId,
         game: Game,
         myPlayerId: PlayerId,
     ) {
         val nextGame = addBetPhaseActionInToGame.invoke(
+            playerOrder = playerOrder,
+            btnPlayerId = btnPlayerId,
             currentGame = game,
             betPhaseAction = BetPhaseAction.Fold(
                 actionId = ActionId(randomIdRepository.generateRandomId()),
                 playerId = myPlayerId
             ),
-            playerOrder = playerOrder,
         )
         sendNextGame(nextGame)
     }
 
     private suspend fun doCheck(
         playerOrder: List<PlayerId>,
+        btnPlayerId: PlayerId,
         game: Game,
         myPlayerId: PlayerId,
     ) {
         val nextGame = addBetPhaseActionInToGame.invoke(
+            playerOrder = playerOrder,
+            btnPlayerId = btnPlayerId,
             currentGame = game,
             betPhaseAction = BetPhaseAction.Check(
                 actionId = ActionId(randomIdRepository.generateRandomId()),
                 playerId = myPlayerId
             ),
-            playerOrder = playerOrder,
         )
         sendNextGame(nextGame)
     }
 
     private suspend fun doAllIn(
         playerOrder: List<PlayerId>,
+        btnPlayerId: PlayerId,
         game: Game,
         myPlayerId: PlayerId,
     ) {
         val player = game.players.find { it.id == myPlayerId }!!
         val nextGame = addBetPhaseActionInToGame.invoke(
+            playerOrder = playerOrder,
+            btnPlayerId = btnPlayerId,
             currentGame = game,
             betPhaseAction = BetPhaseAction.AllIn(
                 actionId = ActionId(randomIdRepository.generateRandomId()),
                 playerId = myPlayerId,
                 betSize = player.stack
             ),
-            playerOrder = playerOrder,
         )
         sendNextGame(nextGame)
     }
 
     private suspend fun doCall(
         playerOrder: List<PlayerId>,
+        btnPlayerId: PlayerId,
         game: Game,
         myPlayerId: PlayerId,
     ) {
@@ -358,19 +379,21 @@ constructor(
         }
         val callSize = getMaxBetSize.invoke(actionStateList = betPhase.actionStateList)
         val nextGame = addBetPhaseActionInToGame.invoke(
+            playerOrder = playerOrder,
+            btnPlayerId = btnPlayerId,
             currentGame = game,
             betPhaseAction = BetPhaseAction.Call(
                 actionId = ActionId(randomIdRepository.generateRandomId()),
                 playerId = myPlayerId,
                 betSize = callSize
             ),
-            playerOrder = playerOrder,
         )
         sendNextGame(nextGame)
     }
 
     private suspend fun doRaise(
         playerOrder: List<PlayerId>,
+        btnPlayerId: PlayerId,
         game: Game,
         myPlayerId: PlayerId,
         raiseSize: Int,
@@ -381,7 +404,9 @@ constructor(
         // このフェーズ中、まだBetやAllInをしていない(オープンアクション)
         val isNotRaisedYet = isNotRaisedYet.invoke(actionStateList)
         val nextGame = addBetPhaseActionInToGame.invoke(
+            playerOrder = playerOrder,
             currentGame = game,
+            btnPlayerId = btnPlayerId,
             betPhaseAction = if (raiseSize == player.stack) {
                 // レイズサイズ == スタックサイズの場合はAllIn
                 BetPhaseAction.AllIn(
@@ -404,7 +429,6 @@ constructor(
                     )
                 }
             },
-            playerOrder = playerOrder,
         )
         sendNextGame(nextGame)
     }
@@ -449,6 +473,7 @@ constructor(
 
             doFold(
                 playerOrder = table.playerOrder,
+                btnPlayerId = table.btnPlayerId,
                 game = game,
                 myPlayerId = myPlayerId,
             )
@@ -463,6 +488,7 @@ constructor(
 
             doCheck(
                 playerOrder = table.playerOrder,
+                btnPlayerId = table.btnPlayerId,
                 game = game,
                 myPlayerId = myPlayerId,
             )
@@ -477,6 +503,7 @@ constructor(
 
             doAllIn(
                 playerOrder = table.playerOrder,
+                btnPlayerId = table.btnPlayerId,
                 game = game,
                 myPlayerId = myPlayerId,
             )
@@ -490,9 +517,10 @@ constructor(
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
             doCall(
+                playerOrder = table.playerOrder,
+                btnPlayerId = table.btnPlayerId,
                 game = game,
                 myPlayerId = myPlayerId,
-                playerOrder = table.playerOrder
             )
         }
     }
@@ -509,6 +537,7 @@ constructor(
 
             doRaise(
                 playerOrder = table.playerOrder,
+                btnPlayerId = table.btnPlayerId,
                 game = game,
                 myPlayerId = myPlayerId,
                 raiseSize = raiseSize,
@@ -641,7 +670,7 @@ constructor(
                 currentGame = game,
             )
             if (myPlayerId == nextPlayerId) {
-                val nextGame = getGameInAdvancedPhase.invoke(
+                val nextGame = getNextGameFromInterval.invoke(
                     playerOrder = table.playerOrder,
                     currentGame = game
                 )

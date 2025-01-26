@@ -7,7 +7,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetActivePlayerIdsUseCa
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetBetPhaseActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetFirstActionPlayerIdOfNextPhaseUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetGameInAdvancedPhaseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameFromIntervalUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
@@ -39,7 +39,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActivePlayerIds
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetBetPhaseActionUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetFirstActionPlayerIdOfNextPhaseUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetGameInAdvancedPhaseUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextGameFromIntervalUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLastPhaseAsBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMinRaiseSizeUseCaseImpl
@@ -163,7 +163,7 @@ interface UseCaseModule {
     fun bindGetFirstActionPlayerIdOfNextPhaseUseCase(useCase: GetFirstActionPlayerIdOfNextPhaseUseCaseImpl): GetFirstActionPlayerIdOfNextPhaseUseCase
 
     @Binds
-    fun bindGetGameInAdvancedPhaseUseCase(useCase: GetGameInAdvancedPhaseUseCaseImpl): GetGameInAdvancedPhaseUseCase
+    fun bindGetNextGameFromIntervalUseCase(useCase: GetNextGameFromIntervalUseCaseImpl): GetNextGameFromIntervalUseCase
 
     @Binds
     fun bindGetActivePlayerIdsUseCase(useCase: GetActivePlayerIdsUseCaseImpl): GetActivePlayerIdsUseCase

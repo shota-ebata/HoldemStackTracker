@@ -3,6 +3,7 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
+import com.ebata_shota.holdemstacktracker.domain.model.PhaseStatus
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
@@ -26,7 +27,7 @@ class GetCurrentPlayerIdUseCaseImpl
         playerOrder: List<PlayerId>,
         currentBetPhase: Phase.BetPhase,
     ): PlayerId? = withContext(dispatcher) {
-        if (currentBetPhase.isClosed) {
+        if (currentBetPhase.phaseStatus != PhaseStatus.Active) {
             return@withContext null
         }
         // 全員の最後のアクションを一つづつ取得

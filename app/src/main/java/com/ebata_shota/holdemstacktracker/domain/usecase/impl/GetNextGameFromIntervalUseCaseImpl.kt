@@ -1,24 +1,22 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
-import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pot
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActivePlayerIdsUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetGameInAdvancedPhaseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameFromIntervalUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotStateListUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class GetGameInAdvancedPhaseUseCaseImpl
+class GetNextGameFromIntervalUseCaseImpl
 @Inject
 constructor(
     private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
@@ -28,9 +26,10 @@ constructor(
     private val getActivePlayerIds: GetActivePlayerIdsUseCase,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
-) : GetGameInAdvancedPhaseUseCase {
+) : GetNextGameFromIntervalUseCase {
 
     /**
+     * インターバル状態にGameから
      * ポッドに反映して次のフェーズにする
      */
     override suspend fun invoke(
@@ -67,7 +66,6 @@ constructor(
         val updatedPhaseList = currentPhase + nextPhase
         // TableState更新
         return@withContext currentGame.copy(
-            version = currentGame.version + 1L,
             potList = updatedPotList,
             phaseList = updatedPhaseList,
         )

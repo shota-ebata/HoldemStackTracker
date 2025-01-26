@@ -1,7 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
-import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.AllInOpen
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
@@ -14,11 +13,10 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase.ShowDown
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.Standby
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.Turn
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
+import com.ebata_shota.holdemstacktracker.domain.model.PhaseStatus
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetActivePlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -26,13 +24,16 @@ import javax.inject.Inject
 class GetNextPhaseUseCaseImpl
 @Inject
 constructor(
-    private val getActivePlayerIds: GetActivePlayerIdsUseCase,
-    private val getPlayerLastActions: GetPlayerLastActionsUseCase,
     private val randomIdRepository: RandomIdRepository,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
 ) : GetNextPhaseUseCase {
 
+    /**
+     * BetPhaseのときは
+     * PhaseStatus.Active
+     * 以外の時に呼ばれる想定
+     */
     override suspend fun invoke(
         playerOrder: List<PlayerId>,
         phaseList: List<Phase>,
@@ -41,13 +42,28 @@ constructor(
             is Standby -> PreFlop(
                 phaseId = PhaseId(randomIdRepository.generateRandomId()),
                 actionStateList = emptyList(),
-                isClosed = false
+                phaseStatus = PhaseStatus.Active
             )
-            is BetPhase -> getNextPhaseStateFromBetPhase(playerOrder, phaseList, latestPhase)
-            is AllInOpen -> PotSettlement(phaseId = PhaseId(randomIdRepository.generateRandomId()))
-            is ShowDown -> PotSettlement(phaseId = PhaseId(randomIdRepository.generateRandomId()))
-            is PotSettlement -> End(phaseId = PhaseId(randomIdRepository.generateRandomId()))
-            is End -> Standby(phaseId = PhaseId(randomIdRepository.generateRandomId()))
+
+            is BetPhase -> getNextPhaseStateFromBetPhase(
+                latestPhase = latestPhase
+            )
+
+            is AllInOpen -> PotSettlement(
+                phaseId = PhaseId(randomIdRepository.generateRandomId())
+            )
+
+            is ShowDown -> PotSettlement(
+                phaseId = PhaseId(randomIdRepository.generateRandomId())
+            )
+
+            is PotSettlement -> End(
+                phaseId = PhaseId(randomIdRepository.generateRandomId())
+            )
+
+            is End -> Standby(
+                phaseId = PhaseId(randomIdRepository.generateRandomId())
+            )
             null -> {
                 // 基本無いはずだが
                 Standby(phaseId = PhaseId(randomIdRepository.generateRandomId()))
@@ -56,77 +72,51 @@ constructor(
     }
 
     private suspend fun getNextPhaseStateFromBetPhase(
-        playerOrder: List<PlayerId>,
-        phaseList: List<Phase>,
         latestPhase: BetPhase
     ): Phase {
-        // プレイヤーそれぞれの最後のAction
-        val lastActions: Map<PlayerId, BetPhaseAction?> = getPlayerLastActions.invoke(playerOrder, phaseList)
-        // 降りてないプレイヤー人数
-        val activePlayers: List<PlayerId> = getActivePlayerIds.invoke(
-            playerOrder = playerOrder,
-            phaseList = phaseList
-        )
-        val activePlayerCount = activePlayers.count()
-        // 降りてないプレイヤーが2人未満（基本的には、1人を除いてFoldしている状態）
-        // の場合は決済フェーズへ
-        if (activePlayerCount < 2) {
-            return PotSettlement(phaseId = PhaseId(randomIdRepository.generateRandomId()))
-        }
-        // AllInプレイヤー人数
-        val allInPlayerCount = lastActions.count { (_, lastAction) ->
-            lastAction is BetPhaseAction.AllIn || lastAction is BetPhaseAction.AllInSkip
-        }
-        // AllInプレイヤーだけが残っている場合は
-        if (allInPlayerCount == activePlayerCount) {
-            // AllInOpenへ
-            return AllInOpen(phaseId = PhaseId(randomIdRepository.generateRandomId()))
-        }
         // その他の場合は次のべットフェーズへ
         // (フェーズのアクションがすべて終わっている前提で、このメソッドを呼び出している想定）
-        return when (latestPhase) {
-            is PreFlop -> {
-                if (latestPhase.isClosed) {
-                    // 閉じているなら次のフェーズへ
+        return when (latestPhase.phaseStatus) {
+            PhaseStatus.Active -> {
+                throw IllegalStateException("PhaseStatus.Active is not supported.")
+            }
+
+            // 閉じているなら次のフェーズへ
+            PhaseStatus.Close -> when (latestPhase) {
+                is PreFlop -> {
                     Flop(
                         phaseId = PhaseId(randomIdRepository.generateRandomId()),
                         actionStateList = emptyList(),
-                        isClosed = false,
                     )
-                } else {
-                    // まだ閉じていない場合は閉じる
-                    latestPhase.copy(isClosed = true)
                 }
-            }
 
-            is Flop -> {
-                if (latestPhase.isClosed) {
-                    // 閉じているなら次のフェーズへ
+                is Flop -> {
                     Turn(
                         phaseId = PhaseId(randomIdRepository.generateRandomId()),
                         actionStateList = emptyList(),
-                        isClosed = false,
                     )
-                } else {
-                    // まだ閉じていない場合は閉じる
-                    latestPhase.copy(isClosed = true)
                 }
-            }
 
-            is Turn -> {
-                if (latestPhase.isClosed) {
-                    // 閉じているなら次のフェーズへ
+                is Turn -> {
                     River(
                         phaseId = PhaseId(randomIdRepository.generateRandomId()),
                         actionStateList = emptyList(),
-                        isClosed = false,
                     )
-                } else {
-                    // まだ閉じていない場合は閉じる
-                    latestPhase.copy(isClosed = true)
+                }
+
+                is River -> {
+                    ShowDown(
+                        phaseId = PhaseId(randomIdRepository.generateRandomId()),
+                    )
                 }
             }
-            is River -> ShowDown(phaseId = PhaseId(randomIdRepository.generateRandomId()))
+
+            PhaseStatus.AllInClose -> {
+                // AllInの場合はAllInOpenに移動
+                AllInOpen(
+                    phaseId = PhaseId(randomIdRepository.generateRandomId())
+                )
+            }
         }
     }
 }

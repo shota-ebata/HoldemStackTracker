@@ -7,7 +7,7 @@ interface GetPotStateListUseCase {
     /**
      * ベット状況をポットに反映して返却
      * @param potList ポット状況
-     * @param pendingBetPerPlayer ポットに入っていない別途が残っているプレイヤーのベット状況
+     * @param pendingBetPerPlayer ポットに入っていないBetが残っているプレイヤーのベット状況
      */
     suspend fun invoke(
         potList: List<Pot>,

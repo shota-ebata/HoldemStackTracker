@@ -20,6 +20,8 @@ constructor(
 
     /**
      * アクションが必要なプレイヤーIDの一覧を取得する
+     * FIXME: 若干意味が違うかも。
+     *  正確に言うと降りているわけでもなく、AllInしているわけでもないプレイヤーIDの一覧を取得する。
      */
     override suspend fun invoke(
         btnPlayerId: PlayerId,

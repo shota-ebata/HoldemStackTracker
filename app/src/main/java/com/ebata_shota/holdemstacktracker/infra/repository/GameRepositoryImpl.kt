@@ -91,9 +91,10 @@ constructor(
                     if (autoAction != null) {
                         // オートアクションがあるなら、それを使って新しいGameを生成
                         val updatedGame = addBetPhaseActionInToGame.invoke(
+                            playerOrder = table.playerOrder,
+                            btnPlayerId = table.btnPlayerId,
                             currentGame = game,
                             betPhaseAction = autoAction,
-                            playerOrder = table.playerOrder
                         )
                         // 更新実行
                         sendGame(
@@ -227,7 +228,9 @@ constructor(
         tableId: TableId,
         newGame: Game,
     ) {
-        val gameHashMap = gameMapper.mapToHashMap(newGame)
+        val gameHashMap = gameMapper.mapToHashMap(
+            newGame = newGame.copy(version = newGame.version + 1L)
+        )
         val gameRef = gamesRef.child(tableId.value)
         gameRef.setValue(gameHashMap)
     }
