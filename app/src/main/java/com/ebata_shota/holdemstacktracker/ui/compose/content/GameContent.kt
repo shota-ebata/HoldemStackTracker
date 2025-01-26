@@ -523,7 +523,6 @@ fun GameContent(
                             onCheckedChange = {
                                 onClickSliderStepSwitch(it)
                             },
-                            enabled = uiState.isEnableSlider
                         )
                     }
 
