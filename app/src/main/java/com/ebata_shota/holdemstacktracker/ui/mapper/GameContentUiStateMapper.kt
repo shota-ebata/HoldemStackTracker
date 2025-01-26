@@ -10,6 +10,10 @@ import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.Flop
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.PreFlop
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.River
+import com.ebata_shota.holdemstacktracker.domain.model.Phase.Turn
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
@@ -18,7 +22,6 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionTypeInLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
@@ -52,7 +55,6 @@ class GameContentUiStateMapper
 @Inject
 constructor(
     private val getPendingBetPerPlayer: GetPendingBetPerPlayerUseCase,
-    private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
     private val getMaxBetSize: GetMaxBetSizeUseCase,
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
     private val isNotRaisedYet: IsNotRaisedYetUseCase,
@@ -85,70 +87,9 @@ constructor(
         val sortedPlayerOrder = playerOrder.rearrangeListFromIndex(startIndex = startIndex)
         val positions: List<GamePlayerUiState.PlayerPosition> =
             playerPositionsMap[sortedPlayerOrder.size]!!
-        val betPhase: BetPhase? = try{
-            getLastPhaseAsBetPhase.invoke(phaseList)
-        } catch (e: IllegalStateException) {
-            null
-        }
-        val currentPlayerId: PlayerId? = betPhase?.let {
-            getCurrentPlayerId.invoke(
-                btnPlayerId = btnPlayerId,
-                playerOrder = playerOrder,
-                currentBetPhase = betPhase,
-            )
-        }
-        if (betPhase == null) {
-            // ほんとに表示するものがないなら、nullを返す
-            return@withContext null
-        }
+        val lastPhase = phaseList.lastOrNull() ?: return@withContext null
 
-        return@withContext createGameContentUiState(
-            betPhase = betPhase,
-            playerOrder = playerOrder,
-            btnPlayerId = btnPlayerId,
-            myPlayerId = myPlayerId,
-            currentPlayerId = currentPlayerId,
-            gamePlayers = gamePlayers,
-            betViewMode = betViewMode,
-            minBetSize = minBetSize,
-            raiseSize = raiseSize,
-            minRaiseSize = minRaiseSize,
-            totalPotSize = totalPotSize,
-            tableId = tableId,
-            sortedPlayerOrder = sortedPlayerOrder,
-            basePlayers = basePlayers,
-            positions = positions,
-            phaseList = phaseList,
-            blindText = blindText,
-            isEnableSliderStep = isEnableSliderStep
-        )
-    }
-
-    private suspend fun createGameContentUiState(
-        betPhase: BetPhase,
-        playerOrder: List<PlayerId>,
-        btnPlayerId: PlayerId,
-        myPlayerId: PlayerId,
-        currentPlayerId: PlayerId?,
-        gamePlayers: Set<GamePlayer>,
-        betViewMode: BetViewMode,
-        minBetSize: Int,
-        raiseSize: Int,
-        minRaiseSize: Int,
-        totalPotSize: Int,
-        tableId: TableId,
-        sortedPlayerOrder: List<PlayerId>,
-        basePlayers: List<PlayerBaseState>,
-        positions: List<GamePlayerUiState.PlayerPosition>,
-        phaseList: List<Phase>,
-        blindText: String,
-        isEnableSliderStep: Boolean,
-    ): GameContentUiState {
-        val isNotRaisedYet: Boolean = isNotRaisedYet.invoke(betPhase.actionStateList)
-        val pendingBetPerPlayer = getPendingBetPerPlayer.invoke(
-            playerOrder = playerOrder,
-            actionStateList = betPhase.actionStateList
-        )
+        val pendingBetPerPlayer = emptyMap<PlayerId, Int>()
         val btnPlayerIndex = playerOrder.indexOf(btnPlayerId)
         val sbIndex = if (playerOrder.size > 2) {
             (btnPlayerIndex + 1) % playerOrder.size
@@ -162,6 +103,97 @@ constructor(
         }
         val sbPlayerId = playerOrder[sbIndex]
         val bbPlayerId = playerOrder[bbIndex]
+
+        return@withContext if (lastPhase is BetPhase) {
+            createGameContentUiState(
+                betPhase = lastPhase,
+                playerOrder = playerOrder,
+                btnPlayerId = btnPlayerId,
+                myPlayerId = myPlayerId,
+                gamePlayers = gamePlayers,
+                betViewMode = betViewMode,
+                minBetSize = minBetSize,
+                raiseSize = raiseSize,
+                minRaiseSize = minRaiseSize,
+                totalPotSize = totalPotSize,
+                tableId = tableId,
+                sortedPlayerOrder = sortedPlayerOrder,
+                basePlayers = basePlayers,
+                positions = positions,
+                phaseList = phaseList,
+                blindText = blindText,
+                isEnableSliderStep = isEnableSliderStep,
+                pendingBetPerPlayer = pendingBetPerPlayer,
+                sbPlayerId = sbPlayerId,
+                bbPlayerId = bbPlayerId,
+            )
+        } else {
+            createGameContentUiState(
+                btnPlayerId = btnPlayerId,
+                myPlayerId = myPlayerId,
+                gamePlayers = gamePlayers,
+                betViewMode = betViewMode,
+                minBetSize = minBetSize,
+                totalPotSize = totalPotSize,
+                tableId = tableId,
+                sortedPlayerOrder = sortedPlayerOrder,
+                basePlayers = basePlayers,
+                positions = positions,
+                phaseList = phaseList,
+                blindText = blindText,
+                isEnableSliderStep = isEnableSliderStep,
+                pendingBetPerPlayer = pendingBetPerPlayer,
+                sbPlayerId = sbPlayerId,
+                bbPlayerId = bbPlayerId,
+            )
+        }
+    }
+
+    /**
+     * BetPhaseでの状態
+     */
+    private suspend fun createGameContentUiState(
+        betPhase: BetPhase,
+        playerOrder: List<PlayerId>,
+        btnPlayerId: PlayerId,
+        myPlayerId: PlayerId,
+        gamePlayers: Set<GamePlayer>,
+        betViewMode: BetViewMode,
+        minBetSize: Int,
+        raiseSize: Int,
+        minRaiseSize: Int,
+        totalPotSize: Int,
+        tableId: TableId,
+        sortedPlayerOrder: List<PlayerId>,
+        basePlayers: List<PlayerBaseState>,
+        positions: List<GamePlayerUiState.PlayerPosition>,
+        phaseList: List<Phase>,
+        blindText: String,
+        isEnableSliderStep: Boolean,
+        pendingBetPerPlayer: Map<PlayerId, Int>,
+        sbPlayerId: PlayerId,
+        bbPlayerId: PlayerId,
+    ): GameContentUiState {
+        val currentPlayerId: PlayerId? = betPhase.let {
+            getCurrentPlayerId.invoke(
+                btnPlayerId = btnPlayerId,
+                playerOrder = playerOrder,
+                currentBetPhase = betPhase,
+            )
+        }
+        val isNotRaisedYet: Boolean = isNotRaisedYet.invoke(betPhase.actionStateList)
+
+        val btnPlayerIndex = playerOrder.indexOf(btnPlayerId)
+        val sbIndex = if (playerOrder.size > 2) {
+            (btnPlayerIndex + 1) % playerOrder.size
+        } else {
+            btnPlayerIndex
+        }
+        val bbIndex = if (playerOrder.size > 2) {
+            (btnPlayerIndex + 2) % playerOrder.size
+        } else {
+            (btnPlayerIndex + 1) % playerOrder.size
+        }
 
         val isEnableFoldButton: Boolean
         val isEnableCheckButton: Boolean
@@ -178,7 +210,6 @@ constructor(
         val sliderLabelStackBody: StringSource
         val sliderLabelPotBody: StringSource
         val isEnableRaiseSizeButton: Boolean
-        val raiseUpSizeText: String
         //  私のターンか
         val isCurrentPlayer = myPlayerId == currentPlayerId
         if (isCurrentPlayer) {
@@ -282,7 +313,6 @@ constructor(
 
             // Raiseサイズボタン
             isEnableRaiseSizeButton = isEnableRaiseButton
-            raiseUpSizeText = "+${"%,d".format(raiseUpSize)}"
         } else {
             // 自分の番ではないなら、無効にする
             isEnableFoldButton = false
@@ -300,7 +330,6 @@ constructor(
             sliderLabelStackBody = StringSource(R.string.text_hyphen)
             sliderLabelPotBody = StringSource(R.string.text_hyphen)
             isEnableRaiseSizeButton = false
-            raiseUpSizeText = ""
         }
 
         return GameContentUiState(
@@ -323,10 +352,10 @@ constructor(
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
                 betPhaseTextResId = when (betPhase) {
-                    is Phase.PreFlop -> R.string.label_pre_flop
-                    is Phase.Flop -> R.string.label_flop
-                    is Phase.Turn -> R.string.label_turn
-                    is Phase.River -> R.string.label_river
+                    is PreFlop -> R.string.label_pre_flop
+                    is Flop -> R.string.label_flop
+                    is Turn -> R.string.label_turn
+                    is River -> R.string.label_river
                     null -> null
                 },
                 totalPot = when (betViewMode) {
@@ -385,7 +414,6 @@ constructor(
             potRatioText = sliderLabelPotBody,
             isEnableSliderStep = isEnableSliderStep,
             isEnableRaiseUpSizeButton = isEnableRaiseSizeButton,
-            raiseUpSizeText = raiseUpSizeText,
         )
     }
 
@@ -415,83 +443,212 @@ constructor(
             playerId = playerId
         )
 
-        GamePlayerUiState(
-            playerName = basePlayer.name,
-            stack = when (betViewMode) {
+        getGamePlayerUiState(
+            basePlayer = basePlayer,
+            betViewMode = betViewMode,
+            gamePlayer = gamePlayer,
+            minBetSize = minBetSize,
+            playerPosition = playerPosition,
+            pendingBetSize = pendingBetSize,
+            playerId = playerId,
+            myPlayerId = myPlayerId,
+            currentPlayerId = currentPlayerId,
+            btnPlayerId = btnPlayerId,
+            sbPlayerId = sbPlayerId,
+            bbPlayerId = bbPlayerId,
+            actionType = actionType
+        )
+    }
+
+    private fun getGamePlayerUiState(
+        basePlayer: PlayerBaseState,
+        betViewMode: BetViewMode,
+        gamePlayer: GamePlayer,
+        minBetSize: Int,
+        playerPosition: GamePlayerUiState.PlayerPosition,
+        pendingBetSize: Int?,
+        playerId: PlayerId,
+        myPlayerId: PlayerId,
+        currentPlayerId: PlayerId?,
+        btnPlayerId: PlayerId,
+        sbPlayerId: PlayerId,
+        bbPlayerId: PlayerId,
+        actionType: BetPhaseActionType?,
+    ): GamePlayerUiState = GamePlayerUiState(
+        playerName = basePlayer.name,
+        stack = when (betViewMode) {
+            BetViewMode.Number -> {
+                StringSource("%,d".format(gamePlayer.stack))
+            }
+
+            BetViewMode.BB -> {
+                StringSource(
+                    (gamePlayer.stack.toFloat() / minBetSize.toFloat())
+                        .roundDigit(2).toString()
+                )
+            }
+        },
+        shouldShowBBSuffix = betViewMode == BetViewMode.BB,
+        playerPosition = playerPosition,
+        pendingBetSize = pendingBetSize?.let {
+            when (betViewMode) {
                 BetViewMode.Number -> {
-                    StringSource("%,d".format(gamePlayer.stack))
+                    StringSource("%,d".format(it))
                 }
 
                 BetViewMode.BB -> {
                     StringSource(
-                        (gamePlayer.stack.toFloat() / minBetSize.toFloat())
+                        (it.toFloat() / minBetSize.toFloat())
                             .roundDigit(2).toString()
                     )
                 }
-            },
-            shouldShowBBSuffix = betViewMode == BetViewMode.BB,
-            playerPosition = playerPosition,
-            pendingBetSize = pendingBetSize?.let {
-                when (betViewMode) {
+            }
+        },
+        isLeaved = gamePlayer.isLeaved,
+        isMine = playerId == myPlayerId,
+        isCurrentPlayer = playerId == currentPlayerId,
+        isBtn = playerId == btnPlayerId,
+        positionLabelResId = when (playerId) {
+            sbPlayerId -> R.string.position_label_sb
+            bbPlayerId -> R.string.position_label_bb
+            else -> null
+        },
+        lastActionText = when (actionType) {
+            Blind -> null
+            Check -> if (playerId != currentPlayerId) {
+                // 自分のターン以外で、アクションを表示する
+                StringSource(R.string.action_label_check)
+            } else {
+                null
+            }
+
+            Call -> if (playerId != currentPlayerId) {
+                // 自分のターン以外で、アクションを表示する
+                StringSource(R.string.action_label_call)
+            } else {
+                null
+            }
+
+            Bet -> if (playerId != currentPlayerId) {
+                // 自分のターン以外で、アクションを表示する
+                StringSource(R.string.action_label_bet)
+            } else {
+                null
+            }
+
+            Raise -> if (playerId != currentPlayerId) {
+                // 自分のターン以外で、アクションを表示する
+                StringSource(R.string.action_label_raise)
+            } else {
+                null
+            }
+
+            AllIn -> StringSource(R.string.action_label_all_in)
+            AllInSkip -> StringSource(R.string.action_label_all_in)
+            Fold -> StringSource(R.string.action_label_fold)
+            FoldSkip -> StringSource(R.string.action_label_fold)
+            else -> null
+        }
+    )
+
+    /**
+     * Betフェーズ以外のフラットなGame状態を表示
+     */
+    private suspend fun createGameContentUiState(
+        tableId: TableId,
+        sortedPlayerOrder: List<PlayerId>,
+        btnPlayerId: PlayerId,
+        basePlayers: List<PlayerBaseState>,
+        gamePlayers: Set<GamePlayer>,
+        positions: List<GamePlayerUiState.PlayerPosition>,
+        phaseList: List<Phase>,
+        betViewMode: BetViewMode,
+        minBetSize: Int,
+        myPlayerId: PlayerId,
+        totalPotSize: Int,
+        blindText: String,
+        isEnableSliderStep: Boolean,
+        pendingBetPerPlayer: Map<PlayerId, Int>,
+        sbPlayerId: PlayerId,
+        bbPlayerId: PlayerId,
+    ): GameContentUiState {
+
+
+        return GameContentUiState(
+            tableIdString = StringSource(R.string.table_id_prefix, tableId.value),
+            currentActionId = null,
+            players = gamePlayerUiStates(
+                sortedPlayerOrder = sortedPlayerOrder,
+                basePlayers = basePlayers,
+                gamePlayers = gamePlayers,
+                positions = positions,
+                pendingBetPerPlayer = pendingBetPerPlayer,
+                currentPlayerId = null,
+                phaseList = phaseList,
+                betViewMode = betViewMode,
+                minBetSize = minBetSize,
+                myPlayerId = myPlayerId,
+                btnPlayerId = btnPlayerId,
+                sbPlayerId = sbPlayerId,
+                bbPlayerId = bbPlayerId,
+            ),
+            centerPanelContentUiState = CenterPanelContentUiState(
+                betPhaseTextResId = null,
+                totalPot = when (betViewMode) {
                     BetViewMode.Number -> {
-                        StringSource("%,d".format(it))
+                        StringSource("%,d".format(totalPotSize))
                     }
 
                     BetViewMode.BB -> {
-                        StringSource(
-                            (it.toFloat() / minBetSize.toFloat())
-                                .roundDigit(2).toString()
-                        )
+                        val bb = (totalPotSize
+                            .toFloat() / minBetSize.toFloat())
+                        StringSource(bb.roundDigit(2).toString())
                     }
-                }
-            },
-            isLeaved = gamePlayer.isLeaved,
-            isMine = playerId == myPlayerId,
-            isCurrentPlayer = playerId == currentPlayerId,
-            isBtn = playerId == btnPlayerId,
-            positionLabelResId = when (playerId) {
-                sbPlayerId -> R.string.position_label_sb
-                bbPlayerId -> R.string.position_label_bb
-                else -> null
-            },
-            lastActionText = when (actionType) {
-                Blind -> null
-                Check -> if (playerId != currentPlayerId) {
-                    // 自分のターン以外で、アクションを表示する
-                    StringSource(R.string.action_label_check)
-                } else {
-                    null
-                }
+                },
+                pendingTotalBetSize = when (betViewMode) {
+                    BetViewMode.Number -> {
+                        StringSource("%,d".format(pendingBetPerPlayer.map { it.value }.sum()))
+                    }
 
-                Call -> if (playerId != currentPlayerId) {
-                    // 自分のターン以外で、アクションを表示する
-                    StringSource(R.string.action_label_call)
-                } else {
-                    null
-                }
-
-                Bet -> if (playerId != currentPlayerId) {
-                    // 自分のターン以外で、アクションを表示する
-                    StringSource(R.string.action_label_bet)
-                } else {
-                    null
-                }
-
-                Raise -> if (playerId != currentPlayerId) {
-                    // 自分のターン以外で、アクションを表示する
-                    StringSource(R.string.action_label_raise)
-                } else {
-                    null
-                }
-
-                AllIn -> StringSource(R.string.action_label_all_in)
-                AllInSkip -> StringSource(R.string.action_label_all_in)
-                Fold -> StringSource(R.string.action_label_fold)
-                FoldSkip -> StringSource(R.string.action_label_fold)
-                else -> null
-            }
+                    BetViewMode.BB -> {
+                        val bb = (pendingBetPerPlayer.map { it.value }.sum()
+                            .toFloat() / minBetSize.toFloat())
+                        StringSource(bb.roundDigit(2).toString())
+                    }
+                },
+                shouldShowBBSuffix = betViewMode == BetViewMode.BB
+            ),
+            blindText = blindText,
+            shouldShowBBSuffix = betViewMode == BetViewMode.BB,
+            isEnableFoldButton = false,
+            isEnableCheckButton = false,
+            isEnableAllInButton = false,
+            myPendingBetSizeStringSource = null,
+            isEnableCallButton = false,
+            callSizeStringSource = null,
+            isEnableRaiseButton = false,
+            raiseButtonMainLabelResId = R.string.button_label_bet,
+            raiseSizeStringSource = null,
+            raiseSizeButtonUiStates = createRaiseSizeChangeButtonUiStates(
+                isNotRaisedYet = true,
+                isExistPot = totalPotSize != 0,
+                totalPotSize = totalPotSize,
+                minBetSize = minBetSize,
+                betPhase = null,
+                isEnableRaiseSizeButtons = false,
+                stackSize = gamePlayers.find { it.id == myPlayerId }!!.stack
+            ),
+            isEnableMinusButton = false,
+            isEnablePlusButton = false,
+            isEnableSlider = false,
+            sliderPosition = 0.0f,
+            stackRatioText = null,
+            potRatioText = null,
+            isEnableSliderStep = isEnableSliderStep,
+            isEnableRaiseUpSizeButton = false,
         )
     }
+
 
     private fun createRaiseSizeChangeButtonUiStates(
         isNotRaisedYet: Boolean,

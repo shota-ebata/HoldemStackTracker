@@ -85,8 +85,6 @@ constructor() {
                     actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty(),
                     phaseStatus = PhaseStatus.of(phaseStatus),
                 )
-                PhaseType.ShowDown -> Phase.ShowDown(phaseId = PhaseId(phaseId))
-                PhaseType.AllInOpen -> Phase.AllInOpen(phaseId = PhaseId(phaseId))
                 PhaseType.PotSettlement -> Phase.PotSettlement(phaseId = PhaseId(phaseId))
                 PhaseType.End -> Phase.End(phaseId = PhaseId(phaseId))
             }

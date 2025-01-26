@@ -2,14 +2,12 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
-import com.ebata_shota.holdemstacktracker.domain.model.Phase.AllInOpen
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.End
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.Flop
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.PotSettlement
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.PreFlop
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.River
-import com.ebata_shota.holdemstacktracker.domain.model.Phase.ShowDown
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.Standby
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.Turn
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
@@ -47,14 +45,6 @@ constructor(
 
             is BetPhase -> getNextPhaseStateFromBetPhase(
                 latestPhase = latestPhase
-            )
-
-            is AllInOpen -> PotSettlement(
-                phaseId = PhaseId(randomIdRepository.generateRandomId())
-            )
-
-            is ShowDown -> PotSettlement(
-                phaseId = PhaseId(randomIdRepository.generateRandomId())
             )
 
             is PotSettlement -> End(
@@ -105,15 +95,15 @@ constructor(
                 }
 
                 is River -> {
-                    ShowDown(
+                    PotSettlement(
                         phaseId = PhaseId(randomIdRepository.generateRandomId()),
                     )
                 }
             }
 
             PhaseStatus.AllInClose -> {
-                // AllInの場合はAllInOpenに移動
-                AllInOpen(
+                // AllInの場合はPotSettlement
+                PotSettlement(
                     phaseId = PhaseId(randomIdRepository.generateRandomId())
                 )
             }

@@ -444,7 +444,7 @@ fun GameContent(
                                                         style = MaterialTheme.typography.bodySmall
                                                     )
                                                     Text(
-                                                        text = uiState.stackRatioText.getString(),
+                                                        text = uiState.stackRatioText?.getString().orEmpty(),
                                                         style = MaterialTheme.typography.titleSmall
                                                     )
                                                 }
@@ -457,7 +457,7 @@ fun GameContent(
                                                         style = MaterialTheme.typography.bodySmall
                                                     )
                                                     Text(
-                                                        text = uiState.potRatioText.getString(),
+                                                        text = uiState.potRatioText?.getString().toString(),
                                                         style = MaterialTheme.typography.titleSmall
                                                     )
                                                 }
@@ -542,7 +542,7 @@ fun GameContent(
                                     style = MaterialTheme.typography.bodySmall
                                 )
                                 Text(
-                                    text = uiState.stackRatioText.getString(),
+                                    text = uiState.stackRatioText?.getString().orEmpty(),
                                     style = MaterialTheme.typography.titleSmall
                                 )
                             }
@@ -557,7 +557,7 @@ fun GameContent(
                                     style = MaterialTheme.typography.bodySmall,
                                 )
                                 Text(
-                                    text = uiState.potRatioText.getString(),
+                                    text = uiState.potRatioText?.getString().orEmpty(),
                                     style = MaterialTheme.typography.titleSmall
                                 )
                             }
@@ -593,7 +593,6 @@ data class GameContentUiState(
     val raiseSizeStringSource: StringSource?,
     // RaiseUp
     val isEnableRaiseUpSizeButton: Boolean,
-    val raiseUpSizeText: String,
     // RaiseSizeButton
     val raiseSizeButtonUiStates: List<RaiseSizeChangeButtonUiState>,
     // MinusButton
@@ -601,8 +600,8 @@ data class GameContentUiState(
     // Slider
     val isEnableSlider: Boolean,
     val sliderPosition: Float,
-    val stackRatioText: StringSource,
-    val potRatioText: StringSource,
+    val stackRatioText: StringSource?,
+    val potRatioText: StringSource?,
     // PlusButton
     val isEnablePlusButton: Boolean,
     // StepSwitch
@@ -794,7 +793,6 @@ private class GameContentUiStatePreviewParam :
             stackRatioText = "".toStringSource(),
             potRatioText = "".toStringSource(),
             isEnableRaiseUpSizeButton = true,
-            raiseUpSizeText = "+10200",
         )
     )
 }

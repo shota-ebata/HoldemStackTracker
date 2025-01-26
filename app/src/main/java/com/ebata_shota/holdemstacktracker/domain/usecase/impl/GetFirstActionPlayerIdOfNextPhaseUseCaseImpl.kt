@@ -58,8 +58,6 @@ constructor(
                 )
             }
             is Phase.River,
-            is Phase.AllInOpen,
-            is Phase.ShowDown,
             is Phase.PotSettlement,
             is Phase.End,
             null,

@@ -219,12 +219,13 @@ constructor(
                 // TODO: AllInCloseのケースを実装したい
                 val phaseIntervalImageDialogUiState =
                     when (val lastPhase = game.phaseList.lastOrNull()) {
+                        is Phase.Standby -> null
                         is Phase.PreFlop -> {
                             when (lastPhase.phaseStatus) {
                                 PhaseStatus.Close -> {
-                                PhaseIntervalImageDialogUiState(
-                                    imageResId = R.drawable.flopimage
-                                )
+                                    PhaseIntervalImageDialogUiState(
+                                        imageResId = R.drawable.flopimage
+                                    )
                                 }
 
                                 PhaseStatus.Active,
@@ -236,9 +237,9 @@ constructor(
                         is Phase.Flop -> {
                             when (lastPhase.phaseStatus) {
                                 PhaseStatus.Close -> {
-                                PhaseIntervalImageDialogUiState(
-                                    imageResId = R.drawable.turnimage
-                                )
+                                    PhaseIntervalImageDialogUiState(
+                                        imageResId = R.drawable.turnimage
+                                    )
                                 }
 
                                 PhaseStatus.Active,
@@ -250,9 +251,9 @@ constructor(
                         is Phase.Turn -> {
                             when (lastPhase.phaseStatus) {
                                 PhaseStatus.Close -> {
-                                PhaseIntervalImageDialogUiState(
-                                    imageResId = R.drawable.riverimage
-                                )
+                                    PhaseIntervalImageDialogUiState(
+                                        imageResId = R.drawable.riverimage
+                                    )
                                 }
 
                                 PhaseStatus.Active,
@@ -261,7 +262,23 @@ constructor(
                             }
                         }
 
-                        else -> null
+                        is Phase.River -> {
+                            when (lastPhase.phaseStatus) {
+                                PhaseStatus.Close -> {
+                                    PhaseIntervalImageDialogUiState(
+                                        imageResId = R.drawable.showdownimage
+                                    )
+                                }
+
+                                PhaseStatus.Active,
+                                PhaseStatus.AllInClose,
+                                    -> null
+                            }
+                        }
+
+                        is Phase.PotSettlement -> null
+                        is Phase.End -> null
+                        null -> null
                     }
 
                 if (phaseIntervalImageDialogUiState != null) {
@@ -656,6 +673,10 @@ constructor(
         }
     }
 
+    /**
+     * インターバル画像
+     * 閉じた時
+     */
     fun onDismissPhaseIntervalImageDialogRequest() {
         viewModelScope.launch {
             // FIXME: PhaseHistoryを保存（見た扱いにしたい）
@@ -669,15 +690,30 @@ constructor(
                 playerOrder = table.playerOrder,
                 currentGame = game,
             )
-            if (myPlayerId == nextPlayerId) {
-                val nextGame = getNextGameFromInterval.invoke(
-                    playerOrder = table.playerOrder,
-                    currentGame = game
-                )
-                // ダイアログを消してから、実際に消した扱いにするまで
-                // delayをかける
-                delay(1000L)
-                sendNextGame(nextGame = nextGame)
+            when (myPlayerId) {
+                // 次のプレイヤーだった場合
+                nextPlayerId -> {
+                    val nextGame = getNextGameFromInterval.invoke(
+                        playerOrder = table.playerOrder,
+                        currentGame = game
+                    )
+                    // ダイアログを消してから、実際に消した扱いにするまで
+                    // delayをかける
+                    delay(1000L)
+                    sendNextGame(nextGame = nextGame)
+                }
+
+                // ホストプレイヤーの場合
+                table.hostPlayerId -> {
+                    val nextGame = getNextGameFromInterval.invoke(
+                        playerOrder = table.playerOrder,
+                        currentGame = game
+                    )
+                    // ダイアログを消してから、実際に消した扱いにするまで
+                    // delayをかける
+                    delay(1000L)
+                    sendNextGame(nextGame = nextGame)
+                }
             }
         }
     }

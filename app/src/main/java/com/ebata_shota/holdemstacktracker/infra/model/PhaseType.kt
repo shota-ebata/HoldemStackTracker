@@ -10,8 +10,6 @@ enum class PhaseType {
     Flop,
     Turn,
     River,
-    ShowDown,
-    AllInOpen,
     PotSettlement,
     End;
 
@@ -29,8 +27,6 @@ enum class PhaseType {
                 is Phase.Flop -> Flop
                 is Phase.Turn -> Turn
                 is Phase.River -> River
-                is Phase.ShowDown -> ShowDown
-                is Phase.AllInOpen -> AllInOpen
                 is Phase.PotSettlement -> PotSettlement
                 is Phase.End -> End
             }

@@ -53,8 +53,6 @@ constructor(
                 )
             }
 
-            is Phase.ShowDown,
-            is Phase.AllInOpen,
             is Phase.PotSettlement,
             is Phase.End,
             null -> null

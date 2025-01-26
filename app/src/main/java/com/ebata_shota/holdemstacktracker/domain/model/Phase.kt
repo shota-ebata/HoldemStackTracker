@@ -80,14 +80,6 @@ sealed interface Phase {
         override val phaseStatus: PhaseStatus = PhaseStatus.Active,
     ) : BetPhase
 
-    data class ShowDown(
-        override val phaseId: PhaseId,
-    ) : Phase
-
-    data class AllInOpen(
-        override val phaseId: PhaseId,
-    ) : Phase
-
     /**
      * ポット決済フェーズ
      */

@@ -59,7 +59,7 @@ fun CenterPanelContent(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(R.string.label_pot),
+                    text = stringResource(R.string.label_total_pot),
                     style = MaterialTheme.typography.bodySmall
                 )
                 ChipSizeText(
