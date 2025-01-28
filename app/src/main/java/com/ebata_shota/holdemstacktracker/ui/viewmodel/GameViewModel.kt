@@ -207,7 +207,7 @@ constructor(
 
         // 最低Raiseサイズの変化があった場合、最低サイズにする監視
         viewModelScope.launch {
-            minRaiseSizeFlow.distinctUntilChanged().collect { minRaiseSize ->
+            minRaiseSizeFlow.collect { minRaiseSize ->
                 raiseSizeStateFlow.update { minRaiseSize }
             }
         }
