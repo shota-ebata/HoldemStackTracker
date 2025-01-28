@@ -370,6 +370,11 @@ constructor(
         myPlayerId: PlayerId,
     ) {
         val player = game.players.find { it.id == myPlayerId }!!
+        val myPendingBetSize = getPendingBetSize.invoke(
+            actionList = getLastPhaseAsBetPhase.invoke(game.phaseList).actionStateList,
+            playerOrder = playerOrder,
+            playerId = myPlayerId
+        )
         val nextGame = addBetPhaseActionInToGame.invoke(
             playerOrder = playerOrder,
             btnPlayerId = btnPlayerId,
@@ -377,7 +382,7 @@ constructor(
             betPhaseAction = BetPhaseAction.AllIn(
                 actionId = ActionId(randomIdRepository.generateRandomId()),
                 playerId = myPlayerId,
-                betSize = player.stack
+                betSize = player.stack + myPendingBetSize
             ),
         )
         sendNextGame(nextGame)
