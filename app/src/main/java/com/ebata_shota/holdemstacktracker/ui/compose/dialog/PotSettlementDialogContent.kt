@@ -42,9 +42,7 @@ import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
 @Composable
 fun PotSettlementDialogContent(
     uiState: PotSettlementDialogUiState,
-    onClickRow: (playerId: PlayerId) -> Unit,
-    onClickBackButton: () -> Unit,
-    onClickDoneButton: () -> Unit,
+    event: PotSettlementDialogEvent,
     modifier: Modifier = Modifier,
 ) {
     //   ・done押下の連打を防ぎたい
@@ -63,20 +61,21 @@ fun PotSettlementDialogContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Box(
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier
+                        .heightIn(min = 56.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
                     if (uiState.shouldShowBackButton) {
                         Row(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(min = 56.dp),
+                                .fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             IconButton(
                                 onClick = {
                                     if (doneButtonDelayState.isDelayed) {
                                         backButtonDelayState.isDelayed = false
-                                        onClickBackButton()
+                                        event.onClickPotSettlementDialogBackButton()
                                     }
                                 }
                             ) {
@@ -127,7 +126,7 @@ fun PotSettlementDialogContent(
                         labelString = { it.label.getString() },
                         onClickRow = {
                             if (doneButtonDelayState.isDelayed && backButtonDelayState.isDelayed) {
-                                onClickRow(it.playerId)
+                                event.onClickPotSettlementDialogPlayerRow(it.playerId)
                             }
                         },
                     )
@@ -144,7 +143,7 @@ fun PotSettlementDialogContent(
                         onClick = {
                             dropUselessDouble(doneButtonDelayState) {
                                 if (backButtonDelayState.isDelayed) {
-                                    onClickDoneButton()
+                                    event.onClickPotSettlementDialogDoneButton()
                                 }
                             }
                         },
@@ -204,6 +203,12 @@ data class PotSettlementDialogUiState(
     )
 }
 
+interface PotSettlementDialogEvent {
+    fun onClickPotSettlementDialogPlayerRow(playerId: PlayerId)
+    fun onClickPotSettlementDialogBackButton()
+    fun onClickPotSettlementDialogDoneButton()
+}
+
 @Preview(showBackground = true, showSystemUi = false, name = "Light Mode")
 @Preview(
     showBackground = true,
@@ -249,9 +254,13 @@ private fun PotSettlementDialogContentPreview() {
                     ),
                 ),
             ),
-            onClickRow = {},
-            onClickBackButton = {},
-            onClickDoneButton = {},
+            event = object : PotSettlementDialogEvent {
+                override fun onClickPotSettlementDialogPlayerRow(playerId: PlayerId) {}
+
+                override fun onClickPotSettlementDialogBackButton() {}
+
+                override fun onClickPotSettlementDialogDoneButton() {}
+            },
         )
     }
 }
