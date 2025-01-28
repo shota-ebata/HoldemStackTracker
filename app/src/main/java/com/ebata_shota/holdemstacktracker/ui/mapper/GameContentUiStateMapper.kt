@@ -89,7 +89,6 @@ constructor(
             playerPositionsMap[sortedPlayerOrder.size]!!
         val lastPhase = phaseList.lastOrNull() ?: return@withContext null
 
-        val pendingBetPerPlayer = emptyMap<PlayerId, Int>()
         val btnPlayerIndex = playerOrder.indexOf(btnPlayerId)
         val sbIndex = if (playerOrder.size > 2) {
             (btnPlayerIndex + 1) % playerOrder.size
@@ -123,7 +122,6 @@ constructor(
                 phaseList = phaseList,
                 blindText = blindText,
                 isEnableSliderStep = isEnableSliderStep,
-                pendingBetPerPlayer = pendingBetPerPlayer,
                 sbPlayerId = sbPlayerId,
                 bbPlayerId = bbPlayerId,
             )
@@ -142,7 +140,6 @@ constructor(
                 phaseList = phaseList,
                 blindText = blindText,
                 isEnableSliderStep = isEnableSliderStep,
-                pendingBetPerPlayer = pendingBetPerPlayer,
                 sbPlayerId = sbPlayerId,
                 bbPlayerId = bbPlayerId,
             )
@@ -170,7 +167,6 @@ constructor(
         phaseList: List<Phase>,
         blindText: String,
         isEnableSliderStep: Boolean,
-        pendingBetPerPlayer: Map<PlayerId, Int>,
         sbPlayerId: PlayerId,
         bbPlayerId: PlayerId,
     ): GameContentUiState {
@@ -182,7 +178,10 @@ constructor(
             )
         }
         val isNotRaisedYet: Boolean = isNotRaisedYet.invoke(betPhase.actionStateList)
-
+        val pendingBetPerPlayer = getPendingBetPerPlayer.invoke(
+            playerOrder = playerOrder,
+            actionStateList = betPhase.actionStateList
+        )
         val btnPlayerIndex = playerOrder.indexOf(btnPlayerId)
         val sbIndex = if (playerOrder.size > 2) {
             (btnPlayerIndex + 1) % playerOrder.size
@@ -568,12 +567,10 @@ constructor(
         totalPotSize: Int,
         blindText: String,
         isEnableSliderStep: Boolean,
-        pendingBetPerPlayer: Map<PlayerId, Int>,
         sbPlayerId: PlayerId,
         bbPlayerId: PlayerId,
     ): GameContentUiState {
-
-
+        val pendingBetPerPlayer = emptyMap<PlayerId, Int>()
         return GameContentUiState(
             tableIdString = StringSource(R.string.table_id_prefix, tableId.value),
             currentActionId = null,
