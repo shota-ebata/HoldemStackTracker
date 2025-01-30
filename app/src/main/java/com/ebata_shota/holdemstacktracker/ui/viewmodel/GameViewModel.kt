@@ -399,16 +399,26 @@ constructor(
         } catch (e: IllegalStateException) {
             return
         }
+        val player = game.players.find { it.id == myPlayerId }!!
         val callSize = getMaxBetSize.invoke(actionStateList = betPhase.actionStateList)
         val nextGame = addBetPhaseActionInToGame.invoke(
             playerOrder = playerOrder,
             btnPlayerId = btnPlayerId,
             currentGame = game,
-            betPhaseAction = BetPhaseAction.Call(
-                actionId = ActionId(randomIdRepository.generateRandomId()),
-                playerId = myPlayerId,
-                betSize = callSize
-            ),
+            betPhaseAction = if (callSize == player.stack) {
+                // コールサイズ == スタックサイズの場合はAllIn
+                BetPhaseAction.AllIn(
+                    actionId = ActionId(randomIdRepository.generateRandomId()),
+                    playerId = myPlayerId,
+                    betSize = callSize
+                )
+            } else {
+                BetPhaseAction.Call(
+                    actionId = ActionId(randomIdRepository.generateRandomId()),
+                    playerId = myPlayerId,
+                    betSize = callSize
+                )
+            },
         )
         sendNextGame(nextGame)
     }
