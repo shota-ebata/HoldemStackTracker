@@ -13,13 +13,13 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pot
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.AddBetPhaseActionInToGameUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetActivePlayerIdsUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionablePlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPlayerStackUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNotFoldPlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotStateListUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetRequiredActionPlayerIdsUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredInPhaseUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -27,11 +27,11 @@ import javax.inject.Inject
 class AddBetPhaseActionInToGameUseCaseImpl
 @Inject
 constructor(
-    private val isActionRequired: IsActionRequiredUseCase,
+    private val isActionRequiredInPhase: IsActionRequiredInPhaseUseCase,
     private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
     private val getNextPlayerStack: GetNextPlayerStackUseCase,
-    private val getActivePlayerIds: GetActivePlayerIdsUseCase,
-    private val getRequiredActionPlayerIds: GetRequiredActionPlayerIdsUseCase,
+    private val getNotFoldPlayerIds: GetNotFoldPlayerIdsUseCase,
+    private val getRequiredActionPlayerIds: GetActionablePlayerIdsUseCase,
     private val getPendingBetPerPlayer: GetPendingBetPerPlayerUseCase,
     private val getPotStateList: GetPotStateListUseCase,
     private val randomIdRepository: RandomIdRepository,
@@ -74,9 +74,9 @@ constructor(
         )
 
         // アクションしていない人がのこっているか？
-        val isActionRequired = isActionRequired.invoke(
+        val isActionRequired = isActionRequiredInPhase.invoke(
             playerOrder = playerOrder,
-            actionStateList = addedActionList
+            phaseList = addedActionPhaseList
         )
         if (isActionRequired) {
             // まだアクションが必要なプレイヤーがいる場合
@@ -96,11 +96,11 @@ constructor(
         // もうアクションが不要な場合
         // 次のフェーズに進めたい
         // 降りてないプレイヤーID一覧
-        val activePlayerIds = getActivePlayerIds.invoke(
+        val notFoldPlayerIds = getNotFoldPlayerIds.invoke(
             playerOrder = playerOrder,
             phaseList = addedActionPhaseList
         )
-        if (activePlayerIds.size <= 1) {
+        if (notFoldPlayerIds.size <= 1) {
             /**
              * Foldで即終了、精算フェーズに
              *
@@ -111,7 +111,7 @@ constructor(
                 playerOrder = playerOrder,
                 addedActionList = addedActionList,
                 currentGame = currentGame,
-                activePlayerIds = activePlayerIds
+                activePlayerIds = notFoldPlayerIds
             )
             return@withContext baseNextGame.copy(
                 potList = updatedPotList,
@@ -132,10 +132,10 @@ constructor(
         // 降りていないプレイヤーが複数人いる
 
         // アクションが必要なプレイヤーの数
+        // 正確に言うと降りているわけでもなく、AllInしているわけでもないプレイヤーIDの一覧を取得
         val requiredActionPlayerIds = getRequiredActionPlayerIds.invoke(
             playerOrder = playerOrder,
-            btnPlayerId = btnPlayerId,
-            currentGame = currentGame
+            phaseList = addedActionPhaseList
         )
         if (requiredActionPlayerIds.size < 2) {
             /**
@@ -150,7 +150,7 @@ constructor(
                 playerOrder = playerOrder,
                 addedActionList = addedActionList,
                 currentGame = currentGame,
-                activePlayerIds = activePlayerIds
+                activePlayerIds = notFoldPlayerIds
             )
             return@withContext baseNextGame.copy(
                 potList = updatedPotList,

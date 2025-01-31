@@ -5,7 +5,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetFirstActionPlayerIdOfNextPhaseUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetRequiredActionPlayerIdsUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionablePlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.util.getSortedByActionOrder
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -15,7 +15,7 @@ import javax.inject.Inject
 class GetFirstActionPlayerIdOfNextPhaseUseCaseImpl
 @Inject
 constructor(
-    private val getRequiredActionPlayerIds: GetRequiredActionPlayerIdsUseCase,
+    private val getRequiredActionPlayerIds: GetActionablePlayerIdsUseCase,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
 ) : GetFirstActionPlayerIdOfNextPhaseUseCase {
@@ -76,9 +76,8 @@ constructor(
     ): PlayerId? {
         // アクションが必要な人の一覧を取得する
         val requiredActionPlayerIds = getRequiredActionPlayerIds.invoke(
-            btnPlayerId = btnPlayerId,
             playerOrder = playerOrder,
-            currentGame = currentGame
+            phaseList = currentGame.phaseList,
         )
         // それをアクション順でソートする
         val sortedRequiredActionPlayerIds = playerOrder

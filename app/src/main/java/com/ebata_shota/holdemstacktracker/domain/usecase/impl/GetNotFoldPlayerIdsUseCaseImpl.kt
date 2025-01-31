@@ -4,19 +4,19 @@ import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefau
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetActivePlayerIdsUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNotFoldPlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class GetActivePlayerIdsUseCaseImpl
+class GetNotFoldPlayerIdsUseCaseImpl
 @Inject
 constructor(
     private val getPlayerLastActions: GetPlayerLastActionsUseCase,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
-) : GetActivePlayerIdsUseCase {
+) : GetNotFoldPlayerIdsUseCase {
 
     override suspend fun invoke(
         playerOrder: List<PlayerId>,

@@ -2,36 +2,36 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
-import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetRequiredActionPlayerIdsUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionablePlayerIdsUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class GetRequiredActionPlayerIdsUseCaseImpl
+class GetActionablePlayerIdsUseCaseImpl
 @Inject
 constructor(
     private val getPlayerLastActions: GetPlayerLastActionsUseCase,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
-) : GetRequiredActionPlayerIdsUseCase {
+) : GetActionablePlayerIdsUseCase {
 
     /**
-     * アクションが必要なプレイヤーIDの一覧を取得する
-     * FIXME: 若干意味が違うかも。
-     *  正確に言うと降りているわけでもなく、AllInしているわけでもないプレイヤーIDの一覧を取得する。
+     * アクションできるプレイヤーIDの一覧を取得する
+     * 正確に言うと降りているわけでもなく、AllInしているわけでもない
+     * アクションする権限を保持しているプレイヤーIDの一覧を取得する。
+     * (フェーズを跨いだ後も考慮)
      */
     override suspend fun invoke(
-        btnPlayerId: PlayerId,
         playerOrder: List<PlayerId>,
-        currentGame: Game,
+        phaseList: List<Phase>,
     ): List<PlayerId> = withContext(dispatcher) {
 
         val lastActions: Map<PlayerId, BetPhaseAction?> = getPlayerLastActions.invoke(
             playerOrder = playerOrder,
-            phaseList = currentGame.phaseList
+            phaseList = phaseList
         )
 
         return@withContext playerOrder.mapNotNull { playerId ->
@@ -50,7 +50,7 @@ constructor(
                 is BetPhaseAction.Check,
                     -> playerId
 
-                null -> null
+                null -> playerId
             }
         }
     }

@@ -3,7 +3,7 @@ package com.ebata_shota.holdemstacktracker.di.module
 import com.ebata_shota.holdemstacktracker.domain.usecase.AddBetPhaseActionInToGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionTypeInLastPhaseAsBetPhaseUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetActivePlayerIdsUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNotFoldPlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetBetPhaseActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetFirstActionPlayerIdOfNextPhaseUseCase
@@ -25,8 +25,8 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUse
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotStateListUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByPotSlider
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlider
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetRequiredActionPlayerIdsUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionablePlayerIdsUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredInPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
@@ -35,7 +35,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCas
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.AddBetPhaseActionInToGameUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.CreateNewGameUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActionTypeInLastPhaseAsBetPhaseUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActivePlayerIdsUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNotFoldPlayerIdsUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetBetPhaseActionUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetCurrentPlayerIdUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetFirstActionPlayerIdOfNextPhaseUseCaseImpl
@@ -57,8 +57,8 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActio
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPotStateListUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetRaiseSizeByPotSliderImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetRaiseSizeByStackSliderImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetRequiredActionPlayerIdsUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsActionRequiredUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActionablePlayerIdsUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsActionRequiredInPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsNotRaisedYetUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.JoinTableUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.MovePositionUseCaseImpl
@@ -94,7 +94,7 @@ interface UseCaseModule {
     fun bindGetPotStateListUseCase(useCase: GetPotStateListUseCaseImpl): GetPotStateListUseCase
 
     @Binds
-    fun bindIsActionRequiredUseCase(useCase: IsActionRequiredUseCaseImpl): IsActionRequiredUseCase
+    fun bindIsActionRequiredUseCase(useCase: IsActionRequiredInPhaseUseCaseImpl): IsActionRequiredInPhaseUseCase
 
     @Binds
     fun bindGetNextPlayerStackUseCase(useCase: GetNextPlayerStackUseCaseImpl): GetNextPlayerStackUseCase
@@ -157,7 +157,7 @@ interface UseCaseModule {
     fun bindGetBetPhaseActionUseCase(useCase: GetBetPhaseActionUseCaseImpl): GetBetPhaseActionUseCase
 
     @Binds
-    fun bindGetRequiredActionPlayerIdsUseCase(useCase: GetRequiredActionPlayerIdsUseCaseImpl): GetRequiredActionPlayerIdsUseCase
+    fun bindGetRequiredActionPlayerIdsUseCase(useCase: GetActionablePlayerIdsUseCaseImpl): GetActionablePlayerIdsUseCase
 
     @Binds
     fun bindGetFirstActionPlayerIdOfNextPhaseUseCase(useCase: GetFirstActionPlayerIdOfNextPhaseUseCaseImpl): GetFirstActionPlayerIdOfNextPhaseUseCase
@@ -166,5 +166,5 @@ interface UseCaseModule {
     fun bindGetNextGameFromIntervalUseCase(useCase: GetNextGameFromIntervalUseCaseImpl): GetNextGameFromIntervalUseCase
 
     @Binds
-    fun bindGetActivePlayerIdsUseCase(useCase: GetActivePlayerIdsUseCaseImpl): GetActivePlayerIdsUseCase
+    fun bindGetActivePlayerIdsUseCase(useCase: GetNotFoldPlayerIdsUseCaseImpl): GetNotFoldPlayerIdsUseCase
 }

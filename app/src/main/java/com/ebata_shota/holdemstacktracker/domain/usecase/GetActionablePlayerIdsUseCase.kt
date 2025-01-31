@@ -1,13 +1,12 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
-import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 
-interface GetRequiredActionPlayerIdsUseCase {
+interface GetActionablePlayerIdsUseCase {
 
     suspend fun invoke(
-        btnPlayerId: PlayerId,
         playerOrder: List<PlayerId>,
-        currentGame: Game,
+        phaseList: List<Phase>,
     ): List<PlayerId>
 }

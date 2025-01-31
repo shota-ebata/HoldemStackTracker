@@ -6,7 +6,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pot
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetActivePlayerIdsUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNotFoldPlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameFromIntervalUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
@@ -23,7 +23,7 @@ constructor(
     private val getPendingBetPerPlayer: GetPendingBetPerPlayerUseCase,
     private val getPotStateList: GetPotStateListUseCase,
     private val getNextPhase: GetNextPhaseUseCase,
-    private val getActivePlayerIds: GetActivePlayerIdsUseCase,
+    private val getNotFoldPlayerIds: GetNotFoldPlayerIdsUseCase,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
 ) : GetNextGameFromIntervalUseCase {
@@ -48,7 +48,7 @@ constructor(
             actionStateList = actionList
         )
         // 降りてないプレイヤー
-        val activePlayers: List<PlayerId> = getActivePlayerIds.invoke(
+        val notFoldPlayers: List<PlayerId> = getNotFoldPlayerIds.invoke(
             playerOrder = playerOrder,
             phaseList = currentGame.phaseList
         )
@@ -56,7 +56,7 @@ constructor(
         val updatedPotList: List<Pot> = getPotStateList.invoke(
             potList = currentGame.potList,
             pendingBetPerPlayer = pendingBetPerPlayer,
-            activePlayerIds = activePlayers
+            activePlayerIds = notFoldPlayers
         )
         // フェーズを進める
         val nextPhase = getNextPhase.invoke(
