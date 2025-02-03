@@ -12,13 +12,13 @@ import androidx.lifecycle.compose.dropUnlessResumed
  *
  * 参考：https://zenn.dev/t2low/articles/4f96f32c919f27
  */
-fun dropUselessDouble(
+fun dropRedundantEventWith(
     delayState: DelayState,
-    invoke: () -> Unit,
+    block: () -> Unit,
 ) {
     if (delayState.isDelayed) {
         delayState.isDelayed = false
-        invoke()
+        block()
     }
 }
 
@@ -27,15 +27,15 @@ fun dropUselessDouble(
  */
 @SuppressLint("ComposableNaming")
 @Composable
-fun dropUselessDouble(
+fun dropRedundantEvent(
     intervalTimeMillis: Long = 500L,
     delayState: DelayState = rememberDelayState(intervalTimeMillis = intervalTimeMillis),
-    invoke: () -> Unit,
+    block: () -> Unit,
 ): () -> Unit {
     return {
         if (delayState.isDelayed) {
             delayState.isDelayed = false
-            invoke()
+            block()
         }
     }
 }

@@ -27,7 +27,7 @@ import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.OutlinedTextFieldWithError
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.TextFieldErrorUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
+import com.ebata_shota.holdemstacktracker.ui.compose.util.dropRedundantEvent
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,7 +70,7 @@ fun MyNameInputDialogContent(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         OutlinedButton(
-                            onClick = dropUselessDouble {
+                            onClick = dropRedundantEvent {
                                 event.onDismissRequestMyNameInputDialog()
                             }
                         ) {
@@ -78,7 +78,7 @@ fun MyNameInputDialogContent(
                         }
 
                         Button(
-                            onClick = dropUselessDouble {
+                            onClick = dropRedundantEvent {
                                 event.onClickSubmitMyNameInputDialog()
                             },
                             enabled = uiState.isEnableSubmitButton

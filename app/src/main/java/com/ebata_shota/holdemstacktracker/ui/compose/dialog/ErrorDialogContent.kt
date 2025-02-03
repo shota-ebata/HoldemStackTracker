@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
-import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
+import com.ebata_shota.holdemstacktracker.ui.compose.util.dropRedundantEvent
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 
 
@@ -63,7 +63,7 @@ fun ErrorDialogContent(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         OutlinedButton(
-                            onClick = dropUselessDouble {
+                            onClick = dropRedundantEvent {
                                 event.onClickErrorDialogOk()
                             },
                         ) {

@@ -58,7 +58,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.parts.RaiseSizeChangeButton
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerCard
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.util.DelayState
-import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
+import com.ebata_shota.holdemstacktracker.ui.compose.util.dropRedundantEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.util.getChipString
 import com.ebata_shota.holdemstacktracker.ui.compose.util.rememberDelayState
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
@@ -237,10 +237,8 @@ fun GameContent(
                         modifier = Modifier
                             .weight(1.0f)
                             .heightIn(min = 56.dp),
-                        onClick = {
-                            dropUselessDouble(delayState) {
-                                onClickFoldButton()
-                            }
+                        onClick = dropRedundantEvent(delayState = delayState) {
+                            onClickFoldButton()
                         },
                         enabled = uiState.isEnableFoldButton
                     ) {
@@ -253,10 +251,8 @@ fun GameContent(
                         modifier = Modifier
                             .weight(2.0f)
                             .heightIn(min = 56.dp),
-                        onClick = {
-                            dropUselessDouble(delayState) {
-                                onClickCheckButton()
-                            }
+                        onClick = dropRedundantEvent(delayState = delayState) {
+                            onClickCheckButton()
                         },
                         enabled = uiState.isEnableCheckButton
                     ) {
@@ -269,10 +265,8 @@ fun GameContent(
                         modifier = Modifier
                             .weight(1.0f)
                             .heightIn(min = 56.dp),
-                        onClick = {
-                            dropUselessDouble(delayState) {
-                                onClickAllInButton()
-                            }
+                        onClick = dropRedundantEvent(delayState = delayState) {
+                            onClickAllInButton()
                         },
                         enabled = uiState.isEnableAllInButton
                     ) {
@@ -290,10 +284,8 @@ fun GameContent(
                     Button(
                         modifier = Modifier
                             .weight(1.0f),
-                        onClick = {
-                            dropUselessDouble(delayState) {
-                                onClickCallButton()
-                            }
+                        onClick = dropRedundantEvent(delayState = delayState) {
+                            onClickCallButton()
                         },
                         enabled = uiState.isEnableCallButton
                     ) {
@@ -337,10 +329,8 @@ fun GameContent(
                     Button(
                         modifier = Modifier
                             .weight(1.0f),
-                        onClick = {
-                            dropUselessDouble(delayState) {
-                                onClickRaiseButton()
-                            }
+                        onClick = dropRedundantEvent(delayState = delayState) {
+                            onClickRaiseButton()
                         },
                         enabled = uiState.isEnableRaiseButton
                     ) {
@@ -501,10 +491,8 @@ fun GameContent(
                     ) {
 
                         IconButton(
-                            onClick = {
-                                dropUselessDouble(delayState) {
-                                    onClickSettingButton()
-                                }
+                            onClick = dropRedundantEvent(delayState = delayState) {
+                                onClickSettingButton()
                             }
                         ) {
                             Icon(

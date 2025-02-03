@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.row.TableSummaryCardRow
 import com.ebata_shota.holdemstacktracker.ui.compose.row.TableSummaryCardRowUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
+import com.ebata_shota.holdemstacktracker.ui.compose.util.dropRedundantEventWith
 import com.ebata_shota.holdemstacktracker.ui.compose.util.rememberDelayState
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 
@@ -46,7 +46,7 @@ fun MainContent(
                 TableSummaryCardRow(
                     uiState = item,
                     onClickTableRow = { tableId ->
-                        dropUselessDouble(delayState) {
+                        dropRedundantEventWith(delayState = delayState) {
                             onClickTableRow.invoke(tableId)
                         }
                     }

@@ -33,7 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
+import com.ebata_shota.holdemstacktracker.ui.compose.util.dropRedundantEvent
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,7 +68,7 @@ fun PlayerRemoveDialog(
                             .height(56.dp)
                             .selectable(
                                 selected = it.isSelected,
-                                onClick = dropUselessDouble {
+                                onClick = dropRedundantEvent {
                                     event.onClickPlayerRemoveDialogPlayer(
                                         playerId = it.playerId,
                                         checked = !it.isSelected
@@ -97,7 +97,7 @@ fun PlayerRemoveDialog(
                             if (it.showHostInfoIcon) {
                                 val context = LocalContext.current
                                 IconButton(
-                                    onClick = dropUselessDouble {
+                                    onClick = dropRedundantEvent {
                                         Toast.makeText(
                                             context,
                                             context.getString(R.string.player_remove_dialog_toast),
@@ -127,7 +127,7 @@ fun PlayerRemoveDialog(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         OutlinedButton(
-                            onClick = dropUselessDouble {
+                            onClick = dropRedundantEvent {
                                 event.onDismissRequestPlayerRemoveDialog()
                             }
                         ) {
@@ -135,7 +135,7 @@ fun PlayerRemoveDialog(
                         }
 
                         Button(
-                            onClick = dropUselessDouble {
+                            onClick = dropRedundantEvent {
                                 event.onClickPlayerRemoveDialogSubmit()
                             },
                             enabled = uiState.isEnableSubmitButton

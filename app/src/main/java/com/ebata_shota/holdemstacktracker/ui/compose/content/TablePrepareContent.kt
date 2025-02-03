@@ -48,7 +48,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.parts.BlindTextLabel
 import com.ebata_shota.holdemstacktracker.ui.compose.row.PlayerEditRowUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.RadioButtonRow
 import com.ebata_shota.holdemstacktracker.ui.compose.row.UserEditRow
-import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
+import com.ebata_shota.holdemstacktracker.ui.compose.util.dropRedundantEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.util.rememberDelayState
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import com.ebata_shota.holdemstacktracker.ui.theme.SideSpace
@@ -158,10 +158,8 @@ fun TablePrepareContent(
                         IconButton(
                             modifier = Modifier
                                 .size(48.dp),
-                            onClick = {
-                                dropUselessDouble(delayState) {
-                                    onClickDeletePlayerButton()
-                                }
+                            onClick = dropRedundantEvent(delayState = delayState) {
+                                onClickDeletePlayerButton()
                             }
                         ) {
                             Icon(
@@ -218,23 +216,17 @@ fun TablePrepareContent(
                     uiState.playerEditRows.forEachIndexed { index, playerEditRowUiState ->
                         UserEditRow(
                             uiState = playerEditRowUiState,
-                            onClickStackEditButton = {
-                                dropUselessDouble(delayState) {
-                                    onClickStackEditButton(
-                                        playerEditRowUiState.playerId,
-                                        playerEditRowUiState.stackSize
-                                    )
-                                }
+                            onClickStackEditButton = dropRedundantEvent(delayState = delayState) {
+                                onClickStackEditButton(
+                                    playerEditRowUiState.playerId,
+                                    playerEditRowUiState.stackSize
+                                )
                             },
-                            onClickUpButton = {
-                                dropUselessDouble(delayState) {
-                                    onClickUpButton(playerEditRowUiState.playerId)
-                                }
+                            onClickUpButton = dropRedundantEvent(delayState = delayState) {
+                                onClickUpButton(playerEditRowUiState.playerId)
                             },
-                            onClickDownButton = {
-                                dropUselessDouble(delayState) {
-                                    onClickDownButton(playerEditRowUiState.playerId)
-                                }
+                            onClickDownButton = dropRedundantEvent(delayState = delayState) {
+                                onClickDownButton(playerEditRowUiState.playerId)
                             },
                             modifier = Modifier
                                 .padding(vertical = 4.dp)
@@ -294,7 +286,7 @@ fun TablePrepareContent(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Button(
-                        onClick = dropUselessDouble { onClickSubmitButton() },
+                        onClick = dropRedundantEvent { onClickSubmitButton() },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),

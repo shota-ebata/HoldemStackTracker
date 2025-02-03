@@ -33,7 +33,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ChipSizeText
 import com.ebata_shota.holdemstacktracker.ui.compose.row.CheckboxRow
-import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
+import com.ebata_shota.holdemstacktracker.ui.compose.util.dropRedundantEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.util.rememberDelayState
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
@@ -140,11 +140,9 @@ fun PotSettlementDialogContent(
                     Button(
                         modifier = Modifier
                             .padding(4.dp),
-                        onClick = {
-                            dropUselessDouble(doneButtonDelayState) {
-                                if (backButtonDelayState.isDelayed) {
-                                    event.onClickPotSettlementDialogDoneButton()
-                                }
+                        onClick = dropRedundantEvent(delayState = doneButtonDelayState) {
+                            if (backButtonDelayState.isDelayed) {
+                                event.onClickPotSettlementDialogDoneButton()
                             }
                         },
                         enabled = uiState.isEnableButton,

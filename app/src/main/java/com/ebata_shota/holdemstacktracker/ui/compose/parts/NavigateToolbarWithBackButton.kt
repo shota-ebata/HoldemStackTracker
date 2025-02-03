@@ -17,7 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
+import com.ebata_shota.holdemstacktracker.ui.compose.util.dropRedundantEvent
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,7 +32,7 @@ fun NavigateToolbarWithBackButton(
             CenterAlignedTopAppBar(
                 title = title,
                 navigationIcon = {
-                    IconButton(onClick = dropUselessDouble { onClickBack() }) {
+                    IconButton(onClick = dropRedundantEvent { onClickBack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Localized description"

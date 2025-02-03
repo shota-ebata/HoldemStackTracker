@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.BlindTextLabel
-import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
+import com.ebata_shota.holdemstacktracker.ui.compose.util.dropRedundantEvent
 import com.ebata_shota.holdemstacktracker.ui.theme.CardSideSpace
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import java.time.LocalDateTime
@@ -52,7 +52,7 @@ fun TableSummaryCardRow(
                 Color.Unspecified
             }
         ),
-        onClick = dropUselessDouble {
+        onClick = dropRedundantEvent {
             onClickTableRow(uiState.tableId)
         },
     ) {

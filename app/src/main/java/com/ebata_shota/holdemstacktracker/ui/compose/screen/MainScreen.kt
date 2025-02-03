@@ -2,7 +2,6 @@ package com.ebata_shota.holdemstacktracker.ui.compose.screen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -42,7 +41,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogCon
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
 import com.ebata_shota.holdemstacktracker.ui.compose.util.OnResumedEffect
-import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
+import com.ebata_shota.holdemstacktracker.ui.compose.util.dropRedundantEvent
 import com.ebata_shota.holdemstacktracker.ui.extension.isScrollingUp
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.MainViewModel
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.MainViewModel.NavigateEvent
@@ -96,7 +95,7 @@ fun MainScreen(
                             ) {
                                 DropdownMenuItem(
                                     text = { Text("プレイヤー名変更") },
-                                    onClick = dropUselessDouble {
+                                    onClick = dropRedundantEvent {
                                         expandedSetting = false
                                         viewModel.onClickSettingRename()
                                     },
@@ -129,7 +128,7 @@ fun MainScreen(
                                 )
                             }
                             FloatingActionButton(
-                                onClick = dropUselessDouble {
+                                onClick = dropRedundantEvent {
                                     viewModel.onClickCreateNewTable()
                                 },
                             ) {

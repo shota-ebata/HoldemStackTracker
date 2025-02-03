@@ -27,13 +27,12 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
-import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.GameType
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.labelResId
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.OutlinedTextFieldWithError
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.TextFieldErrorUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.util.dropUselessDouble
+import com.ebata_shota.holdemstacktracker.ui.compose.util.dropRedundantEvent
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 
 @Composable
@@ -125,7 +124,7 @@ fun TableCreatorContent(
             ) {
                 // Submit Button
                 Button(
-                    onClick = dropUselessDouble {
+                    onClick = dropRedundantEvent {
                         onClickSubmit()
                     },
                     enabled = uiState.enableSubmitButton,
