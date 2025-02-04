@@ -10,6 +10,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseStatus
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pot
+import com.ebata_shota.holdemstacktracker.domain.model.PotId
 import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType
 import com.ebata_shota.holdemstacktracker.infra.model.PhaseType
 import java.time.Instant
@@ -29,6 +30,7 @@ constructor() {
         private const val PLAYER_STATE_PLAYER_STACK = "stack"
         private const val PLAYER_STATE_PLAYER_IS_LEAVED = "isLeaved"
         private const val POTS = "pots"
+        private const val POT_ID = "potId"
         private const val POT_SIZE = "potSize"
         private const val POT_IS_CLOSED = "isClosed"
         private const val POT_INVOLVED_PLAYER_IDS = "involvedPlayerIds"
@@ -50,7 +52,7 @@ constructor() {
             appVersion = gameMap[APP_VERSION] as Long,
             players = mapToGamePlayerStateList(gameMap[PLAYERS] as Map<*, *>),
             potList = (gameMap[POTS] as? List<*>)?.let {
-                mapToPotStateList(it)
+                mapToPotList(it)
             } ?: emptyList(),
             phaseList = mapToPhaseStateList(gameMap[PHASES] as List<*>),
             updateTime = Instant.ofEpochMilli(gameMap[UPDATE_TIME] as Long)
@@ -127,16 +129,17 @@ constructor() {
         }.toSet()
     }
 
-    private fun mapToPotStateList(pots: List<*>): List<Pot> {
+    private fun mapToPotList(pots: List<*>): List<Pot> {
         return pots.map { it as Map<*, *> }.mapIndexed { index, map ->
+            val potId = PotId(map[POT_ID] as String)
             val potSize = map[POT_SIZE]!!.getInt()!!
             val isClosed = map[POT_IS_CLOSED] as Boolean
             val involvedPlayerIds = (map[POT_INVOLVED_PLAYER_IDS] as List<*>).map {
                 PlayerId(it as String)
             }
             Pot(
-                id = index.toLong(),
-                potNumber = 0,
+                id = potId,
+                potNumber = index.toLong(),
                 involvedPlayerIds = involvedPlayerIds,
                 potSize = potSize,
                 isClosed = isClosed
@@ -196,6 +199,7 @@ constructor() {
     }
 
     private fun mapPot(pot: Pot) = hashMapOf(
+        POT_ID to pot.id.value,
         POT_SIZE to pot.potSize,
         POT_IS_CLOSED to pot.isClosed,
         POT_INVOLVED_PLAYER_IDS to mapInvolvedPlayerIds(pot)

@@ -22,7 +22,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSizeUseCas
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionInPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotStateListUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotListUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByPotSlider
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlider
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionablePlayerIdsUseCase
@@ -54,7 +54,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetSizeU
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionInPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionsUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPotStateListUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPotListUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetRaiseSizeByPotSliderImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetRaiseSizeByStackSliderImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActionablePlayerIdsUseCaseImpl
@@ -91,7 +91,7 @@ interface UseCaseModule {
     fun bindGetPendingBetPerPlayerUseCase(useCase: GetPendingBetPerPlayerUseCaseImpl): GetPendingBetPerPlayerUseCase
 
     @Binds
-    fun bindGetPotStateListUseCase(useCase: GetPotStateListUseCaseImpl): GetPotStateListUseCase
+    fun bindGetPotStateListUseCase(useCase: GetPotListUseCaseImpl): GetPotListUseCase
 
     @Binds
     fun bindIsActionRequiredUseCase(useCase: IsActionRequiredInPhaseUseCaseImpl): IsActionRequiredInPhaseUseCase

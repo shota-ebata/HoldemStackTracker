@@ -11,7 +11,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameFromInterval
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotStateListUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotListUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -21,7 +21,7 @@ class GetNextGameFromIntervalUseCaseImpl
 constructor(
     private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
     private val getPendingBetPerPlayer: GetPendingBetPerPlayerUseCase,
-    private val getPotStateList: GetPotStateListUseCase,
+    private val getPotStateList: GetPotListUseCase,
     private val getNextPhase: GetNextPhaseUseCase,
     private val getNotFoldPlayerIds: GetNotFoldPlayerIdsUseCase,
     @CoroutineDispatcherDefault
@@ -54,8 +54,9 @@ constructor(
         )
         // ベット状況をポットに反映
         val updatedPotList: List<Pot> = getPotStateList.invoke(
+            updatedPlayers = currentGame.players,
             potList = currentGame.potList,
-            pendingBetPerPlayer = pendingBetPerPlayer,
+            pendingBetPerPlayerWithoutZero = pendingBetPerPlayer,
             activePlayerIds = notFoldPlayers
         )
         // フェーズを進める

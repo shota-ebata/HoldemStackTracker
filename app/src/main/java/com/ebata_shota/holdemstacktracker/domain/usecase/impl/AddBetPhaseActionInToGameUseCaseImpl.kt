@@ -18,7 +18,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseU
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPlayerStackUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNotFoldPlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotStateListUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotListUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredInPhaseUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -33,7 +33,7 @@ constructor(
     private val getNotFoldPlayerIds: GetNotFoldPlayerIdsUseCase,
     private val getRequiredActionPlayerIds: GetActionablePlayerIdsUseCase,
     private val getPendingBetPerPlayer: GetPendingBetPerPlayerUseCase,
-    private val getPotStateList: GetPotStateListUseCase,
+    private val getPotStateList: GetPotListUseCase,
     private val randomIdRepository: RandomIdRepository,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
@@ -108,6 +108,7 @@ constructor(
              * ベット状況をポットに反映
              */
             val updatedPotList: List<Pot> = getUpdatedPotList(
+                updatedPlayers = updatedPlayers,
                 playerOrder = playerOrder,
                 addedActionList = addedActionList,
                 currentGame = currentGame,
@@ -147,6 +148,7 @@ constructor(
              * ベット状況をポットに反映
              */
             val updatedPotList: List<Pot> = getUpdatedPotList(
+                updatedPlayers = updatedPlayers,
                 playerOrder = playerOrder,
                 addedActionList = addedActionList,
                 currentGame = currentGame,
@@ -179,6 +181,7 @@ constructor(
     }
 
     private suspend fun getUpdatedPotList(
+        updatedPlayers: Set<GamePlayer>,
         playerOrder: List<PlayerId>,
         addedActionList: List<BetPhaseAction>,
         currentGame: Game,
@@ -191,8 +194,9 @@ constructor(
         )
         // ベット状況をポットに反映
         val updatedPotList: List<Pot> = getPotStateList.invoke(
+            updatedPlayers = updatedPlayers,
             potList = currentGame.potList,
-            pendingBetPerPlayer = pendingBetPerPlayer,
+            pendingBetPerPlayerWithoutZero = pendingBetPerPlayer,
             activePlayerIds = activePlayerIds
         )
         return updatedPotList

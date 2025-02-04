@@ -2,33 +2,38 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
+import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pot
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotStateListUseCase
+import com.ebata_shota.holdemstacktracker.domain.model.PotId
+import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotListUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.random.Random
 
-class GetPotStateListUseCaseImpl
+class GetPotListUseCaseImpl
 @Inject
 constructor(
+    private val randomIdRepository: RandomIdRepository,
     @CoroutineDispatcherDefault
-    private val dispatcher: CoroutineDispatcher
-) : GetPotStateListUseCase {
+    private val dispatcher: CoroutineDispatcher,
+) : GetPotListUseCase {
 
     override suspend fun invoke(
+        updatedPlayers: Set<GamePlayer>,
         potList: List<Pot>,
-        pendingBetPerPlayer: Map<PlayerId, Int>,
+        pendingBetPerPlayerWithoutZero: Map<PlayerId, Int>,
         activePlayerIds: List<PlayerId>,
     ): List<Pot> = withContext(dispatcher) {
         // ポットに入っていないベットが残っているプレイヤー数
-        val pendingBetPlayerCount: Int = pendingBetPerPlayer.size
+        val pendingBetPlayerCount: Int = pendingBetPerPlayerWithoutZero.size
         return@withContext if (pendingBetPlayerCount > 0) {
             // 1人以上の場合、ポットに入れていく
-            getNewPotStateList(
+            getNewPotList(
+                updatedPlayers = updatedPlayers,
                 potList = potList,
-                pendingBetPerPlayer = pendingBetPerPlayer,
+                pendingBetPerPlayer = pendingBetPerPlayerWithoutZero,
                 activePlayerIds = activePlayerIds
             )
         } else {
@@ -37,7 +42,8 @@ constructor(
         }
     }
 
-    private fun getNewPotStateList(
+    private fun getNewPotList(
+        updatedPlayers: Set<GamePlayer>,
         potList: List<Pot>,
         pendingBetPerPlayer: Map<PlayerId, Int>,
         activePlayerIds: List<PlayerId>,
@@ -50,7 +56,7 @@ constructor(
         } else {
             // 以前のポットがない、もしくは閉じている場合は、新しいポットを作成する
             val nextPotNumber = lastPot?.potNumber?.plus(1L) ?: 0L
-            createPotState(nextPotNumber)
+            createPot(nextPotNumber)
         }
         var potSize: Int = currentPot.potSize
         val involvedPlayerIds = currentPot.involvedPlayerIds.toMutableList()
@@ -78,43 +84,47 @@ constructor(
             // Potに入れた分だけ、ベットサイズから減らす
             betSize - addSize
         }.filter { it.value > 0 } // ポットに入っていないベットが残っている人でフィルタリングする
-        // まだポットに入っていないベットを持っている人がいる場合、このポットはcloseする
-        val isClosed = updatedPendingPrePlayer.isNotEmpty()
+        // まだポットに入っていないベットを持っている人がいる場合、
+        // もしくは、もしこのpotの関与者のスタックが0になっているなら
+        // このポットはcloseする
+        val isEmptyPotInvolvedPlayerStack: Boolean = involvedPlayerIds.any { involvedPlayerId ->
+            val updatedPlayer = updatedPlayers.find { it.id == involvedPlayerId }
+            updatedPlayer?.stack == 0
+        }
+        val isClosed = updatedPendingPrePlayer.isNotEmpty() || isEmptyPotInvolvedPlayerStack
         currentPot = currentPot.copy(
             potSize = potSize,
             involvedPlayerIds = involvedPlayerIds.distinct(), // 重複を無くして上書き
             isClosed = isClosed
         )
-        val updatedPotStateList = potList.toMutableList()
-        val index = updatedPotStateList.indexOfFirstOrNull { it.id == currentPot.id }
+        val updatedPotList = potList.toMutableList()
+        val index = updatedPotList.indexOfFirstOrNull { it.id == currentPot.id }
         if (index != null) {
             // 既存ポットがあれば上書き
-            updatedPotStateList[index] = currentPot
+            updatedPotList[index] = currentPot
         } else {
             // 新規ポットであれば追加
-            updatedPotStateList.add(currentPot)
+            updatedPotList.add(currentPot)
         }
         if (updatedPendingPrePlayer.isEmpty()) {
-            // もうベットが無いなら、現在のpotを返す
-            return updatedPotStateList
+            // もうベットが無いなら、ポットを返す
+            // 現在のpotを返す
+            return updatedPotList
         }
         // まだ残っている可能性があるので再帰
-        return getNewPotStateList(
-            potList = updatedPotStateList,
+        return getNewPotList(
+            updatedPlayers = updatedPlayers,
+            potList = updatedPotList,
             pendingBetPerPlayer = updatedPendingPrePlayer,
             activePlayerIds = activePlayerIds
         )
     }
 
-    private fun createPotState(potNumber: Long) = Pot(
-        id = createPotId(),
+    private fun createPot(potNumber: Long) = Pot(
+        id = PotId(value = randomIdRepository.generateRandomId()),
         potNumber = potNumber,
         potSize = 0,
         involvedPlayerIds = emptyList(),
         isClosed = false
     )
-
-    private fun createPotId(): Long {
-        return Random.nextLong()
-    }
 }
