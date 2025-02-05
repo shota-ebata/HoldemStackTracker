@@ -199,6 +199,7 @@ data class PotSettlementDialogUiState(
         val players: List<PlayerRowUiState>,
     )
 
+    // FIXME: 直前の選択状態で、選択していないプレイヤーを表示しない機構を実装したい
     data class PlayerRowUiState(
         val playerId: PlayerId,
         val label: StringSource,

@@ -43,6 +43,7 @@ constructor(
             potSettlementInfoList = potSettlementInfoList,
         )
         val nextPhase = getNextPhase.invoke(playerOrder = playerOrder, phaseList = game.phaseList)
+        // FIXME: Potの分配を、「関係者の承認を以て完了」とする仕様に変更したい。
         gameRepository.sendGame(
             tableId = tableId,
             newGame = game.copy(
