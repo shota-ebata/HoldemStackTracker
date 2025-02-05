@@ -612,6 +612,20 @@ class IsActionRequiredInPhaseUseCaseImplTest {
         executeAndAssert(phaseList = phaseList, expected = false)
     }
 
+    /**
+     * PreFlop
+     *  SB:  Blind(100)
+     *  BB:  Blind(200)
+     *  BTN: Call
+     *  SB:  AllIn(10000)
+     *  BB:  Call
+     *  BTN  Call
+     * Flop
+     *  BB: Fold
+     *
+     * この時
+     * isActionRequiredInPhase = true
+     */
     @Test
     fun flop_2() {
         // prepare
@@ -660,5 +674,69 @@ class IsActionRequiredInPhaseUseCaseImplTest {
             )
         )
         executeAndAssert(phaseList = phaseList, expected = false)
+    }
+
+    /**
+     * PreFlop
+     *  SB:  Blind(100)
+     *  BB:  Blind(200)
+     *  BTN: Call
+     *  SB:  AllIn(10000)
+     *  BB:  Call
+     *  BTN  Call
+     * Flop
+     *  BB: AllIn(10000)
+     *
+     * この時
+     * isActionRequiredInPhase = true
+     */
+    @Test
+    fun flop_allin_2() {
+        // prepare
+        val phaseList = listOf(
+            Phase.PreFlop(
+                phaseId = PhaseId(""),
+                actionStateList = listOf(
+                    BetPhaseAction.Blind(
+                        actionId = ActionId(""),
+                        playerId = PlayerId("SB"),
+                        betSize = 100
+                    ),
+                    BetPhaseAction.Blind(
+                        actionId = ActionId(""),
+                        playerId = PlayerId("BB"),
+                        betSize = 200
+                    ),
+                    BetPhaseAction.Call(
+                        actionId = ActionId(""),
+                        playerId = PlayerId("BTN"),
+                        betSize = 200
+                    ),
+                    BetPhaseAction.AllIn(
+                        actionId = ActionId(""),
+                        playerId = PlayerId("SB"),
+                        betSize = 10000
+                    ),
+                    BetPhaseAction.Call(
+                        actionId = ActionId(""),
+                        playerId = PlayerId("BB"),
+                        betSize = 10000
+                    ),
+                    BetPhaseAction.Call(
+                        actionId = ActionId(""),
+                        playerId = PlayerId("BTN"),
+                        betSize = 10000
+                    ),
+                )
+            ),
+            Phase.Flop(
+                phaseId = PhaseId(""),
+                actionStateList = listOf(
+                    BetPhaseAction.AllInSkip(actionId = ActionId(""), playerId = PlayerId("SB")),
+                    BetPhaseAction.AllIn(actionId = ActionId(""), playerId = PlayerId("BB"), 10000),
+                )
+            )
+        )
+        executeAndAssert(phaseList = phaseList, expected = true)
     }
 }

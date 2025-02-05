@@ -87,7 +87,7 @@ class GetPotListUseCaseImplTest {
         val expectedList = listOf(
             Pot(
                 id = PotId("0"),
-                potNumber = 0L,
+                potNumber = 0,
                 potSize = 600,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
@@ -141,7 +141,7 @@ class GetPotListUseCaseImplTest {
         val expectedList = listOf(
             Pot(
                 id = PotId("0"),
-                potNumber = 0L,
+                potNumber = 0,
                 potSize = 600,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
@@ -195,7 +195,7 @@ class GetPotListUseCaseImplTest {
         val expectedList = listOf(
             Pot(
                 id = PotId("0"),
-                potNumber = 0L,
+                potNumber = 0,
                 potSize = 600,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
@@ -248,7 +248,7 @@ class GetPotListUseCaseImplTest {
         val expectedList = listOf(
             Pot(
                 id = PotId("0"),
-                potNumber = 0L,
+                potNumber = 0,
                 potSize = 300,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
@@ -259,7 +259,7 @@ class GetPotListUseCaseImplTest {
             ),
             Pot(
                 id = PotId("0"),
-                potNumber = 1L,
+                potNumber = 1,
                 potSize = 200,
                 involvedPlayerIds = listOf(
                     PlayerId("1"),
@@ -269,7 +269,7 @@ class GetPotListUseCaseImplTest {
             ),
             Pot(
                 id = PotId("0"),
-                potNumber = 2L,
+                potNumber = 2,
                 potSize = 100,
                 involvedPlayerIds = listOf(
                     PlayerId("2"),
@@ -319,7 +319,7 @@ class GetPotListUseCaseImplTest {
         val expectedList = listOf(
             Pot(
                 id = PotId("0"),
-                potNumber = 0L,
+                potNumber = 0,
                 potSize = 1000,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
@@ -359,7 +359,7 @@ class GetPotListUseCaseImplTest {
         val potList = listOf(
             Pot(
                 id = PotId("0"),
-                potNumber = 0L,
+                potNumber = 0,
                 potSize = 300,
                 involvedPlayerIds = listOf(
                     PlayerId("BTN"),
@@ -381,7 +381,7 @@ class GetPotListUseCaseImplTest {
         val expectedList = listOf(
             Pot(
                 id = PotId("0"),
-                potNumber = 0L,
+                potNumber = 0,
                 potSize = 300,
                 involvedPlayerIds = listOf(
                     PlayerId("BTN"),
@@ -392,7 +392,7 @@ class GetPotListUseCaseImplTest {
             ),
             Pot(
                 id = PotId("0"),
-                potNumber = 1L,
+                potNumber = 1,
                 potSize = 4,
                 involvedPlayerIds = listOf(
                     PlayerId("BTN"),
@@ -432,7 +432,7 @@ class GetPotListUseCaseImplTest {
         val potList = listOf(
             Pot(
                 id = PotId("0"),
-                potNumber = 0L,
+                potNumber = 0,
                 potSize = 300,
                 involvedPlayerIds = listOf(
                     PlayerId("BTN"),
@@ -443,7 +443,7 @@ class GetPotListUseCaseImplTest {
             ),
             Pot(
                 id = PotId("0"),
-                potNumber = 1L,
+                potNumber = 1,
                 potSize = 4,
                 involvedPlayerIds = listOf(
                     PlayerId("BTN"),
@@ -461,7 +461,7 @@ class GetPotListUseCaseImplTest {
         val expectedList = listOf(
             Pot(
                 id = PotId("0"),
-                potNumber = 0L,
+                potNumber = 0,
                 potSize = 300,
                 involvedPlayerIds = listOf(
                     PlayerId("BTN"),
@@ -472,7 +472,7 @@ class GetPotListUseCaseImplTest {
             ),
             Pot(
                 id = PotId("0"),
-                potNumber = 1L,
+                potNumber = 1,
                 potSize = 4,
                 involvedPlayerIds = listOf(
                     PlayerId("BTN"),

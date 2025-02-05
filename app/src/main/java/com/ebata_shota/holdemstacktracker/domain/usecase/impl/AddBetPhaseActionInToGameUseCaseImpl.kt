@@ -140,6 +140,8 @@ constructor(
         )
         if (requiredActionPlayerIds.size < 2) {
             /**
+             * ここまでの条件が
+             * すべてfalseという前提の時
              * AllInで即終了、AllInCloseに
              *
              * 降りていないプレイヤーが複数人いて

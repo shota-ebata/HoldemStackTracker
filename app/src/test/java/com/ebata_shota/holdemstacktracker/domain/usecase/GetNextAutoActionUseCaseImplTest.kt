@@ -90,7 +90,7 @@ class GetNextAutoActionUseCaseImplTest {
             potList = listOf(
                 Pot(
                     id = PotId("0"),
-                    potNumber = 0L,
+                    potNumber = 0,
                     potSize = 300,
                     involvedPlayerIds = listOf(
                         PlayerId("BTN"),
@@ -101,7 +101,7 @@ class GetNextAutoActionUseCaseImplTest {
                 ),
                 Pot(
                     id = PotId("0"),
-                    potNumber = 1L,
+                    potNumber = 1,
                     potSize = 4,
                     involvedPlayerIds = listOf(
                         PlayerId("BTN"),

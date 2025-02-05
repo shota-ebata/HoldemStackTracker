@@ -39,7 +39,7 @@ constructor(
         )
 
         if (notFoldPlayerIds.size <= 1) {
-            // 降りていないプレイヤ＝が1人以下になった場合
+            // 降りていないプレイヤーが1人以下になった場合
             // もうアクションは不要
             return@withContext false
         }
@@ -57,6 +57,15 @@ constructor(
             // 全員の最後のアクションを一つづつ取得
             val playerOrderSize = playerOrder.size
             val lastActionList = lastBetPhase.actionStateList.takeLast(playerOrderSize)
+
+            if (
+                lastActionList.size < playerOrder.size
+                && lastBetPhase.actionStateList.lastOrNull() is BetPhaseAction.AllIn
+            ) {
+                // まだこのフェーズでアクションしていないプレイヤーがいて
+                // && 最後のアクションがAllInの場合はまだ終わっていない
+                return@withContext true
+            }
 
             // アクションが必要な人がいるか？
             return@withContext isExistsRequiredActionPlayer(
