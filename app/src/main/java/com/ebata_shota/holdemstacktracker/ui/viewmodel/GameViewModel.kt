@@ -767,8 +767,18 @@ constructor(
     override fun onClickPotSettlementDialogBackButton() {
         potSettlementDialogUiState.update { dialogUiState ->
             dialogUiState ?: return@update null
+
             dialogUiState.copy(
-                currentPotIndex = dialogUiState.currentPotIndex - 1
+                // 一つ前に
+                currentPotIndex = dialogUiState.currentPotIndex - 1,
+                // 戻るときに、Potの選択状態をリセットする
+                pots = dialogUiState.pots.mapAtIndex(
+                    index = dialogUiState.currentPotIndex
+                ) { rowUiState ->
+                    rowUiState.copy(
+                        players = rowUiState.players.map { it.copy(isSelected = false) }
+                    )
+                },
             )
         }
     }

@@ -120,16 +120,20 @@ fun PotSettlementDialogContent(
                 )
 
                 uiState.pots[uiState.currentPotIndex].players.forEach { playerRowUiState ->
-                    CheckboxRow(
-                        item = playerRowUiState,
-                        isChecked = playerRowUiState.isSelected,
-                        labelString = { it.label.getString() },
-                        onClickRow = {
-                            if (doneButtonDelayState.isDelayed && backButtonDelayState.isDelayed) {
-                                event.onClickPotSettlementDialogPlayerRow(it.playerId)
-                            }
-                        },
-                    )
+                    if (uiState.unSelectablePlayerIds.none { it == playerRowUiState.playerId }) {
+                        // 選択できないプレイヤー一覧
+                        // に含まれていないなら、チェックボックスを表示する
+                        CheckboxRow(
+                            item = playerRowUiState,
+                            isChecked = playerRowUiState.isSelected,
+                            labelString = { it.label.getString() },
+                            onClickRow = {
+                                if (doneButtonDelayState.isDelayed && backButtonDelayState.isDelayed) {
+                                    event.onClickPotSettlementDialogPlayerRow(it.playerId)
+                                }
+                            },
+                        )
+                    }
                 }
                 Row(
                     modifier = Modifier
@@ -165,7 +169,7 @@ data class PotSettlementDialogUiState(
     val shouldShowBackButton: Boolean = currentPotIndex > 0
 
     val potLabelString: StringSource = when (currentPotIndex) {
-        0 -> {
+        pots.lastIndex -> {
             StringSource(
                 if (pots.size == 1) {
                     R.string.label_pot
@@ -178,7 +182,7 @@ data class PotSettlementDialogUiState(
         else -> {
             StringSource(
                 R.string.label_side_pot,
-                currentPotIndex
+                pots[currentPotIndex].potNumber
             )
         }
     }
@@ -193,13 +197,22 @@ data class PotSettlementDialogUiState(
 
     val isEnableButton: Boolean = pots[currentPotIndex].players.any { it.isSelected }
 
+    // 現在のページで選択できないプレイヤーID一覧
+    // 直前で選択しなかった人は以降のPotの取得ができないので・・・
+    val unSelectablePlayerIds: List<PlayerId> = if (currentPotIndex > 0) {
+        // 一つ前のページで選択していないプレイヤーは、選択できない
+        pots[currentPotIndex - 1].players.filter { !it.isSelected }.map { it.playerId }
+    } else {
+        // 最初のページであれば、全員選択可能
+        emptyList()
+    }
+
     data class PotUiState(
         val potNumber: Int,
         val potSizeString: StringSource,
         val players: List<PlayerRowUiState>,
     )
 
-    // FIXME: 直前の選択状態で、選択していないプレイヤーを表示しない機構を実装したい
     data class PlayerRowUiState(
         val playerId: PlayerId,
         val label: StringSource,
