@@ -87,7 +87,9 @@ constructor() {
                     actionStateList = actions?.let { mapToActionStateList(actions) }.orEmpty(),
                     phaseStatus = PhaseStatus.of(phaseStatus),
                 )
-                PhaseType.PotSettlement -> Phase.PotSettlement(phaseId = PhaseId(phaseId))
+                PhaseType.PotSettlement -> Phase.PotSettlement(
+                    phaseId = PhaseId(phaseId)
+                )
                 PhaseType.End -> Phase.End(phaseId = PhaseId(phaseId))
             }
 
@@ -139,7 +141,7 @@ constructor() {
             }
             Pot(
                 id = potId,
-                potNumber = index.toLong(),
+                potNumber = index,
                 involvedPlayerIds = involvedPlayerIds,
                 potSize = potSize,
                 isClosed = isClosed

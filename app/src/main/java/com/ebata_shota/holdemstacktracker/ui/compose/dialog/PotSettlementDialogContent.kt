@@ -106,7 +106,7 @@ fun PotSettlementDialogContent(
                         style = MaterialTheme.typography.bodySmall
                     )
                     ChipSizeText(
-                        textStringSource = uiState.pots[uiState.currentPotIndex],
+                        textStringSource = uiState.pots[uiState.currentPotIndex].potSizeString,
                         shouldShowBBSuffix = false,
                         style = MaterialTheme.typography.titleLarge,
                         suffixFontSize = MaterialTheme.typography.bodyMedium.fontSize,
@@ -119,7 +119,7 @@ fun PotSettlementDialogContent(
                     contentDescription = "Phase Interval Image",
                 )
 
-                uiState.playersPerPot[uiState.currentPotIndex].forEach { playerRowUiState ->
+                uiState.pots[uiState.currentPotIndex].players.forEach { playerRowUiState ->
                     CheckboxRow(
                         item = playerRowUiState,
                         isChecked = playerRowUiState.isSelected,
@@ -160,15 +160,14 @@ fun PotSettlementDialogContent(
 
 data class PotSettlementDialogUiState(
     val currentPotIndex: Int,
-    val pots: List<StringSource>,
-    val playersPerPot: List<List<PlayerRowUiState>>,
+    val pots: List<PotUiState>
 ) {
     val shouldShowBackButton: Boolean = currentPotIndex > 0
 
     val potLabelString: StringSource = when (currentPotIndex) {
         0 -> {
             StringSource(
-                if (playersPerPot.size == 1) {
+                if (pots.size == 1) {
                     R.string.label_pot
                 } else {
                     R.string.label_main_pot
@@ -185,14 +184,20 @@ data class PotSettlementDialogUiState(
     }
 
     val buttonLabelString: StringSource = StringSource(
-        if (playersPerPot.lastIndex > currentPotIndex) {
+        if (pots.lastIndex > currentPotIndex) {
             R.string.pot_settlement_next_button
         } else {
             R.string.pot_settlement_done_button
         }
     )
 
-    val isEnableButton: Boolean = playersPerPot[currentPotIndex].any { it.isSelected }
+    val isEnableButton: Boolean = pots[currentPotIndex].players.any { it.isSelected }
+
+    data class PotUiState(
+        val potNumber: Int,
+        val potSizeString: StringSource,
+        val players: List<PlayerRowUiState>,
+    )
 
     data class PlayerRowUiState(
         val playerId: PlayerId,
@@ -221,33 +226,37 @@ private fun PotSettlementDialogContentPreview() {
             uiState = PotSettlementDialogUiState(
                 currentPotIndex = 1,
                 pots = listOf(
-                    StringSource("1000"),
-                    StringSource("2000"),
-                ),
-                playersPerPot = listOf(
-                    listOf(
-                        PotSettlementDialogUiState.PlayerRowUiState(
-                            playerId = PlayerId("1"),
-                            label = StringSource("櫻木"),
-                        ),
-                        PotSettlementDialogUiState.PlayerRowUiState(
-                            playerId = PlayerId("2"),
-                            label = StringSource("風野"),
-                        ),
-                        PotSettlementDialogUiState.PlayerRowUiState(
-                            playerId = PlayerId("3"),
-                            label = StringSource("八宮"),
-                        ),
+                    PotSettlementDialogUiState.PotUiState(
+                        potNumber = 0,
+                        potSizeString = StringSource("1000"),
+                        players = listOf(
+                            PotSettlementDialogUiState.PlayerRowUiState(
+                                playerId = PlayerId("1"),
+                                label = StringSource("櫻木"),
+                            ),
+                            PotSettlementDialogUiState.PlayerRowUiState(
+                                playerId = PlayerId("2"),
+                                label = StringSource("風野"),
+                            ),
+                            PotSettlementDialogUiState.PlayerRowUiState(
+                                playerId = PlayerId("3"),
+                                label = StringSource("八宮"),
+                            ),
+                        )
                     ),
-                    listOf(
-                        PotSettlementDialogUiState.PlayerRowUiState(
-                            playerId = PlayerId("2"),
-                            label = StringSource("風野"),
-                            isSelected = true
-                        ),
-                        PotSettlementDialogUiState.PlayerRowUiState(
-                            playerId = PlayerId("3"),
-                            label = StringSource("八宮"),
+                    PotSettlementDialogUiState.PotUiState(
+                        potNumber = 1,
+                        potSizeString = StringSource("2000"),
+                        players = listOf(
+                            PotSettlementDialogUiState.PlayerRowUiState(
+                                playerId = PlayerId("2"),
+                                label = StringSource("風野"),
+                                isSelected = true
+                            ),
+                            PotSettlementDialogUiState.PlayerRowUiState(
+                                playerId = PlayerId("3"),
+                                label = StringSource("八宮"),
+                            ),
                         ),
                     ),
                 ),

@@ -84,7 +84,7 @@ sealed interface Phase {
      * ポット決済フェーズ
      */
     data class PotSettlement(
-        override val phaseId: PhaseId,
+        override val phaseId: PhaseId
     ) : Phase
 
     data class End(

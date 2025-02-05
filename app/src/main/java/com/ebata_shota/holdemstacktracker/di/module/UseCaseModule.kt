@@ -32,6 +32,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.SetPotSettlementInfoUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.AddBetPhaseActionInToGameUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.CreateNewGameUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActionTypeInLastPhaseAsBetPhaseUseCaseImpl
@@ -64,6 +65,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.JoinTableUseCaseIm
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.MovePositionUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.RemovePlayersUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.RenameTablePlayerUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.SetPotSettlementInfoUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -167,4 +169,7 @@ interface UseCaseModule {
 
     @Binds
     fun bindGetActivePlayerIdsUseCase(useCase: GetNotFoldPlayerIdsUseCaseImpl): GetNotFoldPlayerIdsUseCase
+
+    @Binds
+    fun bindSetPotSettlementInfoUseCase(useCase: SetPotSettlementInfoUseCaseImpl): SetPotSettlementInfoUseCase
 }

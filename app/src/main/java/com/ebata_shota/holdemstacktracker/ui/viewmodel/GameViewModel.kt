@@ -5,6 +5,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.R
+import com.ebata_shota.holdemstacktracker.domain.extension.mapAtFind
+import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
@@ -14,6 +16,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseStatus
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
+import com.ebata_shota.holdemstacktracker.domain.model.PotSettlementInfo
+import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.ActionHistoryRepository
@@ -29,18 +33,23 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseU
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameFromIntervalUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNotFoldPlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneDownRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneUpRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlider
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.SetPotSettlementInfoUseCase
 import com.ebata_shota.holdemstacktracker.domain.util.combine
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameSettingsContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PhaseIntervalImageDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogEvent
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogUiState.PlayerRowUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
 import com.ebata_shota.holdemstacktracker.ui.mapper.GameContentUiStateMapper
@@ -87,9 +96,13 @@ constructor(
     private val getPendingBetSize: GetPendingBetSizeUseCase,
     private val getOneDownRaiseSize: GetOneDownRaiseSizeUseCase,
     private val getOneUpRaiseSize: GetOneUpRaiseSizeUseCase,
+    private val getNotFoldPlayerIds: GetNotFoldPlayerIdsUseCase,
     private val getNextPlayerIdOfNextPhase: GetFirstActionPlayerIdOfNextPhaseUseCase,
+    private val setPotSettlementInfo: SetPotSettlementInfoUseCase,
     private val uiStateMapper: GameContentUiStateMapper,
-) : ViewModel(), GameSettingsDialogEvent {
+) : ViewModel(),
+    GameSettingsDialogEvent,
+    PotSettlementDialogEvent {
     private val tableId: TableId by savedStateHandle.param()
 
     private val _screenUiState = MutableStateFlow<GameScreenUiState>(GameScreenUiState.Loading)
@@ -155,6 +168,9 @@ constructor(
 
     // PhaseIntervalImageDialog
     val phaseIntervalImageDialog = MutableStateFlow<PhaseIntervalImageDialogUiState?>(null)
+
+    // PotSettlementDialog
+    val potSettlementDialogUiState = MutableStateFlow<PotSettlementDialogUiState?>(null)
 
     init {
         // テーブル監視開始
@@ -290,6 +306,47 @@ constructor(
                 }
             }
         }
+
+        // PotSettlementDialog表示の監視
+        viewModelScope.launch {
+            gameStateFlow.filterNotNull().collect { game ->
+                val table = tableStateFlow.value ?: return@collect
+                val lastPhase = game.phaseList.lastOrNull()
+                if (lastPhase is Phase.PotSettlement) {
+                    val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+                    if (myPlayerId != table.hostPlayerId) {
+                        // ホスト以外では表示しない
+                        return@collect
+                    }
+                    val notFoldPlayerIds = getNotFoldPlayerIds.invoke(
+                        playerOrder = table.playerOrder,
+                        phaseList = game.phaseList
+                    )
+                    val dialogUiState = PotSettlementDialogUiState(
+                        currentPotIndex = 0,
+                        pots = game.potList.reversed().map { pot ->
+                            PotSettlementDialogUiState.PotUiState(
+                                potNumber = pot.potNumber,
+                                potSizeString = StringSource(pot.potSize.toString()),
+                                players = pot.involvedPlayerIds.mapNotNull { involvedPlayerId ->
+                                    if (notFoldPlayerIds.any { it == involvedPlayerId }) {
+                                        PlayerRowUiState(
+                                            playerId = involvedPlayerId,
+                                            label = StringSource(
+                                                table.basePlayers.find { it.id == involvedPlayerId }!!.name
+                                            )
+                                        )
+                                    } else {
+                                        return@mapNotNull null
+                                    }
+                                }
+                            )
+                        },
+                    )
+                    potSettlementDialogUiState.update { dialogUiState }
+                }
+            }
+        }
     }
 
     private suspend fun observer(
@@ -319,8 +376,6 @@ constructor(
         val content = GameScreenUiState.Content(
             contentUiState = contentUiState
         )
-        // TODO: フェーズが進んだことを検知したい
-        //   たとえば、Raiseサイズをフェーズが進んだタイミングで最低にしたい。
 
         _screenUiState.update {
             content
@@ -687,6 +742,77 @@ constructor(
             shouldShowGameSettingDialog.update { false }
         }
     }
+
+    override fun onClickPotSettlementDialogPlayerRow(playerId: PlayerId) {
+        potSettlementDialogUiState.update { dialogUiState ->
+            dialogUiState ?: return@update null
+            dialogUiState.copy(
+                pots = dialogUiState.pots.mapAtIndex(
+                    index = dialogUiState.currentPotIndex
+                ) { potUiState ->
+                    potUiState.copy(
+                        players = potUiState.players.mapAtFind(
+                            predicate = { it.playerId == playerId }
+                        ) { rowUiState ->
+                            rowUiState.copy(
+                                isSelected = !rowUiState.isSelected
+                            )
+                        }
+                    )
+                },
+            )
+        }
+    }
+
+    override fun onClickPotSettlementDialogBackButton() {
+        potSettlementDialogUiState.update { dialogUiState ->
+            dialogUiState ?: return@update null
+            dialogUiState.copy(
+                currentPotIndex = dialogUiState.currentPotIndex - 1
+            )
+        }
+    }
+
+    override fun onClickPotSettlementDialogDoneButton() {
+        viewModelScope.launch {
+            val table = tableStateFlow.value ?: return@launch
+            val dialogUiState = potSettlementDialogUiState.value ?: return@launch
+            val currentPotIndex = dialogUiState.currentPotIndex
+            val game = gameStateFlow.value ?: return@launch
+            if (currentPotIndex == dialogUiState.pots.lastIndex) {
+                // Pot精算する
+                val potSettlementInfoList: List<PotSettlementInfo> = game.potList.map { pot ->
+                    val potUiState = dialogUiState.pots.find { it.potNumber == pot.potNumber }!!
+                    val selectedPlayerIds: List<PlayerId> = potUiState.players
+                        .filter { it.isSelected }
+                        .map { it.playerId }
+                    PotSettlementInfo(
+                        potId = pot.id,
+                        potSize = pot.potSize,
+                        acquirerPlayerIds = selectedPlayerIds,
+                    )
+                }
+                setPotSettlementInfo.invoke(
+                    tableId = tableId,
+                    btnPlayerId = table.btnPlayerId,
+                    playerOrder = table.playerOrder,
+                    game = game,
+                    potSettlementInfoList = potSettlementInfoList
+                )
+                potSettlementDialogUiState.update { null }
+            } else {
+                potSettlementDialogUiState.update {
+                    it ?: return@update null
+                    it.copy(
+                        currentPotIndex = dialogUiState.currentPotIndex + 1
+                    )
+                }
+            }
+        }
+
+    }
+
+
 
     /**
      * インターバル画像

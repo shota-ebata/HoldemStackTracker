@@ -55,7 +55,7 @@ constructor(
             lastPot
         } else {
             // 以前のポットがない、もしくは閉じている場合は、新しいポットを作成する
-            val nextPotNumber = lastPot?.potNumber?.plus(1L) ?: 0L
+            val nextPotNumber = lastPot?.potNumber?.plus(1) ?: 0
             createPot(nextPotNumber)
         }
         var potSize: Int = currentPot.potSize
@@ -120,7 +120,7 @@ constructor(
         )
     }
 
-    private fun createPot(potNumber: Long) = Pot(
+    private fun createPot(potNumber: Int) = Pot(
         id = PotId(value = randomIdRepository.generateRandomId()),
         potNumber = potNumber,
         potSize = 0,
