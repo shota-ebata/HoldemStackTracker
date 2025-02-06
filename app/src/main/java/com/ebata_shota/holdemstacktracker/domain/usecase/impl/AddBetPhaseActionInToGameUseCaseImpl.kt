@@ -147,17 +147,10 @@ constructor(
              * 降りていないプレイヤーが複数人いて
              * 降りてない、AllInしているわででもないプレイヤーが2人未満なら
              * AllIn でフェーズを終えているということなので
-             * ベット状況をポットに反映
+             * AllInCloseとする
+             * フェーズは変えないのでポットへの反映はまだしない
              */
-            val updatedPotList: List<Pot> = getUpdatedPotList(
-                updatedPlayers = updatedPlayers,
-                playerOrder = playerOrder,
-                addedActionList = addedActionList,
-                currentGame = currentGame,
-                activePlayerIds = notFoldPlayerIds
-            )
             return@withContext baseNextGame.copy(
-                potList = updatedPotList,
                 phaseList = addedActionPhaseList.mapAtIndex(currentPhaseList.lastIndex) {
                     // Phaseに反映
                     addedActionPhase.copyWith(phaseStatus = PhaseStatus.AllInClose)

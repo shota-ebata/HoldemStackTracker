@@ -243,10 +243,11 @@ constructor(
                                         imageResId = R.drawable.flopimage
                                     )
                                 }
+                                PhaseStatus.AllInClose -> PhaseIntervalImageDialogUiState(
+                                    imageResId = R.drawable.all_in_show_down
+                                )
 
-                                PhaseStatus.Active,
-                                PhaseStatus.AllInClose,
-                                    -> null
+                                PhaseStatus.Active -> null
                             }
                         }
 
@@ -257,10 +258,11 @@ constructor(
                                         imageResId = R.drawable.turnimage
                                     )
                                 }
+                                PhaseStatus.AllInClose -> PhaseIntervalImageDialogUiState(
+                                    imageResId = R.drawable.all_in_show_down
+                                )
 
-                                PhaseStatus.Active,
-                                PhaseStatus.AllInClose,
-                                    -> null
+                                PhaseStatus.Active -> null
                             }
                         }
 
@@ -272,9 +274,11 @@ constructor(
                                     )
                                 }
 
-                                PhaseStatus.Active,
-                                PhaseStatus.AllInClose,
-                                    -> null
+                                PhaseStatus.AllInClose -> PhaseIntervalImageDialogUiState(
+                                    imageResId = R.drawable.all_in_show_down
+                                )
+
+                                PhaseStatus.Active -> null
                             }
                         }
 
