@@ -459,13 +459,19 @@ constructor(
             return
         }
         val player = game.players.find { it.id == myPlayerId }!!
-        val callSize = getMaxBetSize.invoke(actionStateList = betPhase.actionStateList)
+        val actionList = betPhase.actionStateList
+        val callSize = getMaxBetSize.invoke(actionStateList = actionList)
+        val currentPendingBetSize = getPendingBetSize.invoke(
+            actionList = actionList,
+            playerOrder = playerOrder,
+            playerId = myPlayerId,
+        )
         val nextGame = addBetPhaseActionInToGame.invoke(
             playerOrder = playerOrder,
             btnPlayerId = btnPlayerId,
             currentGame = game,
-            betPhaseAction = if (callSize == player.stack) {
-                // コールサイズ == スタックサイズの場合はAllIn
+            betPhaseAction = if (callSize == player.stack + currentPendingBetSize) {
+                // コールサイズ == スタックサイズ + PendingBetサイズ の場合はAllIn
                 BetPhaseAction.AllIn(
                     actionId = ActionId(randomIdRepository.generateRandomId()),
                     playerId = myPlayerId,
@@ -491,15 +497,20 @@ constructor(
     ) {
         val player = game.players.find { it.id == myPlayerId }!!
         val betPhase = getLastPhaseAsBetPhase.invoke(game.phaseList)
-        val actionStateList = betPhase.actionStateList
+        val actionList = betPhase.actionStateList
         // このフェーズ中、まだBetやAllInをしていない(オープンアクション)
-        val isNotRaisedYet = isNotRaisedYet.invoke(actionStateList)
+        val isNotRaisedYet = isNotRaisedYet.invoke(actionList)
+        val currentPendingBetSize = getPendingBetSize.invoke(
+            actionList = actionList,
+            playerOrder = playerOrder,
+            playerId = myPlayerId,
+        )
         val nextGame = addBetPhaseActionInToGame.invoke(
             playerOrder = playerOrder,
             currentGame = game,
             btnPlayerId = btnPlayerId,
-            betPhaseAction = if (raiseSize == player.stack) {
-                // レイズサイズ == スタックサイズの場合はAllIn
+            betPhaseAction = if (raiseSize == player.stack + currentPendingBetSize) {
+                // レイズサイズ == スタックサイズ + PendingBetサイズ の場合はAllIn
                 BetPhaseAction.AllIn(
                     actionId = ActionId(randomIdRepository.generateRandomId()),
                     playerId = myPlayerId,
