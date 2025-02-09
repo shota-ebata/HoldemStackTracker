@@ -26,6 +26,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotListUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByPotSlider
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlider
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionablePlayerIdsUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.HasErrorChipSizeTextValueUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredInPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
@@ -59,6 +60,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPotListUseCaseI
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetRaiseSizeByPotSliderImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetRaiseSizeByStackSliderImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActionablePlayerIdsUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.HasErrorChipSizeTextValueUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsActionRequiredInPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsNotRaisedYetUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.JoinTableUseCaseImpl
@@ -172,4 +174,7 @@ interface UseCaseModule {
 
     @Binds
     fun bindSetPotSettlementInfoUseCase(useCase: SetPotSettlementInfoUseCaseImpl): SetPotSettlementInfoUseCase
+
+    @Binds
+    fun bindHasErrorChipSizeTextValueUseCase(useCase: HasErrorChipSizeTextValueUseCaseImpl): HasErrorChipSizeTextValueUseCase
 }

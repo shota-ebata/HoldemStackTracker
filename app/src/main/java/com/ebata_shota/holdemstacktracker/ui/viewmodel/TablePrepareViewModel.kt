@@ -15,19 +15,23 @@ import com.ebata_shota.holdemstacktracker.domain.extension.mapAtFind
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.MovePosition
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
+import com.ebata_shota.holdemstacktracker.domain.model.Rule
+import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
+import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRuleStateOfRingRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.HasErrorChipSizeTextValueUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
-import com.ebata_shota.holdemstacktracker.ui.mapper.TablePrepareScreenUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.EditGameRuleDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEvent
@@ -39,6 +43,8 @@ import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TablePrepareScreenDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TablePrepareScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
+import com.ebata_shota.holdemstacktracker.ui.mapper.TableCreatorUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.mapper.TablePrepareScreenUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -66,16 +72,20 @@ constructor(
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val qrBitmapRepository: QrBitmapRepository,
     private val prefRepository: PrefRepository,
+    private val defaultRuleStateOfRingRepository: DefaultRuleStateOfRingRepository,
     private val joinTable: JoinTableUseCase,
     private val createNewGame: CreateNewGameUseCase,
     private val movePositionUseCase: MovePositionUseCase,
     private val removePlayers: RemovePlayersUseCase,
     private val renameTablePlayer: RenameTablePlayerUseCase,
-    private val uiStateMapper: TablePrepareScreenUiStateMapper
+    private val hasErrorChipSizeTextValue: HasErrorChipSizeTextValueUseCase,
+    private val uiStateMapper: TablePrepareScreenUiStateMapper,
+    private val tableCreatorUiStateMapper: TableCreatorUiStateMapper,
 ) : ViewModel(),
     MyNameInputDialogEvent,
     PlayerRemoveDialogEvent,
-    ErrorDialogEvent {
+    ErrorDialogEvent,
+    EditGameRuleDialogEvent {
 
     private val tableIdString: String by savedStateHandle.param()
     private val tableId: TableId = TableId(tableIdString)
@@ -234,6 +244,23 @@ constructor(
                     stackValue = TextFieldValue(stackText)
                 )
             )
+        }
+    }
+
+    /**
+     * ゲームルール変更ボタンを押下
+     */
+    fun onClickEditGameRuleButton() {
+        val table = tableStateFlow.value ?: return
+        when (val rule = table.rule) {
+            is Rule.RingGame -> _dialogUiState.update {
+                it.copy(
+                    tableCreatorContentUiState = tableCreatorUiStateMapper.createUiState(
+                        ringGameRule = rule,
+                        submitButtonLabel = StringSource(R.string.game_rule_update_button),
+                    )
+                )
+            }
         }
     }
 
@@ -472,6 +499,116 @@ constructor(
 
     fun onClickSubmitButton() {
         startNewGame()
+    }
+
+    override fun onDismissEditGameRuleDialog() {
+        _dialogUiState.update { it.copy(tableCreatorContentUiState = null) }
+    }
+
+    override fun onChangeSizeOfSB(value: TextFieldValue) {
+        _dialogUiState.update {
+            val currentTextValue = it.tableCreatorContentUiState?.sbSize ?: return
+            var errorMessage: ErrorMessage? = null
+            val hasError = hasErrorChipSizeTextValue.invoke(value.text)
+            if (hasError) {
+                // エラーがある場合はエラーメッセージ
+                errorMessage = ErrorMessage(errorMessageResId = R.string.input_error_message)
+            } else {
+                // デフォルトを更新しておく
+                val intValue = value.text.toIntOrNull()!!
+                viewModelScope.launch {
+                    defaultRuleStateOfRingRepository.setDefaultSizeOfSb(intValue)
+                }
+            }
+            it.copy(
+                tableCreatorContentUiState = it.tableCreatorContentUiState.copy(
+                    sbSize = currentTextValue.copy(
+                        value = value,
+                        error = errorMessage,
+                    )
+                )
+            )
+        }
+    }
+
+    override fun onChangeSizeOfBB(value: TextFieldValue) {
+        _dialogUiState.update {
+            val currentTextValue = it.tableCreatorContentUiState?.bbSize ?: return
+            var errorMessage: ErrorMessage? = null
+            val hasError = hasErrorChipSizeTextValue.invoke(value.text)
+            if (hasError) {
+                // エラーがある場合はエラーメッセージ
+                errorMessage = ErrorMessage(errorMessageResId = R.string.input_error_message)
+            } else {
+                // デフォルトを更新しておく
+                val intValue = value.text.toIntOrNull()!!
+                viewModelScope.launch {
+                    defaultRuleStateOfRingRepository.setDefaultSizeOfBb(intValue)
+                }
+            }
+            it.copy(
+                tableCreatorContentUiState = it.tableCreatorContentUiState.copy(
+                    bbSize = currentTextValue.copy(
+                        value = value,
+                        error = errorMessage,
+                    )
+                )
+            )
+        }
+    }
+
+    override fun onChangeDefaultStackSize(value: TextFieldValue) {
+        _dialogUiState.update {
+            val currentTextValue = it.tableCreatorContentUiState?.defaultStack ?: return
+            var errorMessage: ErrorMessage? = null
+            val hasError = hasErrorChipSizeTextValue.invoke(value.text)
+            if (hasError) {
+                // エラーがある場合はエラーメッセージ
+                errorMessage = ErrorMessage(errorMessageResId = R.string.input_error_message)
+            } else {
+                // デフォルトを更新しておく
+                val intValue = value.text.toIntOrNull()!!
+                viewModelScope.launch {
+                    defaultRuleStateOfRingRepository.setDefaultStackSize(intValue)
+                }
+            }
+            it.copy(
+                tableCreatorContentUiState = it.tableCreatorContentUiState.copy(
+                    defaultStack = currentTextValue.copy(
+                        value = value,
+                        error = errorMessage,
+                    )
+                )
+            )
+        }
+    }
+
+    override fun onClickEditGameRuleDialogSubmitButton() {
+        val uiState = dialogUiState.value.tableCreatorContentUiState ?: return
+        if (uiState.sbSize.value.text.toInt() > uiState.bbSize.value.text.toInt()) {
+            // SB > BB は弾く
+            _dialogUiState.update {
+                it.copy(
+                    tableCreatorContentUiState = uiState.copy(
+                        bottomErrorMessage = ErrorMessage(errorMessageResId = R.string.input_error_message_sb_bb)
+                    )
+                )
+            }
+        } else {
+            val table = tableStateFlow.value ?: return
+            viewModelScope.launch {
+                val newTable = table.copy(
+                    // TODO: ルールに応じて
+                    rule = Rule.RingGame(
+                        sbSize = uiState.sbSize.value.text.toInt(),
+                        bbSize = uiState.bbSize.value.text.toInt(),
+                        defaultStack = uiState.defaultStack.value.text.toInt(),
+                    )
+                )
+                tableRepository.sendTable(newTable)
+                onDismissEditGameRuleDialog()
+            }
+        }
     }
 
     private fun showErrorDialog(throwable: Throwable) {

@@ -10,6 +10,6 @@ interface DefaultRuleStateOfRingRepository {
 
     suspend fun setDefaultBetViewMode(value: BetViewMode)
     suspend fun setDefaultSizeOfSb(value: Int)
-    suspend fun saveDefaultSizeOfBb(value: Int)
+    suspend fun setDefaultSizeOfBb(value: Int)
     suspend fun setDefaultStackSize(value: Int)
 }

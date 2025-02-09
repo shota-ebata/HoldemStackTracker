@@ -6,8 +6,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
+import com.ebata_shota.holdemstacktracker.ui.compose.content.TableCreatorContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TablePrepareContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TablePrepareContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.EditGameRuleDialog
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogContent
@@ -45,6 +47,7 @@ fun TablePrepareScreen(
             TablePrepareContent(
                 uiState = uiState.contentUiState,
                 getTableQrPainter = viewModel::getTableQrPainter,
+                onClickEditGameRuleButton = viewModel::onClickEditGameRuleButton,
                 onClickDeletePlayerButton = viewModel::onClickDeletePlayerButton,
                 onClickStackEditButton = viewModel::onClickStackEditButton,
                 onClickUpButton = viewModel::onClickUpButton,
@@ -52,6 +55,13 @@ fun TablePrepareScreen(
                 onChangeBtnChosen = viewModel::onChangeBtnChosen,
                 onClickSubmitButton = viewModel::onClickSubmitButton
             )
+            val tableCreatorContentUiState = dialogUiState.tableCreatorContentUiState
+            if (tableCreatorContentUiState != null) {
+                EditGameRuleDialog(
+                    uiState = tableCreatorContentUiState,
+                    event = viewModel
+                )
+            }
             val stackEditDialogState = dialogUiState.stackEditDialogState
             if (stackEditDialogState != null) {
                 StackEditDialogContent(
@@ -94,8 +104,9 @@ sealed interface TablePrepareScreenUiState {
 }
 
 data class TablePrepareScreenDialogUiState(
+    val tableCreatorContentUiState: TableCreatorContentUiState? = null,
     val stackEditDialogState: StackEditDialogState? = null,
     val myNameInputDialogUiState: MyNameInputDialogUiState? = null,
     val playerRemoveDialogUiState: PlayerRemoveDialogUiState? = null,
-    val errorDialog: ErrorDialogUiState? = null
+    val errorDialog: ErrorDialogUiState? = null,
 )

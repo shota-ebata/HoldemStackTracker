@@ -33,7 +33,7 @@ constructor(
         prefRepository.saveDefaultSizeOfSb(value)
     }
 
-    override suspend fun saveDefaultSizeOfBb(value: Int) {
+    override suspend fun setDefaultSizeOfBb(value: Int) {
         prefRepository.saveDefaultSizeOfBb(value)
     }
 

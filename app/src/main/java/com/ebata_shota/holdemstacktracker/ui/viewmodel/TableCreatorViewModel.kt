@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
-import com.ebata_shota.holdemstacktracker.domain.model.GameType
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
@@ -16,13 +15,14 @@ import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthReposito
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
+import com.ebata_shota.holdemstacktracker.domain.usecase.HasErrorChipSizeTextValueUseCase
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableCreatorContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
-import com.ebata_shota.holdemstacktracker.ui.compose.parts.TextFieldErrorUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableCreatorDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableCreatorUiState
+import com.ebata_shota.holdemstacktracker.ui.mapper.TableCreatorUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,11 +41,13 @@ class TableCreatorViewModel
 @Inject
 constructor(
     savedStateHandle: SavedStateHandle,
+    private val hasErrorChipSizeTextValue: HasErrorChipSizeTextValueUseCase,
     private val tableRepository: TableRepository,
     private val randomIdRepository: RandomIdRepository,
     private val defaultRuleStateOfRingRepository: DefaultRuleStateOfRingRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val prefRepository: PrefRepository,
+    private val uiStateMapper: TableCreatorUiStateMapper,
 ) : ViewModel(), MyNameInputDialogEvent {
 
     /**
@@ -67,7 +69,12 @@ constructor(
         viewModelScope.launch {
             val ringGame = defaultRuleStateOfRingRepository.ringGameFlow.first()
             _screenUiState.update {
-                createMainContent(ringGame)
+                TableCreatorUiState.MainContent(
+                    tableCreatorContentUiState = uiStateMapper.createUiState(
+                        ringGameRule = ringGame,
+                        submitButtonLabel = StringSource(R.string.table_creator_submit),
+                    )
+                )
             }
         }
 
@@ -84,34 +91,6 @@ constructor(
             }.collect()
         }
     }
-
-    // TODO: UseCaseへ移動
-    private suspend fun createMainContent(ringGame: Rule.RingGame) =
-        TableCreatorUiState.MainContent(
-            tableCreatorContentUiState = TableCreatorContentUiState(
-                gameType = GameType.RingGame,
-                sbSize = TextFieldErrorUiState(
-                    label = R.string.sb_size_label,
-                    value = TextFieldValue(
-                        "%,d".format(ringGame.sbSize)
-                    )
-                ),
-                bbSize = TextFieldErrorUiState(
-                    label = R.string.bb_size_label,
-                    value = TextFieldValue(
-                        "%,d".format(ringGame.bbSize)
-                    ),
-                ),
-                defaultStack = TextFieldErrorUiState(
-                    label = R.string.default_stack_label,
-                    value = TextFieldValue(
-                        ringGame.defaultStack.toString()
-                    )
-                ),
-                submitButtonLabel = StringSource(R.string.table_creator_submit),
-                bottomErrorMessage = null
-            )
-        )
 
     private fun showMyNameInputDialog(playerId: PlayerId) {
         val defaultPlayerName = "Player${playerId.value.take(6)}"
@@ -142,14 +121,15 @@ constructor(
         viewModelScope.launch {
             val contentUiState = tableCreatorContentUiState ?: return@launch
             var errorMessage: ErrorMessage? = null
-            val intValue = value.text.toIntOrNull()
-            if (intValue != null && intValue > 0) {
-                // デフォルトを更新しておく
-                defaultRuleStateOfRingRepository.setDefaultSizeOfSb(intValue)
-            } else {
+            val hasError = hasErrorChipSizeTextValue.invoke(value.text)
+            if (hasError) {
                 // エラーがある場合はエラーメッセージ
                 errorMessage =
                     ErrorMessage(errorMessageResId = R.string.input_error_message)
+            } else {
+                // デフォルトを更新しておく
+                val intValue = value.text.toIntOrNull()!!
+                defaultRuleStateOfRingRepository.setDefaultSizeOfSb(intValue)
             }
             _screenUiState.update {
                 TableCreatorUiState.MainContent(
@@ -170,14 +150,16 @@ constructor(
     fun onChangeSizeOfBB(value: TextFieldValue) {
         viewModelScope.launch {
             val contentUiState = tableCreatorContentUiState ?: return@launch
-            val intValue = value.text.toIntOrNull()
             var errorMessage: ErrorMessage? = null
-            if (intValue != null && intValue > 0) {
-                // デフォルトを更新しておく
-                defaultRuleStateOfRingRepository.saveDefaultSizeOfBb(intValue)
-            } else {
+            val hasError = hasErrorChipSizeTextValue.invoke(value.text)
+            if (hasError) {
                 // エラーがある場合はエラーメッセージ
-                errorMessage = ErrorMessage(errorMessageResId = R.string.input_error_message)
+                errorMessage =
+                    ErrorMessage(errorMessageResId = R.string.input_error_message)
+            } else {
+                // デフォルトを更新しておく
+                val intValue = value.text.toIntOrNull()!!
+                defaultRuleStateOfRingRepository.setDefaultSizeOfBb(intValue)
             }
             _screenUiState.update {
                 TableCreatorUiState.MainContent(
@@ -236,17 +218,16 @@ constructor(
             if (uiState !is TableCreatorUiState.MainContent) {
                 return@launch
             }
-            val intValue = value.text.toIntOrNull()
             var errorMessage: ErrorMessage? = null
-            if (intValue != null && intValue > 0) {
-                // デフォルトを更新しておく
-                defaultRuleStateOfRingRepository.setDefaultStackSize(
-                    intValue
-                )
-            } else {
+            val hasError = hasErrorChipSizeTextValue.invoke(value.text)
+            if (hasError) {
                 // エラーがある場合はエラーメッセージ
                 errorMessage =
                     ErrorMessage(errorMessageResId = R.string.input_error_message)
+            } else {
+                // デフォルトを更新しておく
+                val intValue = value.text.toIntOrNull()!!
+                defaultRuleStateOfRingRepository.setDefaultStackSize(intValue)
             }
             _screenUiState.update {
                 uiState.copy(
@@ -332,6 +313,7 @@ constructor(
         val contentUiState = tableCreatorContentUiState ?: return
         tableRepository.createNewTable(
             tableId = tableId,
+            // TODO: ルールに応じて
             rule = Rule.RingGame(
                 sbSize = contentUiState.sbSize.value.text.toInt(),
                 bbSize = contentUiState.bbSize.value.text.toInt(),
