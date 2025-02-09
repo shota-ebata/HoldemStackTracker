@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.GameType
+import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.labelResId
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.OutlinedTextFieldWithError
@@ -130,7 +131,7 @@ fun TableCreatorContent(
                     enabled = uiState.enableSubmitButton,
                 ) {
                     Text(
-                        text = stringResource(R.string.table_creator_submit)
+                        text = uiState.submitButtonLabel.getString()
                     )
                 }
             }
@@ -144,6 +145,7 @@ data class TableCreatorContentUiState(
     val sbSize: TextFieldErrorUiState,
     val bbSize: TextFieldErrorUiState,
     val defaultStack: TextFieldErrorUiState,
+    val submitButtonLabel: StringSource,
     val bottomErrorMessage: ErrorMessage?
 ) {
     val enableSubmitButton: Boolean
@@ -176,6 +178,7 @@ fun TableCreatorContentPreview() {
                     label = R.string.default_stack_label,
                     value = TextFieldValue("0")
                 ),
+                submitButtonLabel = StringSource(R.string.table_creator_submit),
                 bottomErrorMessage = null
             ),
             onChangeSizeOfSB = {},

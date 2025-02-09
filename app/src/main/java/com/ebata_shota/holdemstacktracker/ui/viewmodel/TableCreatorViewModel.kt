@@ -9,6 +9,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.GameType
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
+import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRuleStateOfRingRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
@@ -107,6 +108,7 @@ constructor(
                         ringGame.defaultStack.toString()
                     )
                 ),
+                submitButtonLabel = StringSource(R.string.table_creator_submit),
                 bottomErrorMessage = null
             )
         )
