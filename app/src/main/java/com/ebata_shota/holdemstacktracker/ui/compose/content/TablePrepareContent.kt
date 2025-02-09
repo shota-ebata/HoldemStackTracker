@@ -8,14 +8,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -34,14 +32,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
+import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TablePrepareContentUiState.BtnChosenUiState
@@ -70,6 +71,7 @@ fun TablePrepareContent(
 ) {
     val delayState = rememberDelayState()
     val qrPainter = getTableQrPainter()
+    val clipboardManager = LocalClipboardManager.current
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -98,8 +100,36 @@ fun TablePrepareContent(
                             contentDescription = "",
                             modifier = Modifier
                                 .size(200.dp)
-                                .padding(16.dp)
+                                .padding(horizontal = 16.dp)
+                                .padding(top = 16.dp)
                         )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = uiState.tableIdText.getString(),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+
+                        IconButton(
+                            modifier = Modifier
+                                .size(48.dp),
+                            onClick = dropRedundantEvent(delayState = delayState) {
+                                clipboardManager.setText(AnnotatedString(uiState.tableId.value))
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_content_copy_24),
+                                contentDescription = "copy"
+                            )
+                        }
+
                     }
                 }
                 Row(
@@ -159,10 +189,6 @@ fun TablePrepareContent(
                                 contentDescription = "edit"
                             )
                         }
-                    } else {
-                        Spacer(
-                            modifier = Modifier.width(48.dp)
-                        )
                     }
                 }
 
@@ -334,8 +360,10 @@ data class TablePrepareContentUiState(
     val playerEditRows: List<PlayerEditRowUiState>,
     val btnChosenUiStateList: List<BtnChosenUiState>,
     val enableSubmitButton: Boolean,
-    val isEditable: Boolean
+    val isEditable: Boolean,
 ) {
+    val tableIdText = StringSource(R.string.table_id_prefix, tableId.value)
+
     sealed interface BtnChosenUiState {
         val isSelected: Boolean
 
@@ -355,7 +383,7 @@ data class TablePrepareContentUiState(
 private class PreviewParam : PreviewParameterProvider<TablePrepareContentUiState> {
     override val values: Sequence<TablePrepareContentUiState> = sequenceOf(
         TablePrepareContentUiState(
-            tableId = TableId("tableId"),
+            tableId = TableId("qwe123"),
             tableStatus = TableStatus.PLAYING,
             gameTypeTextResId = R.string.game_type_ring,
             blindText = "100/200",

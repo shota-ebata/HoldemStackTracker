@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.ui.mapper
 
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
+import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.infra.extension.blindText
 import com.ebata_shota.holdemstacktracker.infra.extension.gameTextResId
