@@ -104,7 +104,7 @@ fun UserEditRow(
                                 onClick = {
                                     onClickUpButton()
                                 }
-                            ).size(width = 48.dp, height = 48.dp),
+                            ).size(width = 48.dp, height = 32.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -124,7 +124,7 @@ fun UserEditRow(
                                     onClickDownButton()
                                 }
                             )
-                            .size(width = 48.dp, height = 48.dp),
+                            .size(width = 48.dp, height = 32.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
