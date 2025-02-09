@@ -47,7 +47,7 @@ fun TableCreatorContent(
 ) {
     Surface(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxWidth()
     ) {
         Column(
             modifier = Modifier

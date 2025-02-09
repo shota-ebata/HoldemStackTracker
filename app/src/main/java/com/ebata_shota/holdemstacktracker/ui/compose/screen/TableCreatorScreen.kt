@@ -1,7 +1,9 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.screen
 
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
@@ -37,6 +39,8 @@ fun TableCreatorScreen(
 
         is TableCreatorUiState.MainContent -> {
             TableCreatorContent(
+                modifier = Modifier
+                    .fillMaxHeight(),
                 uiState = uiStateCast.tableCreatorContentUiState,
                 onChangeSizeOfSB = viewModel::onChangeSizeOfSB,
                 onChangeSizeOfBB = viewModel::onChangeSizeOfBB,
