@@ -20,6 +20,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCa
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCase
 import com.ebata_shota.holdemstacktracker.infra.mapper.GameMapper
+import com.google.firebase.database.BuildConfig
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -60,7 +61,11 @@ constructor(
 ) : GameRepository {
 
     private val gamesRef: DatabaseReference = firebaseDatabase.getReference(
-        "games"
+        if (BuildConfig.DEBUG) {
+            "debug_games"
+        } else {
+            "games"
+        }
     )
 
     private val _gameStateFlow = MutableStateFlow<Result<Game>?>(null)

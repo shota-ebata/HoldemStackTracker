@@ -51,7 +51,11 @@ constructor(
 ) : TableRepository {
 
     private val tablesRef: DatabaseReference = firebaseDatabase.getReference(
-        "tables"
+        if (BuildConfig.DEBUG) {
+            "debug_tables"
+        } else {
+            "tables"
+        }
     )
 
     private val _tableStateFlow = MutableStateFlow<Result<Table>?>(null)
