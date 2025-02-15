@@ -14,7 +14,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthReposito
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableSummaryRepository
-import com.ebata_shota.holdemstacktracker.infra.mapper.TableStateMapper
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -43,7 +43,7 @@ constructor(
     private val prefRepository: PrefRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val tableSummaryRepository: TableSummaryRepository,
-    private val tableMapper: TableStateMapper,
+    private val tableMapper: TableMapper,
     @ApplicationScope
     private val appCoroutineScope: CoroutineScope,
     @CoroutineDispatcherIO

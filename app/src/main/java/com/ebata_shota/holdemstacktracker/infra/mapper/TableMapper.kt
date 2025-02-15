@@ -1,7 +1,5 @@
 package com.ebata_shota.holdemstacktracker.infra.mapper
 
-import com.ebata_shota.holdemstacktracker.BuildConfig
-import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
@@ -13,7 +11,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TableStateMapper
+class TableMapper
 @Inject
 constructor() {
 
