@@ -4,7 +4,7 @@ import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherIO
 import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundTableException
-import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerBase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.Table
@@ -78,7 +78,7 @@ constructor(
                 playerOrder = listOf(myPlayerId),
                 btnPlayerId = myPlayerId,
                 basePlayers = listOf(
-                    PlayerBaseState(
+                    PlayerBase(
                         id = myPlayerId,
                         name = myName,
                         stack = rule.defaultStack,

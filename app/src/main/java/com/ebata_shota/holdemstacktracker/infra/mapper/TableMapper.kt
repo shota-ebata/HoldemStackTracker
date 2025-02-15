@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.infra.mapper
 
-import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerBase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.Table
@@ -62,7 +62,7 @@ constructor() {
     }
 
     private fun mapToBasePlayers(basePlayers: List<*>) = basePlayers.map { it as Map<*, *> }.map {
-        PlayerBaseState(
+        PlayerBase(
             id = PlayerId(it[PLAYER_ID] as String),
             name = it[PLAYER_NAME] as String,
             stack = it[PLAYER_STACK]?.getInt() ?: 0,

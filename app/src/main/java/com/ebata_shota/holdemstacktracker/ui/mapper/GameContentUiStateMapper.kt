@@ -14,7 +14,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase.Flop
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.PreFlop
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.River
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.Turn
-import com.ebata_shota.holdemstacktracker.domain.model.PlayerBaseState
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerBase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.Table
@@ -162,7 +162,7 @@ constructor(
         totalPotSize: Int,
         tableId: TableId,
         sortedPlayerOrder: List<PlayerId>,
-        basePlayers: List<PlayerBaseState>,
+        basePlayers: List<PlayerBase>,
         positions: List<GamePlayerUiState.PlayerPosition>,
         phaseList: List<Phase>,
         blindText: String,
@@ -418,7 +418,7 @@ constructor(
 
     private suspend fun gamePlayerUiStates(
         sortedPlayerOrder: List<PlayerId>,
-        basePlayers: List<PlayerBaseState>,
+        basePlayers: List<PlayerBase>,
         gamePlayers: Set<GamePlayer>,
         positions: List<GamePlayerUiState.PlayerPosition>,
         pendingBetPerPlayer: Map<PlayerId, Int>,
@@ -460,7 +460,7 @@ constructor(
     }
 
     private fun getGamePlayerUiState(
-        basePlayer: PlayerBaseState,
+        basePlayer: PlayerBase,
         betViewMode: BetViewMode,
         gamePlayer: GamePlayer,
         minBetSize: Int,
@@ -557,7 +557,7 @@ constructor(
         tableId: TableId,
         sortedPlayerOrder: List<PlayerId>,
         btnPlayerId: PlayerId,
-        basePlayers: List<PlayerBaseState>,
+        basePlayers: List<PlayerBase>,
         gamePlayers: Set<GamePlayer>,
         positions: List<GamePlayerUiState.PlayerPosition>,
         phaseList: List<Phase>,

@@ -1,6 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.model
 
-data class PlayerBaseState(
+data class PlayerBase(
     val id: PlayerId,
     val name: String,
     val stack: Int,
