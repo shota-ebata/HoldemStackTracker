@@ -85,4 +85,6 @@
 
     <string name="setting_keep_screen_on">ゲーム中、画面をオンのままにする</string>
 
+    <string name="label_is_leaved">Out Of Seat</string>
+
 </resources>

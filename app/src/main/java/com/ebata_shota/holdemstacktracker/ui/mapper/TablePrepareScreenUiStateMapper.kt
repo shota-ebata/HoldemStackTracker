@@ -38,6 +38,7 @@ constructor() {
                         playerId = playerId,
                         playerName = player.name,
                         stackSize = playerStackString,
+                        isLeaved = player.isLeaved,
                         isEditable = isHost
                     )
                 },

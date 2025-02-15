@@ -393,6 +393,7 @@ private class PreviewParam : PreviewParameterProvider<TablePrepareContentUiState
                     playerId = PlayerId("playerId$it"),
                     playerName = "PlayerName$it",
                     stackSize = "10000",
+                    isLeaved = true,
                     isEditable = false
                 )
             },
@@ -411,6 +412,7 @@ private class PreviewParam : PreviewParameterProvider<TablePrepareContentUiState
                     playerId = PlayerId("playerId$it"),
                     playerName = "PlayerName$it",
                     stackSize = "10000",
+                    isLeaved = false,
                     isEditable = true
                 )
             },
