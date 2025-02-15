@@ -1,24 +1,24 @@
 <resources>
-    <string name="app_name">HoldemStackTracker</string>
+    <string name="app_name" translatable="false">HoldemStackTracker</string>
 
-    <string name="game_type">ゲームモード</string>
-    <string name="game_type_ring">リングゲーム</string>
-    <string name="sb_size_label">SBサイズ</string>
-    <string name="bb_size_label">BBサイズ</string>
-    <string name="default_stack_label">初期スタック</string>
-    <string name="stack_size_label">スタックサイズ</string>
+    <string name="game_type">Game Mode</string>
+    <string name="game_type_ring">Ring Game</string>
+    <string name="sb_size_label">SB Size</string>
+    <string name="bb_size_label">BB Size</string>
+    <string name="default_stack_label">Default Stack Size</string>
+    <string name="stack_size_label">Stack Size</string>
     <string name="input_error_message">入力値に問題があります</string>
     <string name="input_error_message_sb_bb">SBサイズはBBサイズ以下である必要があります</string>
     <string name="table_creator_submit">テーブル作成</string>
     <string name="game_rule_update_button">Update</string>
 
-    <string name="my_player_name_label">あなたのプレイヤー名</string>
-    <string name="member_title_label">参加プレイヤー</string>
-    <string name="btn_chosen">BTNプレイヤー</string>
-    <string name="btn_random">ランダム</string>
-    <string name="start_game">ゲーム開始</string>
+    <string name="my_player_name_label">Your Name</string>
+    <string name="member_title_label">Players</string>
+    <string name="btn_chosen">BTN Player</string>
+    <string name="btn_random">Random Choice</string>
+    <string name="start_game">Start Game</string>
 
-    <string name="error_title">エラー</string>
+    <string name="error_title">Input Error</string>
     <string name="error_name_limit">15文字以内で入力してください</string>
     <string name="error_not_found_table">テーブルが見つかりません</string>
     <string name="error_message_in_table">テーブルに問題が発生しました</string>
@@ -28,62 +28,62 @@
     <string name="player_remove_dialog_title">プレイヤーを退出させる</string>
     <string name="player_remove_dialog_toast">ホストは退出できません</string>
 
-    <string name="table_status_preparing">準備中</string>
-    <string name="table_status_paused">待機中</string>
-    <string name="table_status_playing">ゲーム中</string>
+    <string name="table_status_preparing">Preparing</string>
+    <string name="table_status_paused">Paused</string>
+    <string name="table_status_playing">In Game</string>
 
-    <string name="label_joined">参加中</string>
-    <string name="label_host">ホスト：</string>
-    <string name="label_blind">BLIND</string>
-    <string name="label_update_datetime">更新日時：</string>
+    <string name="label_joined">Joined</string>
+    <string name="label_host">Host：</string>
+    <string name="label_blind" translatable="false">BLIND</string>
+    <string name="label_update_datetime">Updated：</string>
 
-    <string name="label_stack">Stack</string>
-    <string name="label_total_pot">Total Pot</string>
-    <string name="label_pot">Pot</string>
-    <string name="label_bet">Bet</string>
-    <string name="label_pre_flop">PreFlop</string>
-    <string name="label_flop">Flop</string>
-    <string name="label_turn">Turn</string>
-    <string name="label_river">River</string>
+    <string name="label_stack" translatable="false">Stack</string>
+    <string name="label_total_pot" translatable="false">Total Pot</string>
+    <string name="label_pot" translatable="false">Pot</string>
+    <string name="label_bet" translatable="false">Bet</string>
+    <string name="label_pre_flop" translatable="false">PreFlop</string>
+    <string name="label_flop" translatable="false">Flop</string>
+    <string name="label_turn" translatable="false">Turn</string>
+    <string name="label_river" translatable="false">River</string>
     <string name="label_min">min</string>
     <string name="label_main_pot">Main Pot</string>
     <string name="label_side_pot">Side Pot %1$d</string>
-    <string name="pot_settlement_explanation">Pot取得者</string>
+    <string name="pot_settlement_explanation">Pot Winner</string>
 
     <string name="pot_settlement_next_button">Next Pot</string>
     <string name="pot_settlement_done_button">done</string>
 
-    <string name="button_label_fold">Fold</string>
-    <string name="button_label_check">Check</string>
-    <string name="button_label_all_in">All In</string>
-    <string name="button_label_call">Call</string>
-    <string name="button_label_raise">Raise</string>
-    <string name="button_label_bet">Bet</string>
-    <string name="button_label_size">Size</string>
+    <string name="button_label_fold" translatable="false">Fold</string>
+    <string name="button_label_check" translatable="false">Check</string>
+    <string name="button_label_all_in" translatable="false">All In</string>
+    <string name="button_label_call" translatable="false">Call</string>
+    <string name="button_label_raise" translatable="false">Raise</string>
+    <string name="button_label_bet" translatable="false">Bet</string>
+    <string name="button_label_size" translatable="false">Size</string>
 
-    <string name="suffix_bb">%1$s BB</string>
-    <string name="label_bb">BB</string>
-    <string name="raise_size_button_label_x">×%1$s</string>
-    <string name="table_id_prefix">ID： %1$s</string>
+    <string name="suffix_bb" translatable="false">%1$s BB</string>
+    <string name="label_bb" translatable="false">BB</string>
+    <string name="raise_size_button_label_x" translatable="false">×%1$s</string>
+    <string name="table_id_prefix" translatable="false">ID： %1$s</string>
 
-    <string name="position_label_sb">SB</string>
-    <string name="position_label_bb">BB</string>
+    <string name="position_label_sb" translatable="false">SB</string>
+    <string name="position_label_bb" translatable="false">BB</string>
 
-    <string name="action_label_fold">FOLD</string>
-    <string name="action_label_check">CHECK</string>
-    <string name="action_label_all_in">ALL-IN</string>
-    <string name="action_label_call">CALL</string>
-    <string name="action_label_bet">BET</string>
-    <string name="action_label_raise">RAISE</string>
+    <string name="action_label_fold" translatable="false">FOLD</string>
+    <string name="action_label_check" translatable="false">CHECK</string>
+    <string name="action_label_all_in" translatable="false">ALL-IN</string>
+    <string name="action_label_call" translatable="false">CALL</string>
+    <string name="action_label_bet" translatable="false">BET</string>
+    <string name="action_label_raise" translatable="false">RAISE</string>
 
 
-    <string name="text_hyphen">-</string>
-    <string name="text_ratio">%1$d%%</string>
+    <string name="text_hyphen" translatable="false">-</string>
+    <string name="text_ratio" translatable="false">%1$d%%</string>
 
 <!--    <string name="call_raise_button_sub_text">%1$s → %2$s</string>-->
-    <string name="left_arrow">→</string>
+    <string name="left_arrow" translatable="false">→</string>
 
-    <string name="setting_keep_screen_on">ゲーム中、画面をオンのままにする</string>
+    <string name="setting_keep_screen_on">Prevent screen from turning off during game</string>
 
     <string name="label_is_leaved">Out Of Seat</string>
 

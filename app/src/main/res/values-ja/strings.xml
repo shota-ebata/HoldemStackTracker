@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="game_type">ゲームモード</string>
+    <string name="game_type_ring">リングゲーム</string>
+    <string name="sb_size_label">SBサイズ</string>
+    <string name="bb_size_label">BBサイズ</string>
+    <string name="default_stack_label">初期スタック</string>
+    <string name="stack_size_label">スタックサイズ</string>
+    <string name="input_error_message">入力値に問題があります</string>
+    <string name="input_error_message_sb_bb">SBサイズはBBサイズ以下である必要があります</string>
+    <string name="table_creator_submit">テーブル作成</string>
+    <string name="game_rule_update_button">Update</string>
+
+    <string name="my_player_name_label">あなたのプレイヤー名</string>
+    <string name="member_title_label">参加プレイヤー</string>
+    <string name="btn_chosen">BTNプレイヤー</string>
+    <string name="btn_random">ランダム</string>
+    <string name="start_game">ゲーム開始</string>
+
+    <string name="error_title">エラー</string>
+    <string name="error_name_limit">15文字以内で入力してください</string>
+    <string name="error_not_found_table">テーブルが見つかりません</string>
+    <string name="error_message_in_table">テーブルに問題が発生しました</string>
+
+    <string name="ok_label">OK</string>
+
+    <string name="player_remove_dialog_title">プレイヤーを退出させる</string>
+    <string name="player_remove_dialog_toast">ホストは退出できません</string>
+
+    <string name="table_status_preparing">準備中</string>
+    <string name="table_status_paused">待機中</string>
+    <string name="table_status_playing">ゲーム中</string>
+
+    <string name="label_joined">参加中</string>
+    <string name="label_host">ホスト：</string>
+    <string name="label_update_datetime">更新日時：</string>
+
+    <string name="label_min">min</string>
+    <string name="label_main_pot">Main Pot</string>
+    <string name="label_side_pot">Side Pot %1$d</string>
+    <string name="pot_settlement_explanation">Pot取得者</string>
+
+    <string name="pot_settlement_next_button">Next Pot</string>
+    <string name="pot_settlement_done_button">done</string>
+
+    <!--    <string name="call_raise_button_sub_text">%1$s → %2$s</string>-->
+
+    <string name="setting_keep_screen_on">ゲーム中、画面をオンのままにする</string>
+
+    <string name="label_is_leaved">離席中</string>
+</resources>
