@@ -498,6 +498,7 @@ constructor(
     }
 
     fun onClickSubmitButton() {
+
         startNewGame()
     }
 
@@ -640,6 +641,7 @@ constructor(
     private fun startNewGame() {
         viewModelScope.launch {
             val table: Table = tableStateFlow.value ?: return@launch
+            // TODO: スタック状況の制限を実装。BBを下回っていたら参加できない。
             val btnPlayerId = selectedBtnPlayerId.value ?: run {
                 val index = (0..table.playerOrder.lastIndex).random()
                 table.playerOrder[index]

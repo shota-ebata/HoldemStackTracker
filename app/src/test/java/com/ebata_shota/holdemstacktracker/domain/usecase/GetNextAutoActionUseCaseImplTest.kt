@@ -74,17 +74,14 @@ class GetNextAutoActionUseCaseImplTest {
                 GamePlayer(
                     id = PlayerId("BTN"),
                     stack = 98,
-                    isLeaved = false,
                 ),
                 GamePlayer(
                     id = PlayerId("SB"),
                     stack = 0,
-                    isLeaved = false,
                 ),
                 GamePlayer(
                     id = PlayerId("BB"),
                     stack = 98,
-                    isLeaved = false,
                 ),
             ),
             potList = listOf(

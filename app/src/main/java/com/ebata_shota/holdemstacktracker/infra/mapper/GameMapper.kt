@@ -28,7 +28,6 @@ constructor() {
         private const val PLAYERS = "players"
         private const val PLAYER_STATE_PLAYER_ID = "playerId"
         private const val PLAYER_STATE_PLAYER_STACK = "stack"
-        private const val PLAYER_STATE_PLAYER_IS_LEAVED = "isLeaved"
         private const val POTS = "pots"
         private const val POT_ID = "potId"
         private const val POT_SIZE = "potSize"
@@ -122,11 +121,9 @@ constructor() {
             val value = players[key] as Map<*, *>
             val playerId = key as String
             val stack = value[PLAYER_STATE_PLAYER_STACK]!!.getInt()!!
-            val isLeaved = value[PLAYER_STATE_PLAYER_IS_LEAVED] as Boolean
             GamePlayer(
                 id = PlayerId(playerId),
                 stack = stack,
-                isLeaved = isLeaved
             )
         }.toSet()
     }
@@ -217,6 +214,5 @@ constructor() {
 
     private fun mapGamePlayer(gamePlayer: GamePlayer) = hashMapOf(
         PLAYER_STATE_PLAYER_STACK to gamePlayer.stack,
-        PLAYER_STATE_PLAYER_IS_LEAVED to gamePlayer.isLeaved
     )
 }

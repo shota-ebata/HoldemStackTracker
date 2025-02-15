@@ -81,7 +81,8 @@ constructor(
                     PlayerBaseState(
                         id = myPlayerId,
                         name = myName,
-                        stack = rule.defaultStack
+                        stack = rule.defaultStack,
+                        isLeaved = false,
                     )
                 ),
                 waitPlayerIds = emptyList(),

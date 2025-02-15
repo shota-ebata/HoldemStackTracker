@@ -72,7 +72,8 @@ constructor(
                     newBasePlayers = table.basePlayers + PlayerBaseState(
                         id = myPlayerId,
                         name = myName,
-                        stack = table.rule.defaultStack
+                        stack = table.rule.defaultStack,
+                        isLeaved = false,
                     )
                 }
                 newTable = table.copy(

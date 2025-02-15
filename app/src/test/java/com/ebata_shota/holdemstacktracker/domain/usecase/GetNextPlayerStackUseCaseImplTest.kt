@@ -68,7 +68,6 @@ class GetNextPlayerStackUseCaseImplTest {
             GamePlayer(
                 id = PlayerId("0"),
                 stack = 1000,
-                isLeaved = false
             ),
         )
         coEvery { getNextGamePlayerStateListUseCase.invoke(any(), any(), any()) } returns mockNextPlayerStateListResult

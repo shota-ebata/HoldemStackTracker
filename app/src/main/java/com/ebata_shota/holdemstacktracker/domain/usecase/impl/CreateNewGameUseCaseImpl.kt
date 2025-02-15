@@ -44,7 +44,6 @@ constructor(
                     GamePlayer(
                         id = player.id,
                         stack = player.stack,
-                        isLeaved = false
                     )
                 }
             }.toSet(),

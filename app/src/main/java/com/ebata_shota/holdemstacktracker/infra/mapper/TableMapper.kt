@@ -30,6 +30,7 @@ constructor() {
         private const val PLAYER_ID = "playerId"
         private const val PLAYER_NAME = "name"
         private const val PLAYER_STACK = "stack"
+        private const val PLAYER_IS_LEAVED = "isLeaved"
         private const val PLAYER_ORDER = "playerOrder"
         private const val BTN_PLAYER_ID = "btnPlayerId"
         private const val TABLE_STATUS = "tableStatus"
@@ -64,7 +65,8 @@ constructor() {
         PlayerBaseState(
             id = PlayerId(it[PLAYER_ID] as String),
             name = it[PLAYER_NAME] as String,
-            stack = it[PLAYER_STACK]!!.getInt()!!
+            stack = it[PLAYER_STACK]?.getInt() ?: 0,
+            isLeaved = (it[PLAYER_IS_LEAVED] as? Boolean) ?: false
         )
     }
 
@@ -99,7 +101,8 @@ constructor() {
             hashMapOf(
                 PLAYER_ID to it.id.value,
                 PLAYER_NAME to it.name,
-                PLAYER_STACK to it.stack
+                PLAYER_STACK to it.stack,
+                PLAYER_IS_LEAVED to it.isLeaved,
             )
         },
         WAIT_PLAYER_IDS to table.waitPlayerIds.map {

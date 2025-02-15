@@ -61,17 +61,14 @@ class GetPotListUseCaseImplTest {
             GamePlayer(
                 id = PlayerId("0"),
                 stack = 100,
-                isLeaved = false,
             ),
             GamePlayer(
                 id = PlayerId("1"),
                 stack = 100,
-                isLeaved = false,
             ),
             GamePlayer(
                 id = PlayerId("2"),
                 stack = 100,
-                isLeaved = false,
             ),
         )
         val pendingBetPerPlayerWithoutZero: Map<PlayerId, Int> = mapOf(
@@ -115,17 +112,14 @@ class GetPotListUseCaseImplTest {
             GamePlayer(
                 id = PlayerId("0"),
                 stack = 0,
-                isLeaved = false,
             ),
             GamePlayer(
                 id = PlayerId("1"),
                 stack = 100,
-                isLeaved = false,
             ),
             GamePlayer(
                 id = PlayerId("2"),
                 stack = 100,
-                isLeaved = false,
             ),
         )
         val pendingBetPerPlayerWithoutZero: Map<PlayerId, Int> = mapOf(
@@ -169,17 +163,14 @@ class GetPotListUseCaseImplTest {
             GamePlayer(
                 id = PlayerId("0"),
                 stack = 0,
-                isLeaved = false,
             ),
             GamePlayer(
                 id = PlayerId("1"),
                 stack = 0,
-                isLeaved = false,
             ),
             GamePlayer(
                 id = PlayerId("2"),
                 stack = 100,
-                isLeaved = false,
             ),
         )
         val pendingBetPerPlayerWithoutZero: Map<PlayerId, Int> = mapOf(
@@ -222,17 +213,14 @@ class GetPotListUseCaseImplTest {
             GamePlayer(
                 id = PlayerId("0"),
                 stack = 0,
-                isLeaved = false,
             ),
             GamePlayer(
                 id = PlayerId("1"),
                 stack = 0,
-                isLeaved = false,
             ),
             GamePlayer(
                 id = PlayerId("2"),
                 stack = 0,
-                isLeaved = false,
             ),
         )
         val pendingBetPerPlayerWithoutZero: Map<PlayerId, Int> = mapOf(
@@ -294,17 +282,14 @@ class GetPotListUseCaseImplTest {
             GamePlayer(
                 id = PlayerId("0"),
                 stack = 100,
-                isLeaved = false,
             ),
             GamePlayer(
                 id = PlayerId("1"),
                 stack = 100,
-                isLeaved = false,
             ),
             GamePlayer(
                 id = PlayerId("2"),
                 stack = 100,
-                isLeaved = false,
             ),
         )
         val pendingBetPerPlayerWithoutZero: Map<PlayerId, Int> = mapOf(
@@ -343,17 +328,14 @@ class GetPotListUseCaseImplTest {
             GamePlayer(
                 id = PlayerId("BTN"),
                 stack = 98,
-                isLeaved = false,
             ),
             GamePlayer(
                 id = PlayerId("SB"),
                 stack = 0,
-                isLeaved = false,
             ),
             GamePlayer(
                 id = PlayerId("BB"),
                 stack = 98,
-                isLeaved = false,
             ),
         )
         val potList = listOf(
@@ -416,17 +398,14 @@ class GetPotListUseCaseImplTest {
             GamePlayer(
                 id = PlayerId("BTN"),
                 stack = 98,
-                isLeaved = false,
             ),
             GamePlayer(
                 id = PlayerId("SB"),
                 stack = 0,
-                isLeaved = false,
             ),
             GamePlayer(
                 id = PlayerId("BB"),
                 stack = 98,
-                isLeaved = false,
             ),
         )
         val potList = listOf(
