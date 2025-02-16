@@ -10,7 +10,6 @@ interface GetNextAutoActionUseCase {
     suspend fun invoke(
         playerId: PlayerId,
         rule: Rule,
-        playerOrder: List<PlayerId>,
         game: Game,
     ): BetPhaseAction?
 }

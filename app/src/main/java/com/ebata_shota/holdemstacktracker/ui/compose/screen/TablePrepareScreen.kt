@@ -16,6 +16,8 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogCon
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialog
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SeatOutPlayerDialog
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SeatOutPlayerDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
@@ -86,6 +88,13 @@ fun TablePrepareScreen(
                     event = viewModel
                 )
             }
+            val seatOutDialogUiState = dialogUiState.seatOutDialogUiState
+            if (seatOutDialogUiState != null) {
+                SeatOutPlayerDialog(
+                    uiState = seatOutDialogUiState,
+                    event = viewModel
+                )
+            }
         }
     }
     val errorDialogUiState = dialogUiState.errorDialog
@@ -109,5 +118,6 @@ data class TablePrepareScreenDialogUiState(
     val stackEditDialogState: StackEditDialogState? = null,
     val myNameInputDialogUiState: MyNameInputDialogUiState? = null,
     val playerRemoveDialogUiState: PlayerRemoveDialogUiState? = null,
+    val seatOutDialogUiState: SeatOutPlayerDialogUiState? = null,
     val errorDialog: ErrorDialogUiState? = null,
 )

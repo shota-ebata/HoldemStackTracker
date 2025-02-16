@@ -31,6 +31,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.SeatOutPlayersUseCase
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.EditGameRuleDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogUiState
@@ -38,6 +39,8 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEve
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SeatOutPlayerDialogEvent
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SeatOutPlayerDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TablePrepareScreenDialogUiState
@@ -79,13 +82,15 @@ constructor(
     private val removePlayers: RemovePlayersUseCase,
     private val renameTablePlayer: RenameTablePlayerUseCase,
     private val hasErrorChipSizeTextValue: HasErrorChipSizeTextValueUseCase,
+    private val seatOutPlayers: SeatOutPlayersUseCase,
     private val uiStateMapper: TablePrepareScreenUiStateMapper,
     private val tableCreatorUiStateMapper: TableCreatorUiStateMapper,
 ) : ViewModel(),
     MyNameInputDialogEvent,
     PlayerRemoveDialogEvent,
     ErrorDialogEvent,
-    EditGameRuleDialogEvent {
+    EditGameRuleDialogEvent,
+    SeatOutPlayerDialogEvent {
 
     private val tableIdString: String by savedStateHandle.param()
     private val tableId: TableId = TableId(tableIdString)
@@ -305,19 +310,81 @@ constructor(
     fun onClickSeatOutButton() {
         viewModelScope.launch {
             val table = tableStateFlow.value ?: return@launch
-            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
             showSeatOutDialog(
                 table = table,
-                myPlayerId = myPlayerId
             )
         }
     }
 
     private fun showSeatOutDialog(
         table: Table,
-        myPlayerId: PlayerId,
     ) {
-        // TODO: SeatOutDialogの表示
+        _dialogUiState.update {
+            it.copy(
+                seatOutDialogUiState = SeatOutPlayerDialogUiState(
+                    players = table.playerOrder
+                        .mapNotNull { playerId -> table.basePlayers.find { basePlayer -> basePlayer.id == playerId } }
+                        .map { player ->
+                            SeatOutPlayerDialogUiState.PlayerItemUiState(
+                                playerId = player.id,
+                                name = player.name,
+                                isSelected = player.isLeaved,
+                            )
+                        }
+                )
+            )
+        }
+    }
+
+    /**
+     * SeatOutPlayerDialog
+     * チェック押下
+     */
+    override fun onClickSeatOutPlayerDialogPlayer(playerId: PlayerId, checked: Boolean) {
+        _dialogUiState.update { dialogUiState ->
+            val seatOutDialogUiState = dialogUiState.seatOutDialogUiState
+            dialogUiState.copy(
+                seatOutDialogUiState = seatOutDialogUiState?.copy(
+                    players = seatOutDialogUiState.players.mapAtFind(
+                        { it.playerId == playerId }
+                    ) {
+                        it.copy(isSelected = checked)
+                    }
+                )
+            )
+        }
+    }
+
+    /**
+     * SeatOutPlayerDialog
+     * Submit
+     */
+    override fun onClickSeatOutPlayerDialogSubmit() {
+        viewModelScope.launch {
+            val seatOutDialogUiState = dialogUiState.value.seatOutDialogUiState
+                ?: return@launch
+            val table = tableStateFlow.value
+                ?: return@launch
+            // Checkされているプレイヤー
+            val checkedPlayerIds = seatOutDialogUiState.players
+                .filter { it.isSelected }
+                .map { it.playerId }
+            seatOutPlayers.invoke(
+                currentTable = table,
+                seatOutPlayers = checkedPlayerIds
+            )
+            onDismissRequestSeatOutPlayerDialog()
+        }
+    }
+
+    /**
+     * SeatOutPlayerDialog
+     * dismiss
+     */
+    override fun onDismissRequestSeatOutPlayerDialog() {
+        _dialogUiState.update {
+            it.copy(seatOutDialogUiState = null)
+        }
     }
 
     /**
@@ -663,10 +730,17 @@ constructor(
         viewModelScope.launch {
             val table: Table = tableStateFlow.value ?: return@launch
             // TODO: スタック状況の制限を実装。BBを下回っていたら参加できない。
-            val btnPlayerId = selectedBtnPlayerId.value ?: run {
-                val index = (0..table.playerOrder.lastIndex).random()
-                table.playerOrder[index]
+            val selectedBtnPlayerId = selectedBtnPlayerId.value
+            val btnPlayerId = if (
+                selectedBtnPlayerId != null
+                && table.playerOrderWithoutLeaved.contains(selectedBtnPlayerId)
+            ) {
+                selectedBtnPlayerId
+            } else {
+                val index = (0..table.playerOrderWithoutLeaved.lastIndex).random()
+                table.playerOrderWithoutLeaved[index]
             }
+
             val newTable = table.copy(btnPlayerId = btnPlayerId)
             createNewGame.invoke(
                 table = newTable,

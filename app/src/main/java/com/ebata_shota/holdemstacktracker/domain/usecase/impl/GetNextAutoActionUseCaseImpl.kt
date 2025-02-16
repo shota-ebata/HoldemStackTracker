@@ -29,7 +29,6 @@ constructor(
     override suspend fun invoke(
         playerId: PlayerId,
         rule: Rule,
-        playerOrder: List<PlayerId>,
         game: Game
     ): BetPhaseAction? = withContext(dispatcher) {
         return@withContext when (val latestPhase = game.phaseList.lastOrNull()) {
@@ -38,7 +37,7 @@ constructor(
                 getPreFlopAutoAction(
                     latestPhase = latestPhase,
                     rule = rule,
-                    playerOrder = playerOrder,
+                    playerOrder = game.playerOrder,
                     playerId = playerId,
                     game = game
                 )
@@ -49,7 +48,7 @@ constructor(
                 getAutoAction(
                     game = game,
                     playerId = playerId,
-                    playerOrder = playerOrder
+                    playerOrder = game.playerOrder,
                 )
             }
 

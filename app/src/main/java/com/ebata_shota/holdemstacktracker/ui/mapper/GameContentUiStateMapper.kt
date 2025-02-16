@@ -74,7 +74,7 @@ constructor(
         betViewMode: BetViewMode,
     ): GameContentUiState? = withContext(dispatcher) {
         val tableId = table.id
-        val playerOrder = table.playerOrder
+        val playerOrder = game.playerOrder
         val basePlayers = table.basePlayers
         val minBetSize = table.rule.minBetSize
         val blindText = table.rule.blindText()
@@ -85,8 +85,12 @@ constructor(
 
         val startIndex = playerOrder.indexOf(myPlayerId)
         val sortedPlayerOrder = playerOrder.rearrangeListFromIndex(startIndex = startIndex)
-        val positions: List<GamePlayerUiState.PlayerPosition> =
+        val positions: List<GamePlayerUiState.PlayerPosition> = if (sortedPlayerOrder.contains(myPlayerId)) {
             playerPositionsMap[sortedPlayerOrder.size]!!
+        } else {
+            // 自分が参加者じゃない場合の配置
+            playerPositionsWithoutMeMap[sortedPlayerOrder.size]!!
+        }
         val lastPhase = phaseList.lastOrNull() ?: return@withContext null
 
         val btnPlayerIndex = playerOrder.indexOf(btnPlayerId)
@@ -403,7 +407,7 @@ constructor(
                 minBetSize = minBetSize,
                 betPhase = betPhase,
                 isEnableRaiseSizeButtons = isCurrentPlayer,
-                stackSize = gamePlayers.find { it.id == myPlayerId }!!.stack
+                stackSize = gamePlayers.find { it.id == myPlayerId }?.stack ?: 0
             ),
             isEnableMinusButton = isEnableMinusButton,
             isEnablePlusButton = isEnablePlusButton,
@@ -633,7 +637,7 @@ constructor(
                 minBetSize = minBetSize,
                 betPhase = null,
                 isEnableRaiseSizeButtons = false,
-                stackSize = gamePlayers.find { it.id == myPlayerId }!!.stack
+                stackSize = gamePlayers.find { it.id == myPlayerId }?.stack ?: 0
             ),
             isEnableMinusButton = false,
             isEnablePlusButton = false,
@@ -766,6 +770,17 @@ constructor(
             8 to listOf(BOTTOM, LEFT, LEFT, LEFT, TOP, RIGHT, RIGHT, RIGHT),
             9 to listOf(BOTTOM, LEFT, LEFT, LEFT, TOP, TOP, RIGHT, RIGHT, RIGHT),
             10 to listOf(BOTTOM, LEFT, LEFT, LEFT, TOP, TOP, TOP, RIGHT, RIGHT, RIGHT)
+        )
+
+        private val playerPositionsWithoutMeMap = mapOf(
+            2 to listOf(LEFT, RIGHT),
+            3 to listOf(LEFT, TOP, RIGHT),
+            4 to listOf(LEFT, TOP, TOP, RIGHT),
+            5 to listOf(LEFT, LEFT, TOP, RIGHT, RIGHT),
+            6 to listOf(LEFT, LEFT, TOP, TOP, RIGHT, RIGHT),
+            7 to listOf(LEFT, LEFT, LEFT, TOP, RIGHT, RIGHT, RIGHT),
+            8 to listOf(LEFT, LEFT, LEFT, TOP, TOP, RIGHT, RIGHT, RIGHT),
+            9 to listOf(LEFT, LEFT, LEFT, TOP, TOP, TOP, RIGHT, RIGHT, RIGHT)
         )
     }
 }

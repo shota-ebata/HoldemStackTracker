@@ -128,7 +128,7 @@ constructor(
         val currentPlayerId = currentBetPhase?.let {
             getCurrentPlayerId.invoke(
                 btnPlayerId = table.btnPlayerId,
-                playerOrder = table.playerOrder,
+                playerOrder = game.playerOrder,
                 currentBetPhase = currentBetPhase
             )
         }
@@ -138,7 +138,6 @@ constructor(
             // AutoActionする
             getNextAutoAction.invoke(
                 playerId = myPlayerId,
-                playerOrder = table.playerOrder,
                 rule = table.rule,
                 game = game,
             )

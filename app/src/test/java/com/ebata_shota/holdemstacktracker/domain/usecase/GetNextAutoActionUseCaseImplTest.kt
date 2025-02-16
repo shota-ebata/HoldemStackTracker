@@ -64,11 +64,6 @@ class GetNextAutoActionUseCaseImplTest {
             bbSize = 2,
             defaultStack = 200,
         )
-        val playerOrder = listOf(
-            PlayerId("BTN"),
-            PlayerId("SB"),
-            PlayerId("BB"),
-        )
         val game: Game = createDummyGame().copy(
             players = listOf(
                 GamePlayer(
@@ -156,7 +151,6 @@ class GetNextAutoActionUseCaseImplTest {
             val nextBetPhaseAction = useCase.invoke(
                 playerId = playerId,
                 rule = rule,
-                playerOrder = playerOrder,
                 game = game
             )
             assertThat(nextBetPhaseAction).isNull()

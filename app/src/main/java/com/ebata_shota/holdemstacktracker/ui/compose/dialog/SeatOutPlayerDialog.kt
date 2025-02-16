@@ -109,7 +109,6 @@ fun SeatOutPlayerDialog(
                             onClick = dropRedundantEvent {
                                 event.onClickSeatOutPlayerDialogSubmit()
                             },
-                            enabled = uiState.isEnableSubmitButton
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Done,
@@ -126,8 +125,6 @@ fun SeatOutPlayerDialog(
 data class SeatOutPlayerDialogUiState(
     val players: List<PlayerItemUiState>,
 ) {
-    val isEnableSubmitButton: Boolean = players.any { it.isSelected }
-
     data class PlayerItemUiState(
         val playerId: PlayerId,
         val name: String,
