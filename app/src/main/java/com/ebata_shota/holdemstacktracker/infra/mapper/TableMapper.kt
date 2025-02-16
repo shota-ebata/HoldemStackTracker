@@ -19,6 +19,7 @@ constructor() {
         private const val TABLE_VERSION = "tableVersion"
         private const val APP_VERSION = "appVersion"
         private const val HOST_PLAYER_ID = "hostPlayerId"
+        private const val POT_MANAGER_ID = "potManagerId"
         private const val RULE = "rule"
         private const val RULE_TYPE = "type"
         private const val RULE_TYPE_RING_GAME = "RingGame"
@@ -47,6 +48,7 @@ constructor() {
             version = tableMap[TABLE_VERSION] as Long,
             appVersion = tableMap[APP_VERSION] as Long,
             hostPlayerId = PlayerId(tableMap[HOST_PLAYER_ID] as String),
+            potManagerPlayerId = PlayerId(tableMap[POT_MANAGER_ID] as String),
             rule = mapToRuleState(tableMap[RULE] as Map<*, *>),
             basePlayers = mapToBasePlayers(tableMap[BASE_PLAYERS] as List<*>),
             waitPlayerIds = (tableMap[WAIT_PLAYER_IDS] as? List<*>)?.map { PlayerId(it as String) } ?: emptyList(),
@@ -86,6 +88,7 @@ constructor() {
         TABLE_VERSION to table.version,
         APP_VERSION to table.appVersion,
         HOST_PLAYER_ID to table.hostPlayerId.value,
+        POT_MANAGER_ID to table.potManagerPlayerId.value,
         BTN_PLAYER_ID to table.btnPlayerId.value,
         RULE to when (val ruleState = table.rule) {
             is Rule.RingGame -> {

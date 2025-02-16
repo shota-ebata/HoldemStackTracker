@@ -318,8 +318,8 @@ constructor(
                 val lastPhase = game.phaseList.lastOrNull()
                 if (lastPhase is Phase.PotSettlement) {
                     val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
-                    if (myPlayerId != table.hostPlayerId) {
-                        // ホスト以外では表示しない
+                    if (myPlayerId != table.potManagerPlayerId) {
+                        // ポットマネージャー以外では表示しない
                         return@collect
                     }
                     val notFoldPlayerIds = getNotFoldPlayerIds.invoke(

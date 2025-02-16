@@ -7,11 +7,12 @@ data class Table(
     val version: Long,
     val appVersion: Long,
     val hostPlayerId: PlayerId,
+    val potManagerPlayerId: PlayerId,
     val rule: Rule,
     val basePlayers: List<PlayerBase>,
     val waitPlayerIds: List<PlayerId>,
     val playerOrder: List<PlayerId>,
-    val btnPlayerId: PlayerId,
+    val btnPlayerId: PlayerId,  // TODO: ポットマネージャーを別途選択できるようにしたい
     val tableStatus: TableStatus,
     val startTime: Instant?,
     val tableCreateTime: Instant,

@@ -29,6 +29,7 @@ fun createDummyTable(
     version = 0L,
     appVersion = BuildConfig.VERSION_CODE.toLong(),
     hostPlayerId = PlayerId(""),
+    potManagerPlayerId = PlayerId(""),
     rule = Rule.RingGame(sbSize = 100, bbSize = 200, defaultStack = 1000),
     playerOrder = playerOrder,
     btnPlayerId = PlayerId(""),

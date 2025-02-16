@@ -78,6 +78,7 @@ constructor(
                 rule = rule,
                 playerOrder = listOf(myPlayerId),
                 btnPlayerId = myPlayerId,
+                potManagerPlayerId = myPlayerId,
                 basePlayers = listOf(
                     PlayerBase(
                         id = myPlayerId,
