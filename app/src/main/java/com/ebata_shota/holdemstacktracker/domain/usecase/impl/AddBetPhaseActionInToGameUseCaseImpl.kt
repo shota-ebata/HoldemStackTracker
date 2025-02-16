@@ -43,7 +43,6 @@ constructor(
      * BetPhaseアクションをGameに追加する
      */
     override suspend fun invoke(
-        playerOrder: List<PlayerId>,
         btnPlayerId: PlayerId,
         currentGame: Game,
         betPhaseAction: BetPhaseAction,
@@ -55,10 +54,9 @@ constructor(
         val currentPhaseList: List<Phase> = currentGame.phaseList
 
         // プレイヤーのスタック更新
-        val updatedPlayers: Set<GamePlayer> = getNextPlayerStack.invoke(
+        val updatedPlayers: List<GamePlayer> = getNextPlayerStack.invoke(
             latestGame = currentGame,
             action = betPhaseAction,
-            playerOrder = playerOrder
         )
 
         // PhaseListの最後の要素を置き換える
@@ -75,7 +73,7 @@ constructor(
 
         // アクションしていない人がのこっているか？
         val isActionRequired = isActionRequiredInPhase.invoke(
-            playerOrder = playerOrder,
+            playerOrder = baseNextGame.playerOrder,
             phaseList = addedActionPhaseList
         )
         if (isActionRequired) {
@@ -97,7 +95,7 @@ constructor(
         // 次のフェーズに進めたい
         // 降りてないプレイヤーID一覧
         val notFoldPlayerIds = getNotFoldPlayerIds.invoke(
-            playerOrder = playerOrder,
+            playerOrder = baseNextGame.playerOrder,
             phaseList = addedActionPhaseList
         )
         if (notFoldPlayerIds.size <= 1) {
@@ -109,7 +107,7 @@ constructor(
              */
             val updatedPotList: List<Pot> = getUpdatedPotList(
                 updatedPlayers = updatedPlayers,
-                playerOrder = playerOrder,
+                playerOrder = baseNextGame.playerOrder,
                 addedActionList = addedActionList,
                 currentGame = currentGame,
                 activePlayerIds = notFoldPlayerIds
@@ -135,7 +133,7 @@ constructor(
         // アクションが必要なプレイヤーの数
         // 正確に言うと降りているわけでもなく、AllInしているわけでもないプレイヤーIDの一覧を取得
         val requiredActionPlayerIds = getRequiredActionPlayerIds.invoke(
-            playerOrder = playerOrder,
+            playerOrder = baseNextGame.playerOrder,
             phaseList = addedActionPhaseList
         )
         if (requiredActionPlayerIds.size < 2) {
@@ -176,7 +174,7 @@ constructor(
     }
 
     private suspend fun getUpdatedPotList(
-        updatedPlayers: Set<GamePlayer>,
+        updatedPlayers: List<GamePlayer>,
         playerOrder: List<PlayerId>,
         addedActionList: List<BetPhaseAction>,
         currentGame: Game,

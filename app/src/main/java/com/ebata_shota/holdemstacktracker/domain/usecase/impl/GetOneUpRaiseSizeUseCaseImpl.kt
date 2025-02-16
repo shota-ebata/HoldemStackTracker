@@ -28,7 +28,6 @@ constructor(
     override suspend fun invoke(
         currentRaiseSize: Int,
         game: Game,
-        playerOrder: List<PlayerId>,
     ): Int = withContext(dispatcher) {
         val currentDigitCount = getDigitCount(currentRaiseSize)
         val changeDigit = if (currentDigitCount - 1 > 0) {
@@ -54,7 +53,7 @@ constructor(
 
         val myPendingBetSize = getPendingBetSize.invoke(
             actionList = getLastPhaseAsBetPhase.invoke(game.phaseList).actionStateList,
-            playerOrder = playerOrder,
+            playerOrder = game.playerOrder,
             playerId = myPlayerId
         )
         return@withContext if (nextRaiseSize > stackSize + myPendingBetSize) {

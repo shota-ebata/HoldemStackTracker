@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.infra.repository
 
+import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherIO
 import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundGameException
@@ -20,7 +21,6 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCa
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCase
 import com.ebata_shota.holdemstacktracker.infra.mapper.GameMapper
-import com.google.firebase.database.BuildConfig
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -60,8 +60,9 @@ constructor(
     private val dispatcher: CoroutineDispatcher,
 ) : GameRepository {
 
+    @Suppress("KotlinConstantConditions")
     private val gamesRef: DatabaseReference = firebaseDatabase.getReference(
-        if (BuildConfig.DEBUG) {
+        if (BuildConfig.BUILD_TYPE == "debug") {
             "debug_games"
         } else {
             "games"
@@ -96,7 +97,6 @@ constructor(
                     if (autoAction != null) {
                         // オートアクションがあるなら、それを使って新しいGameを生成
                         val updatedGame = addBetPhaseActionInToGame.invoke(
-                            playerOrder = table.playerOrder,
                             btnPlayerId = table.btnPlayerId,
                             currentGame = game,
                             betPhaseAction = autoAction,

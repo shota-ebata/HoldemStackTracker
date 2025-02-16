@@ -21,7 +21,7 @@ constructor(
 ) : GetPotListUseCase {
 
     override suspend fun invoke(
-        updatedPlayers: Set<GamePlayer>,
+        updatedPlayers: List<GamePlayer>,
         potList: List<Pot>,
         pendingBetPerPlayerWithoutZero: Map<PlayerId, Int>,
         activePlayerIds: List<PlayerId>,
@@ -43,7 +43,7 @@ constructor(
     }
 
     private fun getNewPotList(
-        updatedPlayers: Set<GamePlayer>,
+        updatedPlayers: List<GamePlayer>,
         potList: List<Pot>,
         pendingBetPerPlayer: Map<PlayerId, Int>,
         activePlayerIds: List<PlayerId>,

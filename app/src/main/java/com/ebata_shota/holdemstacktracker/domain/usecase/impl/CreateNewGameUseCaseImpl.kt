@@ -38,7 +38,7 @@ constructor(
         val newGame = Game(
             version = 0,
             appVersion = BuildConfig.VERSION_CODE.toLong(),
-            players = table.playerOrder.mapNotNull { playerId ->
+            players = table.playerOrderWithoutLeaved.mapNotNull { playerId ->
                 val player = table.basePlayers.find { it.id == playerId }
                 player?.let {
                     GamePlayer(
@@ -46,7 +46,7 @@ constructor(
                         stack = player.stack,
                     )
                 }
-            }.toSet(),
+            },
             potList = emptyList(),
             phaseList = listOfNotNull(
                 Phase.Standby(

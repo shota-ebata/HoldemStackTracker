@@ -8,8 +8,10 @@ import java.time.Instant
 data class Game(
     val version: Long,
     val appVersion: Long,
-    val players: Set<GamePlayer>,
+    val players: List<GamePlayer>,
     val potList: List<Pot>,
     val phaseList: List<Phase>,
     val updateTime: Instant
-)
+) {
+    val playerOrder: List<PlayerId> = players.map { it.id }
+}

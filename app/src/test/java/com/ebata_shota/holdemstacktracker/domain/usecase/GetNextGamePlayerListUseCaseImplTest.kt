@@ -40,13 +40,13 @@ class GetNextGamePlayerListUseCaseImplTest {
 
     private fun executeAndAssert(
         pendingBetPerPlayer: Map<PlayerId, Int> = emptyMap(),
-        players: Set<GamePlayer>,
+        players: List<GamePlayer>,
         action: BetPhaseAction,
-        expected: Set<GamePlayer>,
+        expected: List<GamePlayer>,
     ) {
         runTest(dispatcher) {
             // execute
-            val actual: Set<GamePlayer> = useCase.invoke(
+            val actual: List<GamePlayer> = useCase.invoke(
                 pendingBetPerPlayer = pendingBetPerPlayer,
                 players = players,
                 action = action
@@ -60,7 +60,7 @@ class GetNextGamePlayerListUseCaseImplTest {
     fun action_Blind() {
         // prepare
         every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("0"))
-        val players = setOf(
+        val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 1000),
             GamePlayer(id = PlayerId("1"), stack = 1000),
             GamePlayer(id = PlayerId("2"), stack = 1000),
@@ -69,7 +69,7 @@ class GetNextGamePlayerListUseCaseImplTest {
         executeAndAssert(
             players = players,
             action = action,
-            expected = setOf(
+            expected = listOf(
                 GamePlayer(id = PlayerId("0"), stack = 900),
                 GamePlayer(id = PlayerId("1"), stack = 1000),
                 GamePlayer(id = PlayerId("2"), stack = 1000),
@@ -81,7 +81,7 @@ class GetNextGamePlayerListUseCaseImplTest {
     fun action_Call() {
         // prepare
         every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("0"))
-        val players = setOf(
+        val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 1000),
             GamePlayer(id = PlayerId("1"), stack = 1000),
             GamePlayer(id = PlayerId("2"), stack = 1000),
@@ -90,7 +90,7 @@ class GetNextGamePlayerListUseCaseImplTest {
         executeAndAssert(
             players = players,
             action = action,
-            expected = setOf(
+            expected = listOf(
                 GamePlayer(id = PlayerId("0"), stack = 900),
                 GamePlayer(id = PlayerId("1"), stack = 1000),
                 GamePlayer(id = PlayerId("2"), stack = 1000),
@@ -102,7 +102,7 @@ class GetNextGamePlayerListUseCaseImplTest {
     fun action_Raise() {
         // prepare
         every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("0"))
-        val players = setOf(
+        val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 1000),
             GamePlayer(id = PlayerId("1"), stack = 1000),
             GamePlayer(id = PlayerId("2"), stack = 1000),
@@ -111,7 +111,7 @@ class GetNextGamePlayerListUseCaseImplTest {
         executeAndAssert(
             players = players,
             action = action,
-            expected = setOf(
+            expected = listOf(
                 GamePlayer(id = PlayerId("0"), stack = 600),
                 GamePlayer(id = PlayerId("1"), stack = 1000),
                 GamePlayer(id = PlayerId("2"), stack = 1000),
@@ -123,7 +123,7 @@ class GetNextGamePlayerListUseCaseImplTest {
     fun action_Bet() {
         // prepare
         every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("0"))
-        val players = setOf(
+        val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 1000),
             GamePlayer(id = PlayerId("1"), stack = 1000),
             GamePlayer(id = PlayerId("2"), stack = 1000),
@@ -132,7 +132,7 @@ class GetNextGamePlayerListUseCaseImplTest {
         executeAndAssert(
             players = players,
             action = action,
-            expected = setOf(
+            expected = listOf(
                 GamePlayer(id = PlayerId("0"), stack = 900),
                 GamePlayer(id = PlayerId("1"), stack = 1000),
                 GamePlayer(id = PlayerId("2"), stack = 1000),
@@ -144,7 +144,7 @@ class GetNextGamePlayerListUseCaseImplTest {
     fun action_AllIn() {
         // prepare
         every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("0"))
-        val players = setOf(
+        val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 1000),
             GamePlayer(id = PlayerId("1"), stack = 1000),
             GamePlayer(id = PlayerId("2"), stack = 1000),
@@ -153,7 +153,7 @@ class GetNextGamePlayerListUseCaseImplTest {
         executeAndAssert(
             players = players,
             action = action,
-            expected = setOf(
+            expected = listOf(
                 GamePlayer(id = PlayerId("0"), stack = 0),
                 GamePlayer(id = PlayerId("1"), stack = 1000),
                 GamePlayer(id = PlayerId("2"), stack = 1000),
@@ -165,7 +165,7 @@ class GetNextGamePlayerListUseCaseImplTest {
     fun action_Check() {
         // prepare
         every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("0"))
-        val players = setOf(
+        val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 1000),
             GamePlayer(id = PlayerId("1"), stack = 1000),
             GamePlayer(id = PlayerId("2"), stack = 1000),
@@ -174,7 +174,7 @@ class GetNextGamePlayerListUseCaseImplTest {
         executeAndAssert(
             players = players,
             action = action,
-            expected = setOf(
+            expected = listOf(
                 GamePlayer(id = PlayerId("0"), stack = 1000),
                 GamePlayer(id = PlayerId("1"), stack = 1000),
                 GamePlayer(id = PlayerId("2"), stack = 1000),
@@ -186,7 +186,7 @@ class GetNextGamePlayerListUseCaseImplTest {
     fun action_Fold() {
         // prepare
         every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("0"))
-        val players = setOf(
+        val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 1000),
             GamePlayer(id = PlayerId("1"), stack = 1000),
             GamePlayer(id = PlayerId("2"), stack = 1000),
@@ -195,7 +195,7 @@ class GetNextGamePlayerListUseCaseImplTest {
         executeAndAssert(
             players = players,
             action = action,
-            expected = setOf(
+            expected = listOf(
                 GamePlayer(id = PlayerId("0"), stack = 1000),
                 GamePlayer(id = PlayerId("1"), stack = 1000),
                 GamePlayer(id = PlayerId("2"), stack = 1000),
@@ -207,7 +207,7 @@ class GetNextGamePlayerListUseCaseImplTest {
     fun action_Skip() {
         // prepare
         every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("0"))
-        val players = setOf(
+        val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 1000),
             GamePlayer(id = PlayerId("1"), stack = 1000),
             GamePlayer(id = PlayerId("2"), stack = 1000),
@@ -216,7 +216,7 @@ class GetNextGamePlayerListUseCaseImplTest {
         executeAndAssert(
             players = players,
             action = action,
-            expected = setOf(
+            expected = listOf(
                 GamePlayer(id = PlayerId("0"), stack = 1000),
                 GamePlayer(id = PlayerId("1"), stack = 1000),
                 GamePlayer(id = PlayerId("2"), stack = 1000),
@@ -233,7 +233,7 @@ class GetNextGamePlayerListUseCaseImplTest {
             PlayerId("1") to 200,
             PlayerId("2") to 200,
         )
-        val players = setOf(
+        val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 900),
             GamePlayer(id = PlayerId("1"), stack = 800),
             GamePlayer(id = PlayerId("2"), stack = 800),
@@ -243,7 +243,7 @@ class GetNextGamePlayerListUseCaseImplTest {
             pendingBetPerPlayer = pendingBetPerPlayer,
             players = players,
             action = action,
-            expected = setOf(
+            expected = listOf(
                 GamePlayer(id = PlayerId("0"), stack = 800),
                 GamePlayer(id = PlayerId("1"), stack = 800),
                 GamePlayer(id = PlayerId("2"), stack = 800),
@@ -260,7 +260,7 @@ class GetNextGamePlayerListUseCaseImplTest {
             PlayerId("1") to 200,
             PlayerId("2") to 200,
         )
-        val players = setOf(
+        val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 900),
             GamePlayer(id = PlayerId("1"), stack = 800),
             GamePlayer(id = PlayerId("2"), stack = 800),
@@ -270,7 +270,7 @@ class GetNextGamePlayerListUseCaseImplTest {
             pendingBetPerPlayer = pendingBetPerPlayer,
             players = players,
             action = action,
-            expected = setOf(
+            expected = listOf(
                 GamePlayer(id = PlayerId("0"), stack = 0),
                 GamePlayer(id = PlayerId("1"), stack = 800),
                 GamePlayer(id = PlayerId("2"), stack = 800),
@@ -283,7 +283,7 @@ class GetNextGamePlayerListUseCaseImplTest {
         // prepare
         every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("1"))
         val pendingBetPerPlayer = emptyMap<PlayerId, Int>()
-        val players = setOf(
+        val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 800),
             GamePlayer(id = PlayerId("1"), stack = 800),
             GamePlayer(id = PlayerId("2"), stack = 800),
@@ -293,7 +293,7 @@ class GetNextGamePlayerListUseCaseImplTest {
             pendingBetPerPlayer = pendingBetPerPlayer,
             players = players,
             action = action,
-            expected = setOf(
+            expected = listOf(
                 GamePlayer(id = PlayerId("0"), stack = 800),
                 GamePlayer(id = PlayerId("1"), stack = 600),
                 GamePlayer(id = PlayerId("2"), stack = 800),

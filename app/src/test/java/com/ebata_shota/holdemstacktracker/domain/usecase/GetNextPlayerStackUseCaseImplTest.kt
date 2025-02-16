@@ -64,7 +64,7 @@ class GetNextPlayerStackUseCaseImplTest {
             dispatcher = dispatcher,
         )
 
-        val mockNextPlayerStateListResult = setOf<GamePlayer>(
+        val mockNextPlayerStateListResult = listOf<GamePlayer>(
             GamePlayer(
                 id = PlayerId("0"),
                 stack = 1000,
@@ -89,19 +89,27 @@ class GetNextPlayerStackUseCaseImplTest {
         } returns mockPendingBetPerPlayerResult
 
         val latestGame = createDummyGame(
+            players = listOf(
+                GamePlayer(
+                    id = PlayerId("0"),
+                    stack = 1000,
+                ),
+                GamePlayer(
+                    id = PlayerId("1"),
+                    stack = 1000,
+                )
+            ),
             phaseList = listOf(
                 Phase.PreFlop(phaseId = PhaseId(""), actionStateList = emptyList())
             )
         )
         val action = BetPhaseAction.Blind(actionId = ActionId(""), playerId = PlayerId("0"), betSize = 100)
-        val playerOrder = listOf(PlayerId("0"), PlayerId("1"))
 
         runTest(dispatcher) {
             // execute
             val actual = useCase.invoke(
                 latestGame = latestGame,
                 action = action,
-                playerOrder = playerOrder
             )
 
             // assert
@@ -110,7 +118,7 @@ class GetNextPlayerStackUseCaseImplTest {
             }
             coVerify(exactly = 1) {
                 getPendingBetPerPlayerUseCase.invoke(
-                    playerOrder = playerOrder,
+                    playerOrder = latestGame.playerOrder,
                     actionStateList = mockLatestBetPhaseResult.actionStateList
                 )
             }

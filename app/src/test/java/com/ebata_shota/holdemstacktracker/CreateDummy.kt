@@ -11,7 +11,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import java.time.Instant
 
 fun createDummyGame(
-    players: Set<GamePlayer> = emptySet(),
+    players: List<GamePlayer> = emptyList(),
     phaseList: List<Phase> = emptyList()
 ) = Game(
     version = 0,
@@ -23,8 +23,7 @@ fun createDummyGame(
 )
 
 fun createDummyTable(
-    playerOrder: List<PlayerId> = emptyList(),
-    phaseList: List<Phase> = emptyList()
+    playerOrder: List<PlayerId> = emptyList()
 ) = Table(
     id = TableId("0L"),
     version = 0L,

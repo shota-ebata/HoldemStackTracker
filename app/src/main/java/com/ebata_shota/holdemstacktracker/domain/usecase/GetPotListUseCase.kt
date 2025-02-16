@@ -11,7 +11,7 @@ interface GetPotListUseCase {
      * @param pendingBetPerPlayerWithoutZero ポットに入っていないBetが残っているプレイヤーのベット状況
      */
     suspend fun invoke(
-        updatedPlayers: Set<GamePlayer>,
+        updatedPlayers: List<GamePlayer>,
         potList: List<Pot>,
         pendingBetPerPlayerWithoutZero: Map<PlayerId, Int>,
         activePlayerIds: List<PlayerId>,

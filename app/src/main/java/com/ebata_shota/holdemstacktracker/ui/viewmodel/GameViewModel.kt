@@ -323,7 +323,7 @@ constructor(
                         return@collect
                     }
                     val notFoldPlayerIds = getNotFoldPlayerIds.invoke(
-                        playerOrder = table.playerOrder,
+                        playerOrder = game.playerOrder,
                         phaseList = game.phaseList
                     )
                     val dialogUiState = PotSettlementDialogUiState(
@@ -387,13 +387,11 @@ constructor(
     }
 
     private suspend fun doFold(
-        playerOrder: List<PlayerId>,
         btnPlayerId: PlayerId,
         game: Game,
         myPlayerId: PlayerId,
     ) {
         val nextGame = addBetPhaseActionInToGame.invoke(
-            playerOrder = playerOrder,
             btnPlayerId = btnPlayerId,
             currentGame = game,
             betPhaseAction = BetPhaseAction.Fold(
@@ -405,13 +403,11 @@ constructor(
     }
 
     private suspend fun doCheck(
-        playerOrder: List<PlayerId>,
         btnPlayerId: PlayerId,
         game: Game,
         myPlayerId: PlayerId,
     ) {
         val nextGame = addBetPhaseActionInToGame.invoke(
-            playerOrder = playerOrder,
             btnPlayerId = btnPlayerId,
             currentGame = game,
             betPhaseAction = BetPhaseAction.Check(
@@ -423,7 +419,6 @@ constructor(
     }
 
     private suspend fun doAllIn(
-        playerOrder: List<PlayerId>,
         btnPlayerId: PlayerId,
         game: Game,
         myPlayerId: PlayerId,
@@ -431,11 +426,10 @@ constructor(
         val player = game.players.find { it.id == myPlayerId }!!
         val myPendingBetSize = getPendingBetSize.invoke(
             actionList = getLastPhaseAsBetPhase.invoke(game.phaseList).actionStateList,
-            playerOrder = playerOrder,
+            playerOrder = game.playerOrder,
             playerId = myPlayerId
         )
         val nextGame = addBetPhaseActionInToGame.invoke(
-            playerOrder = playerOrder,
             btnPlayerId = btnPlayerId,
             currentGame = game,
             betPhaseAction = BetPhaseAction.AllIn(
@@ -448,7 +442,6 @@ constructor(
     }
 
     private suspend fun doCall(
-        playerOrder: List<PlayerId>,
         btnPlayerId: PlayerId,
         game: Game,
         myPlayerId: PlayerId,
@@ -463,11 +456,10 @@ constructor(
         val callSize = getMaxBetSize.invoke(actionStateList = actionList)
         val currentPendingBetSize = getPendingBetSize.invoke(
             actionList = actionList,
-            playerOrder = playerOrder,
+            playerOrder = game.playerOrder,
             playerId = myPlayerId,
         )
         val nextGame = addBetPhaseActionInToGame.invoke(
-            playerOrder = playerOrder,
             btnPlayerId = btnPlayerId,
             currentGame = game,
             betPhaseAction = if (callSize == player.stack + currentPendingBetSize) {
@@ -506,7 +498,6 @@ constructor(
             playerId = myPlayerId,
         )
         val nextGame = addBetPhaseActionInToGame.invoke(
-            playerOrder = playerOrder,
             currentGame = game,
             btnPlayerId = btnPlayerId,
             betPhaseAction = if (raiseSize == player.stack + currentPendingBetSize) {
@@ -544,7 +535,6 @@ constructor(
     }
 
     private suspend fun getRaiseSize(
-        table: Table,
         game: Game,
         myPlayerId: PlayerId,
         sliderPosition: Float,
@@ -554,7 +544,7 @@ constructor(
         val minRaiseSize = minRaiseSizeFlow.first()
         val myPendingBetSize = getPendingBetSize.invoke(
             actionList = getLastPhaseAsBetPhase.invoke(game.phaseList).actionStateList,
-            playerOrder = table.playerOrder,
+            playerOrder = game.playerOrder,
             playerId = myPlayerId
         )
 
@@ -574,7 +564,6 @@ constructor(
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
             doFold(
-                playerOrder = table.playerOrder,
                 btnPlayerId = table.btnPlayerId,
                 game = game,
                 myPlayerId = myPlayerId,
@@ -589,7 +578,6 @@ constructor(
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
             doCheck(
-                playerOrder = table.playerOrder,
                 btnPlayerId = table.btnPlayerId,
                 game = game,
                 myPlayerId = myPlayerId,
@@ -604,7 +592,6 @@ constructor(
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
             doAllIn(
-                playerOrder = table.playerOrder,
                 btnPlayerId = table.btnPlayerId,
                 game = game,
                 myPlayerId = myPlayerId,
@@ -619,7 +606,6 @@ constructor(
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
             doCall(
-                playerOrder = table.playerOrder,
                 btnPlayerId = table.btnPlayerId,
                 game = game,
                 myPlayerId = myPlayerId,
@@ -638,7 +624,7 @@ constructor(
             val raiseSize = raiseSizeStateFlow.value ?: return@launch
 
             doRaise(
-                playerOrder = table.playerOrder,
+                playerOrder = game.playerOrder,
                 btnPlayerId = table.btnPlayerId,
                 game = game,
                 myPlayerId = myPlayerId,
@@ -673,13 +659,11 @@ constructor(
     fun onClickPlusButton() {
         viewModelScope.launch {
             val currentRaiseSize = raiseSizeStateFlow.value ?: return@launch
-            val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
 
             val nextRaiseSize = getOneUpRaiseSize.invoke(
                 currentRaiseSize = currentRaiseSize,
                 game = game,
-                playerOrder = table.playerOrder
             )
             raiseSizeStateFlow.update { nextRaiseSize }
         }
@@ -704,12 +688,10 @@ constructor(
 
     fun onChangeSlider(sliderPosition: Float) {
         viewModelScope.launch {
-            val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
             val raiseSize: Int = getRaiseSize(
-                table = table,
                 game = game,
                 myPlayerId = myPlayerId,
                 sliderPosition = sliderPosition
@@ -820,7 +802,6 @@ constructor(
                 setPotSettlementInfo.invoke(
                     tableId = tableId,
                     btnPlayerId = table.btnPlayerId,
-                    playerOrder = table.playerOrder,
                     game = game,
                     potSettlementInfoList = potSettlementInfoList
                 )
@@ -847,20 +828,17 @@ constructor(
         viewModelScope.launch {
             // FIXME: PhaseHistoryを保存（見た扱いにしたい）
             phaseIntervalImageDialog.update { null }
-            //
             val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
             val nextPlayerId = getNextPlayerIdOfNextPhase.invoke(
                 btnPlayerId = table.btnPlayerId,
-                playerOrder = table.playerOrder,
                 currentGame = game,
             )
             when (myPlayerId) {
                 // 次のプレイヤーだった場合
                 nextPlayerId -> {
                     val nextGame = getNextGameFromInterval.invoke(
-                        playerOrder = table.playerOrder,
                         currentGame = game
                     )
                     // ダイアログを消してから、実際に消した扱いにするまで
@@ -872,7 +850,6 @@ constructor(
                 // ホストプレイヤーの場合
                 table.hostPlayerId -> {
                     val nextGame = getNextGameFromInterval.invoke(
-                        playerOrder = table.playerOrder,
                         currentGame = game
                     )
                     // ダイアログを消してから、実際に消した扱いにするまで

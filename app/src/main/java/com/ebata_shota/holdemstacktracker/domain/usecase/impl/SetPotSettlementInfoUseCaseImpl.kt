@@ -28,10 +28,10 @@ constructor(
     override suspend fun invoke(
         tableId: TableId,
         btnPlayerId: PlayerId,
-        playerOrder: List<PlayerId>,
         game: Game,
         potSettlementInfoList: List<PotSettlementInfo>,
     ) = withContext(dispatcher) {
+        val playerOrder = game.playerOrder
         val actionOrder = playerOrder.getSortedByActionOrder(btnPlayerId = btnPlayerId)
         val notFoldPlayerIds = notFoldPlayerIds.invoke(playerOrder = playerOrder, game.phaseList)
         val nearestSbPlayerId = actionOrder.first { playerId ->
@@ -47,7 +47,7 @@ constructor(
         gameRepository.sendGame(
             tableId = tableId,
             newGame = game.copy(
-                players = gamePlayers.toSet(),
+                players = gamePlayers,
                 phaseList = game.phaseList + nextPhase,
                 potList = emptyList()
             ),
@@ -55,7 +55,7 @@ constructor(
     }
 
     private fun getNewGamePlayers(
-        players: Set<GamePlayer>,
+        players: List<GamePlayer>,
         potSettlementInfoList: List<PotSettlementInfo>,
         nearestSbPlayerId: PlayerId,
     ): List<GamePlayer> {

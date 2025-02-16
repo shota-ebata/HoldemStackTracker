@@ -10,7 +10,6 @@ interface SetPotSettlementInfoUseCase {
     suspend fun invoke(
         tableId: TableId,
         btnPlayerId: PlayerId,
-        playerOrder: List<PlayerId>,
         game: Game,
         potSettlementInfoList: List<PotSettlementInfo>,
     )

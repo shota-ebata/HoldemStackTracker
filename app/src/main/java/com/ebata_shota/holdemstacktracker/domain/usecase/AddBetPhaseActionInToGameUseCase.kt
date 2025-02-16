@@ -7,7 +7,6 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 interface AddBetPhaseActionInToGameUseCase {
 
     suspend fun invoke(
-        playerOrder: List<PlayerId>,
         btnPlayerId: PlayerId,
         currentGame: Game,
         betPhaseAction: BetPhaseAction,

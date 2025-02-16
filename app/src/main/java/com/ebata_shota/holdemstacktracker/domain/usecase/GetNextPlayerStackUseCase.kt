@@ -10,6 +10,5 @@ interface GetNextPlayerStackUseCase {
     suspend fun invoke(
         latestGame: Game,
         action: BetPhaseAction,
-        playerOrder: List<PlayerId>
-    ): Set<GamePlayer>
+    ): List<GamePlayer>
 }

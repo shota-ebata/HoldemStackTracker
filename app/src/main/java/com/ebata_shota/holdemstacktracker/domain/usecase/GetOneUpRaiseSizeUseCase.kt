@@ -7,6 +7,5 @@ interface GetOneUpRaiseSizeUseCase {
     suspend fun invoke(
         currentRaiseSize: Int,
         game: Game,
-        playerOrder: List<PlayerId>,
     ): Int
 }

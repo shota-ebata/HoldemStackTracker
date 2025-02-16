@@ -70,7 +70,7 @@ class GetNextAutoActionUseCaseImplTest {
             PlayerId("BB"),
         )
         val game: Game = createDummyGame().copy(
-            players = setOf(
+            players = listOf(
                 GamePlayer(
                     id = PlayerId("BTN"),
                     stack = 98,

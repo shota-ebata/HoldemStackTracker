@@ -50,8 +50,9 @@ constructor(
     private val ioDispatcher: CoroutineDispatcher
 ) : TableRepository {
 
+    @Suppress("KotlinConstantConditions")
     private val tablesRef: DatabaseReference = firebaseDatabase.getReference(
-        if (BuildConfig.DEBUG) {
+        if (BuildConfig.BUILD_TYPE == "debug") {
             "debug_tables"
         } else {
             "tables"

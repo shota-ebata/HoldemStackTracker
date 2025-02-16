@@ -25,13 +25,12 @@ constructor(
      */
     override suspend fun invoke(
         btnPlayerId: PlayerId,
-        playerOrder: List<PlayerId>,
         currentGame: Game,
     ): PlayerId? = withContext(dispatcher) {
         val currentPhase = currentGame.phaseList.lastOrNull()
         return@withContext when (currentPhase) {
             is Phase.Standby -> {
-                if (playerOrder.size == 2) {
+                if (currentGame.playerOrder.size == 2) {
                     // 2人しかいない場合
                     // 次のフェーズであるPreFlopの最初のアクションプレイヤーは
                     // BTNからSBを始めるのでnextPlayerはBTNとなる。
@@ -40,7 +39,6 @@ constructor(
                     // 3人以上なら普通に最初のPlayerを返す
                     getFirstActionPlayerId(
                         btnPlayerId = btnPlayerId,
-                        playerOrder = playerOrder,
                         currentGame = currentGame
                     )
                 }
@@ -53,7 +51,6 @@ constructor(
                 // 次のフェーズはベットフェーズなので普通に最初のプレイヤーIDを返す
                 getFirstActionPlayerId(
                     btnPlayerId = btnPlayerId,
-                    playerOrder = playerOrder,
                     currentGame = currentGame
                 )
             }
@@ -71,9 +68,9 @@ constructor(
      */
     private suspend fun getFirstActionPlayerId(
         btnPlayerId: PlayerId,
-        playerOrder: List<PlayerId>,
         currentGame: Game,
     ): PlayerId? {
+        val playerOrder = currentGame.playerOrder
         // アクションが必要な人の一覧を取得する
         val requiredActionPlayerIds = getRequiredActionPlayerIds.invoke(
             playerOrder = playerOrder,

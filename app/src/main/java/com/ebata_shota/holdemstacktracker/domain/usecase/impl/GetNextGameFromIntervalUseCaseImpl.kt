@@ -33,7 +33,6 @@ constructor(
      * ポッドに反映して次のフェーズにする
      */
     override suspend fun invoke(
-        playerOrder: List<PlayerId>,
         currentGame: Game,
     ): Game = withContext(dispatcher) {
         val lastPhase: BetPhase = getLastPhaseAsBetPhase.invoke(currentGame.phaseList)
@@ -44,12 +43,12 @@ constructor(
         val currentPhase: MutableList<Phase> = currentGame.phaseList.toMutableList()
         // プレイヤーごとの、まだポットに入っていないベット額
         val pendingBetPerPlayer: Map<PlayerId, Int> = getPendingBetPerPlayer.invoke(
-            playerOrder = playerOrder,
+            playerOrder = currentGame.playerOrder,
             actionStateList = actionList
         )
         // 降りてないプレイヤー
         val notFoldPlayers: List<PlayerId> = getNotFoldPlayerIds.invoke(
-            playerOrder = playerOrder,
+            playerOrder = currentGame.playerOrder,
             phaseList = currentGame.phaseList
         )
         // ベット状況をポットに反映
@@ -61,7 +60,7 @@ constructor(
         )
         // フェーズを進める
         val nextPhase = getNextPhase.invoke(
-            playerOrder = playerOrder,
+            playerOrder = currentGame.playerOrder,
             phaseList = currentPhase
         )
         val updatedPhaseList = currentPhase + nextPhase

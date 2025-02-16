@@ -27,17 +27,16 @@ constructor(
     override suspend fun invoke(
         latestGame: Game,
         action: BetPhaseAction,
-        playerOrder: List<PlayerId>
-    ): Set<GamePlayer> = withContext(dispatcher) {
+    ): List<GamePlayer> = withContext(dispatcher) {
         // BetPhaseでしかActionはできないので
         val latestPhase: BetPhase = getLastPhaseAsBetPhase.invoke(latestGame.phaseList)
         // プレイヤーごとの、まだポットに入っていないベット額
         val pendingBetPerPlayer: Map<PlayerId, Int> = getPendingBetPerPlayer.invoke(
-            playerOrder = playerOrder,
+            playerOrder = latestGame.playerOrder,
             actionStateList = latestPhase.actionStateList
         )
         // プレイヤーのスタック更新
-        val updatedPlayers: Set<GamePlayer> = getNextPlayerStateList.invoke(
+        val updatedPlayers: List<GamePlayer> = getNextPlayerStateList.invoke(
             pendingBetPerPlayer = pendingBetPerPlayer,
             players = latestGame.players,
             action = action

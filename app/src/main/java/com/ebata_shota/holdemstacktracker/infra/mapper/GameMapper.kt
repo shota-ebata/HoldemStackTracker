@@ -25,9 +25,9 @@ constructor() {
     companion object {
         private const val GAME_VERSION = "gameVersion"
         private const val APP_VERSION = "appVersion"
+        private const val PLAYER_ID = "playerId"
         private const val PLAYERS = "players"
-        private const val PLAYER_STATE_PLAYER_ID = "playerId"
-        private const val PLAYER_STATE_PLAYER_STACK = "stack"
+        private const val PLAYER_STACK = "stack"
         private const val POTS = "pots"
         private const val POT_ID = "potId"
         private const val POT_SIZE = "potSize"
@@ -49,7 +49,7 @@ constructor() {
         return Game(
             version = gameMap[GAME_VERSION] as Long,
             appVersion = gameMap[APP_VERSION] as Long,
-            players = mapToGamePlayerStateList(gameMap[PLAYERS] as Map<*, *>),
+            players = mapToGamePlayerList(gameMap[PLAYERS] as List<*>),
             potList = (gameMap[POTS] as? List<*>)?.let {
                 mapToPotList(it)
             } ?: emptyList(),
@@ -115,17 +115,15 @@ constructor() {
         }
     }
 
-    private fun mapToGamePlayerStateList(players: Map<*, *>): Set<GamePlayer> {
-        val keys = players.keys
-        return keys.map { key ->
-            val value = players[key] as Map<*, *>
-            val playerId = key as String
-            val stack = value[PLAYER_STATE_PLAYER_STACK]!!.getInt()!!
+    private fun mapToGamePlayerList(players: List<*>): List<GamePlayer> {
+        return players.map { it as Map<*, *> }.map { map ->
+            val playerId = map[PLAYER_ID] as String
+            val stack = map[PLAYER_STACK]!!.getInt()!!
             GamePlayer(
                 id = PlayerId(playerId),
                 stack = stack,
             )
-        }.toSet()
+        }
     }
 
     private fun mapToPotList(pots: List<*>): List<Pot> {
@@ -208,11 +206,13 @@ constructor() {
         index.toString() to playerId.value
     }.toMap()
 
-    private fun mapPlayers(players: Set<GamePlayer>) = players.associate { gamePlayer ->
-        gamePlayer.id.value to mapGamePlayer(gamePlayer)
-    }
+    private fun mapPlayers(players: List<GamePlayer>) =
+        players.map { gamePlayer ->
+            mapGamePlayer(gamePlayer)
+        }
 
     private fun mapGamePlayer(gamePlayer: GamePlayer) = hashMapOf(
-        PLAYER_STATE_PLAYER_STACK to gamePlayer.stack,
+        PLAYER_ID to gamePlayer.id.value,
+        PLAYER_STACK to gamePlayer.stack,
     )
 }

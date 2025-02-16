@@ -16,4 +16,11 @@ data class Table(
     val startTime: Instant?,
     val tableCreateTime: Instant,
     val updateTime: Instant
-)
+) {
+    /**
+     * 退席しているプレイヤーを除いたプレイヤー順リスト
+     */
+    val playerOrderWithoutLeaved: List<PlayerId> = playerOrder.filter {
+        basePlayers.find { playerBase -> playerBase.id == it }?.isLeaved == false
+    }
+}

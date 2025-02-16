@@ -28,9 +28,9 @@ constructor(
      */
     override suspend fun invoke(
         pendingBetPerPlayer: Map<PlayerId, Int>,
-        players: Set<GamePlayer>,
+        players: List<GamePlayer>,
         action: BetPhaseAction,
-    ): Set<GamePlayer> = withContext(dispatcher) {
+    ): List<GamePlayer> = withContext(dispatcher) {
         val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
         return@withContext when (action) {
             is BetPhaseAction.BetAction -> {
@@ -43,7 +43,7 @@ constructor(
                     } else {
                         gamePlayer
                     }
-                }.toSet()
+                }
             }
 
             else -> players

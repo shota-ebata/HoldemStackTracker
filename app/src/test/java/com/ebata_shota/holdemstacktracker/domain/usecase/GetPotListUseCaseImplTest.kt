@@ -27,7 +27,7 @@ class GetPotListUseCaseImplTest {
     }
 
     private fun executeAndAssert(
-        updatedPlayers: Set<GamePlayer>,
+        updatedPlayers: List<GamePlayer>,
         pendingBetPerPlayerWithoutZero: Map<PlayerId, Int>,
         activePlayerIds: List<PlayerId>,
         potList: List<Pot> = emptyList(),
@@ -57,7 +57,7 @@ class GetPotListUseCaseImplTest {
      */
     @Test
     fun all_call() {
-        val updatedPlayers = setOf(
+        val updatedPlayers = listOf(
             GamePlayer(
                 id = PlayerId("0"),
                 stack = 100,
@@ -108,7 +108,7 @@ class GetPotListUseCaseImplTest {
      */
     @Test
     fun all_in() {
-        val updatedPlayers = setOf(
+        val updatedPlayers = listOf(
             GamePlayer(
                 id = PlayerId("0"),
                 stack = 0,
@@ -159,7 +159,7 @@ class GetPotListUseCaseImplTest {
      */
     @Test
     fun all_in_2() {
-        val updatedPlayers = setOf(
+        val updatedPlayers = listOf(
             GamePlayer(
                 id = PlayerId("0"),
                 stack = 0,
@@ -209,7 +209,7 @@ class GetPotListUseCaseImplTest {
      */
     @Test
     fun all_in_3() {
-        val updatedPlayers = setOf(
+        val updatedPlayers = listOf(
             GamePlayer(
                 id = PlayerId("0"),
                 stack = 0,
@@ -278,7 +278,7 @@ class GetPotListUseCaseImplTest {
      */
     @Test
     fun fold() {
-        val updatedPlayers = setOf(
+        val updatedPlayers = listOf(
             GamePlayer(
                 id = PlayerId("0"),
                 stack = 100,
@@ -324,7 +324,7 @@ class GetPotListUseCaseImplTest {
 
     @Test
     fun all_in_() {
-        val updatedPlayers = setOf(
+        val updatedPlayers = listOf(
             GamePlayer(
                 id = PlayerId("BTN"),
                 stack = 98,
@@ -394,7 +394,7 @@ class GetPotListUseCaseImplTest {
 
     @Test
     fun all_in_a() {
-        val updatedPlayers = setOf(
+        val updatedPlayers = listOf(
             GamePlayer(
                 id = PlayerId("BTN"),
                 stack = 98,
