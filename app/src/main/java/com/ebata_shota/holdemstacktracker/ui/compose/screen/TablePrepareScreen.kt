@@ -49,6 +49,7 @@ fun TablePrepareScreen(
                 getTableQrPainter = viewModel::getTableQrPainter,
                 onClickEditGameRuleButton = viewModel::onClickEditGameRuleButton,
                 onClickDeletePlayerButton = viewModel::onClickDeletePlayerButton,
+                onClickSeatOutButton = viewModel::onClickSeatOutButton,
                 onClickStackEditButton = viewModel::onClickStackEditButton,
                 onClickUpButton = viewModel::onClickUpButton,
                 onClickDownButton = viewModel::onClickDownButton,

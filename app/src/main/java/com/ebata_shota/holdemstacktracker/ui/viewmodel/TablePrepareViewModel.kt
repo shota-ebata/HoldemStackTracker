@@ -300,6 +300,27 @@ constructor(
     }
 
     /**
+     * 一時離席ボタン
+     */
+    fun onClickSeatOutButton() {
+        viewModelScope.launch {
+            val table = tableStateFlow.value ?: return@launch
+            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+            showSeatOutDialog(
+                table = table,
+                myPlayerId = myPlayerId
+            )
+        }
+    }
+
+    private fun showSeatOutDialog(
+        table: Table,
+        myPlayerId: PlayerId,
+    ) {
+        // TODO: SeatOutDialogの表示
+    }
+
+    /**
      * PlayerRemoveDialog
      * チェック押下
      */

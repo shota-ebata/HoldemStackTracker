@@ -25,8 +25,10 @@
 
     <string name="ok_label">OK</string>
 
-    <string name="player_remove_dialog_title">プレイヤーを退出させる</string>
-    <string name="player_remove_dialog_toast">ホストは退出できません</string>
+    <string name="player_remove_dialog_title">Select remove player from table</string>
+    <string name="player_remove_dialog_toast">Host cannot remove from table</string>
+
+    <string name="player_seat_out_dialog_title">Select seat out player</string>
 
     <string name="table_status_preparing">Preparing</string>
     <string name="table_status_paused">Paused</string>
@@ -86,5 +88,8 @@
     <string name="setting_keep_screen_on">Prevent screen from turning off during game</string>
 
     <string name="label_is_leaved">Out Of Seat</string>
+
+    <string name="button_label_remove">Remove</string>
+    <string name="button_label_seat_out">Seat Out</string>
 
 </resources>
