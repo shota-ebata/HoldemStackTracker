@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
 import android.os.Bundle
+import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
@@ -565,18 +566,6 @@ constructor(
         }
     }
 
-    override fun onClickErrorDialogOk() {
-        viewModelScope.launch {
-            navigateToBack()
-        }
-    }
-
-    override fun onDismissErrorDialogRequest() {
-        viewModelScope.launch {
-            navigateToBack()
-        }
-    }
-
     private suspend fun navigateToBack() {
         _navigateEvent.emit(Navigate.Back)
     }
@@ -586,8 +575,20 @@ constructor(
     }
 
     fun onClickSubmitButton() {
+        viewModelScope.launch {
+            val table: Table = tableStateFlow.value ?: return@launch
 
-        startNewGame()
+            // BBを下回っているプレイヤーがいるなら、アラート表示
+            val hasUnderMinBetSizeStack = table.basePlayersWithoutLeaved.any {
+                it.stack < table.rule.minBetSize
+            }
+
+            if (hasUnderMinBetSizeStack) {
+                showAlertDialog(messageResId = R.string.error_min_bet_size_stack)
+            } else {
+                startNewGame()
+            }
+        }
     }
 
     override fun onDismissEditGameRuleDialog() {
@@ -700,12 +701,23 @@ constructor(
         }
     }
 
+    private fun showAlertDialog(@StringRes messageResId: Int) {
+        _dialogUiState.update {
+            it.copy(
+                alertErrorDialog = ErrorDialogUiState(
+                    messageResId = messageResId,
+                    throwable = null
+                )
+            )
+        }
+    }
+
     private fun showErrorDialog(throwable: Throwable) {
         when (throwable) {
             is NotFoundTableException -> {
                 _dialogUiState.update {
                     it.copy(
-                        errorDialog = ErrorDialogUiState(
+                        backErrorDialog = ErrorDialogUiState(
                             messageResId = R.string.error_not_found_table,
                             throwable = throwable
                         )
@@ -716,7 +728,7 @@ constructor(
             else -> {
                 _dialogUiState.update {
                     it.copy(
-                        errorDialog = ErrorDialogUiState(
+                        backErrorDialog = ErrorDialogUiState(
                             messageResId = R.string.error_message_in_table,
                             throwable = throwable
                         )
@@ -726,27 +738,46 @@ constructor(
         }
     }
 
-    private fun startNewGame() {
-        viewModelScope.launch {
-            val table: Table = tableStateFlow.value ?: return@launch
-            // TODO: スタック状況の制限を実装。BBを下回っていたら参加できない。
-            val selectedBtnPlayerId = selectedBtnPlayerId.value
-            val btnPlayerId = if (
-                selectedBtnPlayerId != null
-                && table.playerOrderWithoutLeaved.contains(selectedBtnPlayerId)
-            ) {
-                selectedBtnPlayerId
-            } else {
-                val index = (0..table.playerOrderWithoutLeaved.lastIndex).random()
-                table.playerOrderWithoutLeaved[index]
+    override fun onClickErrorDialogOk() {
+        onDismissErrorDialogRequest()
+    }
+
+    override fun onDismissErrorDialogRequest() {
+        when {
+            dialogUiState.value.backErrorDialog != null -> {
+                // エラーなら画面を戻す
+                viewModelScope.launch {
+                    navigateToBack()
+                }
             }
 
-            val newTable = table.copy(btnPlayerId = btnPlayerId)
-            createNewGame.invoke(
-                table = newTable,
-                fromPreFlop = true
-            )
+            dialogUiState.value.alertErrorDialog != null -> {
+                // アラートならダイアログを消すだけ
+                _dialogUiState.update {
+                    it.copy(alertErrorDialog = null)
+                }
+            }
         }
+    }
+
+    private suspend fun startNewGame() {
+        val table: Table = tableStateFlow.value ?: return
+        val selectedBtnPlayerId = selectedBtnPlayerId.value
+        val btnPlayerId = if (
+            selectedBtnPlayerId != null
+            && table.playerOrderWithoutLeaved.contains(selectedBtnPlayerId)
+        ) {
+            selectedBtnPlayerId
+        } else {
+            val index = (0..table.playerOrderWithoutLeaved.lastIndex).random()
+            table.playerOrderWithoutLeaved[index]
+        }
+
+        val newTable = table.copy(btnPlayerId = btnPlayerId)
+        createNewGame.invoke(
+            table = newTable,
+            fromPreFlop = true
+        )
     }
 
     private suspend fun navigateToGame(tableId: TableId) {

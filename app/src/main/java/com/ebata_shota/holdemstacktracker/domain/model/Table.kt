@@ -24,4 +24,9 @@ data class Table(
     val playerOrderWithoutLeaved: List<PlayerId> = playerOrder.filter {
         basePlayers.find { playerBase -> playerBase.id == it }?.isLeaved == false
     }
+
+    /**
+     * 堆積しているプレイヤーを除いたBasePlayerリスト
+     */
+    val basePlayersWithoutLeaved: List<PlayerBase> = basePlayers.filter { !it.isLeaved }
 }

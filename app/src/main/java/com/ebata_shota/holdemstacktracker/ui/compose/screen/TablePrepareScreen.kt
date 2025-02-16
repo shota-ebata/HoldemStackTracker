@@ -97,10 +97,18 @@ fun TablePrepareScreen(
             }
         }
     }
-    val errorDialogUiState = dialogUiState.errorDialog
+    val errorDialogUiState = dialogUiState.backErrorDialog
     if (errorDialogUiState != null) {
         ErrorDialogContent(
             uiState = errorDialogUiState,
+            event = viewModel
+        )
+    }
+
+    val alertDialogUiState = dialogUiState.alertErrorDialog
+    if (alertDialogUiState != null) {
+        ErrorDialogContent(
+            uiState = alertDialogUiState,
             event = viewModel
         )
     }
@@ -119,5 +127,6 @@ data class TablePrepareScreenDialogUiState(
     val myNameInputDialogUiState: MyNameInputDialogUiState? = null,
     val playerRemoveDialogUiState: PlayerRemoveDialogUiState? = null,
     val seatOutDialogUiState: SeatOutPlayerDialogUiState? = null,
-    val errorDialog: ErrorDialogUiState? = null,
+    val backErrorDialog: ErrorDialogUiState? = null,
+    val alertErrorDialog: ErrorDialogUiState? = null,
 )

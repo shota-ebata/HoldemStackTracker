@@ -92,4 +92,5 @@
     <string name="button_label_remove">Remove</string>
     <string name="button_label_seat_out">Seat Out</string>
 
+    <string name="error_min_bet_size_stack">There is a player whose stack is less than BB.</string>
 </resources>
