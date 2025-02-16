@@ -1,5 +1,7 @@
 package com.ebata_shota.holdemstacktracker.infra.mapper
 
+import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.GameId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
@@ -35,6 +37,7 @@ constructor() {
         private const val PLAYER_ORDER = "playerOrder"
         private const val BTN_PLAYER_ID = "btnPlayerId"
         private const val TABLE_STATUS = "tableStatus"
+        private const val CURRENT_TABLE_ID = "currentTableId"
         private const val START_TIME = "startTime"
         private const val TABLE_CREATE_TIME = "tableCreateTime"
         private const val UPDATE_TIME = "updateTime"
@@ -55,6 +58,7 @@ constructor() {
             playerOrder = (tableMap[PLAYER_ORDER] as List<*>).map { PlayerId(it as String) },
             btnPlayerId = PlayerId(tableMap[BTN_PLAYER_ID] as String),
             tableStatus = TableStatus.of(tableMap[TABLE_STATUS] as String),
+            currentGameId = (tableMap[CURRENT_TABLE_ID] as? String)?.let { GameId(it) },
             startTime = tableMap.getOrDefault(START_TIME, null)?.let {
                 Instant.ofEpochMilli(it as Long)
             },
@@ -116,6 +120,9 @@ constructor() {
         },
         BTN_PLAYER_ID to table.btnPlayerId.value,
         TABLE_STATUS to table.tableStatus.name,
+        table.currentGameId?.let {
+            CURRENT_TABLE_ID to it.value
+        },
         table.startTime?.let {
             START_TIME to it.toEpochMilli()
         },

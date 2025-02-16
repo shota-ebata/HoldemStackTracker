@@ -3,6 +3,7 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.GameId
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
@@ -29,13 +30,16 @@ constructor(
 
     override suspend fun invoke(table: Table, fromPreFlop: Boolean) = withContext(dispatcher) {
         val updateTime = Instant.now()
+        val gameId = GameId(randomIdRepository.generateRandomId())
         val copiedTable = table.copy(
             tableStatus = TableStatus.PLAYING,
+            currentGameId = gameId,
             startTime = updateTime,
             updateTime = updateTime,
             version = table.version + 1
         )
         val newGame = Game(
+            gameId = gameId,
             version = 0,
             appVersion = BuildConfig.VERSION_CODE.toLong(),
             players = table.playerOrderWithoutLeaved.mapNotNull { playerId ->

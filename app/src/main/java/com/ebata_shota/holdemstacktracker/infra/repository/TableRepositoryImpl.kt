@@ -89,6 +89,7 @@ constructor(
                 ),
                 waitPlayerIds = emptyList(),
                 tableStatus = TableStatus.PREPARING,
+                currentGameId = null,
                 startTime = null,
                 tableCreateTime = tableCreateTime,
                 updateTime = tableCreateTime

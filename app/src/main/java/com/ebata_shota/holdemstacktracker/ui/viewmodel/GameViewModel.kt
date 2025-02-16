@@ -20,6 +20,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.PotSettlementInfo
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.ActionHistoryRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
@@ -33,6 +34,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseU
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameFromIntervalUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNotFoldPlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneDownRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneUpRaiseSizeUseCase
@@ -56,10 +58,12 @@ import com.ebata_shota.holdemstacktracker.ui.mapper.GameContentUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
@@ -99,6 +103,7 @@ constructor(
     private val getNotFoldPlayerIds: GetNotFoldPlayerIdsUseCase,
     private val getNextPlayerIdOfNextPhase: GetFirstActionPlayerIdOfNextPhaseUseCase,
     private val setPotSettlementInfo: SetPotSettlementInfoUseCase,
+    private val getNextPhase: GetNextPhaseUseCase,
     private val uiStateMapper: GameContentUiStateMapper,
 ) : ViewModel(),
     GameSettingsDialogEvent,
@@ -171,6 +176,16 @@ constructor(
 
     // PotSettlementDialog
     val potSettlementDialogUiState = MutableStateFlow<PotSettlementDialogUiState?>(null)
+
+
+    private val _navigateEvent = MutableSharedFlow<Navigate>()
+    val navigateEvent = _navigateEvent.asSharedFlow()
+
+    sealed interface Navigate {
+        data class TablePrepare(
+            val tableId: TableId,
+        ) : Navigate
+    }
 
     init {
         // テーブル監視開始
@@ -311,43 +326,103 @@ constructor(
             }
         }
 
-        // PotSettlementDialog表示の監視
+        // フェーズ変更時に特定の人だけがやることの監視
         viewModelScope.launch {
             gameStateFlow.filterNotNull().collect { game ->
                 val table = tableStateFlow.value ?: return@collect
                 val lastPhase = game.phaseList.lastOrNull()
-                if (lastPhase is Phase.PotSettlement) {
-                    val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
-                    if (myPlayerId != table.potManagerPlayerId) {
-                        // ポットマネージャー以外では表示しない
-                        return@collect
+                val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+                when (lastPhase) {
+                    is Phase.Standby -> {
+                        if (table.hostPlayerId == myPlayerId) {
+                            // スタンバイフェーズになったら、テーブルを準備中にする
+                            tableRepository.sendTable(table.copy(tableStatus = TableStatus.PREPARING))
+                        }
                     }
-                    val notFoldPlayerIds = getNotFoldPlayerIds.invoke(
-                        playerOrder = game.playerOrder,
-                        phaseList = game.phaseList
-                    )
-                    val dialogUiState = PotSettlementDialogUiState(
-                        currentPotIndex = 0,
-                        pots = game.potList.reversed().map { pot ->
-                            PotSettlementDialogUiState.PotUiState(
-                                potNumber = pot.potNumber,
-                                potSizeString = StringSource(pot.potSize.toString()),
-                                players = pot.involvedPlayerIds.mapNotNull { involvedPlayerId ->
-                                    if (notFoldPlayerIds.any { it == involvedPlayerId }) {
-                                        PlayerRowUiState(
-                                            playerId = involvedPlayerId,
-                                            label = StringSource(
-                                                table.basePlayers.find { it.id == involvedPlayerId }!!.name
+
+                    is Phase.PotSettlement -> {
+                        // ポットマネージャー
+                        if (myPlayerId != table.potManagerPlayerId) {
+                            // ポットマネージャー以外では表示しない
+                            return@collect
+                        }
+                        val notFoldPlayerIds = getNotFoldPlayerIds.invoke(
+                            playerOrder = game.playerOrder,
+                            phaseList = game.phaseList
+                        )
+                        val dialogUiState = PotSettlementDialogUiState(
+                            currentPotIndex = 0,
+                            pots = game.potList.reversed().map { pot ->
+                                PotSettlementDialogUiState.PotUiState(
+                                    potNumber = pot.potNumber,
+                                    potSizeString = StringSource(pot.potSize.toString()),
+                                    players = pot.involvedPlayerIds.mapNotNull { involvedPlayerId ->
+                                        if (notFoldPlayerIds.any { it == involvedPlayerId }) {
+                                            PlayerRowUiState(
+                                                playerId = involvedPlayerId,
+                                                label = StringSource(
+                                                    table.basePlayers.find { it.id == involvedPlayerId }!!.name
+                                                )
                                             )
-                                        )
-                                    } else {
-                                        return@mapNotNull null
+                                        } else {
+                                            return@mapNotNull null
+                                        }
                                     }
+                                )
+                            },
+                        )
+                        potSettlementDialogUiState.update { dialogUiState }
+                    }
+
+                    is Phase.End -> {
+                        if (table.hostPlayerId == myPlayerId) {
+                            // Tableにもスタックを反映
+                            var basePlayers = table.basePlayers
+                            game.players.forEach { gamePlayer ->
+                                gamePlayer.stack
+                                basePlayers = basePlayers.mapAtFind({ it.id == gamePlayer.id }) {
+                                    it.copy(stack = gamePlayer.stack)
                                 }
+                            }
+                            tableRepository.sendTable(
+                                table.copy(
+                                    basePlayers = basePlayers,
+                                )
                             )
-                        },
-                    )
-                    potSettlementDialogUiState.update { dialogUiState }
+
+                            val nextPhase = getNextPhase.invoke(
+                                playerOrder = game.playerOrder,
+                                phaseList = game.phaseList,
+                            )
+                            gameRepository.sendGame(
+                                tableId = tableId,
+                                newGame = game.copy(
+                                    phaseList = listOf(nextPhase) // 絶対にStandbyになるのでちょっとキモい
+                                )
+                            )
+                        }
+                    }
+
+                    else -> Unit
+                }
+            }
+        }
+
+        // テーブルの状態に応じた遷移
+        viewModelScope.launch {
+            combine(
+                tableStateFlow.filterNotNull(),
+                gameStateFlow.filterNotNull(),
+                transform = ::Pair
+            ).collect { (table, game) ->
+                val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+                if (
+                    table.hostPlayerId == myPlayerId
+                    && game.phaseList.lastOrNull() is Phase.Standby
+                    && table.tableStatus == TableStatus.PREPARING
+                ) {
+                    // ホストでスタンバイフェーズでTableが準備中なら準備画面に戻す
+                    _navigateEvent.emit(Navigate.TablePrepare(tableId))
                 }
             }
         }
@@ -362,6 +437,10 @@ constructor(
         isEnableSliderStep: Boolean,
         betViewMode: BetViewMode,
     ) {
+        if (table.currentGameId != game.gameId) {
+            // GameIdが一致しない場合はUI不整合が起きる可能性があるので無視する
+            return
+        }
         // オートアクションがない場合だけ、UiStateを更新する
         val contentUiState: GameContentUiState? = uiStateMapper.createUiState(
             game = game,

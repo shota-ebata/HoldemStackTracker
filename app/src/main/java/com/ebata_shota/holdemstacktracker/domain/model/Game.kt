@@ -6,6 +6,7 @@ import java.time.Instant
  * ゲーム中に頻繁更新が入る情報
  */
 data class Game(
+    val gameId: GameId,
     val version: Long,
     val appVersion: Long,
     val players: List<GamePlayer>,

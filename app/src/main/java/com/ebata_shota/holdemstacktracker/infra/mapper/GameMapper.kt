@@ -4,6 +4,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Action
 import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.GameId
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
@@ -23,6 +24,7 @@ class GameMapper
 constructor() {
 
     companion object {
+        private const val GAME_ID = "gameId"
         private const val GAME_VERSION = "gameVersion"
         private const val APP_VERSION = "appVersion"
         private const val PLAYER_ID = "playerId"
@@ -47,6 +49,7 @@ constructor() {
 
     fun mapToGame(gameMap: Map<*, *>): Game {
         return Game(
+            gameId = GameId(gameMap[GAME_ID] as String),
             version = gameMap[GAME_VERSION] as Long,
             appVersion = gameMap[APP_VERSION] as Long,
             players = mapToGamePlayerList(gameMap[PLAYERS] as List<*>),
@@ -149,6 +152,7 @@ constructor() {
     fun mapToHashMap(
         newGame: Game
     ): HashMap<String, Any> = hashMapOf(
+        GAME_ID to newGame.gameId.value,
         GAME_VERSION to newGame.version,
         APP_VERSION to newGame.appVersion,
         UPDATE_TIME to newGame.updateTime.toEpochMilli(),

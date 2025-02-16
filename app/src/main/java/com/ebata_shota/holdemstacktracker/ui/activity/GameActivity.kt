@@ -39,7 +39,19 @@ class GameActivity : ComponentActivity() {
         }
         setContent {
             HoldemStackTrackerTheme {
-                GameScreen()
+                GameScreen(navigateTo = ::navigateTo)
+            }
+        }
+    }
+
+    private fun navigateTo(
+        navigate: GameViewModel.Navigate
+    ) {
+        when (navigate) {
+            is GameViewModel.Navigate.TablePrepare -> {
+                val intent = TablePrepareActivity.intent(this, navigate.tableId)
+                startActivity(intent)
+                finish()
             }
         }
     }
