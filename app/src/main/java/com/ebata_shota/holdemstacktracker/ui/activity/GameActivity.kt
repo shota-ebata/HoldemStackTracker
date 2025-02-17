@@ -49,7 +49,11 @@ class GameActivity : ComponentActivity() {
     ) {
         when (navigate) {
             is GameViewModel.Navigate.TablePrepare -> {
-                val intent = TablePrepareActivity.intent(this, navigate.tableId)
+                val intent = TablePrepareActivity.intent(
+                    context = this,
+                    tableId = navigate.tableId,
+                    lastBtnPlayerId = navigate.lastBtnPlayerId
+                )
                 startActivity(intent)
                 finish()
             }

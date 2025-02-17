@@ -184,6 +184,7 @@ constructor(
     sealed interface Navigate {
         data class TablePrepare(
             val tableId: TableId,
+            val lastBtnPlayerId: PlayerId?,
         ) : Navigate
     }
 
@@ -422,7 +423,12 @@ constructor(
                     && table.tableStatus == TableStatus.PREPARING
                 ) {
                     // ホストでスタンバイフェーズでTableが準備中なら準備画面に戻す
-                    _navigateEvent.emit(Navigate.TablePrepare(tableId))
+                    _navigateEvent.emit(
+                        Navigate.TablePrepare(
+                            tableId = tableId,
+                            lastBtnPlayerId = table.btnPlayerId
+                        )
+                    )
                 }
             }
         }

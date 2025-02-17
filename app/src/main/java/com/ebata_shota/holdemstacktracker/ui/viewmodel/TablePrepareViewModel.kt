@@ -96,6 +96,9 @@ constructor(
     private val tableIdString: String by savedStateHandle.param()
     private val tableId: TableId = TableId(tableIdString)
 
+    // TODO: これを使って次のBTNプレイヤーを選択状態にする
+    private val lastBtnPlayerId: PlayerId? by savedStateHandle.param()
+
     private val _uiState = MutableStateFlow<TablePrepareScreenUiState>(TablePrepareScreenUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
@@ -785,8 +788,12 @@ constructor(
     }
 
     companion object {
-        fun bundle(tableId: TableId) = Bundle().apply {
+        fun bundle(
+            tableId: TableId,
+            lastBtnPlayerId: PlayerId?,
+        ) = Bundle().apply {
             putString(TablePrepareViewModel::tableIdString.name, tableId.value)
+            putString(TablePrepareViewModel::lastBtnPlayerId.name, lastBtnPlayerId?.value)
         }
     }
 }

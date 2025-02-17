@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TablePrepareScreen
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
@@ -37,9 +38,15 @@ class TablePrepareActivity : ComponentActivity() {
     companion object {
         fun intent(
             context: Context,
-            tableId: TableId
+            tableId: TableId,
+            lastBtnPlayerId: PlayerId? = null,
         ) = Intent(context, TablePrepareActivity::class.java).apply {
-            putExtras(TablePrepareViewModel.bundle(tableId))
+            putExtras(
+                TablePrepareViewModel.bundle(
+                    tableId = tableId,
+                    lastBtnPlayerId = lastBtnPlayerId
+                )
+            )
         }
     }
 }
