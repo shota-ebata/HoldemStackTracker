@@ -41,7 +41,7 @@ import com.ebata_shota.holdemstacktracker.ui.theme.SideSpace
 @Composable
 fun UserEditRow(
     uiState: PlayerEditRowUiState,
-    onClickStackEditButton: () -> Unit,
+    onClickPlayerEditButton: () -> Unit,
     onClickUpButton: () -> Unit,
     onClickDownButton: () -> Unit,
     modifier: Modifier = Modifier,
@@ -94,25 +94,6 @@ fun UserEditRow(
                 modifier = Modifier
                     .wrapContentSize(Alignment.Center),
             )
-
-            if (uiState.isEditable) {
-                IconButton(
-                    modifier = Modifier
-                        .size(48.dp),
-                    onClick = {
-                        onClickStackEditButton()
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Edit,
-                        contentDescription = "edit"
-                    )
-                }
-            } else {
-                Spacer(
-                    modifier = Modifier.width(48.dp)
-                )
-            }
         }
 
         Row(
@@ -123,7 +104,7 @@ fun UserEditRow(
             if (uiState.isEditable) {
                 Column(
                     modifier = Modifier
-                        .padding(end = SideSpace),
+                        ,
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Box(
@@ -161,6 +142,19 @@ fun UserEditRow(
                             contentDescription = "down"
                         )
                     }
+                }
+                IconButton(
+                    modifier = Modifier
+                        .padding(end = SideSpace)
+                        .size(48.dp),
+                    onClick = {
+                        onClickPlayerEditButton()
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Edit,
+                        contentDescription = "edit"
+                    )
                 }
             } else {
                 Spacer(
@@ -214,7 +208,7 @@ fun UserEditPreview(
     HoldemStackTrackerTheme {
         UserEditRow(
             uiState = uiState,
-            onClickStackEditButton = {},
+            onClickPlayerEditButton = {},
             onClickUpButton = {},
             onClickDownButton = {}
         )

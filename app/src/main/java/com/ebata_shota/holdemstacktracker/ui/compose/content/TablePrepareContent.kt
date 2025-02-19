@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,16 +17,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,11 +43,9 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
-import com.ebata_shota.holdemstacktracker.ui.compose.content.TablePrepareContentUiState.BtnChosenUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.labelResId
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.BlindTextLabel
 import com.ebata_shota.holdemstacktracker.ui.compose.row.PlayerEditRowUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.row.RadioButtonRow
 import com.ebata_shota.holdemstacktracker.ui.compose.row.UserEditRow
 import com.ebata_shota.holdemstacktracker.ui.compose.util.dropRedundantEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.util.rememberDelayState
@@ -65,12 +58,10 @@ fun TablePrepareContent(
     uiState: TablePrepareContentUiState,
     getTableQrPainter: () -> Painter?,
     onClickEditGameRuleButton: () -> Unit,
-    onClickDeletePlayerButton: () -> Unit,
-    onClickSeatOutButton: () -> Unit,
-    onClickStackEditButton: (PlayerId, String) -> Unit,
+    onClickPlayerEditButton: (PlayerId) -> Unit,
     onClickUpButton: (PlayerId) -> Unit,
     onClickDownButton: (PlayerId) -> Unit,
-    onChangeBtnChosen: (PlayerId?) -> Unit,
+    onClickEditBtnPlayerButton: () -> Unit,
     onClickSubmitButton: () -> Unit,
 ) {
     val delayState = rememberDelayState()
@@ -223,79 +214,6 @@ fun TablePrepareContent(
                         )
                     }
                 }
-
-                if (uiState.isEditable) {
-                    Row(
-                        Modifier
-                            .padding(top = 16.dp)
-                            .padding(horizontal = SideSpace)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceAround,
-                    ) {
-
-                        OutlinedButton(
-                            onClick = dropRedundantEvent(delayState = delayState) {
-                                onClickDeletePlayerButton()
-                            },
-                            contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = "edit"
-                            )
-                            Spacer(
-                                modifier = Modifier.size(ButtonDefaults.IconSpacing)
-                            )
-                            Text(
-                                text = stringResource(R.string.button_label_remove),
-                                style = MaterialTheme.typography.titleSmall,
-                            )
-                        }
-
-                        OutlinedButton(
-                            onClick = dropRedundantEvent(delayState = delayState) {
-                                onClickSeatOutButton()
-                            },
-                            contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.outline_location_away_24),
-                                contentDescription = "edit"
-                            )
-                            Spacer(
-                                modifier = Modifier.size(ButtonDefaults.IconSpacing)
-                            )
-                            Text(
-                                text = stringResource(R.string.button_label_seat_out),
-                                style = MaterialTheme.typography.titleSmall,
-                            )
-                        }
-                    }
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .defaultMinSize(56.dp)
-                        .padding(horizontal = SideSpace),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Player名",
-                        style = MaterialTheme.typography.labelLarge,
-                        modifier = Modifier
-                            .weight(1.0f)
-                    )
-
-                    Text(
-                        text = stringResource(R.string.stack_size_label),
-                        style = MaterialTheme.typography.labelLarge,
-                        modifier = Modifier
-                            .weight(1.0f)
-                            .padding(vertical = 8.dp),
-                    )
-                }
-
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -303,10 +221,9 @@ fun TablePrepareContent(
                     uiState.playerEditRows.forEachIndexed { index, playerEditRowUiState ->
                         UserEditRow(
                             uiState = playerEditRowUiState,
-                            onClickStackEditButton = dropRedundantEvent(delayState = delayState) {
-                                onClickStackEditButton(
-                                    playerEditRowUiState.playerId,
-                                    playerEditRowUiState.stackSize
+                            onClickPlayerEditButton = dropRedundantEvent(delayState = delayState) {
+                                onClickPlayerEditButton(
+                                    playerEditRowUiState.playerId
                                 )
                             },
                             onClickUpButton = dropRedundantEvent(delayState = delayState) {
@@ -328,37 +245,36 @@ fun TablePrepareContent(
                 }
                 // BTNの決め方
                 if (uiState.isEditable) {
-                    Text(
-                        text = stringResource(R.string.btn_chosen),
-                        style = MaterialTheme.typography.titleLarge,
+
+                    Row(
                         modifier = Modifier
+                            .fillMaxWidth()
                             .padding(top = 16.dp)
-                            .padding(horizontal = SideSpace)
-                    )
+                            .padding(horizontal = SideSpace),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = stringResource(R.string.btn_chosen),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
 
-                    uiState.btnChosenUiStateList.forEach { item ->
-                        when (item) {
-                            is BtnChosenUiState.BtnChosenRandom -> {
-                                RadioButtonRow(
-                                    item = item,
-                                    isSelected = item.isSelected, // TODO
-                                    labelString = { stringResource(R.string.btn_random) },
-                                    onClickBtnRadioButton = {
-                                        onChangeBtnChosen(null)
-                                    }
-                                )
-                            }
+                        Text(
+                            text = uiState.btnPlayerName.getString(),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
 
-                            is BtnChosenUiState.Player -> {
-                                RadioButtonRow(
-                                    item = item,
-                                    isSelected = item.isSelected,
-                                    labelString = { it.name },
-                                    onClickBtnRadioButton = {
-                                        onChangeBtnChosen(it.id)
-                                    }
-                                )
+                        IconButton(
+                            modifier = Modifier
+                                .size(48.dp),
+                            onClick = dropRedundantEvent {
+                                onClickEditBtnPlayerButton()
                             }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Edit,
+                                contentDescription = "edit"
+                            )
                         }
                     }
                 }
@@ -379,7 +295,10 @@ fun TablePrepareContent(
                             .height(56.dp),
                         enabled = uiState.enableSubmitButton
                     ) {
-                        Text(stringResource(R.string.start_game))
+                        Text(
+                            text = uiState.submitButtonText.getString(),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
                     }
                 }
             }
@@ -396,25 +315,12 @@ data class TablePrepareContentUiState(
     val blindText: String,
     val playerSizeText: String,
     val playerEditRows: List<PlayerEditRowUiState>,
-    val btnChosenUiStateList: List<BtnChosenUiState>,
     val enableSubmitButton: Boolean,
     val isEditable: Boolean,
+    val btnPlayerName: StringSource,
+    val submitButtonText: StringSource,
 ) {
     val tableIdText = StringSource(R.string.table_id_prefix, tableId.value)
-
-    sealed interface BtnChosenUiState {
-        val isSelected: Boolean
-
-        data class BtnChosenRandom(
-            override val isSelected: Boolean = false
-        ) : BtnChosenUiState
-
-        data class Player(
-            val id: PlayerId,
-            val name: String,
-            override val isSelected: Boolean = false
-        ) : BtnChosenUiState
-    }
 }
 
 
@@ -435,9 +341,10 @@ private class PreviewParam : PreviewParameterProvider<TablePrepareContentUiState
                     isEditable = false
                 )
             },
-            btnChosenUiStateList = emptyList(),
             enableSubmitButton = true,
-            isEditable = false
+            isEditable = false,
+            btnPlayerName = StringSource("PlayerName1"),
+            submitButtonText = StringSource(R.string.start_game),
         ),
         TablePrepareContentUiState(
             tableId = TableId("tableId"),
@@ -454,17 +361,10 @@ private class PreviewParam : PreviewParameterProvider<TablePrepareContentUiState
                     isEditable = true
                 )
             },
-            btnChosenUiStateList = listOf(
-                BtnChosenUiState.BtnChosenRandom(isSelected = false)
-            ) + (0..4).map {
-                BtnChosenUiState.Player(
-                    id = PlayerId("playerId$it"),
-                    name = "PlayerName$it",
-                    isSelected = it == 0
-                )
-            },
             enableSubmitButton = true,
-            isEditable = true
+            isEditable = true,
+            btnPlayerName = StringSource("PlayerName1"),
+            submitButtonText = StringSource(R.string.start_game),
         )
     )
 }
@@ -486,12 +386,10 @@ fun TablePrepareContentPreview(
             uiState = uiState,
             getTableQrPainter = { painter },
             onClickEditGameRuleButton = {},
-            onClickDeletePlayerButton = {},
-            onClickSeatOutButton = {},
-            onClickStackEditButton = { _, _ -> },
+            onClickPlayerEditButton = {},
             onClickUpButton = {},
             onClickDownButton = {},
-            onChangeBtnChosen = {},
+            onClickEditBtnPlayerButton = {},
             onClickSubmitButton = {}
         )
     }

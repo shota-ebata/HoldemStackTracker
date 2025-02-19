@@ -1,6 +1,8 @@
 package com.ebata_shota.holdemstacktracker.ui.mapper
 
+import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
+import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.infra.extension.blindText
 import com.ebata_shota.holdemstacktracker.infra.extension.gameTextResId
@@ -17,7 +19,8 @@ constructor() {
     suspend fun createUiState(
         table: Table,
         myPlayerId: PlayerId,
-        btnPlayerId: PlayerId?
+        isNewGame: Boolean,
+        btnPlayerId: PlayerId?,
     ): TablePrepareScreenUiState.Content {
         val isHost = table.hostPlayerId == myPlayerId
         return TablePrepareScreenUiState.Content(
@@ -41,20 +44,20 @@ constructor() {
                         isEditable = isHost
                     )
                 },
-                // BTNプレイヤーの選択肢
-                btnChosenUiStateList = listOf(
-                    TablePrepareContentUiState.BtnChosenUiState.BtnChosenRandom(
-                        isSelected = btnPlayerId == null || table.playerOrderWithoutLeaved.none { it == btnPlayerId }
-                    )
-                ) + table.playerOrderWithoutLeaved.map { playerId ->
-                    TablePrepareContentUiState.BtnChosenUiState.Player(
-                        id = playerId,
-                        name = table.basePlayers.find { it.id == playerId }!!.name,
-                        isSelected = btnPlayerId == playerId
-                    )
-                },
                 enableSubmitButton = table.playerOrderWithoutLeaved.size >= 2,
-                isEditable = isHost
+                isEditable = isHost,
+                btnPlayerName = btnPlayerId?.let {
+                    table.basePlayersWithoutLeaved.find { it.id == btnPlayerId }?.name?.let {
+                        StringSource(it)
+                    }
+                } ?: StringSource(R.string.btn_random),
+                submitButtonText = StringSource(
+                    if (isNewGame) {
+                        R.string.start_game
+                    } else {
+                        R.string.start_next_game
+                    }
+                ),
             )
         )
     }

@@ -17,6 +17,7 @@
     <string name="btn_chosen">BTN Player</string>
     <string name="btn_random">Random Choice</string>
     <string name="start_game">Start Game</string>
+    <string name="start_next_game">Start Next Game</string>
 
     <string name="error_title">Input Error</string>
     <string name="error_name_limit">15文字以内で入力してください</string>

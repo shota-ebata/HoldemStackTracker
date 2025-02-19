@@ -51,7 +51,7 @@ fun PlayerEditDialog(
         modifier = modifier,
     ) {
         Surface(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
         ) {
             Column(
@@ -118,7 +118,7 @@ fun PlayerEditDialog(
                         .padding(horizontal = 16.dp),
                     horizontalAlignment = Alignment.End
                 ) {
-
+                    // TODO: ボタン配置が悪いので修正、かなりきつきつ
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()

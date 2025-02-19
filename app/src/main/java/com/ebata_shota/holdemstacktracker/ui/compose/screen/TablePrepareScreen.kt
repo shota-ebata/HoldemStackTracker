@@ -14,10 +14,10 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialog
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialogUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SeatOutPlayerDialog
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SeatOutPlayerDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerEditDialog
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerEditDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SelectBtnPlayerDialog
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SelectBtnPlayerDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
@@ -50,12 +50,10 @@ fun TablePrepareScreen(
                 uiState = uiState.contentUiState,
                 getTableQrPainter = viewModel::getTableQrPainter,
                 onClickEditGameRuleButton = viewModel::onClickEditGameRuleButton,
-                onClickDeletePlayerButton = viewModel::onClickDeletePlayerButton,
-                onClickSeatOutButton = viewModel::onClickSeatOutButton,
-                onClickStackEditButton = viewModel::onClickStackEditButton,
+                onClickPlayerEditButton = viewModel::onClickPlayerEditButton,
                 onClickUpButton = viewModel::onClickUpButton,
                 onClickDownButton = viewModel::onClickDownButton,
-                onChangeBtnChosen = viewModel::onChangeBtnChosen,
+                onClickEditBtnPlayerButton = viewModel::onClickEditBtnPlayerButton,
                 onClickSubmitButton = viewModel::onClickSubmitButton
             )
             val tableCreatorContentUiState = dialogUiState.tableCreatorContentUiState
@@ -81,17 +79,17 @@ fun TablePrepareScreen(
                     event = viewModel
                 )
             }
-            val playerRemoveDialogUiState = dialogUiState.playerRemoveDialogUiState
-            if (playerRemoveDialogUiState != null) {
-                PlayerRemoveDialog(
-                    uiState = playerRemoveDialogUiState,
+            val playerEditDialogUiState = dialogUiState.playerEditDialogUiState
+            if (playerEditDialogUiState != null) {
+                PlayerEditDialog(
+                    uiState = playerEditDialogUiState,
                     event = viewModel
                 )
             }
-            val seatOutDialogUiState = dialogUiState.seatOutDialogUiState
-            if (seatOutDialogUiState != null) {
-                SeatOutPlayerDialog(
-                    uiState = seatOutDialogUiState,
+            val selectBtnPlayerDialogUiState = dialogUiState.selectBtnPlayerDialogUiState
+            if (selectBtnPlayerDialogUiState != null) {
+                SelectBtnPlayerDialog(
+                    uiState = selectBtnPlayerDialogUiState,
                     event = viewModel
                 )
             }
@@ -124,9 +122,9 @@ sealed interface TablePrepareScreenUiState {
 data class TablePrepareScreenDialogUiState(
     val tableCreatorContentUiState: TableCreatorContentUiState? = null,
     val stackEditDialogState: StackEditDialogState? = null,
+    val playerEditDialogUiState: PlayerEditDialogUiState? = null,
+    val selectBtnPlayerDialogUiState: SelectBtnPlayerDialogUiState? = null,
     val myNameInputDialogUiState: MyNameInputDialogUiState? = null,
-    val playerRemoveDialogUiState: PlayerRemoveDialogUiState? = null,
-    val seatOutDialogUiState: SeatOutPlayerDialogUiState? = null,
     val backErrorDialog: ErrorDialogUiState? = null,
     val alertErrorDialog: ErrorDialogUiState? = null,
 )

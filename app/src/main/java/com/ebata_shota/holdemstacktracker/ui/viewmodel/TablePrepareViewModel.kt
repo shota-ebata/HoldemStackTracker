@@ -12,7 +12,6 @@ import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundTableException
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
-import com.ebata_shota.holdemstacktracker.domain.extension.mapAtFind
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.MovePosition
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -38,11 +37,10 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialogEvent
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialogUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SeatOutPlayerDialogEvent
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SeatOutPlayerDialogUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerEditDialogEvent
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerEditDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SelectBtnPlayerDialogEvent
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SelectBtnPlayerDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TablePrepareScreenDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TablePrepareScreenUiState
@@ -88,15 +86,11 @@ constructor(
     private val tableCreatorUiStateMapper: TableCreatorUiStateMapper,
 ) : ViewModel(),
     MyNameInputDialogEvent,
-    PlayerRemoveDialogEvent,
     ErrorDialogEvent,
     EditGameRuleDialogEvent,
-    SeatOutPlayerDialogEvent {
-
-    private val tableIdString: String by savedStateHandle.param()
-    private val tableId: TableId = TableId(tableIdString)
-
-    // TODO: これを使って次のBTNプレイヤーを選択状態にする
+    PlayerEditDialogEvent,
+    SelectBtnPlayerDialogEvent {
+    private val tableId: TableId by savedStateHandle.param()
     private val lastBtnPlayerId: PlayerId? by savedStateHandle.param()
 
     private val _uiState = MutableStateFlow<TablePrepareScreenUiState>(TablePrepareScreenUiState.Loading)
@@ -123,7 +117,7 @@ constructor(
             initialValue = null
         )
 
-    // BTNのプレイヤーID
+    // 選択中のBTNのプレイヤーID
     private val selectedBtnPlayerId = MutableStateFlow<PlayerId?>(null)
 
     // QR画像を保持
@@ -132,6 +126,24 @@ constructor(
     init {
         // テーブル情報の監視をスタートする
         tableRepository.startCollectTableFlow(tableId)
+
+        // Tableの初回取得時の処理
+        viewModelScope.launch {
+            val table = tableStateFlow.filterNotNull().first()
+            val defaultBtnId = if (lastBtnPlayerId != null) {
+                val lastBtnPlayerIndex =
+                    table.playerOrderWithoutLeaved.indexOfFirstOrNull { it == lastBtnPlayerId }
+                val nextIndex = if (lastBtnPlayerIndex != null) {
+                    (lastBtnPlayerIndex + 1) % table.playerOrderWithoutLeaved.size
+                } else {
+                    null
+                }
+                nextIndex?.let { table.playerOrderWithoutLeaved[nextIndex] }
+            } else {
+                null
+            }
+            selectedBtnPlayerId.update { defaultBtnId } // FIXME: 初回で設定してしまうと、その後離席でnullになるケースがある
+        }
 
         // UiState生成の監視
         viewModelScope.launch {
@@ -203,6 +215,24 @@ constructor(
             }
         }
 
+        // SelectBtnPlayerDialogUiState
+        // BTNプレイヤーの選択を監視する
+        viewModelScope.launch {
+            combine(
+                selectedBtnPlayerId,
+                tableStateFlow.filterNotNull(),
+                ::Pair
+            ).collect { (btnPlayerId, table) ->
+                _dialogUiState.update { dialogUiState ->
+                    dialogUiState.copy(
+                        selectBtnPlayerDialogUiState = dialogUiState.selectBtnPlayerDialogUiState?.copy(
+                            btnChosenUiStateList = getBtnChosenUiStates(btnPlayerId, table)
+                        )
+                    )
+                }
+            }
+        }
+
         viewModelScope.launch {
             // QRコードを生成する
             val painter = BitmapPainter(
@@ -215,13 +245,14 @@ constructor(
     private fun showContent(
         table: Table,
         myPlayerId: PlayerId,
-        selectedBtnPlayerId: PlayerId?
+        selectedBtnPlayerId: PlayerId?,
     ) {
         viewModelScope.launch {
             _uiState.update {
                 uiStateMapper.createUiState(
                     table = table,
                     myPlayerId = myPlayerId,
+                    isNewGame = lastBtnPlayerId == null,
                     btnPlayerId = selectedBtnPlayerId
                 )
             }
@@ -245,11 +276,16 @@ constructor(
         return qrPainterStateFlow.value
     }
 
-    fun onClickStackEditButton(playerId: PlayerId, stackText: String) {
+    fun onClickPlayerEditButton(playerId: PlayerId) {
+        val table = tableStateFlow.value ?: return
+        val basePlayer = table.basePlayers.find { it.id == playerId } ?: return
+        val stackText = basePlayer.stack.toString()
         _dialogUiState.update {
             it.copy(
-                stackEditDialogState = StackEditDialogState(
-                    playerId = playerId,
+                playerEditDialogUiState = PlayerEditDialogUiState(
+                    playerId = basePlayer.id,
+                    playerName = StringSource(basePlayer.name),
+                    checkedLeaved = basePlayer.isLeaved,
                     stackValue = TextFieldValue(stackText)
                 )
             )
@@ -274,180 +310,79 @@ constructor(
     }
 
     /**
-     * 参加プレイヤー退出ボタン
+     * PlayerEditDialog
+     * onDismissRequest
      */
-    fun onClickDeletePlayerButton() {
-        viewModelScope.launch {
-            val table: Table = tableStateFlow.value ?: return@launch
-            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
-            showDeletePlayerDialog(table, myPlayerId)
-        }
-    }
-
-    private fun showDeletePlayerDialog(
-        table: Table,
-        myPlayerId: PlayerId
-    ) {
+    override fun onDismissRequestPlayerEditDialog() {
         _dialogUiState.update {
-            it.copy(
-                playerRemoveDialogUiState = PlayerRemoveDialogUiState(
-                    players = table.playerOrder.mapNotNull { playerId ->
-                        val player = table.basePlayers
-                            .find { basePlayer -> basePlayer.id == playerId }
-                            ?: return@mapNotNull null
-                        val isEnable = player.id == myPlayerId
-                        PlayerRemoveDialogUiState.PlayerItemUiState(
-                            playerId = player.id,
-                            name = player.name,
-                            isSelected = false,
-                            isHost = isEnable
-                        )
-                    }
-                )
-            )
+            it.copy(playerEditDialogUiState = null)
         }
     }
 
     /**
-     * 一時離席ボタン
+     * PlayerEditDialog
+     * プレイヤー削除ボタン
      */
-    fun onClickSeatOutButton() {
+    override fun onClickRemovePlayerButton() {
+        val table = tableStateFlow.value ?: return
+        val playerEditDialogUiState = dialogUiState.value.playerEditDialogUiState ?: return
+        val playerId = playerEditDialogUiState.playerId
         viewModelScope.launch {
-            val table = tableStateFlow.value ?: return@launch
-            showSeatOutDialog(
-                table = table,
-            )
-        }
-    }
-
-    private fun showSeatOutDialog(
-        table: Table,
-    ) {
-        _dialogUiState.update {
-            it.copy(
-                seatOutDialogUiState = SeatOutPlayerDialogUiState(
-                    players = table.playerOrder
-                        .mapNotNull { playerId -> table.basePlayers.find { basePlayer -> basePlayer.id == playerId } }
-                        .map { player ->
-                            SeatOutPlayerDialogUiState.PlayerItemUiState(
-                                playerId = player.id,
-                                name = player.name,
-                                isSelected = player.isLeaved,
-                            )
-                        }
-                )
-            )
-        }
-    }
-
-    /**
-     * SeatOutPlayerDialog
-     * チェック押下
-     */
-    override fun onClickSeatOutPlayerDialogPlayer(playerId: PlayerId, checked: Boolean) {
-        _dialogUiState.update { dialogUiState ->
-            val seatOutDialogUiState = dialogUiState.seatOutDialogUiState
-            dialogUiState.copy(
-                seatOutDialogUiState = seatOutDialogUiState?.copy(
-                    players = seatOutDialogUiState.players.mapAtFind(
-                        { it.playerId == playerId }
-                    ) {
-                        it.copy(isSelected = checked)
-                    }
-                )
-            )
-        }
-    }
-
-    /**
-     * SeatOutPlayerDialog
-     * Submit
-     */
-    override fun onClickSeatOutPlayerDialogSubmit() {
-        viewModelScope.launch {
-            val seatOutDialogUiState = dialogUiState.value.seatOutDialogUiState
-                ?: return@launch
-            val table = tableStateFlow.value
-                ?: return@launch
-            // Checkされているプレイヤー
-            val checkedPlayerIds = seatOutDialogUiState.players
-                .filter { it.isSelected }
-                .map { it.playerId }
-            seatOutPlayers.invoke(
-                currentTable = table,
-                seatOutPlayers = checkedPlayerIds
-            )
-            onDismissRequestSeatOutPlayerDialog()
-        }
-    }
-
-    /**
-     * SeatOutPlayerDialog
-     * dismiss
-     */
-    override fun onDismissRequestSeatOutPlayerDialog() {
-        _dialogUiState.update {
-            it.copy(seatOutDialogUiState = null)
-        }
-    }
-
-    /**
-     * PlayerRemoveDialog
-     * チェック押下
-     */
-    override fun onClickPlayerRemoveDialogPlayer(
-        playerId: PlayerId,
-        checked: Boolean
-    ) {
-        _dialogUiState.update { dialogUiState ->
-            val playerRemoveDialogUiState = dialogUiState.playerRemoveDialogUiState
-            dialogUiState.copy(
-                playerRemoveDialogUiState = playerRemoveDialogUiState?.copy(
-                    players = playerRemoveDialogUiState.players.mapAtFind(
-                        predicate = { item -> item.playerId == playerId },
-                        transform = { item -> item.copy(isSelected = checked) }
-                    )
-                )
-            )
-        }
-    }
-
-    /**
-     * PlayerRemoveDialog
-     * Submit
-     */
-    override fun onClickPlayerRemoveDialogSubmit() {
-        viewModelScope.launch {
-            val playerRemoveDialogUiState = dialogUiState.value.playerRemoveDialogUiState
-                ?: return@launch
-            val table = tableStateFlow.value
-                ?: return@launch
-            // Checkされているプレイヤー
-            val removePlayerIds = playerRemoveDialogUiState.players
-                .filter { it.isSelected }
-                .map { it.playerId }
             removePlayers.invoke(
                 currentTable = table,
-                removePlayerIds = removePlayerIds
+                removePlayerIds = listOf(playerId)
             )
-            dismissPlayerRemoveDialog()
         }
     }
 
     /**
-     * PlayerRemoveDialog
-     * dismiss
+     * PlayerEditDialog
+     * 離席スイッチ押下
      */
-    override fun onDismissRequestPlayerRemoveDialog() {
-        dismissPlayerRemoveDialog()
-    }
-
-    private fun dismissPlayerRemoveDialog() {
+    override fun onClickLeavedSwitch(checked: Boolean) {
         _dialogUiState.update {
             it.copy(
-                playerRemoveDialogUiState = null
+                playerEditDialogUiState = it.playerEditDialogUiState?.copy(
+                    checkedLeaved = checked
+                )
             )
         }
+    }
+
+    /**
+     * PlayerEditDialog
+     * スタック編集
+     */
+    override fun onChangeStackValue(stackValue: TextFieldValue) {
+        _dialogUiState.update {
+            it.copy(
+                stackEditDialogState = it.stackEditDialogState?.copy(
+                    stackValue = stackValue
+                )
+            )
+        }
+    }
+
+    /**
+     * PlayerEditDialog
+     * 確定ボタン
+     */
+    override fun onClickSubmitPlayerEditDialogButton() {
+        val table = tableStateFlow.value ?: return
+        val playerEditDialogUiState = dialogUiState.value.playerEditDialogUiState ?: return
+        val playerIds = if (playerEditDialogUiState.checkedLeaved) {
+            listOf(playerEditDialogUiState.playerId)
+        } else {
+            emptyList()
+        }
+
+        viewModelScope.launch {
+            seatOutPlayers.invoke(
+                currentTable = table,
+                seatOutPlayers = playerIds
+            )
+        }
+        onDismissRequestPlayerEditDialog()
     }
 
     fun onChangeStackSize(value: TextFieldValue) {
@@ -573,8 +508,52 @@ constructor(
         _navigateEvent.emit(Navigate.Back)
     }
 
-    fun onChangeBtnChosen(btnPlayerId: PlayerId?) {
+    fun onClickEditBtnPlayerButton() {
+        viewModelScope.launch {
+            val table = tableStateFlow.value ?: return@launch
+            val btnPlayerId = selectedBtnPlayerId.value
+            val selectBtnPlayerDialogUiState = SelectBtnPlayerDialogUiState(
+                btnChosenUiStateList = getBtnChosenUiStates(btnPlayerId, table)
+            )
+            _dialogUiState.update {
+                it.copy(
+                    selectBtnPlayerDialogUiState = selectBtnPlayerDialogUiState
+                )
+            }
+        }
+    }
+
+    private fun getBtnChosenUiStates(
+        btnPlayerId: PlayerId?,
+        table: Table,
+    ) = listOf(
+        SelectBtnPlayerDialogUiState.BtnChosenUiState.BtnChosenRandom(
+            isSelected = btnPlayerId == null || table.playerOrderWithoutLeaved.none { it == btnPlayerId }
+        )
+    ) + table.playerOrderWithoutLeaved.map { playerId ->
+        SelectBtnPlayerDialogUiState.BtnChosenUiState.Player(
+            id = playerId,
+            name = table.basePlayers.find { it.id == playerId }!!.name,
+            isSelected = btnPlayerId == playerId
+        )
+    }
+
+    /**
+     * SelectBtnPlayerDialog
+     * BTNプレイヤーItem選択
+     */
+    override fun onClickBtnPlayerItem(btnPlayerId: PlayerId?) {
         selectedBtnPlayerId.update { btnPlayerId }
+    }
+
+    /**
+     * SelectBtnPlayerDialog
+     * onDismiss
+     */
+    override fun onDismissRequestSelectBtnPlayerDialog() {
+        _dialogUiState.update {
+            it.copy(selectBtnPlayerDialogUiState = null)
+        }
     }
 
     fun onClickSubmitButton() {
@@ -792,8 +771,8 @@ constructor(
             tableId: TableId,
             lastBtnPlayerId: PlayerId?,
         ) = Bundle().apply {
-            putString(TablePrepareViewModel::tableIdString.name, tableId.value)
-            putString(TablePrepareViewModel::lastBtnPlayerId.name, lastBtnPlayerId?.value)
+            putParcelable(TablePrepareViewModel::tableId.name, tableId)
+            putParcelable(TablePrepareViewModel::lastBtnPlayerId.name, lastBtnPlayerId)
         }
     }
 }

@@ -117,7 +117,7 @@ private fun SelectBtnPlayerDialogPreview() {
                 }
             ),
             event = object : SelectBtnPlayerDialogEvent {
-                override fun onClickBtnPlayerItem(playerId: PlayerId?) {}
+                override fun onClickBtnPlayerItem(btnPlayerId: PlayerId?) {}
 
                 override fun onDismissRequestSelectBtnPlayerDialog() {}
             }
