@@ -65,21 +65,19 @@ constructor(
         var potSize: Int = currentPot.potSize
         val involvedPlayerIds = currentPot.involvedPlayerIds.toMutableList()
 
-        // 降りてない人の最低ベットサイズを取得
-        val minBetSize = pendingBetPerPlayer.filter { (key, _) ->
-            activePlayerIds.any { it == key}
-        }.map {
+        // 最低ベットサイズを取得
+        val minBetSize = pendingBetPerPlayer.map {
             it.value
         }.min()
         val updatedPendingPrePlayer = pendingBetPerPlayer.mapValues { (playerId, betSize) ->
             // ポットにいれるサイズを決める
-            val isActivePlayer = activePlayerIds.any { it == playerId }
-            val addSize = if (isActivePlayer) {
-                // 降りてないプレイヤーは一番小さいベットを一旦入れる
-                minBetSize
-            } else {
-                // 降りている人は、すべていれる
+//            val isActivePlayer = activePlayerIds.any { it == playerId }
+            val addSize = if (betSize < minBetSize) {
+                // Betサイズが最小Betよりも小さい場合、すべて入れる
                 betSize
+            } else {
+                // 足りてるプレイヤーは、最小Betサイズを一旦入れる
+                minBetSize
             }
             // ポットに入れる
             potSize += addSize

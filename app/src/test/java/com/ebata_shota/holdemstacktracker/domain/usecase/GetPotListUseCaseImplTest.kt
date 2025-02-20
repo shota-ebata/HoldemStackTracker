@@ -163,7 +163,7 @@ class GetPotListUseCaseImplTest {
      * 1人Call
      */
     @Test
-    fun all_in_2() {
+    fun all_in_2_call_1() {
         val updatedPlayers = listOf(
             GamePlayer(
                 id = PlayerId("0"),
@@ -277,9 +277,6 @@ class GetPotListUseCaseImplTest {
         )
     }
 
-    /**
-     * TODO:
-     */
     @Test
     fun fold() {
         val updatedPlayers = listOf(
@@ -309,10 +306,20 @@ class GetPotListUseCaseImplTest {
             Pot(
                 id = PotId("0"),
                 potNumber = 0,
-                potSize = 1000,
+                potSize = 600,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
                     PlayerId("1"),
+                    PlayerId("2"),
+                ),
+                isClosed = true
+            ),
+            Pot(
+                id = PotId("0"),
+                potNumber = 1,
+                potSize = 400,
+                involvedPlayerIds = listOf(
+                    PlayerId("0"),
                     PlayerId("2"),
                 ),
                 isClosed = false
@@ -478,6 +485,102 @@ class GetPotListUseCaseImplTest {
             expected = PotAndRemainingBet(
                 potList = expectedList,
                 pendingBetPerPlayerWithoutZero = emptyMap()
+            ),
+        )
+    }
+
+    /**
+     * 1人AllIn
+     * 1人Fold
+     */
+    @Test
+    fun all_in_1_fold_1() {
+        val updatedPlayers = listOf(
+            GamePlayer(
+                id = PlayerId("0"),
+                stack = 0,
+            ),
+            GamePlayer(
+                id = PlayerId("1"),
+                stack = 100,
+            ),
+        )
+        val pendingBetPerPlayerWithoutZero: Map<PlayerId, Int> = mapOf(
+            PlayerId("0") to 101,
+            PlayerId("1") to 2,
+        )
+        val activePlayerIds = listOf(
+            PlayerId("0"),
+        )
+        val expectedList = listOf(
+            Pot(
+                id = PotId("0"),
+                potNumber = 0,
+                potSize = 4,
+                involvedPlayerIds = listOf(
+                    PlayerId("0"),
+                    PlayerId("1"),
+                ),
+                isClosed = true
+            ),
+        )
+        executeAndAssert(
+            updatedPlayers = updatedPlayers,
+            pendingBetPerPlayerWithoutZero = pendingBetPerPlayerWithoutZero,
+            activePlayerIds = activePlayerIds,
+            expected = PotAndRemainingBet(
+                potList = expectedList,
+                pendingBetPerPlayerWithoutZero = mapOf(
+                    PlayerId("0") to 99
+                )
+            ),
+        )
+    }
+
+    /**
+     * 1人AllIn
+     * 1人AllIn
+     */
+    @Test
+    fun all_in_2() {
+        val updatedPlayers = listOf(
+            GamePlayer(
+                id = PlayerId("0"),
+                stack = 0,
+            ),
+            GamePlayer(
+                id = PlayerId("1"),
+                stack = 0,
+            ),
+        )
+        val pendingBetPerPlayerWithoutZero: Map<PlayerId, Int> = mapOf(
+            PlayerId("0") to 101,
+            PlayerId("1") to 100,
+        )
+        val activePlayerIds = listOf(
+            PlayerId("0"),
+        )
+        val expectedList = listOf(
+            Pot(
+                id = PotId("0"),
+                potNumber = 0,
+                potSize = 200,
+                involvedPlayerIds = listOf(
+                    PlayerId("0"),
+                    PlayerId("1"),
+                ),
+                isClosed = true
+            ),
+        )
+        executeAndAssert(
+            updatedPlayers = updatedPlayers,
+            pendingBetPerPlayerWithoutZero = pendingBetPerPlayerWithoutZero,
+            activePlayerIds = activePlayerIds,
+            expected = PotAndRemainingBet(
+                potList = expectedList,
+                pendingBetPerPlayerWithoutZero = mapOf(
+                    PlayerId("0") to 1
+                )
             ),
         )
     }
