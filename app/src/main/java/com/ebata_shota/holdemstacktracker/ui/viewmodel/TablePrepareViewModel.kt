@@ -453,7 +453,7 @@ constructor(
                 }) { playerBase ->
                     playerBase.copy(
                         isLeaved = playerEditDialogUiState.checkedLeaved,
-                        stack = max(playerEditDialogUiState.stackValue.text.toIntOrNull() ?: 0, 0)
+                        stack = max(playerEditDialogUiState.stackValue.text.toIntOrNull() ?: 0, 0) // TODO: Int超えるとやばい
                     )
                 }
             )
