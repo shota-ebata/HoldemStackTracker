@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
 import android.os.Bundle
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
@@ -15,6 +16,7 @@ import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtFind
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.MovePosition
+import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
@@ -51,6 +53,7 @@ import com.ebata_shota.holdemstacktracker.ui.extension.param
 import com.ebata_shota.holdemstacktracker.ui.mapper.TableCreatorUiStateMapper
 import com.ebata_shota.holdemstacktracker.ui.mapper.TablePrepareScreenUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -186,16 +189,24 @@ constructor(
         viewModelScope.launch {
             combine(
                 tableStateFlow.filterNotNull(),
+                gameStateFlow.filterNotNull(),
                 firebaseAuthRepository.myPlayerIdFlow,
                 qrPainterStateFlow.filterNotNull(),
-            ) { table, myPlayerId, _ ->
+            ) { table, game, myPlayerId, _ ->
+                val lastPhase = game.phaseList.lastOrNull()
                 if (
                     table.tableStatus == TableStatus.PLAYING
+                    && lastPhase!=null && lastPhase !is Phase.Standby
                     && table.playerOrder.any { it == myPlayerId }
                 ) {
-                    // ゲーム中かつplayerOrderに自分が含まれているなら
+                    // ゲーム中かつ
+                    // スタンバイではなく
+                    // playerOrderに自分が含まれているなら
                     // ゲーム画面に遷移
+                    // FIXME: 押下されてから、ここに来るまでにローディング表記はしたほうがいいかも
                     navigateToGame(table.id)
+                    // 一度きり
+                    this.cancel()
                 }
             }.collect()
         }

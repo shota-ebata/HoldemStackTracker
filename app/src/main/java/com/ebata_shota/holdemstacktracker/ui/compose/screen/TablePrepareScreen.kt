@@ -20,8 +20,6 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialog
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SelectBtnPlayerDialog
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SelectBtnPlayerDialogUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogContent
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.TablePrepareViewModel
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.TablePrepareViewModel.Navigate
