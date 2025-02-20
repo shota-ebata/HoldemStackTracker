@@ -67,7 +67,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -217,27 +216,23 @@ constructor(
             ).collect()
         }
 
-        // TODO: 最低レイズバグってるかも
         // 最低Raiseサイズ化するための監視
         viewModelScope.launch {
-            combine(
-                raiseSizeStateFlow,
-                minRaiseSizeFlow.distinctUntilChanged()
-            ) { raiseSize, minRaiseSize ->
+            raiseSizeStateFlow.collect { raiseSize ->
+                val minRaiseSize = minRaiseSizeFlow.first()
                 if (raiseSize == null) {
                     // デフォルト状態（null）の場合は、最低額にする
                     raiseSizeStateFlow.update { minRaiseSize }
-                    return@combine
+                    return@collect
                 }
                 if (raiseSize < minRaiseSize) {
                     // Raiseサイズが、最低を下回っている場合
                     // 最低サイズにする
                     raiseSizeStateFlow.update { minRaiseSize }
                 }
-            }.collect()
+            }
         }
 
-        // TODO: 最低レイズバグってるかも
         // 最低Raiseサイズの変化があった場合、最低サイズにする監視
         viewModelScope.launch {
             minRaiseSizeFlow.collect { minRaiseSize ->
