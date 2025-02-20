@@ -131,6 +131,7 @@ constructor(
             )
         } else {
             createGameContentUiState(
+                lastPhase = lastPhase,
                 btnPlayerId = btnPlayerId,
                 myPlayerId = myPlayerId,
                 gamePlayers = gamePlayers,
@@ -354,12 +355,11 @@ constructor(
                 bbPlayerId = bbPlayerId
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
-                betPhaseTextResId = when (betPhase) {
-                    is PreFlop -> R.string.label_pre_flop
-                    is Flop -> R.string.label_flop
-                    is Turn -> R.string.label_turn
-                    is River -> R.string.label_river
-                    null -> null
+                betPhaseText = when (betPhase) {
+                    is PreFlop -> StringSource(R.string.label_pre_flop)
+                    is Flop -> StringSource(R.string.label_flop)
+                    is Turn -> StringSource(R.string.label_turn)
+                    is River -> StringSource(R.string.label_river)
                 },
                 totalPot = when (betViewMode) {
                     BetViewMode.Number -> {
@@ -558,6 +558,7 @@ constructor(
      * Betフェーズ以外のフラットなGame状態を表示
      */
     private suspend fun createGameContentUiState(
+        lastPhase: Phase,
         tableId: TableId,
         sortedPlayerOrder: List<PlayerId>,
         btnPlayerId: PlayerId,
@@ -594,7 +595,12 @@ constructor(
                 bbPlayerId = bbPlayerId,
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
-                betPhaseTextResId = null,
+                betPhaseText = when (lastPhase) {
+                    is Phase.Standby -> StringSource(R.string.table_status_preparing)
+                    is Phase.PotSettlement -> StringSource(R.string.phase_label_pot_settlement)
+                    is Phase.End -> StringSource(R.string.table_status_preparing)
+                    is BetPhase -> throw IllegalStateException("BetPhase はここには来ない想定")
+                },
                 totalPot = when (betViewMode) {
                     BetViewMode.Number -> {
                         StringSource("%,d".format(totalPotSize))

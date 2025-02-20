@@ -42,7 +42,7 @@
     <string name="label_min">min</string>
     <string name="label_main_pot">Main Pot</string>
     <string name="label_side_pot">Side Pot %1$d</string>
-    <string name="pot_settlement_explanation">Pot取得者</string>
+    <string name="phase_label_pot_settlement">Pot精算中</string>
 
     <string name="pot_settlement_next_button">Next Pot</string>
     <string name="pot_settlement_done_button">done</string>

@@ -35,14 +35,14 @@ fun CenterPanelContent(
             modifier = Modifier.padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val betPhaseTextResId = uiState.betPhaseTextResId
-            if (betPhaseTextResId != null) {
+            val betPhaseText = uiState.betPhaseText
+            if (betPhaseText != null) {
                 Box(
                     modifier = Modifier
                         .padding(bottom = 4.dp)
                 ) {
                     Text(
-                        text = stringResource(betPhaseTextResId),
+                        text = betPhaseText.getString(),
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -98,7 +98,7 @@ fun CenterPanelContent(
 }
 
 data class CenterPanelContentUiState(
-    val betPhaseTextResId: Int?,
+    val betPhaseText: StringSource?,
     val totalPot: StringSource,
     val pendingTotalBetSize: StringSource,
     val shouldShowBBSuffix: Boolean,
@@ -118,7 +118,7 @@ private fun CenterPanelContentPreview() {
             modifier = Modifier
                 .width(150.dp),
             uiState = CenterPanelContentUiState(
-                betPhaseTextResId = R.string.label_pre_flop,
+                betPhaseText = StringSource(R.string.label_pre_flop),
                 totalPot = StringSource("400"),
                 pendingTotalBetSize = StringSource("100"),
                 shouldShowBBSuffix = false

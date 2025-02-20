@@ -735,7 +735,7 @@ private class GameContentUiStatePreviewParam :
                 )
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
-                betPhaseTextResId = R.string.label_pre_flop,
+                betPhaseText = StringSource(R.string.label_pre_flop),
                 totalPot = StringSource("0"),
                 pendingTotalBetSize = StringSource("2"),
                 shouldShowBBSuffix = false
