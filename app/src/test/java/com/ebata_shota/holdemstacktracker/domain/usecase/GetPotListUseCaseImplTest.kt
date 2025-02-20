@@ -559,6 +559,7 @@ class GetPotListUseCaseImplTest {
         )
         val activePlayerIds = listOf(
             PlayerId("0"),
+            PlayerId("1"),
         )
         val expectedList = listOf(
             Pot(
