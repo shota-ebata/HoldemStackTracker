@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
@@ -123,28 +122,8 @@ fun PlayerEditDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.End
                     ) {
-
-                        Button(
-                            onClick = dropRedundantEvent {
-                                event.onClickRemovePlayerButton()
-                            },
-                            contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = "edit"
-                            )
-                            Spacer(
-                                modifier = Modifier.size(ButtonDefaults.IconSpacing)
-                            )
-                            Text(
-                                text = stringResource(R.string.button_label_remove),
-                                style = MaterialTheme.typography.titleSmall,
-                            )
-                        }
-
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
@@ -179,7 +158,6 @@ data class PlayerEditDialogUiState(
 
 interface PlayerEditDialogEvent {
     fun onDismissRequestPlayerEditDialog()
-    fun onClickRemovePlayerButton()
     fun onClickLeavedSwitch(checked: Boolean)
     fun onChangeStackValue(stackValue: TextFieldValue)
     fun onClickSubmitPlayerEditDialogButton()
@@ -204,7 +182,6 @@ private fun PlayerEditContentPreview() {
             ),
             event = object : PlayerEditDialogEvent {
                 override fun onDismissRequestPlayerEditDialog() {}
-                override fun onClickRemovePlayerButton() {}
                 override fun onClickLeavedSwitch(checked: Boolean) {}
                 override fun onChangeStackValue(stackValue: TextFieldValue) {}
                 override fun onClickSubmitPlayerEditDialogButton() {}

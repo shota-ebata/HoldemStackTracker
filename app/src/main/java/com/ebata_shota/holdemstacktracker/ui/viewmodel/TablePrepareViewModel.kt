@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundTableException
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
+import com.ebata_shota.holdemstacktracker.domain.extension.mapAtFind
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.MovePosition
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -31,7 +32,6 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.SeatOutPlayersUseCase
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.EditGameRuleDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogUiState
@@ -39,6 +39,8 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEve
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerEditDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerEditDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialogEvent
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SelectBtnPlayerDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SelectBtnPlayerDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
@@ -81,11 +83,11 @@ constructor(
     private val removePlayers: RemovePlayersUseCase,
     private val renameTablePlayer: RenameTablePlayerUseCase,
     private val hasErrorChipSizeTextValue: HasErrorChipSizeTextValueUseCase,
-    private val seatOutPlayers: SeatOutPlayersUseCase,
     private val uiStateMapper: TablePrepareScreenUiStateMapper,
     private val tableCreatorUiStateMapper: TableCreatorUiStateMapper,
 ) : ViewModel(),
     MyNameInputDialogEvent,
+    PlayerRemoveDialogEvent,
     ErrorDialogEvent,
     EditGameRuleDialogEvent,
     PlayerEditDialogEvent,
@@ -310,6 +312,41 @@ constructor(
     }
 
     /**
+     * 参加プレイヤー退出ボタン
+     */
+    fun onClickRemovePlayerButton() {
+        viewModelScope.launch {
+            val table: Table = tableStateFlow.value ?: return@launch
+            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+            showDeletePlayerDialog(table, myPlayerId)
+        }
+    }
+
+    private fun showDeletePlayerDialog(
+        table: Table,
+        myPlayerId: PlayerId,
+    ) {
+        _dialogUiState.update {
+            it.copy(
+                playerRemoveDialogUiState = PlayerRemoveDialogUiState(
+                    players = table.playerOrder.mapNotNull { playerId ->
+                        val player = table.basePlayers
+                            .find { basePlayer -> basePlayer.id == playerId }
+                            ?: return@mapNotNull null
+                        val isEnable = player.id == myPlayerId
+                        PlayerRemoveDialogUiState.PlayerItemUiState(
+                            playerId = player.id,
+                            name = player.name,
+                            isSelected = false,
+                            isHost = isEnable
+                        )
+                    }
+                )
+            )
+        }
+    }
+
+    /**
      * PlayerEditDialog
      * onDismissRequest
      */
@@ -319,21 +356,6 @@ constructor(
         }
     }
 
-    /**
-     * PlayerEditDialog
-     * プレイヤー削除ボタン
-     */
-    override fun onClickRemovePlayerButton() {
-        val table = tableStateFlow.value ?: return
-        val playerEditDialogUiState = dialogUiState.value.playerEditDialogUiState ?: return
-        val playerId = playerEditDialogUiState.playerId
-        viewModelScope.launch {
-            removePlayers.invoke(
-                currentTable = table,
-                removePlayerIds = listOf(playerId)
-            )
-        }
-    }
 
     /**
      * PlayerEditDialog
@@ -370,19 +392,80 @@ constructor(
     override fun onClickSubmitPlayerEditDialogButton() {
         val table = tableStateFlow.value ?: return
         val playerEditDialogUiState = dialogUiState.value.playerEditDialogUiState ?: return
-        val playerIds = if (playerEditDialogUiState.checkedLeaved) {
-            listOf(playerEditDialogUiState.playerId)
-        } else {
-            emptyList()
-        }
+
 
         viewModelScope.launch {
-            seatOutPlayers.invoke(
-                currentTable = table,
-                seatOutPlayers = playerIds
+            val copiedTable = table.copy(
+                basePlayers = table.basePlayers.mapAtFind({ playerBase ->
+                    playerBase.id == playerEditDialogUiState.playerId
+                }) { playerBase ->
+                    playerBase.copy(
+                        isLeaved = playerEditDialogUiState.checkedLeaved
+                    )
+                }
             )
+            tableRepository.sendTable(copiedTable)
         }
         onDismissRequestPlayerEditDialog()
+    }
+
+    /**
+     * PlayerRemoveDialog
+     * チェック押下
+     */
+    override fun onClickPlayerRemoveDialogPlayer(
+        playerId: PlayerId,
+        checked: Boolean,
+    ) {
+        _dialogUiState.update { dialogUiState ->
+            val playerRemoveDialogUiState = dialogUiState.playerRemoveDialogUiState
+            dialogUiState.copy(
+                playerRemoveDialogUiState = playerRemoveDialogUiState?.copy(
+                    players = playerRemoveDialogUiState.players.mapAtFind(
+                        predicate = { item -> item.playerId == playerId },
+                        transform = { item -> item.copy(isSelected = checked) }
+                    )
+                )
+            )
+        }
+    }
+
+    /**
+     * PlayerRemoveDialog
+     * Submit
+     */
+    override fun onClickPlayerRemoveDialogSubmit() {
+        viewModelScope.launch {
+            val playerRemoveDialogUiState = dialogUiState.value.playerRemoveDialogUiState
+                ?: return@launch
+            val table = tableStateFlow.value
+                ?: return@launch
+            // Checkされているプレイヤー
+            val removePlayerIds = playerRemoveDialogUiState.players
+                .filter { it.isSelected }
+                .map { it.playerId }
+            removePlayers.invoke(
+                currentTable = table,
+                removePlayerIds = removePlayerIds
+            )
+            dismissPlayerRemoveDialog()
+        }
+    }
+
+    /**
+     * PlayerRemoveDialog
+     * dismiss
+     */
+    override fun onDismissRequestPlayerRemoveDialog() {
+        dismissPlayerRemoveDialog()
+    }
+
+    private fun dismissPlayerRemoveDialog() {
+        _dialogUiState.update {
+            it.copy(
+                playerRemoveDialogUiState = null
+            )
+        }
     }
 
     fun onChangeStackSize(value: TextFieldValue) {

@@ -53,7 +53,7 @@
 
     <string name="label_is_leaved">離席</string>
 
-    <string name="button_label_remove">退席させる</string>
+    <string name="button_label_remove">退室させる</string>
     <string name="button_label_seat_out">離席させる</string>
 
     <string name="error_min_bet_size_stack">スタックがBB未満のプレイヤーがいます</string>

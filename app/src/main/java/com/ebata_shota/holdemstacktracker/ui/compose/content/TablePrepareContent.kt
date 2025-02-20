@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,13 +18,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,6 +62,7 @@ fun TablePrepareContent(
     uiState: TablePrepareContentUiState,
     getTableQrPainter: () -> Painter?,
     onClickEditGameRuleButton: () -> Unit,
+    onClickRemovePlayerButton: () -> Unit,
     onClickPlayerEditButton: (PlayerId) -> Unit,
     onClickUpButton: (PlayerId) -> Unit,
     onClickDownButton: (PlayerId) -> Unit,
@@ -212,6 +217,35 @@ fun TablePrepareContent(
                             style = MaterialTheme.typography.bodyMedium,
                             text = uiState.playerSizeText
                         )
+                    }
+                }
+                if (uiState.isEditable) {
+                    Row(
+                        Modifier
+                            .padding(top = 16.dp)
+                            .padding(horizontal = SideSpace)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround,
+                    ) {
+
+                        OutlinedButton(
+                            onClick = dropRedundantEvent(delayState = delayState) {
+                                onClickRemovePlayerButton()
+                            },
+                            contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "edit"
+                            )
+                            Spacer(
+                                modifier = Modifier.size(ButtonDefaults.IconSpacing)
+                            )
+                            Text(
+                                text = stringResource(R.string.button_label_remove),
+                                style = MaterialTheme.typography.titleSmall,
+                            )
+                        }
                     }
                 }
                 Column(
@@ -386,6 +420,7 @@ fun TablePrepareContentPreview(
             uiState = uiState,
             getTableQrPainter = { painter },
             onClickEditGameRuleButton = {},
+            onClickRemovePlayerButton = {},
             onClickPlayerEditButton = {},
             onClickUpButton = {},
             onClickDownButton = {},

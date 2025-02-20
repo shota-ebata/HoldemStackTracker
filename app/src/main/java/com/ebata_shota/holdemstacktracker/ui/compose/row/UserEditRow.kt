@@ -23,6 +23,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -59,6 +60,20 @@ fun UserEditRow(
                 .padding(start = SideSpace)
                 .padding(vertical = 4.dp)
         ) {
+            Text(
+                text = uiState.playerName,
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+
+
+        Row(
+            modifier = Modifier
+                .weight(1.0f)
+                .wrapContentSize(Alignment.Center)
+                .padding(vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             if (uiState.isLeaved) {
                 Box(
                     modifier = Modifier
@@ -74,26 +89,13 @@ fun UserEditRow(
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
+            } else {
+                Text(
+                    text = uiState.stackSize,
+                    modifier = Modifier
+                        .wrapContentSize(Alignment.Center),
+                )
             }
-            Text(
-                text = uiState.playerName,
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
-
-
-        Row(
-            modifier = Modifier
-                .weight(1.0f)
-                .wrapContentSize(Alignment.Center)
-                .padding(vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = uiState.stackSize,
-                modifier = Modifier
-                    .wrapContentSize(Alignment.Center),
-            )
         }
 
         Row(
@@ -179,6 +181,20 @@ private class UserEditPreviewParam : PreviewParameterProvider<PlayerEditRowUiSta
             playerId = PlayerId("playerId1"),
             playerName = "playerName12345",
             stackSize = "10000",
+            isLeaved = false,
+            isEditable = false
+        ),
+        PlayerEditRowUiState(
+            playerId = PlayerId("playerId1"),
+            playerName = "playerName12345",
+            stackSize = "10000",
+            isLeaved = false,
+            isEditable = true
+        ),
+        PlayerEditRowUiState(
+            playerId = PlayerId("playerId1"),
+            playerName = "playerName12345",
+            stackSize = "10000",
             isLeaved = true,
             isEditable = false
         ),
@@ -206,11 +222,13 @@ fun UserEditPreview(
     uiState: PlayerEditRowUiState
 ) {
     HoldemStackTrackerTheme {
-        UserEditRow(
-            uiState = uiState,
-            onClickPlayerEditButton = {},
-            onClickUpButton = {},
-            onClickDownButton = {}
-        )
+        Surface {
+            UserEditRow(
+                uiState = uiState,
+                onClickPlayerEditButton = {},
+                onClickUpButton = {},
+                onClickDownButton = {}
+            )
+        }
     }
 }

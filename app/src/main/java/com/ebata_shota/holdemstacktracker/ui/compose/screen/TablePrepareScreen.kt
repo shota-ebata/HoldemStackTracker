@@ -16,6 +16,8 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogCon
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerEditDialog
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerEditDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialog
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SelectBtnPlayerDialog
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SelectBtnPlayerDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.StackEditDialogContent
@@ -50,6 +52,7 @@ fun TablePrepareScreen(
                 uiState = uiState.contentUiState,
                 getTableQrPainter = viewModel::getTableQrPainter,
                 onClickEditGameRuleButton = viewModel::onClickEditGameRuleButton,
+                onClickRemovePlayerButton = viewModel::onClickRemovePlayerButton,
                 onClickPlayerEditButton = viewModel::onClickPlayerEditButton,
                 onClickUpButton = viewModel::onClickUpButton,
                 onClickDownButton = viewModel::onClickDownButton,
@@ -76,6 +79,13 @@ fun TablePrepareScreen(
             if (myNameInputDialogUiState != null) {
                 MyNameInputDialogContent(
                     uiState = myNameInputDialogUiState,
+                    event = viewModel
+                )
+            }
+            val playerRemoveDialogUiState = dialogUiState.playerRemoveDialogUiState
+            if (playerRemoveDialogUiState != null) {
+                PlayerRemoveDialog(
+                    uiState = playerRemoveDialogUiState,
                     event = viewModel
                 )
             }
@@ -122,6 +132,7 @@ sealed interface TablePrepareScreenUiState {
 data class TablePrepareScreenDialogUiState(
     val tableCreatorContentUiState: TableCreatorContentUiState? = null,
     val stackEditDialogState: StackEditDialogState? = null,
+    val playerRemoveDialogUiState: PlayerRemoveDialogUiState? = null,
     val playerEditDialogUiState: PlayerEditDialogUiState? = null,
     val selectBtnPlayerDialogUiState: SelectBtnPlayerDialogUiState? = null,
     val myNameInputDialogUiState: MyNameInputDialogUiState? = null,
