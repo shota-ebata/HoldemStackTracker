@@ -69,6 +69,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.max
 
 @HiltViewModel
 class TablePrepareViewModel
@@ -451,7 +452,8 @@ constructor(
                     playerBase.id == playerEditDialogUiState.playerId
                 }) { playerBase ->
                     playerBase.copy(
-                        isLeaved = playerEditDialogUiState.checkedLeaved
+                        isLeaved = playerEditDialogUiState.checkedLeaved,
+                        stack = max(playerEditDialogUiState.stackValue.text.toIntOrNull() ?: 0, 0)
                     )
                 }
             )
