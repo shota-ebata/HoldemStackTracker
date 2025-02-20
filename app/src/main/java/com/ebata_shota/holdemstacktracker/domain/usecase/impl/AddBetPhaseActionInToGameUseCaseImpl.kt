@@ -43,7 +43,6 @@ constructor(
      * BetPhaseアクションをGameに追加する
      */
     override suspend fun invoke(
-        btnPlayerId: PlayerId,
         currentGame: Game,
         betPhaseAction: BetPhaseAction,
     ): Game = withContext(dispatcher) {

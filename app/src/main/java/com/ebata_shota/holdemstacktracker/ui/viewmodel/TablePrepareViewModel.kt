@@ -14,6 +14,7 @@ import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundTableExceptio
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtFind
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
+import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.MovePosition
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
@@ -23,6 +24,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRuleStateOfRingRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
@@ -58,6 +60,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -73,6 +76,7 @@ class TablePrepareViewModel
 constructor(
     savedStateHandle: SavedStateHandle,
     private val tableRepository: TableRepository,
+    private val gameRepository: GameRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val qrBitmapRepository: QrBitmapRepository,
     private val prefRepository: PrefRepository,
@@ -93,7 +97,6 @@ constructor(
     PlayerEditDialogEvent,
     SelectBtnPlayerDialogEvent {
     private val tableId: TableId by savedStateHandle.param()
-    private val lastBtnPlayerId: PlayerId? by savedStateHandle.param()
 
     private val _uiState = MutableStateFlow<TablePrepareScreenUiState>(TablePrepareScreenUiState.Loading)
     val uiState = _uiState.asStateFlow()
@@ -119,6 +122,15 @@ constructor(
             initialValue = null
         )
 
+    private val gameStateFlow: StateFlow<Game?> = gameRepository.gameStateFlow
+        .map { it?.getOrNull() }
+        .filter { it?.tableId == tableId }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = null
+        )
+
     // 選択中のBTNのプレイヤーID
     private val selectedBtnPlayerId = MutableStateFlow<PlayerId?>(null)
 
@@ -131,8 +143,11 @@ constructor(
 
         // Tableの初回取得時の処理
         viewModelScope.launch {
-            val table = tableStateFlow.filterNotNull().first()
-            val defaultBtnId = if (lastBtnPlayerId != null) {
+            val defaultBtnId = combine(
+                tableStateFlow.filterNotNull(),
+                gameStateFlow.filterNotNull(),
+            ) { table, game ->
+                val lastBtnPlayerId = game.btnPlayerId
                 val lastBtnPlayerIndex =
                     table.playerOrderWithoutLeaved.indexOfFirstOrNull { it == lastBtnPlayerId }
                 val nextIndex = if (lastBtnPlayerIndex != null) {
@@ -140,21 +155,42 @@ constructor(
                 } else {
                     null
                 }
-                nextIndex?.let { table.playerOrderWithoutLeaved[nextIndex] }
-            } else {
-                null
-            }
-            selectedBtnPlayerId.update { defaultBtnId } // FIXME: 初回で設定してしまうと、その後離席でnullになるケースがある
+                val defaultBtnId = nextIndex?.let { table.playerOrderWithoutLeaved[nextIndex] }
+                defaultBtnId
+            }.first()
+            selectedBtnPlayerId.update { defaultBtnId }
         }
 
         // UiState生成の監視
         viewModelScope.launch {
             combine(
                 tableStateFlow.filterNotNull(),
+                gameStateFlow,
                 firebaseAuthRepository.myPlayerIdFlow,
                 selectedBtnPlayerId,
                 qrPainterStateFlow.filterNotNull(),
-            ) { table, myPlayerId, selectedBtnPlayerId, _ ->
+            ) { table, game, myPlayerId, selectedBtnPlayerId, _ ->
+                if (
+                    table.tableStatus != TableStatus.PLAYING
+                    || table.playerOrder.any { it != myPlayerId }
+                ) {
+                    showContent(
+                        table = table,
+                        myPlayerId = myPlayerId,
+                        selectedBtnPlayerId = selectedBtnPlayerId,
+                        lastBtnPlayerId = game?.btnPlayerId
+                    )
+                }
+            }.collect()
+        }
+
+        // 遷移の監視
+        viewModelScope.launch {
+            combine(
+                tableStateFlow.filterNotNull(),
+                firebaseAuthRepository.myPlayerIdFlow,
+                qrPainterStateFlow.filterNotNull(),
+            ) { table, myPlayerId, _ ->
                 if (
                     table.tableStatus == TableStatus.PLAYING
                     && table.playerOrder.any { it == myPlayerId }
@@ -162,12 +198,6 @@ constructor(
                     // ゲーム中かつplayerOrderに自分が含まれているなら
                     // ゲーム画面に遷移
                     navigateToGame(table.id)
-                } else {
-                    showContent(
-                        table = table,
-                        myPlayerId = myPlayerId,
-                        selectedBtnPlayerId = selectedBtnPlayerId
-                    )
                 }
             }.collect()
         }
@@ -248,6 +278,7 @@ constructor(
         table: Table,
         myPlayerId: PlayerId,
         selectedBtnPlayerId: PlayerId?,
+        lastBtnPlayerId: PlayerId?,
     ) {
         viewModelScope.launch {
             _uiState.update {
@@ -852,10 +883,8 @@ constructor(
     companion object {
         fun bundle(
             tableId: TableId,
-            lastBtnPlayerId: PlayerId?,
         ) = Bundle().apply {
             putParcelable(TablePrepareViewModel::tableId.name, tableId)
-            putParcelable(TablePrepareViewModel::lastBtnPlayerId.name, lastBtnPlayerId)
         }
     }
 }

@@ -27,12 +27,11 @@ constructor(
 
     override suspend fun invoke(
         tableId: TableId,
-        btnPlayerId: PlayerId,
         game: Game,
         potSettlementInfoList: List<PotSettlementInfo>,
     ) = withContext(dispatcher) {
         val playerOrder = game.playerOrder
-        val actionOrder = playerOrder.getSortedByActionOrder(btnPlayerId = btnPlayerId)
+        val actionOrder = playerOrder.getSortedByActionOrder(btnPlayerId = game.btnPlayerId)
         val notFoldPlayerIds = notFoldPlayerIds.invoke(playerOrder = playerOrder, game.phaseList)
         val nearestSbPlayerId = actionOrder.first { playerId ->
             notFoldPlayerIds.any { it == playerId }

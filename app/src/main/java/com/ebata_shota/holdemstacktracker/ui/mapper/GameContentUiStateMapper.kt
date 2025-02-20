@@ -78,7 +78,7 @@ constructor(
         val basePlayers = table.basePlayers
         val minBetSize = table.rule.minBetSize
         val blindText = table.rule.blindText()
-        val btnPlayerId = table.btnPlayerId
+        val btnPlayerId = game.btnPlayerId
         val gamePlayers = game.players
         val totalPotSize: Int = game.potList.sumOf { it.potSize }
         val phaseList = game.phaseList

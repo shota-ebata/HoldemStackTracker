@@ -12,7 +12,7 @@ data class Table(
     val basePlayers: List<PlayerBase>,
     val waitPlayerIds: List<PlayerId>,
     val playerOrder: List<PlayerId>,
-    val btnPlayerId: PlayerId,  // TODO: ポットマネージャーを別途選択できるようにしたい
+    val btnPlayerId: PlayerId,
     val tableStatus: TableStatus,
     val currentGameId: GameId?,
     val startTime: Instant?,

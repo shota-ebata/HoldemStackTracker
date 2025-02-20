@@ -97,7 +97,6 @@ constructor(
                     if (autoAction != null) {
                         // オートアクションがあるなら、それを使って新しいGameを生成
                         val updatedGame = addBetPhaseActionInToGame.invoke(
-                            btnPlayerId = table.btnPlayerId,
                             currentGame = game,
                             betPhaseAction = autoAction,
                         )
@@ -127,7 +126,7 @@ constructor(
         }
         val currentPlayerId = currentBetPhase?.let {
             getCurrentPlayerId.invoke(
-                btnPlayerId = table.btnPlayerId,
+                btnPlayerId = game.btnPlayerId,
                 playerOrder = game.playerOrder,
                 currentBetPhase = currentBetPhase
             )
@@ -198,7 +197,7 @@ constructor(
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     val gameMap: Map<*, *> = snapshot.value as Map<*, *>
-                    val game = gameMapper.mapToGame(gameMap)
+                    val game = gameMapper.mapToGame(tableId, gameMap)
                     trySend(Result.success(game))
                 } else {
                     trySend(Result.failure(NotFoundGameException()))

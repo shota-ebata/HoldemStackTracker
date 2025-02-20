@@ -8,11 +8,13 @@ import java.time.Instant
 data class Game(
     val gameId: GameId,
     val version: Long,
+    val tableId: TableId, // MEMO: RealtimeDBには保存はされない
     val appVersion: Long,
+    val btnPlayerId: PlayerId,
     val players: List<GamePlayer>,
     val potList: List<Pot>,
     val phaseList: List<Phase>,
-    val updateTime: Instant
+    val updateTime: Instant,
 ) {
     val playerOrder: List<PlayerId> = players.map { it.id }
 }

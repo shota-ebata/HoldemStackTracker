@@ -40,8 +40,10 @@ constructor(
         )
         val newGame = Game(
             gameId = gameId,
+            tableId = table.id, // MEMO: RealtimeDBには保存はされない
             version = 0,
             appVersion = BuildConfig.VERSION_CODE.toLong(),
+            btnPlayerId = table.btnPlayerId,
             players = table.playerOrderWithoutLeaved.mapNotNull { playerId ->
                 val player = table.basePlayers.find { it.id == playerId }
                 player?.let {

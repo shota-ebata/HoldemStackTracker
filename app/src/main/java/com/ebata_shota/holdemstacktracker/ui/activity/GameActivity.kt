@@ -52,7 +52,6 @@ class GameActivity : ComponentActivity() {
                 val intent = TablePrepareActivity.intent(
                     context = this,
                     tableId = navigate.tableId,
-                    lastBtnPlayerId = navigate.lastBtnPlayerId
                 )
                 startActivity(intent)
                 finish()

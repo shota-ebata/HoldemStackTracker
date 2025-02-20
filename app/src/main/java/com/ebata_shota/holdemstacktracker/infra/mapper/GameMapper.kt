@@ -12,6 +12,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.PhaseStatus
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pot
 import com.ebata_shota.holdemstacktracker.domain.model.PotId
+import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType
 import com.ebata_shota.holdemstacktracker.infra.model.PhaseType
 import java.time.Instant
@@ -27,6 +28,7 @@ constructor() {
         private const val GAME_ID = "gameId"
         private const val GAME_VERSION = "gameVersion"
         private const val APP_VERSION = "appVersion"
+        private const val BTN_PLAYER_ID = "btnPlayerId"
         private const val PLAYER_ID = "playerId"
         private const val PLAYERS = "players"
         private const val PLAYER_STACK = "stack"
@@ -47,17 +49,19 @@ constructor() {
         private const val UPDATE_TIME = "updateTime"
     }
 
-    fun mapToGame(gameMap: Map<*, *>): Game {
+    fun mapToGame(tableId: TableId, gameMap: Map<*, *>): Game {
         return Game(
             gameId = GameId(gameMap[GAME_ID] as String),
             version = gameMap[GAME_VERSION] as Long,
+            tableId = tableId,
             appVersion = gameMap[APP_VERSION] as Long,
+            btnPlayerId = PlayerId(gameMap[BTN_PLAYER_ID] as String),
             players = mapToGamePlayerList(gameMap[PLAYERS] as List<*>),
             potList = (gameMap[POTS] as? List<*>)?.let {
                 mapToPotList(it)
             } ?: emptyList(),
             phaseList = mapToPhaseStateList(gameMap[PHASES] as List<*>),
-            updateTime = Instant.ofEpochMilli(gameMap[UPDATE_TIME] as Long)
+            updateTime = Instant.ofEpochMilli(gameMap[UPDATE_TIME] as Long),
         )
     }
 
@@ -155,6 +159,7 @@ constructor() {
         GAME_ID to newGame.gameId.value,
         GAME_VERSION to newGame.version,
         APP_VERSION to newGame.appVersion,
+        BTN_PLAYER_ID to newGame.btnPlayerId.value,
         UPDATE_TIME to newGame.updateTime.toEpochMilli(),
         PLAYERS to mapPlayers(newGame.players),
         POTS to mapPots(newGame.potList),

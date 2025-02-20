@@ -184,7 +184,6 @@ constructor(
     sealed interface Navigate {
         data class TablePrepare(
             val tableId: TableId,
-            val lastBtnPlayerId: PlayerId?,
         ) : Navigate
     }
 
@@ -218,6 +217,7 @@ constructor(
             ).collect()
         }
 
+        // TODO: 最低レイズバグってるかも
         // 最低Raiseサイズ化するための監視
         viewModelScope.launch {
             combine(
@@ -237,6 +237,7 @@ constructor(
             }.collect()
         }
 
+        // TODO: 最低レイズバグってるかも
         // 最低Raiseサイズの変化があった場合、最低サイズにする監視
         viewModelScope.launch {
             minRaiseSizeFlow.collect { minRaiseSize ->
@@ -426,7 +427,6 @@ constructor(
                     _navigateEvent.emit(
                         Navigate.TablePrepare(
                             tableId = tableId,
-                            lastBtnPlayerId = table.btnPlayerId
                         )
                     )
                 }
@@ -472,12 +472,10 @@ constructor(
     }
 
     private suspend fun doFold(
-        btnPlayerId: PlayerId,
         game: Game,
         myPlayerId: PlayerId,
     ) {
         val nextGame = addBetPhaseActionInToGame.invoke(
-            btnPlayerId = btnPlayerId,
             currentGame = game,
             betPhaseAction = BetPhaseAction.Fold(
                 actionId = ActionId(randomIdRepository.generateRandomId()),
@@ -488,12 +486,10 @@ constructor(
     }
 
     private suspend fun doCheck(
-        btnPlayerId: PlayerId,
         game: Game,
         myPlayerId: PlayerId,
     ) {
         val nextGame = addBetPhaseActionInToGame.invoke(
-            btnPlayerId = btnPlayerId,
             currentGame = game,
             betPhaseAction = BetPhaseAction.Check(
                 actionId = ActionId(randomIdRepository.generateRandomId()),
@@ -504,7 +500,6 @@ constructor(
     }
 
     private suspend fun doAllIn(
-        btnPlayerId: PlayerId,
         game: Game,
         myPlayerId: PlayerId,
     ) {
@@ -515,7 +510,6 @@ constructor(
             playerId = myPlayerId
         )
         val nextGame = addBetPhaseActionInToGame.invoke(
-            btnPlayerId = btnPlayerId,
             currentGame = game,
             betPhaseAction = BetPhaseAction.AllIn(
                 actionId = ActionId(randomIdRepository.generateRandomId()),
@@ -527,7 +521,6 @@ constructor(
     }
 
     private suspend fun doCall(
-        btnPlayerId: PlayerId,
         game: Game,
         myPlayerId: PlayerId,
     ) {
@@ -545,7 +538,6 @@ constructor(
             playerId = myPlayerId,
         )
         val nextGame = addBetPhaseActionInToGame.invoke(
-            btnPlayerId = btnPlayerId,
             currentGame = game,
             betPhaseAction = if (callSize == player.stack + currentPendingBetSize) {
                 // コールサイズ == スタックサイズ + PendingBetサイズ の場合はAllIn
@@ -566,8 +558,6 @@ constructor(
     }
 
     private suspend fun doRaise(
-        playerOrder: List<PlayerId>,
-        btnPlayerId: PlayerId,
         game: Game,
         myPlayerId: PlayerId,
         raiseSize: Int,
@@ -579,12 +569,11 @@ constructor(
         val isNotRaisedYet = isNotRaisedYet.invoke(actionList)
         val currentPendingBetSize = getPendingBetSize.invoke(
             actionList = actionList,
-            playerOrder = playerOrder,
+            playerOrder = game.playerOrder,
             playerId = myPlayerId,
         )
         val nextGame = addBetPhaseActionInToGame.invoke(
             currentGame = game,
-            btnPlayerId = btnPlayerId,
             betPhaseAction = if (raiseSize == player.stack + currentPendingBetSize) {
                 // レイズサイズ == スタックサイズ + PendingBetサイズ の場合はAllIn
                 BetPhaseAction.AllIn(
@@ -644,12 +633,10 @@ constructor(
 
     fun onClickFoldButton() {
         viewModelScope.launch {
-            val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
             doFold(
-                btnPlayerId = table.btnPlayerId,
                 game = game,
                 myPlayerId = myPlayerId,
             )
@@ -658,12 +645,10 @@ constructor(
 
     fun onClickCheckButton() {
         viewModelScope.launch {
-            val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
             doCheck(
-                btnPlayerId = table.btnPlayerId,
                 game = game,
                 myPlayerId = myPlayerId,
             )
@@ -672,12 +657,10 @@ constructor(
 
     fun onClickAllInButton() {
         viewModelScope.launch {
-            val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
             doAllIn(
-                btnPlayerId = table.btnPlayerId,
                 game = game,
                 myPlayerId = myPlayerId,
             )
@@ -686,12 +669,10 @@ constructor(
 
     fun onClickCallButton() {
         viewModelScope.launch {
-            val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
             doCall(
-                btnPlayerId = table.btnPlayerId,
                 game = game,
                 myPlayerId = myPlayerId,
             )
@@ -703,14 +684,11 @@ constructor(
      */
     fun onClickRaiseButton() {
         viewModelScope.launch {
-            val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
             val raiseSize = raiseSizeStateFlow.value ?: return@launch
 
             doRaise(
-                playerOrder = game.playerOrder,
-                btnPlayerId = table.btnPlayerId,
                 game = game,
                 myPlayerId = myPlayerId,
                 raiseSize = raiseSize,
@@ -867,7 +845,6 @@ constructor(
 
     override fun onClickPotSettlementDialogDoneButton() {
         viewModelScope.launch {
-            val table = tableStateFlow.value ?: return@launch
             val dialogUiState = potSettlementDialogUiState.value ?: return@launch
             val currentPotIndex = dialogUiState.currentPotIndex
             val game = gameStateFlow.value ?: return@launch
@@ -886,7 +863,6 @@ constructor(
                 }
                 setPotSettlementInfo.invoke(
                     tableId = tableId,
-                    btnPlayerId = table.btnPlayerId,
                     game = game,
                     potSettlementInfoList = potSettlementInfoList
                 )
@@ -917,7 +893,7 @@ constructor(
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
             val nextPlayerId = getNextPlayerIdOfNextPhase.invoke(
-                btnPlayerId = table.btnPlayerId,
+                btnPlayerId = game.btnPlayerId,
                 currentGame = game,
             )
             when (myPlayerId) {
