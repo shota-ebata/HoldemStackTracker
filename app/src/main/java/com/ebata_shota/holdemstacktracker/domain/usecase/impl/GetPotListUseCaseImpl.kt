@@ -6,6 +6,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pot
 import com.ebata_shota.holdemstacktracker.domain.model.PotId
+import com.ebata_shota.holdemstacktracker.domain.model.PotAndRemainingBet
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotListUseCase
 import kotlinx.coroutines.CoroutineDispatcher
@@ -25,7 +26,7 @@ constructor(
         potList: List<Pot>,
         pendingBetPerPlayerWithoutZero: Map<PlayerId, Int>,
         activePlayerIds: List<PlayerId>,
-    ): List<Pot> = withContext(dispatcher) {
+    ): PotAndRemainingBet = withContext(dispatcher) {
         // ポットに入っていないベットが残っているプレイヤー数
         val pendingBetPlayerCount: Int = pendingBetPerPlayerWithoutZero.size
         return@withContext if (pendingBetPlayerCount > 0) {
@@ -38,7 +39,10 @@ constructor(
             )
         } else {
             // ポットに入っていないベットが残っているプレイヤー数0人の場合、ポットはそのまま。
-            potList
+            PotAndRemainingBet(
+                potList = potList,
+                pendingBetPerPlayerWithoutZero = pendingBetPerPlayerWithoutZero
+            )
         }
     }
 
@@ -47,7 +51,7 @@ constructor(
         potList: List<Pot>,
         pendingBetPerPlayer: Map<PlayerId, Int>,
         activePlayerIds: List<PlayerId>,
-    ): List<Pot> {
+    ): PotAndRemainingBet {
         // 最新のポットを取得
         val lastPot: Pot? = potList.lastOrNull()
         var currentPot: Pot = if (lastPot != null && lastPot.isClosed.not()) {
@@ -106,10 +110,14 @@ constructor(
             // 新規ポットであれば追加
             updatedPotList.add(currentPot)
         }
-        if (updatedPendingPrePlayer.isEmpty()) {
-            // もうベットが無いなら、ポットを返す
-            // 現在のpotを返す
-            return updatedPotList
+        if (updatedPendingPrePlayer.size <= 1) {
+            // Betが残っているプレイヤーが一人以下の場合
+            // これ以上はポットを作成しないで現在のPotを返す
+            // もし、Betが余っているプレイヤーがいれば返却する
+            return PotAndRemainingBet(
+                potList = updatedPotList,
+                pendingBetPerPlayerWithoutZero = updatedPendingPrePlayer
+            )
         }
         // まだ残っている可能性があるので再帰
         return getNewPotList(

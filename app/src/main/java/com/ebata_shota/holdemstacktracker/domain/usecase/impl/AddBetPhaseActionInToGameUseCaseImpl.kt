@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
+import com.ebata_shota.holdemstacktracker.domain.extension.mapAtFind
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
@@ -10,7 +11,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseStatus
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.Pot
+import com.ebata_shota.holdemstacktracker.domain.model.PotAndRemainingBet
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.AddBetPhaseActionInToGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionablePlayerIdsUseCase
@@ -104,15 +105,22 @@ constructor(
              * 一人を除いて、全員降りている場合
              * ベット状況をポットに反映
              */
-            val updatedPotList: List<Pot> = getUpdatedPotList(
+            val potAndRemainingBet: PotAndRemainingBet = getUpdatedPotList(
                 updatedPlayers = updatedPlayers,
                 playerOrder = baseNextGame.playerOrder,
                 addedActionList = addedActionList,
                 currentGame = currentGame,
                 activePlayerIds = notFoldPlayerIds
             )
+            // 余ったBetをプレイヤーに返却する
+            var reUpdatedPlayers = baseNextGame.players
+            potAndRemainingBet.pendingBetPerPlayerWithoutZero.forEach { (playerId, remainingBetSize) ->
+                reUpdatedPlayers = reUpdatedPlayers.mapAtFind({ it.id == playerId }) {
+                    it.copy(stack = it.stack + remainingBetSize)
+                }
+            }
             return@withContext baseNextGame.copy(
-                potList = updatedPotList,
+                potList = potAndRemainingBet.potList,
                 phaseList = addedActionPhaseList.mapAtIndex(currentPhaseList.lastIndex) {
                     // Phaseに反映
                     addedActionPhase.copyWith(phaseStatus = PhaseStatus.Close)
@@ -124,6 +132,7 @@ constructor(
                         )
                     )
                 },
+                players = reUpdatedPlayers
             )
         }
 
@@ -178,19 +187,18 @@ constructor(
         addedActionList: List<BetPhaseAction>,
         currentGame: Game,
         activePlayerIds: List<PlayerId>,
-    ): List<Pot> {
+    ): PotAndRemainingBet {
         // プレイヤーごとの、まだポットに入っていないベット額
         val pendingBetPerPlayer: Map<PlayerId, Int> = getPendingBetPerPlayer.invoke(
             playerOrder = playerOrder,
             actionStateList = addedActionList
         )
         // ベット状況をポットに反映
-        val updatedPotList: List<Pot> = getPotStateList.invoke(
+        return getPotStateList.invoke(
             updatedPlayers = updatedPlayers,
             potList = currentGame.potList,
             pendingBetPerPlayerWithoutZero = pendingBetPerPlayer,
             activePlayerIds = activePlayerIds
         )
-        return updatedPotList
     }
 }

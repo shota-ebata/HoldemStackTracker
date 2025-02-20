@@ -1,11 +1,12 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
+import com.ebata_shota.holdemstacktracker.domain.extension.mapAtFind
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.Pot
+import com.ebata_shota.holdemstacktracker.domain.model.PotAndRemainingBet
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNotFoldPlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameFromIntervalUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
@@ -52,12 +53,19 @@ constructor(
             phaseList = currentGame.phaseList
         )
         // ベット状況をポットに反映
-        val updatedPotList: List<Pot> = getPotStateList.invoke(
+        val potAndRemainingBet: PotAndRemainingBet = getPotStateList.invoke(
             updatedPlayers = currentGame.players,
             potList = currentGame.potList,
             pendingBetPerPlayerWithoutZero = pendingBetPerPlayer,
             activePlayerIds = notFoldPlayers
         )
+        // 余ったBetをプレイヤーに返却する
+        var updatedPlayers = currentGame.players
+        potAndRemainingBet.pendingBetPerPlayerWithoutZero.forEach { (playerId, remainingBetSize) ->
+            updatedPlayers = updatedPlayers.mapAtFind({ it.id == playerId }) {
+                it.copy(stack = it.stack + remainingBetSize)
+            }
+        }
         // フェーズを進める
         val nextPhase = getNextPhase.invoke(
             playerOrder = currentGame.playerOrder,
@@ -66,8 +74,9 @@ constructor(
         val updatedPhaseList = currentPhase + nextPhase
         // TableState更新
         return@withContext currentGame.copy(
-            potList = updatedPotList,
+            potList = potAndRemainingBet.potList,
             phaseList = updatedPhaseList,
+            players = updatedPlayers
         )
     }
 

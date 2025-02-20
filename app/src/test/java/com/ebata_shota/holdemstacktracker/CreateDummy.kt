@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker
 
 import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.GameId
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -14,8 +15,11 @@ fun createDummyGame(
     players: List<GamePlayer> = emptyList(),
     phaseList: List<Phase> = emptyList()
 ) = Game(
+    gameId = GameId(""),
     version = 0,
+    tableId = TableId("0L"),
     appVersion = BuildConfig.VERSION_CODE.toLong(),
+    btnPlayerId = PlayerId(""),
     players = players,
     potList = emptyList(),
     phaseList = phaseList,
@@ -33,6 +37,7 @@ fun createDummyTable(
     rule = Rule.RingGame(sbSize = 100, bbSize = 200, defaultStack = 1000),
     playerOrder = playerOrder,
     btnPlayerId = PlayerId(""),
+    currentGameId = GameId(""),
     basePlayers = emptyList(),
     waitPlayerIds = emptyList(),
     tableStatus = TableStatus.PREPARING,
