@@ -184,6 +184,18 @@ constructor(
             }.collect()
         }
 
+        // Game監視スタートのタイミングを監視
+        viewModelScope.launch {
+            tableStateFlow.filterNotNull().collect { table ->
+                if (table.tableStatus == TableStatus.PLAYING) {
+                    // Playingになったら監視を開始する
+                    gameRepository.startCollectGameFlow(tableId)
+                    // 一度きり
+                    this.cancel()
+                }
+            }
+        }
+
         // 遷移の監視
         viewModelScope.launch {
             combine(
