@@ -66,15 +66,6 @@ fun TablePrepareScreen(
                     event = viewModel
                 )
             }
-            val stackEditDialogState = dialogUiState.stackEditDialogState
-            if (stackEditDialogState != null) {
-                StackEditDialogContent(
-                    uiState = stackEditDialogState,
-                    onDismissRequestStackEditDialog = viewModel::onDismissRequestStackEditDialog,
-                    onChangeEditText = viewModel::onChangeStackSize,
-                    onClickSubmitButton = viewModel::onClickStackEditSubmit
-                )
-            }
             val myNameInputDialogUiState = dialogUiState.myNameInputDialogUiState
             if (myNameInputDialogUiState != null) {
                 MyNameInputDialogContent(
@@ -131,7 +122,6 @@ sealed interface TablePrepareScreenUiState {
 
 data class TablePrepareScreenDialogUiState(
     val tableCreatorContentUiState: TableCreatorContentUiState? = null,
-    val stackEditDialogState: StackEditDialogState? = null,
     val playerRemoveDialogUiState: PlayerRemoveDialogUiState? = null,
     val playerEditDialogUiState: PlayerEditDialogUiState? = null,
     val selectBtnPlayerDialogUiState: SelectBtnPlayerDialogUiState? = null,

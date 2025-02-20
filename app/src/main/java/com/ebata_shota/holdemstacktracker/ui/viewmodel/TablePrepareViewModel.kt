@@ -13,7 +13,6 @@ import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundTableException
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtFind
-import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.MovePosition
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -67,7 +66,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.Instant
 import javax.inject.Inject
 
 @HiltViewModel
@@ -409,7 +407,7 @@ constructor(
     override fun onChangeStackValue(stackValue: TextFieldValue) {
         _dialogUiState.update {
             it.copy(
-                stackEditDialogState = it.stackEditDialogState?.copy(
+                playerEditDialogUiState = it.playerEditDialogUiState?.copy(
                     stackValue = stackValue
                 )
             )
@@ -499,48 +497,6 @@ constructor(
         }
     }
 
-    fun onChangeStackSize(value: TextFieldValue) {
-        _dialogUiState.update {
-            it.copy(
-                stackEditDialogState = it.stackEditDialogState?.copy(
-                    stackValue = value
-                )
-            )
-        }
-    }
-
-    fun onClickStackEditSubmit(playerId: PlayerId) {
-        viewModelScope.launch {
-            val stackValueText = dialogUiState.value.stackEditDialogState?.stackValue?.text
-                ?: return@launch
-            val table = tableStateFlow.value
-                ?: return@launch
-            val index = table.basePlayers.indexOfFirstOrNull { it.id == playerId }
-                ?: return@launch
-            val stack = stackValueText.toInt() // TODO: バリデーションしたい
-            if (table.basePlayers[index].stack == stack) {
-                // スタックに変化がないので更新しない
-                _dialogUiState.update {
-                    it.copy(stackEditDialogState = null)
-                }
-                return@launch
-            }
-            val copiedTable = table.copy(
-                basePlayers = table.basePlayers.mapAtIndex(index = index) {
-                    it.copy(
-                        stack = stack
-                    )
-                },
-                updateTime = Instant.now(),
-                version = table.version + 1
-            )
-            tableRepository.sendTable(copiedTable)
-            _dialogUiState.update {
-                it.copy(stackEditDialogState = null)
-            }
-        }
-    }
-
     fun onClickUpButton(playerId: PlayerId) {
         movePosition(playerId, MovePosition.PREV)
     }
@@ -560,12 +516,6 @@ constructor(
                 table = table,
                 movePosition = movePosition
             )
-        }
-    }
-
-    fun onDismissRequestStackEditDialog() {
-        _dialogUiState.update {
-            it.copy(stackEditDialogState = null)
         }
     }
 
