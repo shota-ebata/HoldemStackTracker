@@ -1,7 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
 import android.os.Bundle
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
@@ -196,7 +195,7 @@ constructor(
                 val lastPhase = game.phaseList.lastOrNull()
                 if (
                     table.tableStatus == TableStatus.PLAYING
-                    && lastPhase!=null && lastPhase !is Phase.Standby
+                    && lastPhase != null && lastPhase !is Phase.Standby
                     && table.playerOrder.any { it == myPlayerId }
                 ) {
                     // ゲーム中かつ
