@@ -3,7 +3,6 @@ package com.ebata_shota.holdemstacktracker.domain.usecase
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pot
-import com.ebata_shota.holdemstacktracker.domain.model.PotAndRemainingBet
 import com.ebata_shota.holdemstacktracker.domain.model.PotId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPotListUseCaseImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.RandomIdRepositoryImpl
@@ -31,20 +30,17 @@ class GetPotListUseCaseImplTest {
         pendingBetPerPlayerWithoutZero: Map<PlayerId, Int>,
         activePlayerIds: List<PlayerId>,
         potList: List<Pot> = emptyList(),
-        expected: PotAndRemainingBet,
+        expected: List<Pot>,
     ) {
         runTest(dispatcher) {
             // execute
-            val potAndRemainingBet = useCase.invoke(
+            val actual = useCase.invoke(
                 updatedPlayers = updatedPlayers,
                 potList = potList,
                 pendingBetPerPlayerWithoutZero = pendingBetPerPlayerWithoutZero,
                 activePlayerIds = activePlayerIds
-            )
-            // テスト用にIDを0に上書き
-            val actual = potAndRemainingBet.copy(
-                potList = potAndRemainingBet.potList.map { it.copy(id = PotId("0")) }
-            )
+            )// テスト用にIDを0に上書き
+                .map { it.copy(id = PotId("0")) }
             // assert
             assertThat(actual).isEqualTo(expected)
         }
@@ -97,9 +93,7 @@ class GetPotListUseCaseImplTest {
             updatedPlayers = updatedPlayers,
             pendingBetPerPlayerWithoutZero = pendingBetPerPlayerWithoutZero,
             activePlayerIds = activePlayerIds,
-            expected = PotAndRemainingBet(
-                potList = expectedList,
-            ),
+            expected = expectedList,
         )
     }
 
@@ -150,9 +144,7 @@ class GetPotListUseCaseImplTest {
             updatedPlayers = updatedPlayers,
             pendingBetPerPlayerWithoutZero = pendingBetPerPlayerWithoutZero,
             activePlayerIds = activePlayerIds,
-            expected = PotAndRemainingBet(
-                potList = expectedList,
-            ),
+            expected = expectedList,
         )
     }
 
@@ -203,9 +195,7 @@ class GetPotListUseCaseImplTest {
             updatedPlayers = updatedPlayers,
             pendingBetPerPlayerWithoutZero = pendingBetPerPlayerWithoutZero,
             activePlayerIds = activePlayerIds,
-            expected = PotAndRemainingBet(
-                potList = expectedList,
-            ),
+            expected = expectedList,
         )
     }
 
@@ -274,9 +264,7 @@ class GetPotListUseCaseImplTest {
             updatedPlayers = updatedPlayers,
             pendingBetPerPlayerWithoutZero = pendingBetPerPlayerWithoutZero,
             activePlayerIds = activePlayerIds,
-            expected = PotAndRemainingBet(
-                potList = expectedList,
-            ),
+            expected = expectedList,
         )
     }
 
@@ -331,9 +319,7 @@ class GetPotListUseCaseImplTest {
             updatedPlayers = updatedPlayers,
             pendingBetPerPlayerWithoutZero = pendingBetPerPlayerWithoutZero,
             activePlayerIds = activePlayerIds,
-            expected = PotAndRemainingBet(
-                potList = expectedList,
-            ),
+            expected = expectedList,
         )
     }
 
@@ -403,9 +389,7 @@ class GetPotListUseCaseImplTest {
             pendingBetPerPlayerWithoutZero = pendingBetPerPlayerWithoutZero,
             activePlayerIds = activePlayerIds,
             potList = potList,
-            expected = PotAndRemainingBet(
-                potList = expectedList,
-            ),
+            expected = expectedList,
         )
     }
 
@@ -482,9 +466,7 @@ class GetPotListUseCaseImplTest {
             pendingBetPerPlayerWithoutZero = pendingBetPerPlayerWithoutZero,
             activePlayerIds = activePlayerIds,
             potList = potList,
-            expected = PotAndRemainingBet(
-                potList = expectedList,
-            ),
+            expected = expectedList,
         )
     }
 
@@ -536,9 +518,7 @@ class GetPotListUseCaseImplTest {
             updatedPlayers = updatedPlayers,
             pendingBetPerPlayerWithoutZero = pendingBetPerPlayerWithoutZero,
             activePlayerIds = activePlayerIds,
-            expected = PotAndRemainingBet(
-                potList = expectedList,
-            ),
+            expected = expectedList,
         )
     }
 
@@ -595,9 +575,7 @@ class GetPotListUseCaseImplTest {
             updatedPlayers = updatedPlayers,
             pendingBetPerPlayerWithoutZero = pendingBetPerPlayerWithoutZero,
             activePlayerIds = activePlayerIds,
-            expected = PotAndRemainingBet(
-                potList = expectedList,
-            ),
+            expected = expectedList,
         )
     }
 
@@ -663,9 +641,7 @@ class GetPotListUseCaseImplTest {
             updatedPlayers = updatedPlayers,
             pendingBetPerPlayerWithoutZero = pendingBetPerPlayerWithoutZero,
             activePlayerIds = activePlayerIds,
-            expected = PotAndRemainingBet(
-                potList = expectedList,
-            ),
+            expected = expectedList,
         )
     }
 
@@ -732,9 +708,7 @@ class GetPotListUseCaseImplTest {
             updatedPlayers = updatedPlayers,
             pendingBetPerPlayerWithoutZero = pendingBetPerPlayerWithoutZero,
             activePlayerIds = activePlayerIds,
-            expected = PotAndRemainingBet(
-                potList = expectedList,
-            ),
+            expected = expectedList,
         )
     }
 }

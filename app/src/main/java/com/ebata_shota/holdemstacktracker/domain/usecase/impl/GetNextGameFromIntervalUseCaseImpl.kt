@@ -5,7 +5,6 @@ import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.PotAndRemainingBet
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameFromIntervalUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
@@ -52,7 +51,7 @@ constructor(
             phaseList = currentGame.phaseList
         )
         // ベット状況をポットに反映
-        val potAndRemainingBet: PotAndRemainingBet = getPotStateList.invoke(
+        val potList = getPotStateList.invoke(
             updatedPlayers = currentGame.players,
             potList = currentGame.potList,
             pendingBetPerPlayerWithoutZero = pendingBetPerPlayer,
@@ -66,7 +65,7 @@ constructor(
         val updatedPhaseList = currentPhase + nextPhase
         // TableState更新
         return@withContext currentGame.copy(
-            potList = potAndRemainingBet.potList,
+            potList = potList,
             phaseList = updatedPhaseList,
         )
     }

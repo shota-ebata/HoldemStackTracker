@@ -11,7 +11,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseStatus
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.PotAndRemainingBet
+import com.ebata_shota.holdemstacktracker.domain.model.Pot
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.AddBetPhaseActionInToGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionablePlayerIdsUseCase
@@ -105,7 +105,7 @@ constructor(
              * 一人を除いて、全員降りている場合
              * ベット状況をポットに反映
              */
-            val potAndRemainingBet: PotAndRemainingBet = getUpdatedPotList(
+            val potList = getUpdatedPotList(
                 updatedPlayers = updatedPlayers,
                 playerOrder = baseNextGame.playerOrder,
                 addedActionList = addedActionList,
@@ -113,7 +113,7 @@ constructor(
                 activePlayerIds = notFoldPlayerIds
             )
             return@withContext baseNextGame.copy(
-                potList = potAndRemainingBet.potList,
+                potList = potList,
                 phaseList = addedActionPhaseList.mapAtIndex(currentPhaseList.lastIndex) {
                     // Phaseに反映
                     addedActionPhase.copyWith(phaseStatus = PhaseStatus.Close)
@@ -179,7 +179,7 @@ constructor(
         addedActionList: List<BetPhaseAction>,
         currentGame: Game,
         activePlayerIds: List<PlayerId>,
-    ): PotAndRemainingBet {
+    ): List<Pot> {
         // プレイヤーごとの、まだポットに入っていないベット額
         val pendingBetPerPlayer: Map<PlayerId, Int> = getPendingBetPerPlayer.invoke(
             playerOrder = playerOrder,

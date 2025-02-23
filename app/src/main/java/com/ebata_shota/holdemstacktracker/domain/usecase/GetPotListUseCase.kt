@@ -3,7 +3,6 @@ package com.ebata_shota.holdemstacktracker.domain.usecase
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pot
-import com.ebata_shota.holdemstacktracker.domain.model.PotAndRemainingBet
 
 interface GetPotListUseCase {
     /**
@@ -16,5 +15,5 @@ interface GetPotListUseCase {
         potList: List<Pot>,
         pendingBetPerPlayerWithoutZero: Map<PlayerId, Int>,
         activePlayerIds: List<PlayerId>,
-    ): PotAndRemainingBet
+    ): List<Pot>
 }

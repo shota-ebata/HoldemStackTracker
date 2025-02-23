@@ -5,7 +5,6 @@ import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pot
-import com.ebata_shota.holdemstacktracker.domain.model.PotAndRemainingBet
 import com.ebata_shota.holdemstacktracker.domain.model.PotId
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotListUseCase
@@ -26,7 +25,7 @@ constructor(
         potList: List<Pot>,
         pendingBetPerPlayerWithoutZero: Map<PlayerId, Int>,
         activePlayerIds: List<PlayerId>,
-    ): PotAndRemainingBet = withContext(dispatcher) {
+    ): List<Pot> = withContext(dispatcher) {
         // ポットに入っていないベットが残っているプレイヤー数
         val pendingBetPlayerCount: Int = pendingBetPerPlayerWithoutZero.size
         return@withContext if (pendingBetPlayerCount > 0) {
@@ -39,9 +38,7 @@ constructor(
             )
         } else {
             // ポットに入っていないベットが残っているプレイヤー数0人の場合、ポットはそのまま。
-            PotAndRemainingBet(
-                potList = potList,
-            )
+            potList
         }
     }
 
@@ -50,7 +47,7 @@ constructor(
         potList: List<Pot>,
         pendingBetPerPlayer: Map<PlayerId, Int>,
         activePlayerIds: List<PlayerId>,
-    ): PotAndRemainingBet {
+    ): List<Pot> {
         // 最新のポットを取得
         val lastPot: Pot? = potList.lastOrNull()
         var currentPot: Pot = if (lastPot != null && lastPot.isClosed.not()) {
@@ -117,9 +114,7 @@ constructor(
         if (updatedPendingPrePlayer.isEmpty()) {
             // もうベットが無いなら、ポットを返す
             // 現在のpotを返す
-            return PotAndRemainingBet(
-                potList = updatedPotList,
-            )
+            return updatedPotList
         }
         // まだ残っている可能性があるので再帰
         return getNewPotList(
