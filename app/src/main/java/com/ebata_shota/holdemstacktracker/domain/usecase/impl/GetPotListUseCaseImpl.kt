@@ -5,8 +5,8 @@ import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pot
-import com.ebata_shota.holdemstacktracker.domain.model.PotId
 import com.ebata_shota.holdemstacktracker.domain.model.PotAndRemainingBet
+import com.ebata_shota.holdemstacktracker.domain.model.PotId
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotListUseCase
 import kotlinx.coroutines.CoroutineDispatcher
@@ -41,7 +41,6 @@ constructor(
             // ポットに入っていないベットが残っているプレイヤー数0人の場合、ポットはそのまま。
             PotAndRemainingBet(
                 potList = potList,
-                pendingBetPerPlayerWithoutZero = pendingBetPerPlayerWithoutZero
             )
         }
     }
@@ -65,18 +64,25 @@ constructor(
         var potSize: Int = currentPot.potSize
         val involvedPlayerIds = currentPot.involvedPlayerIds.toMutableList()
 
-        // 最低ベットサイズを取得
+        // 一番小さいBetのサイズを探す
         val minBetSize = pendingBetPerPlayer.map {
             it.value
-        }.min()
+        }.minOrNull() ?: 0
+
+        // 降りてない人の最低ベットサイズを探す
+        val activePlayerMinBetSize = pendingBetPerPlayer.filter { (key, _) ->
+            activePlayerIds.any { it == key}
+        }.map {
+            it.value
+        }.minOrNull() ?: 0
         val updatedPendingPrePlayer = pendingBetPerPlayer.mapValues { (playerId, betSize) ->
+            val isActivePlayer = activePlayerIds.any { it == playerId }
             // ポットにいれるサイズを決める
-//            val isActivePlayer = activePlayerIds.any { it == playerId }
-            val addSize = if (betSize < minBetSize) {
-                // Betサイズが最小Betよりも小さい場合、すべて入れる
-                betSize
+            val addSize = if (isActivePlayer) {
+                // 降りてないプレイヤーは一番小さいベットを一旦入れる
+                activePlayerMinBetSize
             } else {
-                // 足りてるプレイヤーは、最小Betサイズを一旦入れる
+                // 降りている人は、一番小さいBetサイズを入れる
                 minBetSize
             }
             // ポットに入れる
@@ -108,13 +114,11 @@ constructor(
             // 新規ポットであれば追加
             updatedPotList.add(currentPot)
         }
-        if (updatedPendingPrePlayer.size <= 1) {
-            // Betが残っているプレイヤーが一人以下の場合
-            // これ以上はポットを作成しないで現在のPotを返す
-            // もし、Betが余っているプレイヤーがいれば返却する
+        if (updatedPendingPrePlayer.isEmpty()) {
+            // もうベットが無いなら、ポットを返す
+            // 現在のpotを返す
             return PotAndRemainingBet(
                 potList = updatedPotList,
-                pendingBetPerPlayerWithoutZero = updatedPendingPrePlayer
             )
         }
         // まだ残っている可能性があるので再帰

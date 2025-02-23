@@ -99,7 +99,6 @@ class GetPotListUseCaseImplTest {
             activePlayerIds = activePlayerIds,
             expected = PotAndRemainingBet(
                 potList = expectedList,
-                pendingBetPerPlayerWithoutZero = emptyMap()
             ),
         )
     }
@@ -153,7 +152,6 @@ class GetPotListUseCaseImplTest {
             activePlayerIds = activePlayerIds,
             expected = PotAndRemainingBet(
                 potList = expectedList,
-                pendingBetPerPlayerWithoutZero = emptyMap()
             ),
         )
     }
@@ -207,7 +205,6 @@ class GetPotListUseCaseImplTest {
             activePlayerIds = activePlayerIds,
             expected = PotAndRemainingBet(
                 potList = expectedList,
-                pendingBetPerPlayerWithoutZero = emptyMap()
             ),
         )
     }
@@ -263,6 +260,15 @@ class GetPotListUseCaseImplTest {
                 ),
                 isClosed = true
             ),
+            Pot(
+                id = PotId("0"),
+                potNumber = 2,
+                potSize = 100,
+                involvedPlayerIds = listOf(
+                    PlayerId("2"),
+                ),
+                isClosed = true
+            ),
         )
         executeAndAssert(
             updatedPlayers = updatedPlayers,
@@ -270,9 +276,6 @@ class GetPotListUseCaseImplTest {
             activePlayerIds = activePlayerIds,
             expected = PotAndRemainingBet(
                 potList = expectedList,
-                pendingBetPerPlayerWithoutZero = mapOf(
-                    PlayerId("2") to 100
-                )
             ),
         )
     }
@@ -330,7 +333,6 @@ class GetPotListUseCaseImplTest {
             activePlayerIds = activePlayerIds,
             expected = PotAndRemainingBet(
                 potList = expectedList,
-                pendingBetPerPlayerWithoutZero = emptyMap()
             ),
         )
     }
@@ -403,7 +405,6 @@ class GetPotListUseCaseImplTest {
             potList = potList,
             expected = PotAndRemainingBet(
                 potList = expectedList,
-                pendingBetPerPlayerWithoutZero = emptyMap()
             ),
         )
     }
@@ -483,7 +484,6 @@ class GetPotListUseCaseImplTest {
             potList = potList,
             expected = PotAndRemainingBet(
                 potList = expectedList,
-                pendingBetPerPlayerWithoutZero = emptyMap()
             ),
         )
     }
@@ -524,7 +524,7 @@ class GetPotListUseCaseImplTest {
             Pot(
                 id = PotId("0"),
                 potNumber = 0,
-                potSize = 4,
+                potSize = 103,
                 involvedPlayerIds = listOf(
                     PlayerId("0"),
                     PlayerId("1"),
@@ -538,9 +538,6 @@ class GetPotListUseCaseImplTest {
             activePlayerIds = activePlayerIds,
             expected = PotAndRemainingBet(
                 potList = expectedList,
-                pendingBetPerPlayerWithoutZero = mapOf(
-                    PlayerId("0") to 99
-                )
             ),
         )
     }
@@ -584,6 +581,15 @@ class GetPotListUseCaseImplTest {
                 ),
                 isClosed = true
             ),
+            Pot(
+                id = PotId("0"),
+                potNumber = 1,
+                potSize = 1,
+                involvedPlayerIds = listOf(
+                    PlayerId("0"),
+                ),
+                isClosed = true
+            ),
         )
         executeAndAssert(
             updatedPlayers = updatedPlayers,
@@ -591,9 +597,6 @@ class GetPotListUseCaseImplTest {
             activePlayerIds = activePlayerIds,
             expected = PotAndRemainingBet(
                 potList = expectedList,
-                pendingBetPerPlayerWithoutZero = mapOf(
-                    PlayerId("0") to 1
-                )
             ),
         )
     }
@@ -645,6 +648,15 @@ class GetPotListUseCaseImplTest {
                     PlayerId("2"),
                 ),
                 isClosed = true
+            ),
+            Pot(
+                id = PotId("0"),
+                potNumber = 1,
+                potSize = 188,
+                involvedPlayerIds = listOf(
+                    PlayerId("1"),
+                ),
+                isClosed = true
             )
         )
         executeAndAssert(
@@ -653,9 +665,6 @@ class GetPotListUseCaseImplTest {
             activePlayerIds = activePlayerIds,
             expected = PotAndRemainingBet(
                 potList = expectedList,
-                pendingBetPerPlayerWithoutZero = mapOf(
-                    PlayerId("1") to 188
-                )
             ),
         )
     }
@@ -711,12 +720,12 @@ class GetPotListUseCaseImplTest {
             Pot(
                 id = PotId("0"),
                 potNumber = 1,
-                potSize = 4,
+                potSize = 192,
                 involvedPlayerIds = listOf(
                     PlayerId("1"),
                     PlayerId("2"),
                 ),
-                isClosed = false
+                isClosed = true
             ),
         )
         executeAndAssert(
@@ -725,9 +734,6 @@ class GetPotListUseCaseImplTest {
             activePlayerIds = activePlayerIds,
             expected = PotAndRemainingBet(
                 potList = expectedList,
-                pendingBetPerPlayerWithoutZero = mapOf(
-                    PlayerId("1") to 188
-                )
             ),
         )
     }

@@ -112,13 +112,6 @@ constructor(
                 currentGame = currentGame,
                 activePlayerIds = notFoldPlayerIds
             )
-            // 余ったBetをプレイヤーに返却する
-            var reUpdatedPlayers = baseNextGame.players
-            potAndRemainingBet.pendingBetPerPlayerWithoutZero.forEach { (playerId, remainingBetSize) ->
-                reUpdatedPlayers = reUpdatedPlayers.mapAtFind({ it.id == playerId }) {
-                    it.copy(stack = it.stack + remainingBetSize)
-                }
-            }
             return@withContext baseNextGame.copy(
                 potList = potAndRemainingBet.potList,
                 phaseList = addedActionPhaseList.mapAtIndex(currentPhaseList.lastIndex) {
@@ -132,7 +125,6 @@ constructor(
                         )
                     )
                 },
-                players = reUpdatedPlayers
             )
         }
 
