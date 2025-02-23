@@ -16,6 +16,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -46,10 +48,13 @@ fun GamePlayerCard(
                 modifier = modifier,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                BetSize(
+                BetSizeRow(
                     uiState = uiState
                 )
-                Position(
+                if (uiState.shouldShowActionNextLine) {
+                    OnlyActionRow(uiState = uiState)
+                }
+                PositionAndActionRow(
                     uiState = uiState
                 )
                 PlayerCard(
@@ -68,10 +73,11 @@ fun GamePlayerCard(
                     uiState = uiState,
                     onClickCard = onClickCard,
                 )
-                Position(
-                    uiState = uiState
-                )
-                BetSize(
+                PositionAndActionRow(uiState = uiState)
+                if (uiState.shouldShowActionNextLine) {
+                    OnlyActionRow(uiState = uiState)
+                }
+                BetSizeRow(
                     uiState = uiState,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
@@ -82,7 +88,7 @@ fun GamePlayerCard(
 }
 
 @Composable
-private fun Position(
+private fun PositionAndActionRow(
     uiState: GamePlayerUiState,
 ) {
     Row(
@@ -112,23 +118,54 @@ private fun Position(
             }
         }
         val lastActionText = uiState.lastActionText
-        if (lastActionText != null) {
-            Card(
-                shape = RoundedCornerShape(4.dp),
-            ) {
-                Text(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp),
-                    text = lastActionText.getString()
-                )
-            }
+        if (lastActionText != null && !uiState.shouldShowActionNextLine) {
+            Text(
+                modifier = Modifier
+                    .border(
+                        width = OutlineLabelBorderWidth,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        shape = RoundedCornerShape(4.dp),
+                    )
+                    .padding(horizontal = 8.dp),
+
+                text = lastActionText.getString(),
+                textAlign = TextAlign.Center
+            )
 
         }
     }
 }
 
 @Composable
-private fun BetSize(
+private fun OnlyActionRow(
+    uiState: GamePlayerUiState
+) {
+    Row(
+        modifier = Modifier
+            .padding(vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        val lastActionText = uiState.lastActionText
+        if (lastActionText != null) {
+            Text(
+                modifier = Modifier
+                    .border(
+                        width = OutlineLabelBorderWidth,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        shape = RoundedCornerShape(4.dp),
+                    )
+                    .padding(horizontal = 8.dp),
+
+                text = lastActionText.getString(),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+private fun BetSizeRow(
     uiState: GamePlayerUiState,
     modifier: Modifier = Modifier,
 ) {
@@ -219,6 +256,10 @@ data class GamePlayerUiState(
         PlayerPosition.BOTTOM -> BetTextPosition.TOP
         else -> BetTextPosition.BOTTOM
     }
+
+    // Actionを次の行に表示する
+    val shouldShowActionNextLine: Boolean = isBtn && positionLabelResId != null
+
     enum class BetTextPosition {
         TOP,
         BOTTOM
@@ -246,7 +287,7 @@ private class GamePlayerCardPreviewParam :
             isCurrentPlayer = false,
             isBtn = true,
             positionLabelResId = R.string.position_label_sb,
-            lastActionText = StringSource(R.string.action_label_bet)
+            lastActionText = StringSource(R.string.action_label_all_in)
         ),
         GamePlayerUiState(
             playerName = "PlayerName",
@@ -259,7 +300,7 @@ private class GamePlayerCardPreviewParam :
             isCurrentPlayer = true,
             isBtn = false,
             positionLabelResId = R.string.position_label_bb,
-            lastActionText = StringSource(R.string.action_label_bet)
+            lastActionText = StringSource(R.string.action_label_all_in)
         ),
         GamePlayerUiState(
             playerName = "Player123456789",
@@ -272,7 +313,7 @@ private class GamePlayerCardPreviewParam :
             isCurrentPlayer = true,
             isBtn = false,
             positionLabelResId = null,
-            lastActionText = StringSource(R.string.action_label_bet)
+            lastActionText = StringSource(R.string.action_label_all_in)
         )
     )
 }
@@ -281,6 +322,7 @@ private class GamePlayerCardPreviewParam :
 @Preview(
     showBackground = false,
     showSystemUi = false,
+    widthDp = 100,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
     name = "Dark Mode"
 )
@@ -290,9 +332,11 @@ private fun GamePlayerCardPreview(
     uiState: GamePlayerUiState
 ) {
     HoldemStackTrackerTheme {
-        GamePlayerCard(
-            uiState = uiState,
-            onClickCard = {}
-        )
+        Surface {
+            GamePlayerCard(
+                uiState = uiState,
+                onClickCard = {}
+            )
+        }
     }
 }

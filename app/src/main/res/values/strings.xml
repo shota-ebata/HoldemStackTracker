@@ -75,7 +75,7 @@
 
     <string name="action_label_fold" translatable="false">FOLD</string>
     <string name="action_label_check" translatable="false">CHECK</string>
-    <string name="action_label_all_in" translatable="false">ALL-IN</string>
+    <string name="action_label_all_in" translatable="false">ALL IN</string>
     <string name="action_label_call" translatable="false">CALL</string>
     <string name="action_label_bet" translatable="false">BET</string>
     <string name="action_label_raise" translatable="false">RAISE</string>
