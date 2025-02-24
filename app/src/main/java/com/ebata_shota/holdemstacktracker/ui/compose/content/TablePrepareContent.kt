@@ -277,49 +277,48 @@ fun TablePrepareContent(
                         }
                     }
                 }
-                // BTNの決め方
-                if (uiState.isEditable) {
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp)
-                            .padding(horizontal = SideSpace),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = stringResource(R.string.btn_chosen),
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-
-                        Text(
-                            text = uiState.btnPlayerName.getString(),
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-
-                        IconButton(
-                            modifier = Modifier
-                                .size(48.dp),
-                            onClick = dropRedundantEvent {
-                                onClickEditBtnPlayerButton()
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Edit,
-                                contentDescription = "edit"
-                            )
-                        }
-                    }
-                }
             }
 
             // ゲーム開始ボタン
             if (uiState.isEditable) {
+                HorizontalDivider(
+                    modifier = Modifier
+                )
+                // BTNの決め方
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(horizontal = SideSpace, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = stringResource(R.string.btn_chosen),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+
+                    Text(
+                        text = uiState.btnPlayerName.getString(),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+
+                    IconButton(
+                        modifier = Modifier
+                            .size(48.dp),
+                        onClick = dropRedundantEvent {
+                            onClickEditBtnPlayerButton()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Edit,
+                            contentDescription = "edit"
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Button(

@@ -13,7 +13,7 @@
     <string name="game_rule_update_button">Update</string>
 
     <string name="my_player_name_label">あなたのプレイヤー名</string>
-    <string name="member_title_label">参加プレイヤー</string>
+    <string name="member_title_label">プレイヤー</string>
     <string name="btn_chosen">BTNプレイヤー</string>
     <string name="btn_random">ランダム</string>
     <string name="start_game">ゲーム開始</string>
