@@ -51,7 +51,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogUi
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PhaseIntervalImageDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogUiState.PlayerRowUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.row.PotSettlementCheckboxRowUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
 import com.ebata_shota.holdemstacktracker.ui.mapper.GameContentUiStateMapper
@@ -353,17 +353,18 @@ constructor(
                                 PotSettlementDialogUiState.PotUiState(
                                     potNumber = pot.potNumber,
                                     potSizeString = StringSource(pot.potSize.toString()),
-                                    players = pot.involvedPlayerIds.mapNotNull { involvedPlayerId ->
-                                        if (notFoldPlayerIds.any { it == involvedPlayerId }) {
-                                            PlayerRowUiState(
-                                                playerId = involvedPlayerId,
-                                                label = StringSource(
-                                                    table.basePlayers.find { it.id == involvedPlayerId }!!.name
-                                                )
-                                            )
-                                        } else {
-                                            return@mapNotNull null
+                                    players = pot.involvedPlayerIds.map { involvedPlayerId ->
+                                        val isEnable = notFoldPlayerIds.any {
+                                            it == involvedPlayerId
                                         }
+                                        PotSettlementCheckboxRowUiState(
+                                            playerId = involvedPlayerId,
+                                            playerName = StringSource(
+                                                table.basePlayers.find { it.id == involvedPlayerId }!!.name
+                                            ),
+                                            isEnable = isEnable,
+                                            shouldShowFoldLabel = !isEnable
+                                        )
                                     }
                                 )
                             },

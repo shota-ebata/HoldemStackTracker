@@ -32,7 +32,8 @@ import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ChipSizeText
-import com.ebata_shota.holdemstacktracker.ui.compose.row.CheckboxRow
+import com.ebata_shota.holdemstacktracker.ui.compose.row.PotSettlementCheckboxRow
+import com.ebata_shota.holdemstacktracker.ui.compose.row.PotSettlementCheckboxRowUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.util.dropRedundantEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.util.rememberDelayState
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
@@ -123,11 +124,11 @@ fun PotSettlementDialogContent(
                     if (uiState.unSelectablePlayerIds.none { it == playerRowUiState.playerId }) {
                         // 選択できないプレイヤー一覧
                         // に含まれていないなら、チェックボックスを表示する
-                        CheckboxRow(
-                            item = playerRowUiState,
-                            isChecked = playerRowUiState.isSelected,
-                            labelString = { it.label.getString() },
+                        PotSettlementCheckboxRow(
+                            uiState = playerRowUiState,
                             onClickRow = {
+                                // 直前にバックボタンも確定ボタンも押されていない場合
+                                // FIXME: 別にバックボタンでの制御はしなくていいいのでは？
                                 if (doneButtonDelayState.isDelayed && backButtonDelayState.isDelayed) {
                                     event.onClickPotSettlementDialogPlayerRow(it.playerId)
                                 }
@@ -210,13 +211,7 @@ data class PotSettlementDialogUiState(
     data class PotUiState(
         val potNumber: Int,
         val potSizeString: StringSource,
-        val players: List<PlayerRowUiState>,
-    )
-
-    data class PlayerRowUiState(
-        val playerId: PlayerId,
-        val label: StringSource,
-        val isSelected: Boolean = false,
+        val players: List<PotSettlementCheckboxRowUiState>,
     )
 }
 
@@ -244,17 +239,17 @@ private fun PotSettlementDialogContentPreview() {
                         potNumber = 0,
                         potSizeString = StringSource("1000"),
                         players = listOf(
-                            PotSettlementDialogUiState.PlayerRowUiState(
+                            PotSettlementCheckboxRowUiState(
                                 playerId = PlayerId("1"),
-                                label = StringSource("櫻木"),
+                                playerName = StringSource("櫻木"),
                             ),
-                            PotSettlementDialogUiState.PlayerRowUiState(
+                            PotSettlementCheckboxRowUiState(
                                 playerId = PlayerId("2"),
-                                label = StringSource("風野"),
+                                playerName = StringSource("風野"),
                             ),
-                            PotSettlementDialogUiState.PlayerRowUiState(
+                            PotSettlementCheckboxRowUiState(
                                 playerId = PlayerId("3"),
-                                label = StringSource("八宮"),
+                                playerName = StringSource("八宮"),
                             ),
                         )
                     ),
@@ -262,14 +257,14 @@ private fun PotSettlementDialogContentPreview() {
                         potNumber = 1,
                         potSizeString = StringSource("2000"),
                         players = listOf(
-                            PotSettlementDialogUiState.PlayerRowUiState(
+                            PotSettlementCheckboxRowUiState(
                                 playerId = PlayerId("2"),
-                                label = StringSource("風野"),
+                                playerName = StringSource("風野"),
                                 isSelected = true
                             ),
-                            PotSettlementDialogUiState.PlayerRowUiState(
+                            PotSettlementCheckboxRowUiState(
                                 playerId = PlayerId("3"),
-                                label = StringSource("八宮"),
+                                playerName = StringSource("八宮"),
                             ),
                         ),
                     ),
