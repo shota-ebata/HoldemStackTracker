@@ -13,6 +13,9 @@ import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableSummaryRepository
 import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.JoinByIdDialogEvent
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.JoinByIdDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MainConsoleDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
@@ -48,8 +51,11 @@ constructor(
     private val tableRepository: TableRepository,
     private val scannerRepository: GmsBarcodeScannerRepository,
     private val prefRepository: PrefRepository,
-    private val firebaseAuthRepository: FirebaseAuthRepository
-) : ViewModel(), MyNameInputDialogEvent {
+    private val firebaseAuthRepository: FirebaseAuthRepository,
+) : ViewModel(),
+    MyNameInputDialogEvent,
+    JoinByIdDialogEvent,
+    MainConsoleDialogEvent {
     private val _uiState = MutableStateFlow<MainScreenUiState>(MainScreenUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
@@ -68,7 +74,7 @@ constructor(
     sealed interface NavigateEvent {
         data object TableCreator : NavigateEvent
 
-        data class TableStandby(
+        data class TablePrepare(
             val tableId: TableId
         ) : NavigateEvent
 
@@ -124,15 +130,25 @@ constructor(
         isLoadingOnScreenContent.update { false }
     }
 
-    fun onClickCreateNewTable() {
+//    fun onClickCreateNewTable() {
+//        navigateTableCreator()
+//    }
+
+    fun onClickFAB() {
+        _dialogUiState.update {
+            it.copy(shouldShowMainConsoleDialog = true)
+        }
+    }
+
+    private fun navigateTableCreator() {
         viewModelScope.launch {
             _navigateEvent.emit(NavigateEvent.TableCreator)
         }
     }
 
-    fun onClickQrScan() {
-        startQrScan()
-    }
+//    fun onClickQrScan() {
+//        startQrScan()
+//    }
 
     fun onClickSettingRename() {
         viewModelScope.launch {
@@ -182,6 +198,76 @@ constructor(
         }
     }
 
+    override fun onChangeEditTextJoinByIdDialog(value: TextFieldValue) {
+        _dialogUiState.update {
+            it.copy(
+                joinByIdDialogUiState = it.joinByIdDialogUiState?.copy(
+                    value = value
+                )
+            )
+        }
+    }
+
+    override fun onClickSubmitButtonJoinByIdDialog() {
+        val tableIdText = dialogUiState.value.joinByIdDialogUiState?.value?.text.orEmpty()
+        if (tableIdText.isNotBlank()) {
+            viewModelScope.launch {
+                val isExistsTable = tableRepository.isExistsTable(TableId(tableIdText))
+                if (isExistsTable) {
+                    _navigateEvent.emit(NavigateEvent.TablePrepare(TableId(tableIdText)))
+                }
+            }
+        }
+    }
+
+    override fun onDismissRequestJoinByIdDialog() {
+        _dialogUiState.update {
+            it.copy(joinByIdDialogUiState = null)
+        }
+    }
+
+    /**
+     * テーブル新規作成ボタン
+     */
+    override fun onClickTableCreator() {
+        navigateTableCreator()
+        _dialogUiState.update {
+            it.copy(
+                shouldShowMainConsoleDialog = false,
+            )
+        }
+    }
+
+    /**
+     * QRで参加ボタン
+     */
+    override fun onClickJoinTableByQr() {
+        startQrScan()
+        _dialogUiState.update {
+            it.copy(
+                shouldShowMainConsoleDialog = false,
+            )
+        }
+    }
+
+    /**
+     * IDで参加ボタン
+     */
+    override fun onClickJoinTableById() {
+        _dialogUiState.update {
+            it.copy(
+                joinByIdDialogUiState = JoinByIdDialogUiState(value = TextFieldValue()),
+                shouldShowMainConsoleDialog = false
+            )
+        }
+    }
+
+    override fun onDismissRequestMainConsoleDialog() {
+        _dialogUiState.update {
+            it.copy(shouldShowMainConsoleDialog = false)
+        }
+    }
+
     fun onClickTableRow(tableId: TableId) {
         loadingOnScreenJob = viewModelScope.launch {
             isLoadingOnScreenContent.update { true }
@@ -195,7 +281,7 @@ constructor(
             // テーブルの状態によって遷移先は変わるので判定する
             _navigateEvent.emit(
                 when (table.tableStatus) {
-                    TableStatus.PREPARING -> NavigateEvent.TableStandby(tableId)
+                    TableStatus.PREPARING -> NavigateEvent.TablePrepare(tableId)
                     TableStatus.PAUSED -> TODO()
                     TableStatus.PLAYING -> NavigateEvent.Game(tableId)
                 }
@@ -209,7 +295,7 @@ constructor(
             // FIXME: バリデーションほしいかも
             if (scanText != null) {
                 val tableId = TableId(scanText)
-                _navigateEvent.emit(NavigateEvent.TableStandby(tableId))
+                _navigateEvent.emit(NavigateEvent.TablePrepare(tableId))
             }
         }
     }

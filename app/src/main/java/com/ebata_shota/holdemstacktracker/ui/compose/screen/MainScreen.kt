@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.screen
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +38,9 @@ import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingOnScreenContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.JoinByIdDialog
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.JoinByIdDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MainConsoleDialog
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
@@ -67,7 +71,7 @@ fun MainScreen(
     viewModel.navigateEvent.collectWithLifecycle {
         when (it) {
             is NavigateEvent.TableCreator -> navigateToTableCreator()
-            is NavigateEvent.TableStandby -> navigateToTableStandby(it.tableId)
+            is NavigateEvent.TablePrepare -> navigateToTableStandby(it.tableId)
             is NavigateEvent.Game -> navigateToGame(it.tableId)
         }
     }
@@ -111,31 +115,23 @@ fun MainScreen(
                     )
                 },
                 floatingActionButton = {
-                    AnimatedVisibility(
-                        visible = isScrollingUp
-                    ) {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                    if (castUiState.mainContentUiState.tableSummaryList.isNotEmpty()) {
+                        AnimatedVisibility(
+                            visible = isScrollingUp
                         ) {
-                            FloatingActionButton(
-                                onClick = {
-                                    viewModel.onClickQrScan()
-                                },
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.baseline_qr_code_scanner_24),
-                                    contentDescription = "QR Scanner"
-                                )
-                            }
-                            FloatingActionButton(
-                                onClick = dropRedundantEvent {
-                                    viewModel.onClickCreateNewTable()
-                                },
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Add,
-                                    contentDescription = "Add"
-                                )
+                                FloatingActionButton(
+                                    onClick = dropRedundantEvent {
+                                        viewModel.onClickFAB()
+                                    },
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Add,
+                                        contentDescription = "Add"
+                                    )
+                                }
                             }
                         }
                     }
@@ -145,15 +141,35 @@ fun MainScreen(
                 MainContent(
                     uiState = castUiState.mainContentUiState,
                     lazyListState = lazyListState,
+                    onClickTableCreator = viewModel::onClickTableCreator,
+                    onClickJoinTableByQr = viewModel::onClickJoinTableByQr,
+                    onClickJoinTableById = viewModel::onClickJoinTableById,
                     onClickTableRow = viewModel::onClickTableRow,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
                 )
+
+                val joinByIdDialogUiState = dialogUiState.joinByIdDialogUiState
+                if (joinByIdDialogUiState != null) {
+                    JoinByIdDialog(
+                        uiState = joinByIdDialogUiState,
+                        event = viewModel
+                    )
+                }
+
+                val shouldShowMainConsoleDialog = dialogUiState.shouldShowMainConsoleDialog
+                if (shouldShowMainConsoleDialog) {
+                    MainConsoleDialog(
+                        event = viewModel
+                    )
+                }
             }
             if (castUiState.isLoadingOnScreenContent) {
                 LoadingOnScreenContent(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable(true) {  }
                 )
             }
         }
@@ -177,5 +193,7 @@ sealed interface MainScreenUiState {
 }
 
 data class MainScreenDialogUiState(
-    val myNameInputDialogUiState: MyNameInputDialogUiState? = null
+    val myNameInputDialogUiState: MyNameInputDialogUiState? = null,
+    val joinByIdDialogUiState: JoinByIdDialogUiState? = null,
+    val shouldShowMainConsoleDialog: Boolean = false,
 )

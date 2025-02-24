@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="label_create_table">テーブル作成</string>
+    <string name="button_create_table">新規作成</string>
+    <string name="label_join_table">テーブルに参加</string>
+    <string name="button_qr_scanner">QRコード</string>
+    <string name="button_table_id_search">ID検索</string>
+
+
     <string name="game_type">ゲームモード</string>
     <string name="game_type_ring">リングゲーム</string>
     <string name="sb_size_label">SBサイズ</string>

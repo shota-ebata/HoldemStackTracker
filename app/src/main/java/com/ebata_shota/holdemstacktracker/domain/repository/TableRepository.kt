@@ -21,6 +21,8 @@ interface TableRepository {
     // FIXME: updateTimeとかversionの更新処理を行うUseCaseを用意したほうがいいね
     suspend fun sendTable(table: Table)
 
+    suspend fun isExistsTable(tableId: TableId): Boolean
+
     suspend fun renameTableBasePlayer(
         tableId: TableId,
         indexOfBasePlayers: Long,

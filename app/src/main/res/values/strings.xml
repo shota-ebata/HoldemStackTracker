@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name" translatable="false">HoldemStackTracker</string>
 
+    <string name="label_create_table">Create table</string>
+    <string name="button_create_table">Create new table</string>
+    <string name="label_join_table">Join someone table</string>
+    <string name="button_qr_scanner">QR scanner</string>
+    <string name="button_table_id_search">Search table ID</string>
+
     <string name="game_type">Game Mode</string>
     <string name="game_type_ring">Ring Game</string>
     <string name="sb_size_label">SB Size</string>
@@ -34,6 +40,8 @@
     <string name="table_status_preparing">Preparing</string>
     <string name="table_status_paused">Paused</string>
     <string name="table_status_playing">In Game</string>
+
+    <string name="label_id" translatable="false">ID</string>
 
     <string name="label_joined">Joined</string>
     <string name="label_host">Host：</string>

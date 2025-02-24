@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.time.Instant
 import javax.inject.Inject
@@ -165,6 +166,15 @@ constructor(
 
         awaitClose {
             tablesRef.child(tableId.value).removeEventListener(listener)
+        }
+    }
+
+    override suspend fun isExistsTable(tableId: TableId): Boolean {
+        return withContext(ioDispatcher) {
+            tablesRef.child(tableId.value)
+                .get()
+                .await()
+                .exists()
         }
     }
 
