@@ -103,7 +103,8 @@ fun PotSettlementDialogContent(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = uiState.potLabelString.getString(),
+                        text = uiState.potLabelString.getString()
+                        ,
                         style = MaterialTheme.typography.bodySmall
                     )
                     ChipSizeText(
@@ -169,32 +170,36 @@ data class PotSettlementDialogUiState(
 ) {
     val shouldShowBackButton: Boolean = currentPotIndex > 0
 
-    val potLabelString: StringSource = when (currentPotIndex) {
-        pots.lastIndex -> {
-            StringSource(
-                if (pots.size == 1) {
-                    R.string.label_pot
-                } else {
-                    R.string.label_main_pot
-                }
-            )
-        }
+    val potLabelString: StringSource = if (pots[currentPotIndex].isAmari) {
+        StringSource(R.string.label_excess_chips)
+    } else {
+        when (currentPotIndex) {
+            pots.lastIndex -> {
+                StringSource(
+                    if (pots.size == 1) {
+                        R.string.label_pot
+                    } else {
+                        R.string.label_main_pot
+                    }
+                )
+            }
 
-        else -> {
-            StringSource(
-                R.string.label_side_pot,
-                pots[currentPotIndex].potNumber
-            )
+            else -> {
+                StringSource(
+                    R.string.label_side_pot,
+                    pots[currentPotIndex].potNumber
+                )
+            }
         }
     }
 
     val buttonLabelString: StringSource = StringSource(
-        if (pots.lastIndex > currentPotIndex) {
-            R.string.pot_settlement_next_button
-        } else {
-            R.string.pot_settlement_done_button
-        }
-    )
+            if (pots.lastIndex > currentPotIndex) {
+                R.string.pot_settlement_next_button
+            } else {
+                R.string.pot_settlement_done_button
+            }
+        )
 
     val isEnableButton: Boolean = pots[currentPotIndex].players.any { it.isSelected }
 
@@ -212,7 +217,9 @@ data class PotSettlementDialogUiState(
         val potNumber: Int,
         val potSizeString: StringSource,
         val players: List<PotSettlementCheckboxRowUiState>,
-    )
+    ) {
+        val isAmari: Boolean = players.size == 1
+    }
 }
 
 interface PotSettlementDialogEvent {
