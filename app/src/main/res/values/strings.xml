@@ -13,9 +13,9 @@
     <string name="bb_size_label">BB Size</string>
     <string name="default_stack_label">Default Stack Size</string>
     <string name="stack_size_label">Stack Size</string>
-    <string name="input_error_message">入力値に問題があります</string>
-    <string name="input_error_message_sb_bb">SBサイズはBBサイズ以下である必要があります</string>
-    <string name="table_creator_submit">テーブル作成</string>
+    <string name="input_error_message">There is a problem with the input value.</string>
+    <string name="input_error_message_sb_bb">SB size must be BB size or smaller.</string>
+    <string name="table_creator_submit">Create table</string>
     <string name="game_rule_update_button">Update</string>
 
     <string name="my_player_name_label">Your Name</string>
@@ -26,9 +26,9 @@
     <string name="start_next_game">Start Next Game</string>
 
     <string name="error_title">Input Error</string>
-    <string name="error_name_limit">15文字以内で入力してください</string>
-    <string name="error_not_found_table">テーブルが見つかりません</string>
-    <string name="error_message_in_table">テーブルに問題が発生しました</string>
+    <string name="error_name_limit">Please enter up to 15 characters.</string>
+    <string name="error_not_found_table">Table not found.</string>
+    <string name="error_message_in_table">There is a problem with the table.</string>
 
     <string name="ok_label">OK</string>
 
