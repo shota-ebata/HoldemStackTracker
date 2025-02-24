@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
+import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
@@ -24,10 +25,13 @@ import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.row.TableSummaryCardRowUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.MainScreenDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.MainScreenUiState
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
@@ -36,6 +40,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -72,6 +77,16 @@ constructor(
 
     private val _navigateEvent = MutableSharedFlow<NavigateEvent>()
     val navigateEvent = _navigateEvent.asSharedFlow()
+
+    // Tableの状態を保持 (遷移用として利用を想定）
+    private val tableStateFlow: StateFlow<Table?> = tableRepository.tableStateFlow
+        .map { it?.getOrNull() }
+        .filterNotNull()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = null
+        )
 
     sealed interface NavigateEvent {
         data object TableCreator : NavigateEvent
@@ -132,10 +147,6 @@ constructor(
         isLoadingOnScreenContent.update { false }
     }
 
-//    fun onClickCreateNewTable() {
-//        navigateTableCreator()
-//    }
-
     fun onClickFAB() {
         _dialogUiState.update {
             it.copy(shouldShowMainConsoleDialog = true)
@@ -147,10 +158,6 @@ constructor(
             _navigateEvent.emit(NavigateEvent.TableCreator)
         }
     }
-
-//    fun onClickQrScan() {
-//        startQrScan()
-//    }
 
     fun onClickSettingRename() {
         viewModelScope.launch {
@@ -274,8 +281,8 @@ constructor(
         loadingOnScreenJob = viewModelScope.launch {
             isLoadingOnScreenContent.update { true }
             tableRepository.startCollectTableFlow(tableId)
-            val table = tableRepository.tableStateFlow
-                .map { it?.getOrNull() }
+
+            val table = tableStateFlow
                 .filterNotNull()
                 .filter { it.id == tableId }
                 .first()
