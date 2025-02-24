@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
+import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.BlindTextLabel
 import com.ebata_shota.holdemstacktracker.ui.compose.util.dropRedundantEvent
@@ -88,11 +89,11 @@ fun TableSummaryCardRow(
                             shape = RoundedCornerShape(8.dp),
                         )
                         .padding(vertical = 2.dp, horizontal = 8.dp),
-                    text = stringResource(uiState.gameTypeTextResId),
+                    text = uiState.gameTypeText.getString(),
                     color = MaterialTheme.colorScheme.onSecondary
                 )
                 BlindTextLabel(
-                    blindText = uiState.blindText,
+                    blindText = uiState.blindText.getString(),
                     modifier.padding(start = 4.dp)
                 )
             }
@@ -142,9 +143,8 @@ fun TableSummaryCardRow(
 
 data class TableSummaryCardRowUiState(
     val tableId: TableId,
-    @StringRes
-    val gameTypeTextResId: Int,
-    val blindText: String,
+    val gameTypeText: StringSource,
+    val blindText: StringSource,
     val hostName: String,
     val isJoined: Boolean,
     val playerSize: String,
@@ -157,8 +157,8 @@ private class TableSummaryCardRowPreviewParam :
     override val values: Sequence<TableSummaryCardRowUiState> = sequenceOf(
         TableSummaryCardRowUiState(
             tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
-            gameTypeTextResId = R.string.game_type_ring,
-            blindText = "1/2",
+            gameTypeText = StringSource(R.string.game_type_ring),
+            blindText = StringSource("1/2"),
             hostName = "ホスト名",
             isJoined = false,
             playerSize = "1/10",
@@ -168,8 +168,8 @@ private class TableSummaryCardRowPreviewParam :
         TableSummaryCardRowUiState(
             tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
             hostName = "ホスト名",
-            gameTypeTextResId = R.string.game_type_ring,
-            blindText = "1/2",
+            gameTypeText = StringSource(R.string.game_type_ring),
+            blindText = StringSource("1/2"),
             isJoined = true,
             playerSize = "1/10",
             updateTime = "2024/12/08 22:54:01",

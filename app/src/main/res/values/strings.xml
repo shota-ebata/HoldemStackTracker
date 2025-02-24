@@ -3,7 +3,7 @@
 
     <string name="label_create_table">Create table</string>
     <string name="button_create_table">Create new table</string>
-    <string name="label_join_table">Join someone table</string>
+    <string name="label_join_table">Join table</string>
     <string name="button_qr_scanner">QR scanner</string>
     <string name="button_table_id_search">Search table ID</string>
 

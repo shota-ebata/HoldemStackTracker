@@ -1,5 +1,7 @@
 package com.ebata_shota.holdemstacktracker.infra.repository
 
+import com.ebata_shota.holdemstacktracker.domain.model.GameType
+import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableSummary
@@ -7,7 +9,6 @@ import com.ebata_shota.holdemstacktracker.domain.repository.TableSummaryReposito
 import com.ebata_shota.holdemstacktracker.infra.db.dao.TableSummaryDao
 import com.ebata_shota.holdemstacktracker.infra.db.entity.TableSummaryEntity
 import com.ebata_shota.holdemstacktracker.infra.extension.blindText
-import com.ebata_shota.holdemstacktracker.infra.extension.gameTextResId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -23,7 +24,7 @@ constructor(
             entityList.map { entity ->
                 TableSummary(
                     tableId = TableId(entity.tableId),
-                    gameTypeTextResId = entity.gameTypeTextResId,
+                    gameType = entity.gameType,
                     blindText = entity.blindText,
                     hostName = entity.hostName,
                     playerSize = entity.playerSize,
@@ -37,7 +38,9 @@ constructor(
     override suspend fun saveTable(table: Table) {
         val entity = TableSummaryEntity(
             tableId = table.id.value,
-            gameTypeTextResId = table.rule.gameTextResId(),
+            gameType = when (table.rule) {
+                is Rule.RingGame -> GameType.RingGame
+            },
             blindText = table.rule.blindText(),
             hostName = table.hostPlayerId.let { hostPlayerId ->
                 table.basePlayers.find { it.id == hostPlayerId }?.name.orEmpty()

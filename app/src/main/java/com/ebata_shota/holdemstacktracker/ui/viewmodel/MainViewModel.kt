@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
+import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
@@ -18,6 +19,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.JoinByIdDialogUiStat
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MainConsoleDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.extension.labelResId
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.row.TableSummaryCardRowUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.MainScreenDialogUiState
@@ -101,8 +103,8 @@ constructor(
                                     .withLocale(Locale.getDefault())
                                 TableSummaryCardRowUiState(
                                     tableId = it.tableId,
-                                    gameTypeTextResId = it.gameTypeTextResId,
-                                    blindText = it.blindText,
+                                    gameTypeText = StringSource(it.gameType.labelResId()),
+                                    blindText = StringSource(it.blindText),
                                     hostName = it.hostName,
                                     isJoined = tableRepository.currentTableId == it.tableId,
                                     playerSize = it.playerSize,

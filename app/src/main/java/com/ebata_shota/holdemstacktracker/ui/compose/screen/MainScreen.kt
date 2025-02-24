@@ -83,7 +83,7 @@ fun MainScreen(
                 modifier = Modifier.fillMaxSize(),
                 topBar = {
                     TopAppBar(
-                        title = { Text("Bar") },
+                        title = {  },
                         actions = {
                             IconButton(
                                 onClick = { expandedSetting = true }
