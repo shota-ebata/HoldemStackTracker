@@ -13,6 +13,7 @@ import com.ebata_shota.holdemstacktracker.infra.db.AppDatabase
 import com.google.firebase.BuildConfig
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.database
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -79,6 +80,12 @@ class AppModule {
         }
         remoteConfig.setConfigSettingsAsync(configSettings)
         return remoteConfig
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirebaseCrashlytics(): FirebaseCrashlytics {
+        return FirebaseCrashlytics.getInstance()
     }
 
     @Provides
