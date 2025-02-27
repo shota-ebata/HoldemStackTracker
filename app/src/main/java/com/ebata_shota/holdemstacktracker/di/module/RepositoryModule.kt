@@ -9,6 +9,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.PhaseHistoryReposito
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.RemoteConfigRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableSummaryRepository
 import com.ebata_shota.holdemstacktracker.infra.repository.ActionHistoryRepositoryImpl
@@ -20,6 +21,7 @@ import com.ebata_shota.holdemstacktracker.infra.repository.PhaseHistoryRepositor
 import com.ebata_shota.holdemstacktracker.infra.repository.PrefRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.QrBitmapRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.RandomIdRepositoryImpl
+import com.ebata_shota.holdemstacktracker.infra.repository.RemoteConfigRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.TableRepositoryImpl
 import com.ebata_shota.holdemstacktracker.infra.repository.TableSummaryRepositoryImpl
 import dagger.Binds
@@ -75,4 +77,8 @@ interface RepositoryModule {
     @Singleton
     @Binds
     fun bindPhaseHistoryRepository(repo: PhaseHistoryRepositoryImpl): PhaseHistoryRepository
+
+    @Singleton
+    @Binds
+    fun bindRemoteConfigRepository(repo: RemoteConfigRepositoryImpl): RemoteConfigRepository
 }
