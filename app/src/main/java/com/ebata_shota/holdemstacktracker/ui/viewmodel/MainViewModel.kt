@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
+import android.util.Log
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,9 +13,11 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GmsBarcodeScannerRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.RemoteConfigRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableSummaryRepository
 import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.AppCloseAlertDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.JoinByIdDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.JoinByIdDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MainConsoleDialogEvent
@@ -59,6 +62,7 @@ constructor(
     private val scannerRepository: GmsBarcodeScannerRepository,
     private val prefRepository: PrefRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
+    private val remoteConfigRepository: RemoteConfigRepository,
 ) : ViewModel(),
     MyNameInputDialogEvent,
     JoinByIdDialogEvent,
@@ -68,6 +72,9 @@ constructor(
 
     private val _dialogUiState = MutableStateFlow(MainScreenDialogUiState())
     val dialogUiState = _dialogUiState.asStateFlow()
+
+    private val _maintenanceDialog = MutableStateFlow<AppCloseAlertDialogUiState?>(null)
+    val maintenanceDialog = _maintenanceDialog.asStateFlow()
 
     // 画面に被さるローディング
     private val isLoadingOnScreenContent = MutableStateFlow(false)
@@ -98,6 +105,8 @@ constructor(
         data class Game(
             val tableId: TableId
         ) : NavigateEvent
+
+        data object CloseApp : NavigateEvent
     }
 
     init {
@@ -132,6 +141,18 @@ constructor(
                     )
                 }
             }.collect()
+        }
+
+        viewModelScope.launch {
+            remoteConfigRepository.isMaintenance.collect {
+                if (it) {
+                    _maintenanceDialog.update {
+                        AppCloseAlertDialogUiState(
+                            messageText = StringSource(R.string.message_maintenance)
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -306,6 +327,12 @@ constructor(
                 val tableId = TableId(scanText)
                 _navigateEvent.emit(NavigateEvent.TablePrepare(tableId))
             }
+        }
+    }
+
+    fun onClickMaintenanceDialogDoneButton() {
+        viewModelScope.launch {
+            _navigateEvent.emit(NavigateEvent.CloseApp)
         }
     }
 }

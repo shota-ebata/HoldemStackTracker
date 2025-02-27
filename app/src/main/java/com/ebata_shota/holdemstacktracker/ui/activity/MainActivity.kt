@@ -33,7 +33,8 @@ class MainActivity : ComponentActivity() {
                 MainScreen(
                     navigateToTableCreator = ::navigateToTableCreator,
                     navigateToTableStandby = ::navigateToTableStandby,
-                    navigateToGame = ::navigateToGame
+                    navigateToGame = ::navigateToGame,
+                    closeApp = { finish() },
                 )
             }
         }

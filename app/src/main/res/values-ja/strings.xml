@@ -66,4 +66,7 @@
     <string name="error_min_bet_size_stack">スタックがBB未満のプレイヤーがいます</string>
 
     <string name="label_excess_chips">余剰チップ</string>
+
+    <string name="message_maintenance">現在メンテナンス中のため\nアプリを利用できません。</string>
+    <string name="message_lower_version">Google PlayStoreにて\nアプリの更新をしてください。</string>
 </resources>

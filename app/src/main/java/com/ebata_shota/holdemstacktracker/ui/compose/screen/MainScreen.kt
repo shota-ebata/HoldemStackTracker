@@ -38,6 +38,8 @@ import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingOnScreenContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.AppCloseAlertDialog
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.AppCloseAlertDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.JoinByIdDialog
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.JoinByIdDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MainConsoleDialog
@@ -56,10 +58,12 @@ fun MainScreen(
     navigateToTableCreator: () -> Unit,
     navigateToTableStandby: (TableId) -> Unit,
     navigateToGame: (TableId) -> Unit,
+    closeApp: () -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val uiState: MainScreenUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val dialogUiState: MainScreenDialogUiState by viewModel.dialogUiState.collectAsStateWithLifecycle()
+    val maintenanceDialog: AppCloseAlertDialogUiState? by viewModel.maintenanceDialog.collectAsStateWithLifecycle()
     var expandedSetting by remember { mutableStateOf(false) }
     val lazyListState: LazyListState = rememberLazyListState()
     val isScrollingUp: Boolean = lazyListState.isScrollingUp().value
@@ -73,6 +77,7 @@ fun MainScreen(
             is NavigateEvent.TableCreator -> navigateToTableCreator()
             is NavigateEvent.TablePrepare -> navigateToTableStandby(it.tableId)
             is NavigateEvent.Game -> navigateToGame(it.tableId)
+            is NavigateEvent.CloseApp -> closeApp()
         }
     }
 
@@ -182,6 +187,16 @@ fun MainScreen(
         )
     }
 
+    val maintenanceDialogUiState = maintenanceDialog
+    if (maintenanceDialogUiState != null) {
+        AppCloseAlertDialog(
+            uiState = maintenanceDialogUiState,
+            onClickDoneButton = {
+                viewModel.onClickMaintenanceDialogDoneButton()
+            },
+            onDismissRequestAppCloseAlertDialog = {}
+        )
+    }
 }
 
 sealed interface MainScreenUiState {
