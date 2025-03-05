@@ -9,6 +9,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundTableException
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
@@ -455,7 +456,10 @@ constructor(
                         isLeaved = playerEditDialogUiState.checkedLeaved,
                         stack = max(playerEditDialogUiState.stackValue.text.toIntOrNull() ?: 0, 0) // TODO: Int超えるとやばい
                     )
-                }
+                },
+                // FIXME: ここってアプリのVersionCodeを入れるべきなのだろうか？
+                //  取得できてるMinVersionをいれたほうがいいのでは？
+                appVersion = BuildConfig.VERSION_CODE,
             )
             tableRepository.sendTable(copiedTable)
         }

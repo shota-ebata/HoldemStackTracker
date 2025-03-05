@@ -74,7 +74,7 @@ constructor(
             val table = Table(
                 id = tableId,
                 version = 0L,
-                appVersion = BuildConfig.VERSION_CODE.toLong(),
+                appVersion = BuildConfig.VERSION_CODE,
                 hostPlayerId = myPlayerId,
                 rule = rule,
                 playerOrder = listOf(myPlayerId),

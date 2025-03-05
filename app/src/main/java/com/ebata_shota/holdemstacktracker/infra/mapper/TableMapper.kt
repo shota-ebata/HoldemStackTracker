@@ -49,7 +49,7 @@ constructor() {
         return Table(
             id = tableId,
             version = tableMap[TABLE_VERSION] as Long,
-            appVersion = tableMap[APP_VERSION] as Long,
+            appVersion = tableMap[APP_VERSION]?.getInt() ?: 0,
             hostPlayerId = PlayerId(tableMap[HOST_PLAYER_ID] as String),
             potManagerPlayerId = PlayerId(tableMap[POT_MANAGER_ID] as String),
             rule = mapToRuleState(tableMap[RULE] as Map<*, *>),
