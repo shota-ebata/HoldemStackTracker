@@ -1,9 +1,9 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
-import android.util.Log
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
@@ -28,7 +28,6 @@ import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.row.TableSummaryCardRowUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.MainScreenDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.MainScreenUiState
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -75,6 +74,9 @@ constructor(
 
     private val _maintenanceDialog = MutableStateFlow<AppCloseAlertDialogUiState?>(null)
     val maintenanceDialog = _maintenanceDialog.asStateFlow()
+
+    private val _versionUpAlertDialog = MutableStateFlow<AppCloseAlertDialogUiState?>(null)
+    val versionUpAlertDialog = _versionUpAlertDialog.asStateFlow()
 
     // 画面に被さるローディング
     private val isLoadingOnScreenContent = MutableStateFlow(false)
@@ -143,12 +145,26 @@ constructor(
             }.collect()
         }
 
+        // メンテナンスダイアログ表示の監視
         viewModelScope.launch {
-            remoteConfigRepository.isMaintenance.collect {
-                if (it) {
+            remoteConfigRepository.isMaintenance.collect { isMaintenance ->
+                if (isMaintenance) {
                     _maintenanceDialog.update {
                         AppCloseAlertDialogUiState(
                             messageText = StringSource(R.string.message_maintenance)
+                        )
+                    }
+                }
+            }
+        }
+
+        // 新バージョンインストールの表示ダイアログ監視
+        viewModelScope.launch {
+            remoteConfigRepository.minVersionCode.collect { minVersionCode ->
+                if (minVersionCode > BuildConfig.VERSION_CODE) {
+                    _versionUpAlertDialog.update {
+                        AppCloseAlertDialogUiState(
+                            messageText = StringSource(R.string.message_lower_version)
                         )
                     }
                 }
@@ -330,7 +346,7 @@ constructor(
         }
     }
 
-    fun onClickMaintenanceDialogDoneButton() {
+    fun onClickAppCloseAlertDialogDoneButton() {
         viewModelScope.launch {
             _navigateEvent.emit(NavigateEvent.CloseApp)
         }

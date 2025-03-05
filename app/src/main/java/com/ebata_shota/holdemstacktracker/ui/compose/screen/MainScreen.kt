@@ -28,11 +28,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingOnScreenContent
@@ -64,6 +62,7 @@ fun MainScreen(
     val uiState: MainScreenUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val dialogUiState: MainScreenDialogUiState by viewModel.dialogUiState.collectAsStateWithLifecycle()
     val maintenanceDialog: AppCloseAlertDialogUiState? by viewModel.maintenanceDialog.collectAsStateWithLifecycle()
+    val versionUpAlertDialog: AppCloseAlertDialogUiState? by viewModel.versionUpAlertDialog.collectAsStateWithLifecycle()
     var expandedSetting by remember { mutableStateOf(false) }
     val lazyListState: LazyListState = rememberLazyListState()
     val isScrollingUp: Boolean = lazyListState.isScrollingUp().value
@@ -191,10 +190,16 @@ fun MainScreen(
     if (maintenanceDialogUiState != null) {
         AppCloseAlertDialog(
             uiState = maintenanceDialogUiState,
-            onClickDoneButton = {
-                viewModel.onClickMaintenanceDialogDoneButton()
-            },
-            onDismissRequestAppCloseAlertDialog = {}
+            onClickDoneButton = viewModel::onClickAppCloseAlertDialogDoneButton,
+            onDismissRequestAppCloseAlertDialog = {},
+        )
+    }
+    val versionUpAlertDialogUiState = versionUpAlertDialog
+    if (versionUpAlertDialogUiState != null) {
+        AppCloseAlertDialog(
+            uiState = versionUpAlertDialogUiState,
+            onClickDoneButton = viewModel::onClickAppCloseAlertDialogDoneButton,
+            onDismissRequestAppCloseAlertDialog = {},
         )
     }
 }
