@@ -27,7 +27,7 @@ class IsActionRequiredInPhaseUseCaseImplTest {
 
     @Before
     fun setup() {
-        // TODO: hilt
+        // FIXME: hilt
         useCase = IsActionRequiredInPhaseUseCaseImpl(
             getMaxBetSize = GetMaxBetSizeUseCaseImpl(
                 dispatcher = dispatcher

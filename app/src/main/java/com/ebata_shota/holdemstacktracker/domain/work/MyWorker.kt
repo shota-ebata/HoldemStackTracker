@@ -14,7 +14,7 @@ class MyWorker
 constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    // TODO: DIしたいのもをここに追加
+    // FIXME: DIしたいのもをここに追加
 ) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
 

@@ -196,7 +196,7 @@ constructor(
             is BetPhaseAction.Raise,
             null -> {
                 val gamePlayer = game.players.find { it.id == playerId }
-                // TODO: 離席の場合は強制Fold
+                // FIXME: 離席の場合は強制Fold
 //                if (gamePlayer?.isLeaved == true) {
 //                    // 離席の場合は強制Fold
 //                    BetPhaseAction.Fold(

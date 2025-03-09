@@ -244,7 +244,7 @@ data class GamePlayerUiState(
     val shouldShowBBSuffix: Boolean,
     val playerPosition: PlayerPosition,
     val pendingBetSize: StringSource?,
-    val isLeaved: Boolean, // TODO: 退席情報を反映する
+    val isLeaved: Boolean, // FIXME: 退席情報を反映する
     val isMine: Boolean,
     val isCurrentPlayer: Boolean,
     val isBtn: Boolean,

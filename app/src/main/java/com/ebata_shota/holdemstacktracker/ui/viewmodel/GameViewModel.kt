@@ -244,7 +244,7 @@ constructor(
         viewModelScope.launch {
             gameStateFlow.filterNotNull().collect { game ->
                 // FIXME: PhaseHistoryをPhaseIdから見て、見た後であれば表示しない対応を入れたい
-                // TODO: AllInCloseのケースを実装したい
+                // FIXME: AllInCloseのケースを実装したい
                 val phaseIntervalImageDialogUiState =
                     when (val lastPhase = game.phaseList.lastOrNull()) {
                         is Phase.Standby -> null

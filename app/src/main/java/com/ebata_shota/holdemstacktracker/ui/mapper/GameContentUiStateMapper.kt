@@ -507,7 +507,7 @@ constructor(
                 }
             }
         },
-        isLeaved = false, // TODO: 退席情報を反映する
+        isLeaved = false, // FIXME: 退席情報を反映する
         isMine = playerId == myPlayerId,
         isCurrentPlayer = playerId == currentPlayerId,
         isBtn = playerId == btnPlayerId,

@@ -313,7 +313,7 @@ constructor(
         val contentUiState = tableCreatorContentUiState ?: return
         tableRepository.createNewTable(
             tableId = tableId,
-            // TODO: ルールに応じて
+            // FIXME: ルールに応じて
             rule = Rule.RingGame(
                 sbSize = contentUiState.sbSize.value.text.toIntOrZero(),
                 bbSize = contentUiState.bbSize.value.text.toIntOrZero(),
