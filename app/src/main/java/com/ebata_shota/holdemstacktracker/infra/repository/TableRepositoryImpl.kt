@@ -185,10 +185,8 @@ constructor(
         playerId: PlayerId,
         name: String
     ) {
-        // FIXME: pathは定数を使いたい
-        val nameRef = firebaseDatabase.getReference(
-            "tables/${tableId.value}/basePlayers/${indexOfBasePlayers}/name"
-        )
+        val tableRef = tablesRef.child(tableId.value)
+        val nameRef = tableRef.child("basePlayers/${indexOfBasePlayers}/name")
         nameRef.setValue(name)
     }
 
@@ -198,10 +196,8 @@ constructor(
         playerId: PlayerId,
         name: String
     ) {
-        // FIXME: pathは定数を使いたい
-        val nameRef = firebaseDatabase.getReference(
-            "tables/${tableId.value}/waitPlayers/${indexOfWaitPlayers}/name"
-        )
+        val tableRef = tablesRef.child(tableId.value)
+        val nameRef = tableRef.child("waitPlayers/${indexOfWaitPlayers}/name")
         nameRef.setValue(name)
     }
 }
