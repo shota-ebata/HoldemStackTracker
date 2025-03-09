@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -298,7 +299,12 @@ fun TablePrepareContent(
                     )
 
                     Text(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                            .weight(1.0f, fill = false),
                         text = uiState.btnPlayerName.getString(),
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
                         style = MaterialTheme.typography.bodyMedium,
                     )
 
@@ -396,7 +402,7 @@ private class PreviewParam : PreviewParameterProvider<TablePrepareContentUiState
             },
             enableSubmitButton = true,
             isEditable = true,
-            btnPlayerName = StringSource("PlayerName1"),
+            btnPlayerName = StringSource("風野っｓｄｓｆｓｄｌｆ；ｊｓ； != 風野っｓｄｓｆｓｄｌｆ；ｊｓ；"),
             submitButtonText = StringSource(R.string.start_game),
         )
     )
