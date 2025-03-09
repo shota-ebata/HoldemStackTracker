@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.infra.repository
 
+import android.util.Log
 import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherIO
@@ -159,7 +160,7 @@ constructor(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                println("Failed to read game data: ${error.message}")
+                Log.d("TableRepository", "Failed to read game data: ${error.message}")
             }
         }
         tablesRef.child(tableId.value).addValueEventListener(listener)
