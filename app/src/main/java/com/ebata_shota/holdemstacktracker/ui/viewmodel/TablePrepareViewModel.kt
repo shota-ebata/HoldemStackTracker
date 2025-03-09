@@ -14,6 +14,7 @@ import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundTableException
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtFind
+import com.ebata_shota.holdemstacktracker.domain.extension.toIntOrZero
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.MovePosition
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
@@ -452,9 +453,10 @@ constructor(
                 basePlayers = table.basePlayers.mapAtFind({ playerBase ->
                     playerBase.id == playerEditDialogUiState.playerId
                 }) { playerBase ->
+                    val stackSize = playerEditDialogUiState.stackValue.text.toIntOrZero()
                     playerBase.copy(
                         isLeaved = playerEditDialogUiState.checkedLeaved,
-                        stack = max(playerEditDialogUiState.stackValue.text.toIntOrNull() ?: 0, 0) // TODO: Int超えるとやばい
+                        stack = max(stackSize, 0)
                     )
                 },
                 // FIXME: ここってアプリのVersionCodeを入れるべきなのだろうか？
@@ -679,7 +681,7 @@ constructor(
                 errorMessage = ErrorMessage(errorMessageResId = R.string.input_error_message)
             } else {
                 // デフォルトを更新しておく
-                val intValue = value.text.toIntOrNull()!!
+                val intValue = value.text.toIntOrZero()
                 viewModelScope.launch {
                     defaultRuleStateOfRingRepository.setDefaultSizeOfSb(intValue)
                 }
@@ -705,7 +707,7 @@ constructor(
                 errorMessage = ErrorMessage(errorMessageResId = R.string.input_error_message)
             } else {
                 // デフォルトを更新しておく
-                val intValue = value.text.toIntOrNull()!!
+                val intValue = value.text.toIntOrZero()
                 viewModelScope.launch {
                     defaultRuleStateOfRingRepository.setDefaultSizeOfBb(intValue)
                 }
@@ -731,7 +733,7 @@ constructor(
                 errorMessage = ErrorMessage(errorMessageResId = R.string.input_error_message)
             } else {
                 // デフォルトを更新しておく
-                val intValue = value.text.toIntOrNull()!!
+                val intValue = value.text.toIntOrZero()
                 viewModelScope.launch {
                     defaultRuleStateOfRingRepository.setDefaultStackSize(intValue)
                 }
@@ -749,7 +751,10 @@ constructor(
 
     override fun onClickEditGameRuleDialogSubmitButton() {
         val uiState = dialogUiState.value.tableCreatorContentUiState ?: return
-        if (uiState.sbSize.value.text.toInt() > uiState.bbSize.value.text.toInt()) {
+        val sbSize = uiState.sbSize.value.text.toIntOrZero()
+        val bbSize = uiState.bbSize.value.text.toIntOrZero()
+        val defaultStack = uiState.defaultStack.value.text.toIntOrZero()
+        if (sbSize > bbSize) {
             // SB > BB は弾く
             _dialogUiState.update {
                 it.copy(
@@ -762,11 +767,11 @@ constructor(
             val table = tableStateFlow.value ?: return
             viewModelScope.launch {
                 val newTable = table.copy(
-                    // TODO: ルールに応じて
+                    // FIXME: ルールに応じて
                     rule = Rule.RingGame(
-                        sbSize = uiState.sbSize.value.text.toInt(),
-                        bbSize = uiState.bbSize.value.text.toInt(),
-                        defaultStack = uiState.defaultStack.value.text.toInt(),
+                        sbSize = sbSize,
+                        bbSize = bbSize,
+                        defaultStack = defaultStack,
                     )
                 )
                 tableRepository.sendTable(newTable)

@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.R
+import com.ebata_shota.holdemstacktracker.domain.extension.toIntOrZero
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
@@ -128,7 +129,7 @@ constructor(
                     ErrorMessage(errorMessageResId = R.string.input_error_message)
             } else {
                 // デフォルトを更新しておく
-                val intValue = value.text.toIntOrNull()!!
+                val intValue = value.text.toIntOrZero()
                 defaultRuleStateOfRingRepository.setDefaultSizeOfSb(intValue)
             }
             _screenUiState.update {
@@ -158,7 +159,7 @@ constructor(
                     ErrorMessage(errorMessageResId = R.string.input_error_message)
             } else {
                 // デフォルトを更新しておく
-                val intValue = value.text.toIntOrNull()!!
+                val intValue = value.text.toIntOrZero()
                 defaultRuleStateOfRingRepository.setDefaultSizeOfBb(intValue)
             }
             _screenUiState.update {
@@ -226,7 +227,7 @@ constructor(
                     ErrorMessage(errorMessageResId = R.string.input_error_message)
             } else {
                 // デフォルトを更新しておく
-                val intValue = value.text.toIntOrNull()!!
+                val intValue = value.text.toIntOrZero()
                 defaultRuleStateOfRingRepository.setDefaultStackSize(intValue)
             }
             _screenUiState.update {
@@ -309,15 +310,14 @@ constructor(
 
     private suspend fun createTable() {
         val tableId = TableId(randomIdRepository.generateRandomId())
-        // TODO: バリデーション
         val contentUiState = tableCreatorContentUiState ?: return
         tableRepository.createNewTable(
             tableId = tableId,
             // TODO: ルールに応じて
             rule = Rule.RingGame(
-                sbSize = contentUiState.sbSize.value.text.toInt(),
-                bbSize = contentUiState.bbSize.value.text.toInt(),
-                defaultStack = contentUiState.defaultStack.value.text.toInt()
+                sbSize = contentUiState.sbSize.value.text.toIntOrZero(),
+                bbSize = contentUiState.bbSize.value.text.toIntOrZero(),
+                defaultStack = contentUiState.defaultStack.value.text.toIntOrZero()
             )
         )
         _navigateEvent.emit(NavigateEvent.TablePrepare(tableId))
