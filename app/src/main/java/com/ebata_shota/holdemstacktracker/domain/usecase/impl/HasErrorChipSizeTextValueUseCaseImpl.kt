@@ -7,8 +7,8 @@ class HasErrorChipSizeTextValueUseCaseImpl
 @Inject
 constructor() : HasErrorChipSizeTextValueUseCase {
 
-    override fun invoke(value: String): Boolean {
+    override fun invoke(value: String, range: IntRange): Boolean {
         val intValue = value.toIntOrNull()
-        return !(intValue != null && intValue > 0)
+        return !(intValue != null && intValue in range)
     }
 }

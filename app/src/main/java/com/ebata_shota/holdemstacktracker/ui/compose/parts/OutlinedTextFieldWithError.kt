@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.ebata_shota.holdemstacktracker.R
+import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 
 @Composable
@@ -59,7 +60,7 @@ fun OutlinedTextFieldWithError(
 
         if (uiState.error != null) {
             Text(
-                text = stringResource(uiState.error.errorMessageResId),
+                text = uiState.error.errorMessage.getString(),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall,
             )
@@ -70,7 +71,7 @@ fun OutlinedTextFieldWithError(
 private class PreviewParam : PreviewParameterProvider<ErrorMessage?> {
     override val values: Sequence<ErrorMessage?> = sequenceOf(
         null,
-        ErrorMessage(R.string.input_error_message)
+        ErrorMessage(StringSource(R.string.input_error_message))
     )
 }
 
@@ -101,6 +102,5 @@ data class TextFieldErrorUiState(
 )
 
 data class ErrorMessage(
-    @StringRes
-    val errorMessageResId: Int
+    val errorMessage: StringSource
 )

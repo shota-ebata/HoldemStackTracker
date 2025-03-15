@@ -213,7 +213,7 @@ constructor(
 
     override fun onChangeEditTextMyNameInputDialog(value: TextFieldValue) {
         val errorMessage = if (value.text.length > 15) {
-            ErrorMessage(R.string.error_name_limit)
+            ErrorMessage(StringSource(R.string.error_name_limit))
         } else {
             null
         }

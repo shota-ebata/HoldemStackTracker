@@ -122,11 +122,11 @@ constructor(
         viewModelScope.launch {
             val contentUiState = tableCreatorContentUiState ?: return@launch
             var errorMessage: ErrorMessage? = null
-            val hasError = hasErrorChipSizeTextValue.invoke(value.text)
+            val hasError = hasErrorChipSizeTextValue.invoke(value.text, 1..10000000)
             if (hasError) {
                 // エラーがある場合はエラーメッセージ
                 errorMessage =
-                    ErrorMessage(errorMessageResId = R.string.input_error_message)
+                    ErrorMessage(StringSource(R.string.input_error_message))
             } else {
                 // デフォルトを更新しておく
                 val intValue = value.text.toIntOrZero()
@@ -152,11 +152,11 @@ constructor(
         viewModelScope.launch {
             val contentUiState = tableCreatorContentUiState ?: return@launch
             var errorMessage: ErrorMessage? = null
-            val hasError = hasErrorChipSizeTextValue.invoke(value.text)
+            val hasError = hasErrorChipSizeTextValue.invoke(value.text, 1..10000000)
             if (hasError) {
                 // エラーがある場合はエラーメッセージ
                 errorMessage =
-                    ErrorMessage(errorMessageResId = R.string.input_error_message)
+                    ErrorMessage(StringSource(R.string.input_error_message))
             } else {
                 // デフォルトを更新しておく
                 val intValue = value.text.toIntOrZero()
@@ -220,11 +220,11 @@ constructor(
                 return@launch
             }
             var errorMessage: ErrorMessage? = null
-            val hasError = hasErrorChipSizeTextValue.invoke(value.text)
+            val hasError = hasErrorChipSizeTextValue.invoke(value.text, 0..1000000)
             if (hasError) {
                 // エラーがある場合はエラーメッセージ
                 errorMessage =
-                    ErrorMessage(errorMessageResId = R.string.input_error_message)
+                    ErrorMessage(StringSource(R.string.input_error_message_stack))
             } else {
                 // デフォルトを更新しておく
                 val intValue = value.text.toIntOrZero()
@@ -245,7 +245,7 @@ constructor(
 
     override fun onChangeEditTextMyNameInputDialog(value: TextFieldValue) {
         val errorMessage = if (value.text.length > 20) {
-            ErrorMessage(R.string.error_name_limit)
+            ErrorMessage(StringSource(R.string.error_name_limit))
         } else {
             null
         }
@@ -290,7 +290,7 @@ constructor(
             _screenUiState.update {
                 TableCreatorUiState.MainContent(
                     tableCreatorContentUiState = contentUiState.copy(
-                        bottomErrorMessage = ErrorMessage(errorMessageResId = R.string.input_error_message_sb_bb)
+                        bottomErrorMessage = ErrorMessage(StringSource(R.string.input_error_message_sb_bb))
                     )
                 )
             }

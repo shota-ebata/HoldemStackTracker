@@ -112,7 +112,7 @@ fun TableCreatorContent(
 
             if (uiState.bottomErrorMessage != null) {
                 Text(
-                    text = stringResource(uiState.bottomErrorMessage.errorMessageResId),
+                    text = uiState.bottomErrorMessage.errorMessage.getString(),
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.Red,
                     modifier = Modifier.padding(start = 16.dp)
