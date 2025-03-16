@@ -10,6 +10,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
+import com.ebata_shota.holdemstacktracker.domain.model.ThemeMode
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GmsBarcodeScannerRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
@@ -23,6 +24,8 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.JoinByIdDialogUiStat
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MainConsoleDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SelectThemeDialogEvent
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SelectThemeDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.labelResId
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.row.TableSummaryCardRowUiState
@@ -65,9 +68,16 @@ constructor(
 ) : ViewModel(),
     MyNameInputDialogEvent,
     JoinByIdDialogEvent,
-    MainConsoleDialogEvent {
+    MainConsoleDialogEvent,
+    SelectThemeDialogEvent {
     private val _uiState = MutableStateFlow<MainScreenUiState>(MainScreenUiState.Loading)
     val uiState = _uiState.asStateFlow()
+
+    val themeMode: StateFlow<ThemeMode> = prefRepository.themeMode.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = ThemeMode.SYSTEM
+    )
 
     private val _dialogUiState = MutableStateFlow(MainScreenDialogUiState())
     val dialogUiState = _dialogUiState.asStateFlow()
@@ -211,6 +221,12 @@ constructor(
         }
     }
 
+    fun onClickSettingChangeTheme() {
+        viewModelScope.launch {
+
+        }
+    }
+
     override fun onChangeEditTextMyNameInputDialog(value: TextFieldValue) {
         val errorMessage = if (value.text.length > 15) {
             ErrorMessage(StringSource(R.string.error_name_limit))
@@ -349,6 +365,29 @@ constructor(
     fun onClickAppCloseAlertDialogDoneButton() {
         viewModelScope.launch {
             _navigateEvent.emit(NavigateEvent.CloseApp)
+        }
+    }
+
+    fun onClickEditThemeModel() {
+        _dialogUiState.update {
+            it.copy(
+                selectThemeDialogUiState = SelectThemeDialogUiState(
+                    selectedTheme = themeMode.value
+                )
+            )
+        }
+    }
+
+    override fun onClickTheme(theme: ThemeMode) {
+        viewModelScope.launch {
+            prefRepository.saveThemeMode(theme)
+            onDismissRequestSelectThemeDialog()
+        }
+    }
+
+    override fun onDismissRequestSelectThemeDialog() {
+        _dialogUiState.update {
+            it.copy(selectThemeDialogUiState = null)
         }
     }
 }

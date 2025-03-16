@@ -6,8 +6,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.domain.model.ThemeMode
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TablePrepareScreen
+import com.ebata_shota.holdemstacktracker.ui.compose.util.SetWindowConfig
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.TablePrepareViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -15,11 +21,22 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class TablePrepareActivity : ComponentActivity() {
 
+    private val viewModel: TablePrepareViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            HoldemStackTrackerTheme {
+            val themeMode: ThemeMode by viewModel.themeMode.collectAsStateWithLifecycle()
+            val isEnableDarkTheme: Boolean = when (themeMode) {
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+                ThemeMode.SYSTEM -> isSystemInDarkTheme()
+            }
+            SetWindowConfig(window, isEnableDarkTheme)
+            HoldemStackTrackerTheme(
+                darkTheme = isEnableDarkTheme
+            ) {
                 TablePrepareScreen(
                     navigateToBack = { finish() },
                     navigateToGameScreen = ::navigateToGameActivity

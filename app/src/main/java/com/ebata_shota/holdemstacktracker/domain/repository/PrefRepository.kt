@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.domain.repository
 
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
+import com.ebata_shota.holdemstacktracker.domain.model.ThemeMode
 import kotlinx.coroutines.flow.Flow
 
 
@@ -50,4 +51,10 @@ interface PrefRepository {
      */
     val isKeepScreenOn: Flow<Boolean>
     suspend fun saveKeepScreenOn(value: Boolean)
+
+    /**
+     * テーマ
+     */
+    val themeMode: Flow<ThemeMode>
+    suspend fun saveThemeMode(themeMode: ThemeMode)
 }

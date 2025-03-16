@@ -11,6 +11,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.domain.model.ThemeMode
 import com.ebata_shota.holdemstacktracker.domain.repository.DefaultRuleStateOfRingRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
@@ -27,12 +28,14 @@ import com.ebata_shota.holdemstacktracker.ui.mapper.TableCreatorUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -58,6 +61,12 @@ constructor(
     val screenUiState: StateFlow<TableCreatorUiState> = _screenUiState.asStateFlow()
     private val tableCreatorContentUiState: TableCreatorContentUiState?
         get() = (screenUiState.value as? TableCreatorUiState.MainContent)?.tableCreatorContentUiState
+
+    val themeMode: StateFlow<ThemeMode> = prefRepository.themeMode.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = ThemeMode.SYSTEM
+    )
 
     private val _dialogUiState = MutableStateFlow(
         TableCreatorDialogUiState(

@@ -21,6 +21,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
+import com.ebata_shota.holdemstacktracker.domain.model.ThemeMode
 import com.ebata_shota.holdemstacktracker.domain.repository.ActionHistoryRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
@@ -111,6 +112,12 @@ constructor(
 
     private val _screenUiState = MutableStateFlow<GameScreenUiState>(GameScreenUiState.Loading)
     val screenUiState = _screenUiState.asStateFlow()
+
+    val themeMode: StateFlow<ThemeMode> = prefRepository.themeMode.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = ThemeMode.SYSTEM
+    )
 
     // Tableの状態を保持
     private val tableStateFlow: StateFlow<Table?> = tableRepository.tableStateFlow

@@ -7,7 +7,6 @@
     <string name="button_qr_scanner">QRコード</string>
     <string name="button_table_id_search">ID検索</string>
 
-
     <string name="game_type">ゲームモード</string>
     <string name="game_type_ring">リングゲーム</string>
     <string name="sb_size_label">SBサイズ</string>
@@ -20,6 +19,12 @@
     <string name="input_error_message_sb_bb">SBサイズはBBサイズ以下である必要があります</string>
     <string name="table_creator_submit">テーブル作成</string>
     <string name="game_rule_update_button">更新</string>
+
+    <string name="rename_menu_label">プレイヤー名変更</string>
+    <string name="change_theme_menu_label">テーマ変更</string>
+    <string name="theme_mode_light">Light</string>
+    <string name="theme_mode_dark">Dark</string>
+    <string name="theme_mode_system">端末設定</string>
 
     <string name="my_player_name_label">あなたのプレイヤー名</string>
     <string name="member_title_label">プレイヤー</string>

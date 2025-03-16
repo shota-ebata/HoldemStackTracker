@@ -20,6 +20,12 @@
     <string name="table_creator_submit">Create table</string>
     <string name="game_rule_update_button">Update</string>
 
+    <string name="rename_menu_label">Rename your name</string>
+    <string name="change_theme_menu_label">Change theme</string>
+    <string name="theme_mode_light">Light</string>
+    <string name="theme_mode_dark">Dark</string>
+    <string name="theme_mode_system">Phone setting</string>
+
     <string name="my_player_name_label">Your Name</string>
     <string name="member_title_label">Players</string>
     <string name="btn_chosen">BTN Player</string>

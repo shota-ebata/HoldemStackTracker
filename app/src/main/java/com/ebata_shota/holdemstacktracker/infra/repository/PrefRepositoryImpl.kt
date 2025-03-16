@@ -3,6 +3,7 @@ package com.ebata_shota.holdemstacktracker.infra.repository
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
+import com.ebata_shota.holdemstacktracker.domain.model.ThemeMode
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultBetViewMode
@@ -13,9 +14,11 @@ import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.EnableRaiseUp
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.KeepScreenOn
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.MyName
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.PotSliderMaxRatio
+import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.ThemeModeKey
 import com.ebata_shota.holdemstacktracker.infra.extension.prefFlow
 import com.ebata_shota.holdemstacktracker.infra.extension.setPrefValue
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 
@@ -99,4 +102,18 @@ constructor(
     override suspend fun saveKeepScreenOn(value: Boolean) {
         dataStore.setPrefValue(KeepScreenOn, value)
     }
+
+    private val _themeMode: Flow<String> by dataStore.prefFlow(
+        key = ThemeModeKey,
+        defaultValue = { ThemeMode.SYSTEM.code }
+    )
+    override val themeMode: Flow<ThemeMode> = _themeMode.map { themeMode ->
+        ThemeMode.entries.find { it.code == themeMode } ?: ThemeMode.SYSTEM
+    }
+
+    override suspend fun saveThemeMode(themeMode: ThemeMode) {
+        dataStore.setPrefValue(key = ThemeModeKey, value = themeMode.code)
+    }
+
+
 }

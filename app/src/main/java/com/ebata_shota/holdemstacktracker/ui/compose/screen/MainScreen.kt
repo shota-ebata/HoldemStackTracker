@@ -28,9 +28,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingOnScreenContent
@@ -43,6 +46,8 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.JoinByIdDialogUiStat
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MainConsoleDialog
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SelectThemeDialog
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SelectThemeDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
 import com.ebata_shota.holdemstacktracker.ui.compose.util.OnResumedEffect
 import com.ebata_shota.holdemstacktracker.ui.compose.util.dropRedundantEvent
@@ -87,7 +92,7 @@ fun MainScreen(
                 modifier = Modifier.fillMaxSize(),
                 topBar = {
                     TopAppBar(
-                        title = {  },
+                        title = { },
                         actions = {
                             IconButton(
                                 onClick = { expandedSetting = true }
@@ -102,7 +107,7 @@ fun MainScreen(
                                 onDismissRequest = { expandedSetting = false }
                             ) {
                                 DropdownMenuItem(
-                                    text = { Text("プレイヤー名変更") },
+                                    text = { Text(stringResource(R.string.rename_menu_label)) },
                                     onClick = dropRedundantEvent {
                                         expandedSetting = false
                                         viewModel.onClickSettingRename()
@@ -111,6 +116,20 @@ fun MainScreen(
                                         Icon(
                                             Icons.Outlined.Edit,
                                             contentDescription = "Rename"
+                                        )
+                                    }
+                                )
+
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.change_theme_menu_label)) },
+                                    onClick = dropRedundantEvent {
+                                        expandedSetting = false
+                                        viewModel.onClickEditThemeModel()
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            painter = painterResource(R.drawable.baseline_palette_24),
+                                            contentDescription = "Theme"
                                         )
                                     }
                                 )
@@ -173,7 +192,7 @@ fun MainScreen(
                 LoadingOnScreenContent(
                     modifier = Modifier
                         .fillMaxSize()
-                        .clickable(true) {  }
+                        .clickable(true) { }
                 )
             }
         }
@@ -185,7 +204,13 @@ fun MainScreen(
             event = viewModel
         )
     }
-
+    val selectThemeDialogUiState = dialogUiState.selectThemeDialogUiState
+    if (selectThemeDialogUiState != null) {
+        SelectThemeDialog(
+            uiState = selectThemeDialogUiState,
+            event = viewModel
+        )
+    }
     val maintenanceDialogUiState = maintenanceDialog
     if (maintenanceDialogUiState != null) {
         AppCloseAlertDialog(
@@ -214,6 +239,7 @@ sealed interface MainScreenUiState {
 
 data class MainScreenDialogUiState(
     val myNameInputDialogUiState: MyNameInputDialogUiState? = null,
+    val selectThemeDialogUiState: SelectThemeDialogUiState? = null,
     val joinByIdDialogUiState: JoinByIdDialogUiState? = null,
     val shouldShowMainConsoleDialog: Boolean = false,
 )
