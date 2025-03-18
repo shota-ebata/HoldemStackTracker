@@ -10,7 +10,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseHistory
-import com.ebata_shota.holdemstacktracker.domain.model.Table
+import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.ActionHistoryRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
@@ -94,7 +94,10 @@ constructor(
                 val table = tableRepository.tableStateFlow.value?.getOrNull()
                 val game = gameResult.getOrNull()
                 if (table != null && game != null) {
-                    val autoAction: BetPhaseAction? = getAutoActionIfNeed(game, table)
+                    val autoAction: BetPhaseAction? = getAutoActionIfNeed(
+                        game = game,
+                        rule = table.rule
+                    )
                     if (autoAction != null) {
                         // オートアクションがあるなら、それを使って新しいGameを生成
                         val updatedGame = addBetPhaseActionInToGame.invoke(
@@ -117,7 +120,7 @@ constructor(
 
     private suspend fun getAutoActionIfNeed(
         game: Game,
-        table: Table,
+        rule: Rule,
     ): BetPhaseAction? {
         val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
         val currentBetPhase = try {
@@ -134,11 +137,11 @@ constructor(
         }
         // 自分の番でAutoActionが発生するか確認する
         val isCurrentPlayer: Boolean = myPlayerId == currentPlayerId
-        val autoAction: BetPhaseAction? = if (isCurrentPlayer) {
+        val autoAction: BetPhaseAction? = if (isCurrentPlayer && currentPlayerId != null) {
             // AutoActionする
             getNextAutoAction.invoke(
-                playerId = myPlayerId,
-                rule = table.rule,
+                playerId = currentPlayerId,
+                rule = rule,
                 game = game,
             )
         } else {
