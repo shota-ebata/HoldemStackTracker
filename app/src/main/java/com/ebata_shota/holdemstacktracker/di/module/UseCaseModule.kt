@@ -75,10 +75,11 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.SetPotSettlementIn
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 interface UseCaseModule {
     @Binds
     fun bindGetLastPhaseAsBetPhaseUseCase(useCase: GetLastPhaseAsBetPhaseUseCaseImpl): GetLastPhaseAsBetPhaseUseCase
