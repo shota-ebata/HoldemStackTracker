@@ -201,7 +201,8 @@ private fun PlayerCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier,
+        modifier = modifier
+            .padding(horizontal = 2.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (uiState.isCurrentPlayer) {
                 MaterialTheme.colorScheme.inversePrimary
