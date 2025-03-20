@@ -6,21 +6,14 @@ import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherIO
 import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundGameException
 import com.ebata_shota.holdemstacktracker.domain.model.ActionHistory
-import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseHistory
-import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.ActionHistoryRepository
-import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PhaseHistoryRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
-import com.ebata_shota.holdemstacktracker.domain.usecase.AddBetPhaseActionInToGameUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCase
 import com.ebata_shota.holdemstacktracker.infra.mapper.GameMapper
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -36,7 +29,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -50,11 +42,6 @@ constructor(
     private val phaseHistoryRepository: PhaseHistoryRepository,
     private val actionHistoryRepository: ActionHistoryRepository,
     private val tableRepository: TableRepository,
-    private val firebaseAuthRepository: FirebaseAuthRepository,
-    private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
-    private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
-    private val getNextAutoAction: GetNextAutoActionUseCase,
-    private val addBetPhaseActionInToGame: AddBetPhaseActionInToGameUseCase,
     @ApplicationScope
     private val appCoroutineScope: CoroutineScope,
     @CoroutineDispatcherIO
@@ -94,60 +81,10 @@ constructor(
                 val table = tableRepository.tableStateFlow.value?.getOrNull()
                 val game = gameResult.getOrNull()
                 if (table != null && game != null) {
-                    val autoAction: BetPhaseAction? = getAutoActionIfNeed(
-                        game = game,
-                        rule = table.rule
-                    )
-                    if (autoAction != null) {
-                        // オートアクションがあるなら、それを使って新しいGameを生成
-                        val updatedGame = addBetPhaseActionInToGame.invoke(
-                            currentGame = game,
-                            betPhaseAction = autoAction,
-                        )
-                        // 更新実行
-                        sendGame(
-                            tableId = tableId,
-                            newGame = updatedGame
-                        )
-                    } else {
-                        // オートアクションがない場合だけ、StateFlowに反映
-                        _gameStateFlow.update { gameResult }
-                    }
+                    _gameStateFlow.update { gameResult }
                 }
             }
         }
-    }
-
-    private suspend fun getAutoActionIfNeed(
-        game: Game,
-        rule: Rule,
-    ): BetPhaseAction? {
-        val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
-        val currentBetPhase = try {
-            getLastPhaseAsBetPhase.invoke(game.phaseList)
-        } catch (e: IllegalStateException) {
-            null
-        }
-        val currentPlayerId = currentBetPhase?.let {
-            getCurrentPlayerId.invoke(
-                btnPlayerId = game.btnPlayerId,
-                playerOrder = game.playerOrder,
-                currentBetPhase = currentBetPhase
-            )
-        }
-        // 自分の番でAutoActionが発生するか確認する
-        val isCurrentPlayer: Boolean = myPlayerId == currentPlayerId
-        val autoAction: BetPhaseAction? = if (isCurrentPlayer && currentPlayerId != null) {
-            // AutoActionする
-            getNextAutoAction.invoke(
-                playerId = currentPlayerId,
-                rule = rule,
-                game = game,
-            )
-        } else {
-            null
-        }
-        return autoAction
     }
 
     private suspend fun saveActionIfNeed(
@@ -236,7 +173,9 @@ constructor(
         newGame: Game,
     ) {
         val gameHashMap = gameMapper.mapToHashMap(
-            newGame = newGame.copy(version = newGame.version + 1L)
+            newGame = newGame.copy(
+                version = newGame.version + 1L,
+            ),
         )
         val gameRef = gamesRef.child(tableId.value)
         gameRef.setValue(gameHashMap)

@@ -4,7 +4,6 @@ import com.ebata_shota.holdemstacktracker.domain.model.Table
 
 interface CreateNewGameUseCase {
     suspend fun invoke(
-        table: Table,
-        fromPreFlop: Boolean
+        table: Table
     )
 }

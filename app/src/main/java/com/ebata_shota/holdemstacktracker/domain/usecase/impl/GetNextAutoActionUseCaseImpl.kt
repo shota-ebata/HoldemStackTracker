@@ -24,7 +24,7 @@ constructor(
 ) : GetNextAutoActionUseCase {
 
     /**
-     * AutoActionを行う
+     * AutoActionを取得する
      */
     override suspend fun invoke(
         playerId: PlayerId,

@@ -13,6 +13,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetAddedAutoActionsGameUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.time.Instant
@@ -21,6 +22,7 @@ import javax.inject.Inject
 class CreateNewGameUseCaseImpl
 @Inject
 constructor(
+    private val getAddedAutoActionsGame: GetAddedAutoActionsGameUseCase,
     private val tableRepository: TableRepository,
     private val gameRepository: GameRepository,
     private val randomIdRepository: RandomIdRepository,
@@ -28,7 +30,7 @@ constructor(
     private val dispatcher: CoroutineDispatcher,
 ) : CreateNewGameUseCase {
 
-    override suspend fun invoke(table: Table, fromPreFlop: Boolean) = withContext(dispatcher) {
+    override suspend fun invoke(table: Table) = withContext(dispatcher) {
         val updateTime = Instant.now()
         val gameId = GameId(randomIdRepository.generateRandomId())
         val copiedTable = table.copy(
@@ -58,19 +60,24 @@ constructor(
                 Phase.Standby(
                     phaseId = PhaseId(randomIdRepository.generateRandomId())
                 ),
-                if (fromPreFlop) Phase.PreFlop(
+                Phase.PreFlop(
                     phaseId = PhaseId(randomIdRepository.generateRandomId()),
                     actionStateList = emptyList()
-                ) else null
+                )
             ),
             updateTime = updateTime
         )
         tableRepository.sendTable(
             table = copiedTable
         )
+        // AutoActionがあれば追加する
+        val addedAutoActionGame = getAddedAutoActionsGame.invoke(
+            game = newGame,
+            rule = copiedTable.rule
+        )
         gameRepository.sendGame(
             tableId = copiedTable.id,
-            newGame = newGame
+            newGame = addedAutoActionGame
         )
     }
 }

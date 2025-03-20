@@ -861,8 +861,7 @@ constructor(
 
         val newTable = table.copy(btnPlayerId = btnPlayerId)
         createNewGame.invoke(
-            table = newTable,
-            fromPreFlop = true
+            table = newTable
         )
     }
 

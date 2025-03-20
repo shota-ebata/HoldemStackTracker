@@ -15,6 +15,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+/**
+ * Pot精算処理
+ */
 class SetPotSettlementInfoUseCaseImpl
 @Inject
 constructor(

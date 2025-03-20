@@ -30,6 +30,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.AddBetPhaseActionInToGameUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetAddedAutoActionsGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetFirstActionPlayerIdOfNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
@@ -75,6 +76,7 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
 import javax.inject.Inject
 
 @HiltViewModel
@@ -104,6 +106,7 @@ constructor(
     private val getNextPlayerIdOfNextPhase: GetFirstActionPlayerIdOfNextPhaseUseCase,
     private val setPotSettlementInfo: SetPotSettlementInfoUseCase,
     private val getNextPhase: GetNextPhaseUseCase,
+    private val getAddedAutoActionsGame: GetAddedAutoActionsGameUseCase,
     private val uiStateMapper: GameContentUiStateMapper,
 ) : ViewModel(),
     GameSettingsDialogEvent,
@@ -399,9 +402,8 @@ constructor(
                                 playerOrder = game.playerOrder,
                                 phaseList = game.phaseList,
                             )
-                            gameRepository.sendGame(
-                                tableId = tableId,
-                                newGame = game.copy(
+                            sendNextGame(
+                                nextGame = game.copy(
                                     phaseList = listOf(nextPhase) // 絶対にStandbyになるのでちょっとキモい
                                 )
                             )
@@ -604,10 +606,17 @@ constructor(
     }
 
     private suspend fun sendNextGame(nextGame: Game) {
-        // FIXME: あのータイムスタンプの更新をしたいです
+        val table = tableStateFlow.value ?: return
+        // AutoActionがあれば追加する
+        val addedAutoActionGame = getAddedAutoActionsGame.invoke(
+            game = nextGame,
+            rule = table.rule
+        )
         gameRepository.sendGame(
             tableId = tableId,
-            newGame = nextGame,
+            newGame = addedAutoActionGame.copy(
+                updateTime = Instant.now()
+            ),
         )
     }
 
@@ -911,7 +920,7 @@ constructor(
                     sendNextGame(nextGame = nextGame)
                 }
 
-                // ホストプレイヤーの場合
+                // ホストプレイヤーの場合（ホストの操作はフェーズを進める力を持たせる、特に精算のときはホストも操作できたほうが都合が良い）
                 table.hostPlayerId -> {
                     val nextGame = getNextGameFromInterval.invoke(
                         currentGame = game
