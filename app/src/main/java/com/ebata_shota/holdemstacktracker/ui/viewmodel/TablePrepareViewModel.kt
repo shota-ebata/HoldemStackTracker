@@ -1,7 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
 import android.os.Bundle
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
@@ -251,7 +250,6 @@ constructor(
                 firebaseAuthRepository.myPlayerIdFlow,
                 prefRepository.myName.filterNotNull()
             ) { table, myPlayerId, myName ->
-                Log.d("hoge", "call rename $myName")
                 renameTablePlayer.invoke(table, myPlayerId, myName)
             }.collect()
         }
