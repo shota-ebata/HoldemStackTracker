@@ -55,35 +55,36 @@ fun TableCreatorContent(
                 .selectableGroup()
                 .padding(16.dp)
         ) {
-            Text(
-                text = stringResource(R.string.game_type),
-                modifier = Modifier.padding(top = 16.dp)
-            )
-            GameType.entries.forEach {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .selectable(
-                            selected = (it == uiState.gameType),
-                            onClick = { },
-                            role = Role.RadioButton
-                        )
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = (it == uiState.gameType),
-                        onClick = null
-                    )
-                    Text(
-                        text = stringResource(it.labelResId()),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
-                }
-            }
+            // FIXME: GameTypeが実装されたときに
+//            Text(
+//                text = stringResource(R.string.game_type),
+//                modifier = Modifier.padding(top = 16.dp)
+//            )
+//            GameType.entries.forEach {
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .height(56.dp)
+//                        .selectable(
+//                            selected = (it == uiState.gameType),
+//                            onClick = { },
+//                            role = Role.RadioButton
+//                        )
+//                        .padding(horizontal = 16.dp),
+//                    horizontalArrangement = Arrangement.Start,
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
+//                    RadioButton(
+//                        selected = (it == uiState.gameType),
+//                        onClick = null
+//                    )
+//                    Text(
+//                        text = stringResource(it.labelResId()),
+//                        style = MaterialTheme.typography.bodyLarge,
+//                        modifier = Modifier.padding(start = 16.dp)
+//                    )
+//                }
+//            }
 
             OutlinedTextFieldWithError(
                 uiState = uiState.sbSize,
