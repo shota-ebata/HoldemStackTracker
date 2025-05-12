@@ -9,9 +9,7 @@ import kotlinx.coroutines.withContext
 import java.time.Instant
 import javax.inject.Inject
 
-/**
- * 更新時間とテーブルバージョンを更新してテーブルを更新する
- */
+
 class UpdateTableUseCaseImpl
 @Inject
 constructor(
@@ -20,6 +18,11 @@ constructor(
     private val dispatcher: CoroutineDispatcher,
 ) : UpdateTableUseCase {
 
+    /**
+     * versionをインクリメントしつつ更新する
+     * @param table: テーブル（更新日時は次の引数で上書きされる）
+     * @param updateTime: 更新日時（先の引数tableの、updateTimeを上書きする）
+     */
     override suspend fun invoke(
         table: Table,
         updateTime: Instant,
