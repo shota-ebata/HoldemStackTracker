@@ -36,6 +36,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.SeatOutPlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.SetPotSettlementInfoUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.UpdateTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.AddBetPhaseActionInToGameUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.CreateNewGameUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActionTypeInLastPhaseAsBetPhaseUseCaseImpl
@@ -72,6 +73,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.RemovePlayersUseCa
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.RenameTablePlayerUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.SeatOutPlayersUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.SetPotSettlementInfoUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.UpdateTableUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -188,4 +190,7 @@ interface UseCaseModule {
 
     @Binds
     fun bindGetAddedAutoActionsGameUseCase(useCase: GetAddedAutoActionsGameUseCaseImpl): GetAddedAutoActionsGameUseCase
+
+    @Binds
+    fun bindUpdateTableUseCase(useCase: UpdateTableUseCaseImpl): UpdateTableUseCase
 }
