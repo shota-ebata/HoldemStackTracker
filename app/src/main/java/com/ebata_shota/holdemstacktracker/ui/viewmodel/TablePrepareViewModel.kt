@@ -37,6 +37,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.UpdateTableUseCase
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.EditGameRuleDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogUiState
@@ -85,6 +86,7 @@ constructor(
     private val qrBitmapRepository: QrBitmapRepository,
     private val prefRepository: PrefRepository,
     private val defaultRuleStateOfRingRepository: DefaultRuleStateOfRingRepository,
+    private val updateTableUseCase: UpdateTableUseCase,
     private val joinTable: JoinTableUseCase,
     private val createNewGame: CreateNewGameUseCase,
     private val movePositionUseCase: MovePositionUseCase,
@@ -468,9 +470,11 @@ constructor(
                 },
                 // FIXME: ここってアプリのVersionCodeを入れるべきなのだろうか？
                 //  取得できてるMinVersionをいれたほうがいいのでは？
+                // TODO: ここはアプリのVersionCodeを入れるべきではない
+                //  取得できてるMinVersionをいれたほうがいい
                 appVersion = BuildConfig.VERSION_CODE,
             )
-            tableRepository.sendTable(copiedTable)
+            updateTableUseCase.invoke(copiedTable)
         }
         onDismissRequestPlayerEditDialog()
     }
@@ -781,7 +785,7 @@ constructor(
                         defaultStack = defaultStack,
                     )
                 )
-                tableRepository.sendTable(newTable)
+                updateTableUseCase.invoke(newTable)
                 onDismissEditGameRuleDialog()
             }
         }

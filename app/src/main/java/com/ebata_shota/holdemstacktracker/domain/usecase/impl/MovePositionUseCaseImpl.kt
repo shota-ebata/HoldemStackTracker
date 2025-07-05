@@ -3,15 +3,14 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 import com.ebata_shota.holdemstacktracker.domain.model.MovePosition
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
-import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
-import java.time.Instant
+import com.ebata_shota.holdemstacktracker.domain.usecase.UpdateTableUseCase
 import javax.inject.Inject
 
 class MovePositionUseCaseImpl
 @Inject
 constructor(
-    private val tableRepository: TableRepository
+    private val updateTableUseCase: UpdateTableUseCase,
 ) : MovePositionUseCase {
     override suspend fun invoke(
         playerId: PlayerId,
@@ -48,11 +47,9 @@ constructor(
         )
 
         val copiedTable = table.copy(
-            playerOrder = movedPlayerOrder,
-            updateTime = Instant.now(),
-            version = table.version + 1
+            playerOrder = movedPlayerOrder
         )
-        tableRepository.sendTable(copiedTable)
+        updateTableUseCase.invoke(copiedTable)
     }
 
     private fun <T> moveItem(list: MutableList<T>, fromIndex: Int, toIndex: Int): List<T> {

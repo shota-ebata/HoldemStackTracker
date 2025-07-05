@@ -45,6 +45,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlid
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.SetPotSettlementInfoUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.UpdateTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.util.combine
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameSettingsContentUiState
@@ -85,6 +86,7 @@ class GameViewModel
 constructor(
     savedStateHandle: SavedStateHandle,
     tableRepository: TableRepository,
+    updateTableUseCase: UpdateTableUseCase,
     private val gameRepository: GameRepository,
     private val prefRepository: PrefRepository,
     private val renameTablePlayer: RenameTablePlayerUseCase,
@@ -343,7 +345,7 @@ constructor(
                     is Phase.Standby -> {
                         if (table.hostPlayerId == myPlayerId) {
                             // スタンバイフェーズになったら、テーブルを準備中にする
-                            tableRepository.sendTable(table.copy(tableStatus = TableStatus.PREPARING))
+                            updateTableUseCase.invoke(table.copy(tableStatus = TableStatus.PREPARING))
                         }
                     }
 
@@ -392,9 +394,9 @@ constructor(
                                     it.copy(stack = gamePlayer.stack)
                                 }
                             }
-                            tableRepository.sendTable(
+                            updateTableUseCase.invoke(
                                 table.copy(
-                                    basePlayers = basePlayers,
+                                    basePlayers = basePlayers
                                 )
                             )
 
