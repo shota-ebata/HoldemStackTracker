@@ -83,9 +83,7 @@ constructor(
         }
 
         if (newTable != table) {
-            updateTableUseCase.invoke(
-                table = newTable,
-            )
+            updateTableUseCase.invoke(newTable)
         }
     }
 
