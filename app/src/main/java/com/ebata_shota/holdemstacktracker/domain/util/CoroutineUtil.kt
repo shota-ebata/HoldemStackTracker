@@ -2,9 +2,11 @@ package com.ebata_shota.holdemstacktracker.domain.util
 
 import com.ebata_shota.holdemstacktracker.domain.exception.WrappedException
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.coroutineContext
 
 /**
  * withContextを使用して、例外をラップするための関数
@@ -21,9 +23,11 @@ suspend fun <T> withContextAndExceptionWrapper(
     context: CoroutineContext,
     block: suspend CoroutineScope.() -> T,
 ): T {
+    // 呼び出し元のメソッド名と行番号を取得
+    // ただし、難読化されている場合は、ファイル名や行番号を取得できない可能性がある。
     val callerStackTraceElement = Throwable().stackTrace[1] // 呼び出しているメソッド
     val callerOfCallerStackTraceElement = Throwable().stackTrace[2] // 呼び出しているメソッドの更に呼び出し元
-    val callerInfo =
+    var callerInfo =
         "(${callerOfCallerStackTraceElement.fileName}:${callerOfCallerStackTraceElement.lineNumber}→${callerStackTraceElement.fileName}:${callerStackTraceElement.lineNumber})"
     return try {
         withContext(context) {
@@ -33,6 +37,7 @@ suspend fun <T> withContextAndExceptionWrapper(
         // CancellationExceptionはそのまま投げる(suspend中断例外の伝播のため)
         throw e
     } catch (e: Exception) {
+        callerInfo = coroutineContext[CoroutineName]?.name ?: callerInfo
         throw WrappedException(callerInfo, e)
     }
 }
