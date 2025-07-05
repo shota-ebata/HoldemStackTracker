@@ -4,9 +4,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerBase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
-import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
-import java.time.Instant
+import com.ebata_shota.holdemstacktracker.domain.usecase.UpdateTableUseCase
 import javax.inject.Inject
 
 
@@ -14,7 +13,7 @@ import javax.inject.Inject
 class JoinTableUseCaseImpl
 @Inject
 constructor(
-    private val tableRepository: TableRepository
+    private val updateTableUseCase: UpdateTableUseCase,
 ) : JoinTableUseCase {
     override suspend fun invoke(
         table: Table,
@@ -84,13 +83,9 @@ constructor(
         }
 
         if (newTable != table) {
-            val updateTime = Instant.now()
-            newTable = newTable.copy(
-                updateTime = updateTime,
-                version = table.version + 1
+            updateTableUseCase.invoke(
+                table = newTable,
             )
-            // FIXME: updateTimeとかversionの更新処理を別のUseCaseに移動させたほうが冗長解消できそう
-            tableRepository.sendTable(newTable)
         }
     }
 

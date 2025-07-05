@@ -2,15 +2,15 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
-import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.SeatOutPlayersUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.UpdateTableUseCase
 import javax.inject.Inject
 
 
 class SeatOutPlayersUseCaseImpl
 @Inject
 constructor(
-    private val tableRepository: TableRepository,
+    private val updateTableUseCase: UpdateTableUseCase,
 ) : SeatOutPlayersUseCase {
 
     override suspend fun invoke(
@@ -24,6 +24,6 @@ constructor(
                 )
             }
         )
-        tableRepository.sendTable(copiedTable)
+        updateTableUseCase.invoke(copiedTable)
     }
 }

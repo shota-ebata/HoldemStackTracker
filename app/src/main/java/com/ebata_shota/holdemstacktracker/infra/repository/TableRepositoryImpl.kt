@@ -75,7 +75,7 @@ constructor(
             val table = Table(
                 id = tableId,
                 version = 0L,
-                appVersion = BuildConfig.VERSION_CODE,
+                appVersion = BuildConfig.VERSION_CODE, // FIXME: ここには最低アプリバージョンを入れたほうがいいかも？
                 hostPlayerId = myPlayerId,
                 rule = rule,
                 playerOrder = listOf(myPlayerId),
