@@ -11,7 +11,6 @@ interface UpdateTableUseCase {
      */
     suspend fun invoke(
         table: Table,
-        // interfaceのデフォルト引数って分かりづらいよね...
         updateTime: Instant = Instant.now(),
     )
 }
