@@ -80,7 +80,6 @@ class TablePrepareViewModel
 @Inject
 constructor(
     savedStateHandle: SavedStateHandle,
-    private val remoteConfigRepository: RemoteConfigRepository,
     private val tableRepository: TableRepository,
     private val gameRepository: GameRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
@@ -468,7 +467,6 @@ constructor(
                         stack = max(stackSize, 0)
                     )
                 },
-                minAppVersionCode = remoteConfigRepository.minVersionCode.value,
             )
             updateTableUseCase.invoke(copiedTable)
         }

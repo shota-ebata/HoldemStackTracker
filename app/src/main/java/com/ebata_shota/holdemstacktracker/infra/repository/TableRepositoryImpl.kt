@@ -46,7 +46,6 @@ constructor(
     private val prefRepository: PrefRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val tableSummaryRepository: TableSummaryRepository,
-    private val remoteConfigRepository: RemoteConfigRepository,
     private val tableMapper: TableMapper,
     @ApplicationScope
     private val appCoroutineScope: CoroutineScope,
@@ -77,7 +76,7 @@ constructor(
             val table = Table(
                 id = tableId,
                 version = 0L,
-                minAppVersionCode = remoteConfigRepository.minVersionCode.value,
+                hostAppVersionCode = BuildConfig.VERSION_CODE,
                 hostPlayerId = myPlayerId,
                 rule = rule,
                 playerOrder = listOf(myPlayerId),
