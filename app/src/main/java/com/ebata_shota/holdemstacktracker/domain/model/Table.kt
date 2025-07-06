@@ -5,7 +5,7 @@ import java.time.Instant
 data class Table(
     val id: TableId,
     val version: Long,
-    val appVersion: Int,
+    val minAppVersionCode: Int,
     val hostPlayerId: PlayerId,
     val potManagerPlayerId: PlayerId,
     val rule: Rule,

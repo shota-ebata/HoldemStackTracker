@@ -9,7 +9,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundTableException
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
@@ -30,6 +29,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthReposito
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.RemoteConfigRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.HasErrorChipSizeTextValueUseCase
@@ -80,6 +80,7 @@ class TablePrepareViewModel
 @Inject
 constructor(
     savedStateHandle: SavedStateHandle,
+    private val remoteConfigRepository: RemoteConfigRepository,
     private val tableRepository: TableRepository,
     private val gameRepository: GameRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
@@ -456,7 +457,6 @@ constructor(
         val table = tableStateFlow.value ?: return
         val playerEditDialogUiState = dialogUiState.value.playerEditDialogUiState ?: return
 
-
         viewModelScope.launch {
             val copiedTable = table.copy(
                 basePlayers = table.basePlayers.mapAtFind({ playerBase ->
@@ -468,11 +468,7 @@ constructor(
                         stack = max(stackSize, 0)
                     )
                 },
-                // FIXME: ここってアプリのVersionCodeを入れるべきなのだろうか？
-                //  取得できてるMinVersionをいれたほうがいいのでは？
-                // TODO: ここはアプリのVersionCodeを入れるべきではない
-                //  取得できてるMinVersionをいれたほうがいい
-                appVersion = BuildConfig.VERSION_CODE,
+                minAppVersionCode = remoteConfigRepository.minVersionCode.value,
             )
             updateTableUseCase.invoke(copiedTable)
         }
