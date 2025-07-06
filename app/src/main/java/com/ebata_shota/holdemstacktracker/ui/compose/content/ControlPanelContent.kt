@@ -63,7 +63,6 @@ fun ControlPanelContent(
     onChangeSlider: (Float) -> Unit,
     onClickPlusButton: () -> Unit,
     onClickSettingButton: () -> Unit,
-    onClickSliderStepSwitch: (Boolean) -> Unit,
 ) {
     val delayState: DelayState = rememberDelayState()
 
@@ -97,7 +96,6 @@ fun ControlPanelContent(
                     uiState = uiState,
                     delayState = delayState,
                     onClickSettingButton = onClickSettingButton,
-                    onClickSliderStepSwitch = onClickSliderStepSwitch
                 )
             }
         }
@@ -393,7 +391,6 @@ private fun BottomSetting(
     uiState: ControlPanelUiState.ActiveControlPanelUiState,
     delayState: DelayState,
     onClickSettingButton: () -> Unit,
-    onClickSliderStepSwitch: (Boolean) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -417,17 +414,17 @@ private fun BottomSetting(
                 )
             }
 
-            Switch(
-                modifier = Modifier
-                    .padding(
-                        start = 24.dp,
-                        end = 4.dp
-                    ),
-                checked = uiState.isEnableSliderStep,
-                onCheckedChange = {
-                    onClickSliderStepSwitch(it)
-                },
-            )
+//            Switch(
+//                modifier = Modifier
+//                    .padding(
+//                        start = 24.dp,
+//                        end = 4.dp
+//                    ),
+//                checked = uiState.isEnableSliderStep,
+//                onCheckedChange = {
+//                    onClickSliderStepSwitch(it)
+//                },
+//            )
         }
 
         Box(
@@ -586,7 +583,6 @@ private fun ControlPanelContentPreview(
                 onChangeSlider = {},
                 onClickPlusButton = {},
                 onClickSettingButton = {},
-                onClickSliderStepSwitch = {}
             )
         }
     }

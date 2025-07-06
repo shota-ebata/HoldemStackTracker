@@ -23,6 +23,7 @@ import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 fun GameSettingsContent(
     uiState: GameSettingsContentUiState,
     onClickKeepScreenSwitch: (Boolean) -> Unit,
+    onClickSettingSliderStepSwitch: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val rememberScrollState = rememberScrollState()
@@ -57,15 +58,39 @@ fun GameSettingsContent(
                 )
             }
         )
+
+        ListItem(
+            headlineContent = {
+                Text(
+                    text = stringResource(R.string.setting_slider_step_on),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            trailingContent = {
+                Switch(
+                    modifier = Modifier
+                        .padding(
+                            start = 24.dp,
+                            end = 4.dp
+                        ),
+                    checked = uiState.isEnableSliderStep,
+                    onCheckedChange = {
+                        onClickSettingSliderStepSwitch(it)
+                    }
+                )
+            }
+        )
     }
 }
 
 data class GameSettingsContentUiState(
     val isKeepScreenOn: Boolean,
+    val isEnableSliderStep: Boolean,
 )
 
 interface GameSettingsContentEvent {
     fun onClickKeepScreenSwitch(isChecked: Boolean)
+    fun onClickSettingSliderStepSwitch(isChecked: Boolean)
 }
 
 
@@ -81,9 +106,11 @@ private fun GameSettingsContentPreview() {
     HoldemStackTrackerTheme {
         GameSettingsContent(
             uiState = GameSettingsContentUiState(
-                isKeepScreenOn = true,
+                isKeepScreenOn = false,
+                isEnableSliderStep = true,
             ),
             onClickKeepScreenSwitch = {},
+            onClickSettingSliderStepSwitch = {},
         )
     }
 }

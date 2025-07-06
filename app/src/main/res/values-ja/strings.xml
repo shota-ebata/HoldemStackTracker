@@ -64,6 +64,7 @@
     <!--    <string name="call_raise_button_sub_text">%1$s → %2$s</string>-->
 
     <string name="setting_keep_screen_on">ゲーム中、画面をオンのままにする</string>
+    <string name="setting_slider_step_on">BetSizeスライダーにステップを表示する</string>
 
     <string name="label_is_leaved">離席</string>
 

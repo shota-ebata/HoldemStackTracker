@@ -103,7 +103,8 @@
 <!--    <string name="call_raise_button_sub_text">%1$s → %2$s</string>-->
     <string name="left_arrow" translatable="false">→</string>
 
-    <string name="setting_keep_screen_on">Prevent screen from turning off during game</string>
+    <string name="setting_keep_screen_on">Prevent screen from turning off during game.</string>
+    <string name="setting_slider_step_on">Show steps on bet size slider.</string>
 
     <string name="label_is_leaved">Out Of Seat</string>
 

@@ -166,11 +166,13 @@ constructor(
     val gameSettingsDialogUiState: StateFlow<GameSettingsDialogUiState?> = combine(
         shouldShowGameSettingDialog,
         prefRepository.isKeepScreenOn,
-    ) { shouldShow, isKeepScreenOn ->
+        prefRepository.isEnableRaiseUpSliderStep,
+    ) { shouldShow, isKeepScreenOn, isEnableRaiseUpSliderStep ->
         if (shouldShow) {
             GameSettingsDialogUiState(
                 GameSettingsContentUiState(
-                    isKeepScreenOn = isKeepScreenOn
+                    isKeepScreenOn = isKeepScreenOn,
+                    isEnableSliderStep = isEnableRaiseUpSliderStep
                 )
             )
         } else {
@@ -808,6 +810,12 @@ constructor(
     override fun onClickKeepScreenSwitch(isChecked: Boolean) {
         viewModelScope.launch {
             prefRepository.saveKeepScreenOn(isChecked)
+        }
+    }
+
+    override fun onClickSettingSliderStepSwitch(isChecked: Boolean) {
+        viewModelScope.launch {
+            prefRepository.saveEnableRaiseUpSliderStep(isChecked)
         }
     }
 

@@ -23,7 +23,8 @@ fun GameSettingsDialog(
         Surface {
             GameSettingsContent(
                 uiState = uiState.contentUiState,
-                onClickKeepScreenSwitch = event::onClickKeepScreenSwitch
+                onClickKeepScreenSwitch = event::onClickKeepScreenSwitch,
+                onClickSettingSliderStepSwitch = event::onClickSettingSliderStepSwitch,
             )
         }
     }
