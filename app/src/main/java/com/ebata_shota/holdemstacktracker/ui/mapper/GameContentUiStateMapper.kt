@@ -19,7 +19,6 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
-import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionTypeInLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
@@ -37,6 +36,7 @@ import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType.Fold
 import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType.FoldSkip
 import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType.Raise
 import com.ebata_shota.holdemstacktracker.ui.compose.content.CenterPanelContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.content.ControlPanelUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.RaiseSizeChangeButtonUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
@@ -59,7 +59,6 @@ constructor(
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
     private val isNotRaisedYet: IsNotRaisedYetUseCase,
     private val getActionTypeInLastPhaseAsBetPhase: GetActionTypeInLastPhaseAsBetPhaseUseCase,
-    private val prefRepository: PrefRepository,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
 ) {
@@ -386,37 +385,39 @@ constructor(
                 shouldShowBBSuffix = betViewMode == BetViewMode.BB
             ),
             blindText = blindText,
-            shouldShowBBSuffix = betViewMode == BetViewMode.BB,
-            isEnableFoldButton = isEnableFoldButton,
-            isEnableCheckButton = isEnableCheckButton,
-            isEnableAllInButton = isEnableAllInButton,
-            myPendingBetSizeStringSource = myPendingBetSizeStringSource,
-            isEnableCallButton = isEnableCallButton,
-            callSizeStringSource = callSizeStringSource,
-            isEnableRaiseButton = isEnableRaiseButton,
-            raiseButtonMainLabelResId = if (isNotRaisedYet) {
-                R.string.button_label_bet
-            } else {
-                R.string.button_label_raise
-            },
-            raiseSizeStringSource = raiseSizeStringSource,
-            raiseSizeButtonUiStates = createRaiseSizeChangeButtonUiStates(
-                isNotRaisedYet = isNotRaisedYet,
-                isExistPot = totalPotSize != 0,
-                totalPotSize = totalPotSize,
-                minBetSize = minBetSize,
-                betPhase = betPhase,
-                isEnableRaiseSizeButtons = isCurrentPlayer,
-                stackSize = gamePlayers.find { it.id == myPlayerId }?.stack ?: 0
+            controlPanelUiState = ControlPanelUiState.ActiveControlPanelUiState(
+                shouldShowBBSuffix = betViewMode == BetViewMode.BB,
+                isEnableFoldButton = isEnableFoldButton,
+                isEnableCheckButton = isEnableCheckButton,
+                isEnableAllInButton = isEnableAllInButton,
+                myPendingBetSizeStringSource = myPendingBetSizeStringSource,
+                isEnableCallButton = isEnableCallButton,
+                callSizeStringSource = callSizeStringSource,
+                isEnableRaiseButton = isEnableRaiseButton,
+                raiseButtonMainLabelResId = if (isNotRaisedYet) {
+                    R.string.button_label_bet
+                } else {
+                    R.string.button_label_raise
+                },
+                raiseSizeStringSource = raiseSizeStringSource,
+                raiseSizeButtonUiStates = createRaiseSizeChangeButtonUiStates(
+                    isNotRaisedYet = isNotRaisedYet,
+                    isExistPot = totalPotSize != 0,
+                    totalPotSize = totalPotSize,
+                    minBetSize = minBetSize,
+                    betPhase = betPhase,
+                    isEnableRaiseSizeButtons = isCurrentPlayer,
+                    stackSize = gamePlayers.find { it.id == myPlayerId }?.stack ?: 0
+                ),
+                isEnableMinusButton = isEnableMinusButton,
+                isEnablePlusButton = isEnablePlusButton,
+                isEnableSlider = isEnableSlider,
+                sliderPosition = sliderPosition,
+                stackRatioText = sliderLabelStackBody,
+                potRatioText = sliderLabelPotBody,
+                isEnableSliderStep = isEnableSliderStep,
+                isEnableRaiseUpSizeButton = isEnableRaiseSizeButton,
             ),
-            isEnableMinusButton = isEnableMinusButton,
-            isEnablePlusButton = isEnablePlusButton,
-            isEnableSlider = isEnableSlider,
-            sliderPosition = sliderPosition,
-            stackRatioText = sliderLabelStackBody,
-            potRatioText = sliderLabelPotBody,
-            isEnableSliderStep = isEnableSliderStep,
-            isEnableRaiseUpSizeButton = isEnableRaiseSizeButton,
         )
     }
 
@@ -626,33 +627,35 @@ constructor(
                 shouldShowBBSuffix = betViewMode == BetViewMode.BB
             ),
             blindText = blindText,
-            shouldShowBBSuffix = betViewMode == BetViewMode.BB,
-            isEnableFoldButton = false,
-            isEnableCheckButton = false,
-            isEnableAllInButton = false,
-            myPendingBetSizeStringSource = null,
-            isEnableCallButton = false,
-            callSizeStringSource = null,
-            isEnableRaiseButton = false,
-            raiseButtonMainLabelResId = R.string.button_label_bet,
-            raiseSizeStringSource = null,
-            raiseSizeButtonUiStates = createRaiseSizeChangeButtonUiStates(
-                isNotRaisedYet = true,
-                isExistPot = totalPotSize != 0,
-                totalPotSize = totalPotSize,
-                minBetSize = minBetSize,
-                betPhase = null,
-                isEnableRaiseSizeButtons = false,
-                stackSize = gamePlayers.find { it.id == myPlayerId }?.stack ?: 0
+            controlPanelUiState = ControlPanelUiState.ActiveControlPanelUiState(
+                shouldShowBBSuffix = betViewMode == BetViewMode.BB,
+                isEnableFoldButton = false,
+                isEnableCheckButton = false,
+                isEnableAllInButton = false,
+                myPendingBetSizeStringSource = null,
+                isEnableCallButton = false,
+                callSizeStringSource = null,
+                isEnableRaiseButton = false,
+                raiseButtonMainLabelResId = R.string.button_label_bet,
+                raiseSizeStringSource = null,
+                raiseSizeButtonUiStates = createRaiseSizeChangeButtonUiStates(
+                    isNotRaisedYet = true,
+                    isExistPot = totalPotSize != 0,
+                    totalPotSize = totalPotSize,
+                    minBetSize = minBetSize,
+                    betPhase = null,
+                    isEnableRaiseSizeButtons = false,
+                    stackSize = gamePlayers.find { it.id == myPlayerId }?.stack ?: 0
+                ),
+                isEnableMinusButton = false,
+                isEnablePlusButton = false,
+                isEnableSlider = false,
+                sliderPosition = 0.0f,
+                stackRatioText = null,
+                potRatioText = null,
+                isEnableSliderStep = isEnableSliderStep,
+                isEnableRaiseUpSizeButton = false,
             ),
-            isEnableMinusButton = false,
-            isEnablePlusButton = false,
-            isEnableSlider = false,
-            sliderPosition = 0.0f,
-            stackRatioText = null,
-            potRatioText = null,
-            isEnableSliderStep = isEnableSliderStep,
-            isEnableRaiseUpSizeButton = false,
         )
     }
 
