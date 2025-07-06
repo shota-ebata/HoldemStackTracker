@@ -9,7 +9,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundTableException
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
@@ -37,6 +36,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.UpdateTableUseCase
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.EditGameRuleDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogUiState
@@ -85,6 +85,7 @@ constructor(
     private val qrBitmapRepository: QrBitmapRepository,
     private val prefRepository: PrefRepository,
     private val defaultRuleStateOfRingRepository: DefaultRuleStateOfRingRepository,
+    private val updateTableUseCase: UpdateTableUseCase,
     private val joinTable: JoinTableUseCase,
     private val createNewGame: CreateNewGameUseCase,
     private val movePositionUseCase: MovePositionUseCase,
@@ -454,7 +455,6 @@ constructor(
         val table = tableStateFlow.value ?: return
         val playerEditDialogUiState = dialogUiState.value.playerEditDialogUiState ?: return
 
-
         viewModelScope.launch {
             val copiedTable = table.copy(
                 basePlayers = table.basePlayers.mapAtFind({ playerBase ->
@@ -466,11 +466,8 @@ constructor(
                         stack = max(stackSize, 0)
                     )
                 },
-                // FIXME: ここってアプリのVersionCodeを入れるべきなのだろうか？
-                //  取得できてるMinVersionをいれたほうがいいのでは？
-                appVersion = BuildConfig.VERSION_CODE,
             )
-            tableRepository.sendTable(copiedTable)
+            updateTableUseCase.invoke(copiedTable)
         }
         onDismissRequestPlayerEditDialog()
     }
@@ -781,7 +778,7 @@ constructor(
                         defaultStack = defaultStack,
                     )
                 )
-                tableRepository.sendTable(newTable)
+                updateTableUseCase.invoke(newTable)
                 onDismissEditGameRuleDialog()
             }
         }

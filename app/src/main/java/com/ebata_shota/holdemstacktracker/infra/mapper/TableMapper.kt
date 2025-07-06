@@ -1,7 +1,10 @@
 package com.ebata_shota.holdemstacktracker.infra.mapper
 
+<<<<<<< HEAD
 import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.domain.exception.AppVersionException
+=======
+>>>>>>> main
 import com.ebata_shota.holdemstacktracker.domain.model.GameId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -20,7 +23,7 @@ constructor() {
 
     companion object {
         private const val TABLE_VERSION = "tableVersion"
-        private const val APP_VERSION = "appVersion"
+        private const val HOST_APP_VERSION_CODE = "hostAppVersionCode"
         private const val HOST_PLAYER_ID = "hostPlayerId"
         private const val POT_MANAGER_ID = "potManagerId"
         private const val RULE = "rule"
@@ -55,7 +58,11 @@ constructor() {
         return Table(
             id = tableId,
             version = tableMap[TABLE_VERSION] as Long,
+<<<<<<< HEAD
             appVersion = appVersion,
+=======
+            hostAppVersionCode = (tableMap[HOST_APP_VERSION_CODE] as? Number)?.toInt() ?: 0,
+>>>>>>> main
             hostPlayerId = PlayerId(tableMap[HOST_PLAYER_ID] as String),
             potManagerPlayerId = PlayerId(tableMap[POT_MANAGER_ID] as String),
             rule = mapToRuleState(tableMap[RULE] as Map<*, *>),
@@ -96,7 +103,7 @@ constructor() {
 
     fun toMap(table: Table): Map<String, Any> = listOfNotNull(
         TABLE_VERSION to table.version,
-        APP_VERSION to table.appVersion,
+        HOST_APP_VERSION_CODE to table.hostAppVersionCode,
         HOST_PLAYER_ID to table.hostPlayerId.value,
         POT_MANAGER_ID to table.potManagerPlayerId.value,
         BTN_PLAYER_ID to table.btnPlayerId.value,

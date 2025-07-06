@@ -14,6 +14,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetAddedAutoActionsGameUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.UpdateTableUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.time.Instant
@@ -23,7 +24,7 @@ class CreateNewGameUseCaseImpl
 @Inject
 constructor(
     private val getAddedAutoActionsGame: GetAddedAutoActionsGameUseCase,
-    private val tableRepository: TableRepository,
+    private val updateTableUseCase: UpdateTableUseCase,
     private val gameRepository: GameRepository,
     private val randomIdRepository: RandomIdRepository,
     @CoroutineDispatcherDefault
@@ -38,7 +39,6 @@ constructor(
             currentGameId = gameId,
             startTime = updateTime,
             updateTime = updateTime,
-            version = table.version + 1
         )
         val newGame = Game(
             gameId = gameId,
@@ -67,8 +67,9 @@ constructor(
             ),
             updateTime = updateTime
         )
-        tableRepository.sendTable(
-            table = copiedTable
+        updateTableUseCase.invoke(
+            table = copiedTable,
+            updateTime = updateTime
         )
         // AutoActionがあれば追加する
         val addedAutoActionGame = getAddedAutoActionsGame.invoke(
