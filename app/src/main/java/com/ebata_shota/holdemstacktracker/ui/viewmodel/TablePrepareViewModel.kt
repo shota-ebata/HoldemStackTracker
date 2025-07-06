@@ -9,7 +9,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundTableException
 import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
@@ -456,7 +455,6 @@ constructor(
         val table = tableStateFlow.value ?: return
         val playerEditDialogUiState = dialogUiState.value.playerEditDialogUiState ?: return
 
-
         viewModelScope.launch {
             val copiedTable = table.copy(
                 basePlayers = table.basePlayers.mapAtFind({ playerBase ->
@@ -468,11 +466,6 @@ constructor(
                         stack = max(stackSize, 0)
                     )
                 },
-                // FIXME: ここってアプリのVersionCodeを入れるべきなのだろうか？
-                //  取得できてるMinVersionをいれたほうがいいのでは？
-                // TODO: ここはアプリのVersionCodeを入れるべきではない
-                //  取得できてるMinVersionをいれたほうがいい
-                appVersion = BuildConfig.VERSION_CODE,
             )
             updateTableUseCase.invoke(copiedTable)
         }

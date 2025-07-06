@@ -13,6 +13,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.RemoteConfigRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableSummaryRepository
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper
@@ -75,7 +76,7 @@ constructor(
             val table = Table(
                 id = tableId,
                 version = 0L,
-                appVersion = BuildConfig.VERSION_CODE, // FIXME: ここには最低アプリバージョンを入れたほうがいいかも？
+                hostAppVersionCode = BuildConfig.VERSION_CODE,
                 hostPlayerId = myPlayerId,
                 rule = rule,
                 playerOrder = listOf(myPlayerId),
