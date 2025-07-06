@@ -1,10 +1,7 @@
 package com.ebata_shota.holdemstacktracker.infra.mapper
 
-<<<<<<< HEAD
 import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.domain.exception.AppVersionException
-=======
->>>>>>> main
 import com.ebata_shota.holdemstacktracker.domain.model.GameId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -51,18 +48,14 @@ constructor() {
 
     @Throws(AppVersionException::class)
     fun mapToTableState(tableId: TableId, tableMap: Map<*, *>): Table {
-        val appVersion = tableMap[APP_VERSION]?.getInt() ?: 0
-        if (appVersion > BuildConfig.VERSION_CODE) {
+        val hostAppVersion = (tableMap[HOST_APP_VERSION_CODE] as? Number)?.toInt() ?: 0
+        if (hostAppVersion > BuildConfig.VERSION_CODE) {
             throw AppVersionException()
         }
         return Table(
             id = tableId,
             version = tableMap[TABLE_VERSION] as Long,
-<<<<<<< HEAD
-            appVersion = appVersion,
-=======
-            hostAppVersionCode = (tableMap[HOST_APP_VERSION_CODE] as? Number)?.toInt() ?: 0,
->>>>>>> main
+            hostAppVersionCode = hostAppVersion,
             hostPlayerId = PlayerId(tableMap[HOST_PLAYER_ID] as String),
             potManagerPlayerId = PlayerId(tableMap[POT_MANAGER_ID] as String),
             rule = mapToRuleState(tableMap[RULE] as Map<*, *>),
