@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -15,6 +16,7 @@ import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 @Composable
 fun ChipSizeText(
     textStringSource: StringSource,
+    color: Color = Color.Unspecified,
     shouldShowBBSuffix: Boolean,
     style: TextStyle = MaterialTheme.typography.titleMedium,
     suffixFontSize: TextUnit = MaterialTheme.typography.bodySmall.fontSize,
@@ -28,7 +30,8 @@ fun ChipSizeText(
     Text(
         modifier = modifier,
         text = text,
-        style = style
+        style = style,
+        color = color
     )
 }
 

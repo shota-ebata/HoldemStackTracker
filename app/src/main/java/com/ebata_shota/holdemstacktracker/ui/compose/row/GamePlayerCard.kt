@@ -207,7 +207,11 @@ private fun PlayerCard(
             containerColor = if (uiState.isCurrentPlayer) {
                 MaterialTheme.colorScheme.inversePrimary
             } else {
-                Color.Unspecified
+                if (uiState.isFolded) {
+                    Color.Unspecified.copy(alpha = 0.38f)
+                } else {
+                    Color.Unspecified
+                }
             }
         ),
         onClick = onClickCard,
@@ -215,7 +219,7 @@ private fun PlayerCard(
     ) {
         Column(
             modifier = Modifier
-                .widthIn(min = 100.dp)
+                .widthIn(min = if (uiState.isMine || uiState.isCurrentPlayer && !uiState.isFolded) 10.dp else 100.dp)
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -224,16 +228,22 @@ private fun PlayerCard(
                 shouldShowBBSuffix = uiState.shouldShowBBSuffix,
                 style = MaterialTheme.typography.titleMedium,
                 suffixFontSize = MaterialTheme.typography.bodySmall.fontSize,
+                color = if (uiState.isFolded) {
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                } else {
+                    Color.Unspecified
+                },
             )
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = uiState.playerName,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    style = MaterialTheme.typography.bodySmall
-                )
+            if (uiState.isMine || uiState.isCurrentPlayer && !uiState.isFolded) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = uiState.playerName,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                    )
+                }
             }
         }
     }
@@ -252,6 +262,7 @@ data class GamePlayerUiState(
     @StringRes
     val positionLabelResId: Int?,
     val lastActionText: StringSource?,
+    val isFolded: Boolean = false,
 ) {
     val betTextPosition: BetTextPosition = when (playerPosition) {
         PlayerPosition.BOTTOM -> BetTextPosition.TOP
@@ -315,6 +326,20 @@ private class GamePlayerCardPreviewParam :
             isBtn = false,
             positionLabelResId = null,
             lastActionText = StringSource(R.string.action_label_all_in)
+        ),
+        GamePlayerUiState(
+            playerName = "Player123456789",
+            stack = StringSource("200.0"),
+            shouldShowBBSuffix = true,
+            playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
+            pendingBetSize = null,
+            isLeaved = false,
+            isMine = false,
+            isCurrentPlayer = false,
+            isBtn = false,
+            positionLabelResId = null,
+            lastActionText = StringSource(R.string.action_label_fold),
+            isFolded = true
         )
     )
 }

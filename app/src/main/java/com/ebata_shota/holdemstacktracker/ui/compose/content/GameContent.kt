@@ -1,30 +1,15 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.AbsoluteAlignment
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -35,10 +20,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.toStringSource
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.RaiseSizeChangeButtonUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerCard
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
-import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,132 +54,12 @@ fun GameContent(
                 .safeDrawingPadding()
                 .padding(4.dp)
         ) {
-            // TOP
-            Row(
+            PlayersContent(
+                uiState = uiState,
+                onClickPlayerCard = onClickPlayerCard,
                 modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                uiState.players
-                    .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.TOP }
-                    .forEach { playerUiState ->
-                        GamePlayerCard(
-                            uiState = playerUiState,
-                            onClickCard = onClickPlayerCard,
-                        )
-                    }
-            }
-            Row(
-                modifier = Modifier
-                    .weight(weight = 1.0f)
-            ) {
-                // LEFT
-                Column(
-                    modifier = modifier
-                        .fillMaxHeight()
-                        .weight(1.0f),
-                    horizontalAlignment = AbsoluteAlignment.Left,
-                    verticalArrangement = Arrangement.SpaceEvenly,
-                ) {
-                    uiState.players
-                        .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.LEFT }
-                        .reversed()
-                        .forEach { playerUiState ->
-                            GamePlayerCard(
-                                uiState = playerUiState,
-                                onClickCard = onClickPlayerCard,
-                            )
-                        }
-                }
-                // CENTER
-                Column(
-                    modifier = Modifier.weight(1.0f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Bottom
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .weight(1.0f)
-                            .fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CenterPanelContent(
-                            uiState = uiState.centerPanelContentUiState
-                        )
-                    }
-                    // BOTTOM
-                    Column(
-                        modifier = Modifier,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Bottom
-                    ) {
-                        uiState.players
-                            .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.BOTTOM }
-                            .forEach { playerUiState ->
-                                GamePlayerCard(
-                                    uiState = playerUiState,
-                                    onClickCard = onClickPlayerCard,
-                                )
-                            }
-                    }
-                }
-                // RIGHT
-                Column(
-                    modifier = modifier
-                        .fillMaxHeight()
-                        .weight(1.0f),
-                    horizontalAlignment = AbsoluteAlignment.Right,
-                    verticalArrangement = Arrangement.SpaceEvenly,
-                ) {
-                    uiState.players
-                        .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.RIGHT }
-                        .forEach { playerUiState ->
-                            GamePlayerCard(
-                                uiState = playerUiState,
-                                onClickCard = onClickPlayerCard,
-                            )
-                        }
-                }
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(
-                    modifier = Modifier
-                        .border(
-                            width = OutlineLabelBorderWidth,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            shape = RoundedCornerShape(4.dp),
-                        )
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        modifier = Modifier.padding(end = 4.dp),
-                        text = stringResource(R.string.label_blind),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Box(
-                        modifier = Modifier
-                            .height(height = 16.dp)
-                            .width(OutlineLabelBorderWidth)
-                            .background(MaterialTheme.colorScheme.onSurface)
-                    )
-                    Text(
-                        modifier = Modifier.padding(start = 4.dp),
-                        text = uiState.blindText,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-
-                Text(
-                    modifier = Modifier.padding(start = 10.dp),
-                    text = uiState.tableIdString.getString(),
-                )
-            }
+                    .weight(weight = 1.0f),
+            )
 
             // ここからコントロールパネル
             ControlPanelContent(
@@ -240,8 +103,8 @@ private class GameContentUiStatePreviewParam :
                     playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
                     pendingBetSize = StringSource("2"),
                     isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = true,
+                    isMine = true,
+                    isCurrentPlayer = false,
                     isBtn = false,
                     positionLabelResId = null,
                     lastActionText = StringSource(R.string.action_label_bet),
@@ -270,7 +133,8 @@ private class GameContentUiStatePreviewParam :
                     isCurrentPlayer = false,
                     isBtn = false,
                     positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_all_in),
+                    lastActionText = StringSource(R.string.action_label_fold),
+                    isFolded = true,
                 ),
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -345,7 +209,7 @@ private class GameContentUiStatePreviewParam :
                     pendingBetSize = StringSource("2"),
                     isLeaved = false,
                     isMine = false,
-                    isCurrentPlayer = false,
+                    isCurrentPlayer = true,
                     isBtn = false,
                     positionLabelResId = R.string.position_label_sb,
                     lastActionText = StringSource(R.string.action_label_bet),
