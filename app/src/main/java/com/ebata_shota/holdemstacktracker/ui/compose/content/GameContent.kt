@@ -56,7 +56,6 @@ fun GameContent(
     onClickSettingButton: () -> Unit,
     onClickPlayerCard: () -> Unit,
     onChangeSlider: (Float) -> Unit,
-    onClickSliderStepSwitch: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val currentActionId = uiState.currentActionId
@@ -212,7 +211,6 @@ fun GameContent(
                 onChangeSlider = onChangeSlider,
                 onClickPlusButton = onClickPlusButton,
                 onClickSettingButton = onClickSettingButton,
-                onClickSliderStepSwitch = onClickSliderStepSwitch
             )
 
         }
@@ -452,7 +450,6 @@ private fun GameContentPreview(
             onClickSettingButton = {},
             onClickPlayerCard = {},
             onChangeSlider = {},
-            onClickSliderStepSwitch = {}
         )
     }
 }

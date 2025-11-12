@@ -47,7 +47,6 @@ fun GameScreen(
                 onClickSettingButton = viewModel::onClickSettingButton,
                 onClickPlayerCard = viewModel::onClickPlayerCard,
                 onChangeSlider = viewModel::onChangeSlider,
-                onClickSliderStepSwitch = viewModel::onClickSliderStepSwitch,
             )
 
             gameSettingDialogUiState?.let {

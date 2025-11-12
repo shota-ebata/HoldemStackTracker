@@ -779,14 +779,6 @@ constructor(
         }
     }
 
-    fun onClickSliderStepSwitch(
-        value: Boolean,
-    ) {
-        viewModelScope.launch {
-            prefRepository.saveEnableRaiseUpSliderStep(value)
-        }
-    }
-
     fun onActionDisplayed(actionId: ActionId?) {
         viewModelScope.launch {
             if (actionId != null) {
