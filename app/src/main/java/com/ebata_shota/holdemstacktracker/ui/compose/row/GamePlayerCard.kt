@@ -219,7 +219,7 @@ private fun PlayerCard(
     ) {
         Column(
             modifier = Modifier
-                .widthIn(min = if (uiState.isMine || uiState.isCurrentPlayer && !uiState.isFolded) 10.dp else 100.dp)
+                .widthIn(min = 100.dp)
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -242,6 +242,11 @@ private fun PlayerCard(
                         text = uiState.playerName,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
+                        color = if (uiState.isFolded) {
+                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                        } else {
+                            Color.Unspecified
+                        },
                     )
                 }
             }

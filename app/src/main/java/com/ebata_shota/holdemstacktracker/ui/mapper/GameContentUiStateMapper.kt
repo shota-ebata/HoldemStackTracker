@@ -552,7 +552,8 @@ constructor(
             Fold -> StringSource(R.string.action_label_fold)
             FoldSkip -> StringSource(R.string.action_label_fold)
             else -> null
-        }
+        },
+        isFolded = actionType == Fold || actionType == FoldSkip,
     )
 
     /**
