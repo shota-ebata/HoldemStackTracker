@@ -81,11 +81,9 @@ fun GameContent(
 }
 
 data class GameContentUiState(
-    val tableIdString: StringSource,
     val currentActionId: ActionId?,
     val players: List<GamePlayerUiState>,
     val centerPanelContentUiState: CenterPanelContentUiState,
-    val blindText: String,
     val controlPanelUiState: ControlPanelUiState,
 )
 
@@ -93,7 +91,6 @@ private class GameContentUiStatePreviewParam :
     PreviewParameterProvider<GameContentUiState> {
     override val values: Sequence<GameContentUiState> = sequenceOf(
         GameContentUiState(
-            tableIdString = StringSource(R.string.table_id_prefix, "123abc"),
             currentActionId = ActionId("actionId"),
             players = listOf(
                 GamePlayerUiState(
@@ -229,12 +226,12 @@ private class GameContentUiStatePreviewParam :
                 )
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
+                blindText = StringSource("100/200"),
                 betPhaseText = StringSource(R.string.label_pre_flop),
                 totalPot = StringSource("0"),
                 pendingTotalBetSize = StringSource("2"),
                 shouldShowBBSuffix = false
             ),
-            blindText = "100/200",
             controlPanelUiState = ControlPanelUiState.ActiveControlPanelUiState(
                 shouldShowBBSuffix = false,
                 isEnableFoldButton = true,

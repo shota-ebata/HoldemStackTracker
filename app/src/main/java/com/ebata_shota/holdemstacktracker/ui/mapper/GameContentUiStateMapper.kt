@@ -336,7 +336,6 @@ constructor(
         }
 
         return GameContentUiState(
-            tableIdString = StringSource(R.string.table_id_prefix, tableId.value),
             currentActionId = betPhase.actionStateList.lastOrNull()?.actionId,
             players = gamePlayerUiStates(
                 sortedPlayerOrder = sortedPlayerOrder,
@@ -354,6 +353,7 @@ constructor(
                 bbPlayerId = bbPlayerId
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
+                blindText = StringSource(blindText),
                 betPhaseText = when (betPhase) {
                     is PreFlop -> StringSource(R.string.label_pre_flop)
                     is Flop -> StringSource(R.string.label_flop)
@@ -384,7 +384,6 @@ constructor(
                 },
                 shouldShowBBSuffix = betViewMode == BetViewMode.BB
             ),
-            blindText = blindText,
             controlPanelUiState = ControlPanelUiState.ActiveControlPanelUiState(
                 shouldShowBBSuffix = betViewMode == BetViewMode.BB,
                 isEnableFoldButton = isEnableFoldButton,
@@ -579,7 +578,6 @@ constructor(
     ): GameContentUiState {
         val pendingBetPerPlayer = emptyMap<PlayerId, Int>()
         return GameContentUiState(
-            tableIdString = StringSource(R.string.table_id_prefix, tableId.value),
             currentActionId = null,
             players = gamePlayerUiStates(
                 sortedPlayerOrder = sortedPlayerOrder,
@@ -597,6 +595,7 @@ constructor(
                 bbPlayerId = bbPlayerId,
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
+                blindText = StringSource(blindText),
                 betPhaseText = when (lastPhase) {
                     is Phase.Standby -> StringSource(R.string.table_status_preparing)
                     is Phase.PotSettlement -> StringSource(R.string.phase_label_pot_settlement)
@@ -627,7 +626,6 @@ constructor(
                 },
                 shouldShowBBSuffix = betViewMode == BetViewMode.BB
             ),
-            blindText = blindText,
             controlPanelUiState = ControlPanelUiState.ActiveControlPanelUiState(
                 shouldShowBBSuffix = betViewMode == BetViewMode.BB,
                 isEnableFoldButton = false,

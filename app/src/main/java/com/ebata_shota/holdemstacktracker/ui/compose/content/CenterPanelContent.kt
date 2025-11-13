@@ -1,10 +1,13 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,6 +38,33 @@ fun CenterPanelContent(
             modifier = Modifier.padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Column(
+                modifier = Modifier
+                    .padding(bottom = 4.dp)
+                    .border(
+                        width = OutlineLabelBorderWidth,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        shape = RoundedCornerShape(4.dp),
+                    )
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    modifier = Modifier,
+                    text = stringResource(R.string.label_blind),
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Box(
+                    modifier = Modifier
+                        .height(OutlineLabelBorderWidth)
+                        .background(MaterialTheme.colorScheme.onSurface)
+                )
+                Text(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = uiState.blindText.getString(),
+                    style = MaterialTheme.typography.titleSmall
+                )
+            }
             val betPhaseText = uiState.betPhaseText
             if (betPhaseText != null) {
                 Box(
@@ -59,7 +89,7 @@ fun CenterPanelContent(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(R.string.label_total_pot),
+                    text = stringResource(R.string.label_pot),
                     style = MaterialTheme.typography.bodySmall
                 )
                 ChipSizeText(
@@ -98,6 +128,7 @@ fun CenterPanelContent(
 }
 
 data class CenterPanelContentUiState(
+    val blindText: StringSource,
     val betPhaseText: StringSource?,
     val totalPot: StringSource,
     val pendingTotalBetSize: StringSource,
@@ -118,6 +149,7 @@ private fun CenterPanelContentPreview() {
             modifier = Modifier
                 .width(150.dp),
             uiState = CenterPanelContentUiState(
+                blindText = StringSource("100/200"),
                 betPhaseText = StringSource(R.string.label_pre_flop),
                 totalPot = StringSource("400"),
                 pendingTotalBetSize = StringSource("100"),

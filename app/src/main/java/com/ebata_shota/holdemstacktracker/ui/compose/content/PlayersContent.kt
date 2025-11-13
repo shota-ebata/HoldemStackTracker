@@ -1,29 +1,17 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
@@ -31,7 +19,6 @@ import com.ebata_shota.holdemstacktracker.domain.model.toStringSource
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.RaiseSizeChangeButtonUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerCard
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
-import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
 
 @Composable
 fun PlayersContent(
@@ -101,40 +88,6 @@ fun PlayersContent(
                     CenterPanelContent(
                         uiState = uiState.centerPanelContentUiState
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Row(
-                        modifier = Modifier
-                            .border(
-                                width = OutlineLabelBorderWidth,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                shape = RoundedCornerShape(4.dp),
-                            )
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(end = 4.dp),
-                            text = stringResource(R.string.label_blind),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                        Box(
-                            modifier = Modifier
-                                .height(height = 16.dp)
-                                .width(OutlineLabelBorderWidth)
-                                .background(MaterialTheme.colorScheme.onSurface)
-                        )
-                        Text(
-                            modifier = Modifier.padding(start = 4.dp),
-                            text = uiState.blindText,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-
-                    // TODO: 除却する
-                    Text(
-                        modifier = Modifier.padding(start = 10.dp),
-                        text = uiState.tableIdString.getString(),
-                    )
                 }
                 // BOTTOM
                 Column(
@@ -184,7 +137,6 @@ private class PlayersFor10ContentPreviewParameterProvider :
     override val values: Sequence<GameContentUiState> = sequenceOf(
         // 10人フル
         GameContentUiState(
-            tableIdString = StringSource(R.string.table_id_prefix, "123abc"),
             currentActionId = ActionId("actionId"),
             players = listOf(
                 GamePlayerUiState(
@@ -321,12 +273,12 @@ private class PlayersFor10ContentPreviewParameterProvider :
                 )
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
+                blindText = StringSource("100000/200000"),
                 betPhaseText = StringSource(R.string.label_pre_flop),
                 totalPot = StringSource("0"),
                 pendingTotalBetSize = StringSource("2"),
                 shouldShowBBSuffix = false
             ),
-            blindText = "100/200",
             controlPanelUiState = ControlPanelUiState.ActiveControlPanelUiState(
                 shouldShowBBSuffix = false,
                 isEnableFoldButton = true,
@@ -372,7 +324,6 @@ private class PlayersFor10ContentPreviewParameterProvider :
         ),
         // 6人
         GameContentUiState(
-            tableIdString = StringSource(R.string.table_id_prefix, "123abc"),
             currentActionId = ActionId("actionId"),
             players = listOf(
                 GamePlayerUiState(
@@ -457,12 +408,12 @@ private class PlayersFor10ContentPreviewParameterProvider :
                 ),
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
+                blindText = StringSource("100/200"),
                 betPhaseText = StringSource(R.string.label_pre_flop),
                 totalPot = StringSource("0"),
                 pendingTotalBetSize = StringSource("2"),
                 shouldShowBBSuffix = false
             ),
-            blindText = "100/200",
             controlPanelUiState = ControlPanelUiState.ActiveControlPanelUiState(
                 shouldShowBBSuffix = false,
                 isEnableFoldButton = true,
@@ -508,7 +459,6 @@ private class PlayersFor10ContentPreviewParameterProvider :
         ),
         // 4人
         GameContentUiState(
-            tableIdString = StringSource(R.string.table_id_prefix, "123abc"),
             currentActionId = ActionId("actionId"),
             players = listOf(
                 GamePlayerUiState(
@@ -566,12 +516,12 @@ private class PlayersFor10ContentPreviewParameterProvider :
                 ),
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
+                blindText = StringSource("100/200"),
                 betPhaseText = StringSource(R.string.label_pre_flop),
                 totalPot = StringSource("0"),
                 pendingTotalBetSize = StringSource("2"),
                 shouldShowBBSuffix = false
             ),
-            blindText = "100/200",
             controlPanelUiState = ControlPanelUiState.ActiveControlPanelUiState(
                 shouldShowBBSuffix = false,
                 isEnableFoldButton = true,
@@ -617,7 +567,6 @@ private class PlayersFor10ContentPreviewParameterProvider :
         ),
         // 3人
         GameContentUiState(
-            tableIdString = StringSource(R.string.table_id_prefix, "123abc"),
             currentActionId = ActionId("actionId"),
             players = listOf(
                 GamePlayerUiState(
@@ -662,12 +611,12 @@ private class PlayersFor10ContentPreviewParameterProvider :
                 ),
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
+                blindText = StringSource("100/200"),
                 betPhaseText = StringSource(R.string.label_pre_flop),
                 totalPot = StringSource("0"),
                 pendingTotalBetSize = StringSource("2"),
                 shouldShowBBSuffix = false
             ),
-            blindText = "100/200",
             controlPanelUiState = ControlPanelUiState.ActiveControlPanelUiState(
                 shouldShowBBSuffix = false,
                 isEnableFoldButton = true,
@@ -713,7 +662,6 @@ private class PlayersFor10ContentPreviewParameterProvider :
         ),
         // 2人
         GameContentUiState(
-            tableIdString = StringSource(R.string.table_id_prefix, "123abc"),
             currentActionId = ActionId("actionId"),
             players = listOf(
                 GamePlayerUiState(
@@ -744,12 +692,12 @@ private class PlayersFor10ContentPreviewParameterProvider :
                 ),
             ),
             centerPanelContentUiState = CenterPanelContentUiState(
+                blindText = StringSource("100/200"),
                 betPhaseText = StringSource(R.string.label_pre_flop),
                 totalPot = StringSource("0"),
                 pendingTotalBetSize = StringSource("2"),
                 shouldShowBBSuffix = false
             ),
-            blindText = "100/200",
             controlPanelUiState = ControlPanelUiState.ActiveControlPanelUiState(
                 shouldShowBBSuffix = false,
                 isEnableFoldButton = true,
