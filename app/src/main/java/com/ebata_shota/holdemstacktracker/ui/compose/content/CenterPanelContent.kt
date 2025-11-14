@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -29,10 +28,12 @@ import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
 @Composable
 fun CenterPanelContent(
     uiState: CenterPanelContentUiState,
-    modifier: Modifier = Modifier
+    onClickCenterPanel: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier
+        modifier = modifier,
+        onClick = onClickCenterPanel,
     ) {
         Column(
             modifier = Modifier.padding(8.dp),
@@ -152,7 +153,8 @@ private fun CenterPanelContentPreview() {
                 totalPot = StringSource("400"),
                 pendingTotalBetSize = StringSource("100"),
                 shouldShowBBSuffix = false
-            )
+            ),
+            onClickCenterPanel = { }
         )
     }
 }

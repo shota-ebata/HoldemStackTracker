@@ -42,7 +42,6 @@ fun PlayersContent(
                 .forEach { playerUiState ->
                     GamePlayerCard(
                         uiState = playerUiState,
-                        onClickCard = onClickPlayerCard,
                     )
                 }
         }
@@ -69,7 +68,6 @@ fun PlayersContent(
                         .forEach { playerUiState ->
                             GamePlayerCard(
                                 uiState = playerUiState,
-                                onClickCard = onClickPlayerCard,
                             )
                         }
                 }
@@ -89,10 +87,7 @@ fun PlayersContent(
                 ) {
                     CenterPanelContent(
                         uiState = uiState.centerPanelContentUiState,
-                        modifier = Modifier
-                            .clickable {
-                                onClickCenterPanel()
-                            }
+                        onClickCenterPanel = onClickCenterPanel
                     )
                 }
                 // BOTTOM
@@ -106,7 +101,6 @@ fun PlayersContent(
                         .forEach { playerUiState ->
                             GamePlayerCard(
                                 uiState = playerUiState,
-                                onClickCard = onClickPlayerCard,
                             )
                         }
                 }
@@ -129,7 +123,6 @@ fun PlayersContent(
                         .forEach { playerUiState ->
                             GamePlayerCard(
                                 uiState = playerUiState,
-                                onClickCard = onClickPlayerCard,
                             )
                         }
                 }

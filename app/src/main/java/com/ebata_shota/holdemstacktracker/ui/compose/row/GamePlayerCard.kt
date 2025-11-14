@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,7 +44,6 @@ import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
 @Composable
 fun GamePlayerCard(
     uiState: GamePlayerUiState,
-    onClickCard: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (uiState.betTextPosition) {
@@ -59,7 +63,6 @@ fun GamePlayerCard(
                 )
                 PlayerCard(
                     uiState = uiState,
-                    onClickCard = onClickCard,
                 )
             }
         }
@@ -71,7 +74,6 @@ fun GamePlayerCard(
             ) {
                 PlayerCard(
                     uiState = uiState,
-                    onClickCard = onClickCard,
                 )
                 PositionAndActionRow(uiState = uiState)
                 if (uiState.shouldShowActionNextLine) {
@@ -197,26 +199,10 @@ private fun BetSizeRow(
 @Composable
 private fun PlayerCard(
     uiState: GamePlayerUiState,
-    onClickCard: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier
-            .padding(horizontal = 2.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (uiState.isCurrentPlayer) {
-                MaterialTheme.colorScheme.inversePrimary
-            } else {
-                if (uiState.isFolded) {
-                    Color.Unspecified.copy(alpha = 0.38f)
-                } else {
-                    Color.Unspecified
-                }
-            }
-        ),
-        onClick = onClickCard,
-        shape = RoundedCornerShape(8.dp),
-    ) {
+    var tapForceExpanded: Boolean by remember { mutableStateOf(false) }
+    val cardContent: @Composable ColumnScope.() -> Unit = {
         Column(
             modifier = Modifier
                 .widthIn(min = 100.dp)
@@ -234,7 +220,7 @@ private fun PlayerCard(
                     Color.Unspecified
                 },
             )
-            if (uiState.isMine || uiState.isCurrentPlayer && !uiState.isFolded) {
+            if (tapForceExpanded || uiState.expanded) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -247,10 +233,51 @@ private fun PlayerCard(
                         } else {
                             Color.Unspecified
                         },
+                        style = MaterialTheme.typography.bodySmall,
                     )
                 }
             }
         }
+    }
+    if (uiState.expanded) {
+        Card(
+            modifier = modifier
+                .padding(horizontal = 2.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = if (uiState.isCurrentPlayer) {
+                    MaterialTheme.colorScheme.inversePrimary
+                } else {
+                    if (uiState.isFolded) {
+                        Color.Unspecified.copy(alpha = 0.38f)
+                    } else {
+                        Color.Unspecified
+                    }
+                }
+            ),
+            shape = RoundedCornerShape(8.dp),
+            content = cardContent,
+        )
+    } else {
+        Card(
+            modifier = modifier
+                .padding(horizontal = 2.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = if (uiState.isCurrentPlayer) {
+                    MaterialTheme.colorScheme.inversePrimary
+                } else {
+                    if (uiState.isFolded) {
+                        Color.Unspecified.copy(alpha = 0.38f)
+                    } else {
+                        Color.Unspecified
+                    }
+                }
+            ),
+            onClick = {
+                tapForceExpanded = !tapForceExpanded
+            },
+            shape = RoundedCornerShape(8.dp),
+            content = cardContent,
+        )
     }
 }
 
@@ -276,6 +303,9 @@ data class GamePlayerUiState(
 
     // Actionを次の行に表示する
     val shouldShowActionNextLine: Boolean = isBtn && positionLabelResId != null
+
+
+    val expanded: Boolean = isMine || isCurrentPlayer && !isFolded
 
     enum class BetTextPosition {
         TOP,
@@ -366,7 +396,6 @@ private fun GamePlayerCardPreview(
         Surface {
             GamePlayerCard(
                 uiState = uiState,
-                onClickCard = {}
             )
         }
     }
