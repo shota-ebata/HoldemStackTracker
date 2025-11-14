@@ -6,9 +6,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.content.GameTableInfoDetailContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialog
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameTableInfoDetailDialog
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PhaseIntervalImageDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PhaseIntervalImageDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogContent
@@ -24,6 +26,7 @@ fun GameScreen(
     val screenUiState: GameScreenUiState by viewModel.screenUiState.collectAsStateWithLifecycle()
     val gameSettingDialogUiState: GameSettingsDialogUiState? by viewModel.gameSettingsDialogUiState.collectAsStateWithLifecycle()
     val phaseIntervalImageDialogUiState: PhaseIntervalImageDialogUiState? by viewModel.phaseIntervalImageDialog.collectAsStateWithLifecycle()
+    val gameTableInfoDetailDialogUiState: GameTableInfoDetailContentUiState? by viewModel.gameTableInfoDetailDialogUiState.collectAsStateWithLifecycle()
     val potSettlementDialogUiState: PotSettlementDialogUiState? by viewModel.potSettlementDialogUiState.collectAsStateWithLifecycle()
 
     viewModel.navigateEvent.collectWithLifecycle {
@@ -36,6 +39,7 @@ fun GameScreen(
             GameContent(
                 uiState = uiState.contentUiState,
                 onActionDisplayed = viewModel::onActionDisplayed,
+                onClickCenterPanel = viewModel::onClickCenterPanel,
                 onClickFoldButton = viewModel::onClickFoldButton,
                 onClickCheckButton = viewModel::onClickCheckButton,
                 onClickAllInButton = viewModel::onClickAllInButton,
@@ -53,6 +57,15 @@ fun GameScreen(
                 GameSettingsDialog(
                     uiState = it,
                     event = viewModel
+                )
+            }
+
+            // TODO: GameTableInfoDetailDialog
+            gameTableInfoDetailDialogUiState?.let {
+                GameTableInfoDetailDialog(
+                    uiState = it,
+                    getTableQrPainter = viewModel::getTableQrPainter,
+                    onDismissRequest = viewModel::onDismissGameTableInfoDetailDialogRequest
                 )
             }
 

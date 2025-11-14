@@ -28,6 +28,7 @@ import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 fun GameContent(
     uiState: GameContentUiState,
     onActionDisplayed: (ActionId?) -> Unit,
+    onClickCenterPanel: () -> Unit,
     onClickFoldButton: () -> Unit,
     onClickCheckButton: () -> Unit,
     onClickAllInButton: () -> Unit,
@@ -56,6 +57,7 @@ fun GameContent(
         ) {
             PlayersContent(
                 uiState = uiState,
+                onClickCenterPanel = onClickCenterPanel,
                 onClickPlayerCard = onClickPlayerCard,
                 modifier = Modifier
                     .weight(weight = 1.0f),
@@ -300,6 +302,7 @@ private fun GameContentPreview(
         GameContent(
             uiState = uiState,
             onActionDisplayed = {},
+            onClickCenterPanel = {},
             onClickFoldButton = {},
             onClickCheckButton = {},
             onClickAllInButton = {},

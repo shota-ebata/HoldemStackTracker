@@ -1,6 +1,9 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
 import android.os.Bundle
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,6 +30,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthReposito
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PhaseHistoryRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
+import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.AddBetPhaseActionInToGameUseCase
@@ -49,6 +53,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.UpdateTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.util.combine
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameSettingsContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.content.GameTableInfoDetailContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PhaseIntervalImageDialogUiState
@@ -94,6 +99,7 @@ constructor(
     private val randomIdRepository: RandomIdRepository,
     private val actionHistoryRepository: ActionHistoryRepository,
     private val phaseHistoryRepository: PhaseHistoryRepository,
+    private val qrBitmapRepository: QrBitmapRepository,
     private val addBetPhaseActionInToGame: AddBetPhaseActionInToGameUseCase,
     private val getNextGameFromInterval: GetNextGameFromIntervalUseCase,
     private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
@@ -187,9 +193,15 @@ constructor(
     // PhaseIntervalImageDialog
     val phaseIntervalImageDialog = MutableStateFlow<PhaseIntervalImageDialogUiState?>(null)
 
+    // GameTableInfoDetailDialog
+    val gameTableInfoDetailDialogUiState =
+        MutableStateFlow<GameTableInfoDetailContentUiState?>(null)
+
     // PotSettlementDialog
     val potSettlementDialogUiState = MutableStateFlow<PotSettlementDialogUiState?>(null)
 
+    // QR画像を保持
+    private val qrPainterStateFlow = MutableStateFlow<Painter?>(null)
 
     private val _navigateEvent = MutableSharedFlow<Navigate>()
     val navigateEvent = _navigateEvent.asSharedFlow()
@@ -441,6 +453,14 @@ constructor(
                 }
             }
         }
+
+        viewModelScope.launch {
+            // QRコードを生成する
+            val painter = BitmapPainter(
+                image = qrBitmapRepository.createQrBitmap(tableId.value).asImageBitmap()
+            )
+            qrPainterStateFlow.update { painter }
+        }
     }
 
     private suspend fun observer(
@@ -645,6 +665,33 @@ constructor(
             sliderPosition = sliderPosition,
         )
         return raiseSize
+    }
+
+    fun onClickCenterPanel() {
+        viewModelScope.launch {
+            val game = gameStateFlow.value ?: return@launch
+            val gameScreenUiState =
+                screenUiState.value as? GameScreenUiState.Content ?: return@launch
+            gameTableInfoDetailDialogUiState.update {
+                // FIXME: UiStateMapperへ移動したいかも？
+                GameTableInfoDetailContentUiState(
+                    tableId = tableId,
+                    blindText = gameScreenUiState.contentUiState.centerPanelContentUiState.blindText,
+                    potList = game.potList.mapIndexed { index, pot ->
+                        GameTableInfoDetailContentUiState.Pot(
+                            id = pot.id,
+                            potName = if (index == 0) {
+                                StringSource(R.string.label_main_pot)
+                            } else {
+                                StringSource(R.string.label_side_pot, pot.potNumber)
+                            },
+                            potSize = StringSource(pot.potSize.toString())
+                        )
+                    },
+                    pendingTotalBetSize = gameScreenUiState.contentUiState.centerPanelContentUiState.pendingTotalBetSize
+                )
+            }
+        }
     }
 
     fun onClickFoldButton() {
@@ -893,7 +940,16 @@ constructor(
 
     }
 
+    fun getTableQrPainter(): Painter? {
+        return qrPainterStateFlow.value
+    }
 
+
+    fun onDismissGameTableInfoDetailDialogRequest() {
+        viewModelScope.launch {
+            gameTableInfoDetailDialogUiState.update { null }
+        }
+    }
 
     /**
      * インターバル画像

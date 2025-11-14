@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
 @Composable
 fun PlayersContent(
     uiState: GameContentUiState,
+    onClickCenterPanel: () -> Unit,
     onClickPlayerCard: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -86,7 +88,11 @@ fun PlayersContent(
                     verticalArrangement = Arrangement.Center,
                 ) {
                     CenterPanelContent(
-                        uiState = uiState.centerPanelContentUiState
+                        uiState = uiState.centerPanelContentUiState,
+                        modifier = Modifier
+                            .clickable {
+                                onClickCenterPanel()
+                            }
                     )
                 }
                 // BOTTOM
@@ -757,6 +763,7 @@ private fun PlayersContentPreview(
 ) {
     PlayersContent(
         uiState = uiState,
+        onClickCenterPanel = {},
         onClickPlayerCard = {}
     )
 }
