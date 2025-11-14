@@ -50,7 +50,6 @@ fun CenterPanelContent(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    modifier = Modifier,
                     text = stringResource(R.string.label_blind),
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -60,7 +59,6 @@ fun CenterPanelContent(
                         .background(MaterialTheme.colorScheme.onSurface)
                 )
                 Text(
-                    modifier = Modifier.padding(start = 4.dp),
                     text = uiState.blindText.getString(),
                     style = MaterialTheme.typography.titleSmall
                 )
