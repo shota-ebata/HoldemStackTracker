@@ -4,6 +4,7 @@ import android.util.Log
 import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherIO
+import com.ebata_shota.holdemstacktracker.domain.exception.AppVersionException
 import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundTableException
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -151,12 +152,18 @@ constructor(
     private fun firebaseDatabaseTableFlow(tableId: TableId): Flow<Result<Table>> = callbackFlow {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    val tableMap: Map<*, *> = snapshot.value as Map<*, *>
-                    val tableState = tableMapper.mapToTableState(tableId, tableMap)
-                    trySend(Result.success(tableState))
-                } else {
-                    trySend(Result.failure(NotFoundTableException()))
+                try {
+                    if (snapshot.exists()) {
+                        val tableMap: Map<*, *> = snapshot.value as Map<*, *>
+                        val tableState = tableMapper.mapToTableState(tableId, tableMap)
+                        trySend(Result.success(tableState))
+                    } else {
+                        trySend(Result.failure(NotFoundTableException()))
+                    }
+                } catch (e: AppVersionException) {
+                    trySend(Result.failure(e))
+                } catch (e: Exception) {
+                    trySend(Result.failure(e))
                 }
             }
 
