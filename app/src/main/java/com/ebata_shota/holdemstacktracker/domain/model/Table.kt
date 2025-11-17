@@ -11,6 +11,7 @@ data class Table(
     val rule: Rule,
     val basePlayers: List<PlayerBase>,
     val waitPlayerIds: List<PlayerId>,
+    val connectionPlayerIds: List<PlayerId>, // 現在接続しているプレイヤーIDリスト 別テーブルから取得している
     val playerOrder: List<PlayerId>,
     val btnPlayerId: PlayerId,
     val tableStatus: TableStatus,

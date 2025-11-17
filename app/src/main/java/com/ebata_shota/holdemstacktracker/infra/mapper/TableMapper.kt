@@ -44,7 +44,11 @@ constructor() {
 
     private fun Any.getInt() = (this as? Long)?.toInt()
 
-    fun mapToTableState(tableId: TableId, tableMap: Map<*, *>): Table {
+    fun mapToTableState(
+        tableId: TableId,
+        tableMap: Map<*, *>,
+        connectionPlayerIds: List<PlayerId>
+    ): Table {
         return Table(
             id = tableId,
             version = tableMap[TABLE_VERSION] as Long,
@@ -54,6 +58,7 @@ constructor() {
             rule = mapToRuleState(tableMap[RULE] as Map<*, *>),
             basePlayers = mapToBasePlayers(tableMap[BASE_PLAYERS] as List<*>),
             waitPlayerIds = (tableMap[WAIT_PLAYER_IDS] as? List<*>)?.map { PlayerId(it as String) } ?: emptyList(),
+            connectionPlayerIds = connectionPlayerIds,
             playerOrder = (tableMap[PLAYER_ORDER] as List<*>).map { PlayerId(it as String) },
             btnPlayerId = PlayerId(tableMap[BTN_PLAYER_ID] as String),
             tableStatus = TableStatus.of(tableMap[TABLE_STATUS] as String),

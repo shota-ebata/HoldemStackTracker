@@ -13,7 +13,6 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
-import com.ebata_shota.holdemstacktracker.domain.repository.RemoteConfigRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableSummaryRepository
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper
@@ -21,6 +20,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.OnDisconnect
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -31,6 +31,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -62,6 +64,18 @@ constructor(
         }
     )
 
+    @Suppress("KotlinConstantConditions")
+    private val tableConnectionRef: DatabaseReference = firebaseDatabase.getReference(
+        if (BuildConfig.BUILD_TYPE == "debug") {
+            "debug_table_connections"
+        } else {
+            "table_connections"
+        }
+    )
+
+    private var myTableConnectionRef: DatabaseReference? = null
+    private var myTableConnectionRefOnDisconnect: OnDisconnect? = null
+
     private val _tableStateFlow = MutableStateFlow<Result<Table>?>(null)
     override val tableStateFlow: StateFlow<Result<Table>?> = _tableStateFlow.asStateFlow()
 
@@ -91,6 +105,7 @@ constructor(
                     )
                 ),
                 waitPlayerIds = emptyList(),
+                connectionPlayerIds = emptyList(),
                 tableStatus = TableStatus.PREPARING,
                 currentGameId = null,
                 startTime = null,
@@ -113,27 +128,53 @@ constructor(
         stopCollectTableFlow()
         currentTableId = tableId
         collectTableJob = appCoroutineScope.launch {
-            firebaseDatabaseTableFlow(tableId)
-                .collect { tableResult ->
-                    val table = tableResult.getOrNull()
-                    val exception = tableResult.exceptionOrNull()
-                    when {
-                        table != null -> {
-                            tableSummaryRepository.saveTable(table)
-                            // FIXME: 無駄にResultに再ラップしているので修正したい
-                            _tableStateFlow.emit(Result.success(table))
-                        }
+            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+            myTableConnectionRef = tableConnectionRef.child(tableId.value).child(myPlayerId.value)
+            myTableConnectionRef?.setValue(true)
 
-                        exception != null -> {
-                            // FIXME: 無駄にResultに再ラップしているので修正したい
-                            _tableStateFlow.emit(Result.failure(exception))
-                        }
+            launch {
+                myTableConnectionRefOnDisconnect = myTableConnectionRef?.onDisconnect()
+                myTableConnectionRefOnDisconnect?.removeValue { error, _ ->
+                    if (error != null) {
+                        Log.e(
+                            "TableRepository",
+                            "Failed to set onDisconnect removeValue: ${error.message} $myPlayerId"
+                        )
                     }
                 }
+            }
+
+            launch {
+                combine(
+                    firebaseDatabaseTableFlow(tableId),
+                    firebaseDatabaseTableConnectionFlow(tableId)
+                ) { tableSnapshot: DataSnapshot, tableConnectionSnapshot: DataSnapshot ->
+                    if (tableSnapshot.exists() && tableConnectionSnapshot.exists()) {
+                        val connectionPlayerIds: List<PlayerId> = tableConnectionSnapshot.children
+                            .map { it.key!! }
+                            .map { PlayerId(it) }
+                        val tableMap: Map<*, *> = tableSnapshot.value as Map<*, *>
+                        val tableState = tableMapper.mapToTableState(
+                            tableId = tableId,
+                            tableMap = tableMap,
+                            connectionPlayerIds = connectionPlayerIds
+                        )
+                        tableSummaryRepository.saveTable(tableState)
+                        _tableStateFlow.emit(Result.success(tableState))
+                    } else {
+                        // FIXME: 例外の種類を豊富にしたい
+                        _tableStateFlow.emit(Result.failure(NotFoundTableException()))
+                    }
+                }.collect()
+            }
         }
     }
 
     override fun stopCollectTableFlow() {
+        myTableConnectionRefOnDisconnect?.cancel()
+        myTableConnectionRef?.setValue(null)
+        myTableConnectionRef?.onDisconnect()
+        myTableConnectionRef = null
         _tableStateFlow.update { null }
         collectTableJob?.cancel()
         collectTableJob = null
@@ -148,20 +189,14 @@ constructor(
         tableRef.setValue(tableMap)
     }
 
-    private fun firebaseDatabaseTableFlow(tableId: TableId): Flow<Result<Table>> = callbackFlow {
+    private fun firebaseDatabaseTableFlow(tableId: TableId): Flow<DataSnapshot> = callbackFlow {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    val tableMap: Map<*, *> = snapshot.value as Map<*, *>
-                    val tableState = tableMapper.mapToTableState(tableId, tableMap)
-                    trySend(Result.success(tableState))
-                } else {
-                    trySend(Result.failure(NotFoundTableException()))
-                }
+                trySend(snapshot)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.d("TableRepository", "Failed to read game data: ${error.message}")
+                Log.d("TableRepository", "Failed to read table data: ${error.message}")
             }
         }
         tablesRef.child(tableId.value).addValueEventListener(listener)
@@ -170,6 +205,27 @@ constructor(
             tablesRef.child(tableId.value).removeEventListener(listener)
         }
     }
+
+    private fun firebaseDatabaseTableConnectionFlow(tableId: TableId): Flow<DataSnapshot> =
+        callbackFlow {
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    trySend(snapshot)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d(
+                        "TableRepository",
+                        "Failed to read table connection data: ${error.message}"
+                    )
+                }
+            }
+            tableConnectionRef.child(tableId.value).addValueEventListener(listener)
+
+            awaitClose {
+                tableConnectionRef.child(tableId.value).removeEventListener(listener)
+            }
+        }
 
     override suspend fun isExistsTable(tableId: TableId): Boolean {
         return withContext(ioDispatcher) {

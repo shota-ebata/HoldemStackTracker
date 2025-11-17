@@ -40,6 +40,7 @@ fun createDummyTable(
     currentGameId = GameId(""),
     basePlayers = emptyList(),
     waitPlayerIds = emptyList(),
+    connectionPlayerIds = emptyList(),
     tableStatus = TableStatus.PREPARING,
     startTime = null,
     tableCreateTime = Instant.now(),
