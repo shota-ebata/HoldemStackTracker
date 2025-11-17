@@ -24,7 +24,6 @@ import org.junit.Test
 
 class GetNextPlayerStackUseCaseImplTest {
     private lateinit var useCase: GetNextPlayerStackUseCaseImpl
-    private val firebaseAuthRepository: FirebaseAuthRepository = mockk()
 
     private val dispatcher = StandardTestDispatcher()
 
@@ -40,7 +39,6 @@ class GetNextPlayerStackUseCaseImplTest {
                 dispatcher = dispatcher
             ),
             getNextPlayerStateList = GetNextGamePlayerStateListUseCaseImpl(
-                firebaseAuthRepository = firebaseAuthRepository,
                 dispatcher = dispatcher
             ),
             dispatcher = dispatcher

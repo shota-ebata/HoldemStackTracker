@@ -14,7 +14,6 @@ import javax.inject.Inject
 class GetNextGamePlayerStateListUseCaseImpl
 @Inject
 constructor(
-    private val firebaseAuthRepository: FirebaseAuthRepository,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher
 ) : GetNextGamePlayerStateListUseCase {
@@ -31,14 +30,13 @@ constructor(
         players: List<GamePlayer>,
         action: BetPhaseAction,
     ): List<GamePlayer> = withContext(dispatcher) {
-        val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
         return@withContext when (action) {
             is BetPhaseAction.BetAction -> {
                 // ベットアクションならスタックを減らす
 
                 return@withContext players.map { gamePlayer ->
                     if (gamePlayer.id == action.playerId) {
-                        val latestBetSize: Int = pendingBetPerPlayer[myPlayerId] ?: 0
+                        val latestBetSize: Int = pendingBetPerPlayer[action.playerId] ?: 0
                         gamePlayer.copy(stack = gamePlayer.stack + latestBetSize - action.betSize)
                     } else {
                         gamePlayer

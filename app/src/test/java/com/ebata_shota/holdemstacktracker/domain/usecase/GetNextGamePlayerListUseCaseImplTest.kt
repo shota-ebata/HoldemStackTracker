@@ -20,14 +20,11 @@ import org.junit.Test
 class GetNextGamePlayerListUseCaseImplTest {
     private lateinit var useCase: GetNextGamePlayerStateListUseCaseImpl
 
-    private val firebaseAuthRepository: FirebaseAuthRepository = mockk()
-
     private val dispatcher = StandardTestDispatcher()
 
     @Before
     fun setup() {
         useCase = GetNextGamePlayerStateListUseCaseImpl(
-            firebaseAuthRepository = firebaseAuthRepository,
             dispatcher = dispatcher
         )
     }
@@ -35,7 +32,7 @@ class GetNextGamePlayerListUseCaseImplTest {
 
     @After
     fun reset() {
-        clearMocks(firebaseAuthRepository)
+
     }
 
     private fun executeAndAssert(
@@ -59,7 +56,6 @@ class GetNextGamePlayerListUseCaseImplTest {
     @Test
     fun action_Blind() {
         // prepare
-        every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("0"))
         val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 1000),
             GamePlayer(id = PlayerId("1"), stack = 1000),
@@ -80,7 +76,6 @@ class GetNextGamePlayerListUseCaseImplTest {
     @Test
     fun action_Call() {
         // prepare
-        every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("0"))
         val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 1000),
             GamePlayer(id = PlayerId("1"), stack = 1000),
@@ -101,7 +96,6 @@ class GetNextGamePlayerListUseCaseImplTest {
     @Test
     fun action_Raise() {
         // prepare
-        every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("0"))
         val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 1000),
             GamePlayer(id = PlayerId("1"), stack = 1000),
@@ -122,7 +116,6 @@ class GetNextGamePlayerListUseCaseImplTest {
     @Test
     fun action_Bet() {
         // prepare
-        every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("0"))
         val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 1000),
             GamePlayer(id = PlayerId("1"), stack = 1000),
@@ -143,7 +136,6 @@ class GetNextGamePlayerListUseCaseImplTest {
     @Test
     fun action_AllIn() {
         // prepare
-        every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("0"))
         val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 1000),
             GamePlayer(id = PlayerId("1"), stack = 1000),
@@ -164,7 +156,6 @@ class GetNextGamePlayerListUseCaseImplTest {
     @Test
     fun action_Check() {
         // prepare
-        every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("0"))
         val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 1000),
             GamePlayer(id = PlayerId("1"), stack = 1000),
@@ -185,7 +176,6 @@ class GetNextGamePlayerListUseCaseImplTest {
     @Test
     fun action_Fold() {
         // prepare
-        every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("0"))
         val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 1000),
             GamePlayer(id = PlayerId("1"), stack = 1000),
@@ -206,7 +196,6 @@ class GetNextGamePlayerListUseCaseImplTest {
     @Test
     fun action_Skip() {
         // prepare
-        every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("0"))
         val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 1000),
             GamePlayer(id = PlayerId("1"), stack = 1000),
@@ -227,7 +216,6 @@ class GetNextGamePlayerListUseCaseImplTest {
     @Test
     fun action_BTN_Call_And_SB_Call() {
         // prepare
-        every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("0"))
         val pendingBetPerPlayer = mapOf(
             PlayerId("0") to 100,
             PlayerId("1") to 200,
@@ -254,7 +242,6 @@ class GetNextGamePlayerListUseCaseImplTest {
     @Test
     fun action_BTN_Call_And_SB_AllIn() {
         // prepare
-        every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("0"))
         val pendingBetPerPlayer = mapOf(
             PlayerId("0") to 100,
             PlayerId("1") to 200,
@@ -281,7 +268,6 @@ class GetNextGamePlayerListUseCaseImplTest {
     @Test
     fun action_SB_Check_and_BB_Bet() {
         // prepare
-        every { firebaseAuthRepository.myPlayerIdFlow } returns flowOf(PlayerId("1"))
         val pendingBetPerPlayer = emptyMap<PlayerId, Int>()
         val players = listOf(
             GamePlayer(id = PlayerId("0"), stack = 800),
