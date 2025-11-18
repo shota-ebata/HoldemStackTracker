@@ -115,9 +115,10 @@ fun PotSettlementDialogContent(
                     )
                 }
 
-                // FIXME: 画像色がダークテーマでも黒いまま
-                Image(
-                    modifier = Modifier.fillMaxWidth(),
+                Icon(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
                     painter = painterResource(R.drawable.baseline_arrow_downward_24),
                     contentDescription = "Phase Interval Image",
                 )
