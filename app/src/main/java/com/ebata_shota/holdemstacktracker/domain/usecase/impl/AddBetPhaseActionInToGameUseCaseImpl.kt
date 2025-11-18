@@ -1,7 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
-import com.ebata_shota.holdemstacktracker.domain.extension.mapAtFind
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
@@ -32,7 +31,7 @@ constructor(
     private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
     private val getNextPlayerStack: GetNextPlayerStackUseCase,
     private val getNotFoldPlayerIds: GetNotFoldPlayerIdsUseCase,
-    private val getRequiredActionPlayerIds: GetActionablePlayerIdsUseCase,
+    private val getActionablePlayerIds: GetActionablePlayerIdsUseCase,
     private val getPendingBetPerPlayer: GetPendingBetPerPlayerUseCase,
     private val getPotStateList: GetPotListUseCase,
     private val randomIdRepository: RandomIdRepository,
@@ -132,7 +131,7 @@ constructor(
 
         // アクションが必要なプレイヤーの数
         // 正確に言うと降りているわけでもなく、AllInしているわけでもないプレイヤーIDの一覧を取得
-        val requiredActionPlayerIds = getRequiredActionPlayerIds.invoke(
+        val requiredActionPlayerIds = getActionablePlayerIds.invoke(
             playerOrder = baseNextGame.playerOrder,
             phaseList = addedActionPhaseList
         )

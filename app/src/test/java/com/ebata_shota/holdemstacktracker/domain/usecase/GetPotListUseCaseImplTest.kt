@@ -711,4 +711,50 @@ class GetPotListUseCaseImplTest {
             expected = expectedList,
         )
     }
+
+    @Test
+    fun fold_BB() {
+        val updatedPlayers = listOf(
+            GamePlayer(
+                id = PlayerId("BTN"),
+                stack = 198,
+            ),
+            GamePlayer(
+                id = PlayerId("SB"),
+                stack = 199,
+            ),
+            GamePlayer(
+                id = PlayerId("BB"),
+                stack = 198,
+            ),
+        )
+        val pendingBetPerPlayerWithoutZero: Map<PlayerId, Int> = mapOf(
+            PlayerId("BTN") to 2,
+            PlayerId("SB") to 1,
+            PlayerId("BB") to 2,
+        )
+        val activePlayerIds = listOf(
+            PlayerId("BB"),
+        )
+        val expectedList = listOf(
+            Pot(
+                id = PotId("0"),
+                potNumber = 0,
+                potSize = 5,
+                involvedPlayerIds = listOf(
+                    PlayerId("BTN"),
+                    PlayerId("SB"),
+                    PlayerId("BB"),
+                ),
+                isClosed = true
+            ),
+        )
+        executeAndAssert(
+            updatedPlayers = updatedPlayers,
+            pendingBetPerPlayerWithoutZero = pendingBetPerPlayerWithoutZero,
+            activePlayerIds = activePlayerIds,
+            potList = emptyList(),
+            expected = expectedList,
+        )
+    }
 }

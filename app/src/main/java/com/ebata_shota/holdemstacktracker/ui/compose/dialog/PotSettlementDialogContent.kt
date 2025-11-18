@@ -115,6 +115,7 @@ fun PotSettlementDialogContent(
                     )
                 }
 
+                // FIXME: 画像色がダークテーマでも黒いまま
                 Image(
                     modifier = Modifier.fillMaxWidth(),
                     painter = painterResource(R.drawable.baseline_arrow_downward_24),

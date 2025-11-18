@@ -61,6 +61,22 @@ constructor(
         var potSize: Int = currentPot.potSize
         val involvedPlayerIds = currentPot.involvedPlayerIds.toMutableList()
 
+        if (activePlayerIds.size == 1) {
+            // 残り一人だけの場合、Bet中のチップをすべてポットに入れて終了する
+            val pendingBetTotal: Int = pendingBetPerPlayer.map { it.value }.sum()
+            currentPot = currentPot.copy(
+                potSize = currentPot.potSize + pendingBetTotal,
+                involvedPlayerIds = involvedPlayerIds.apply {
+                    // BETしてた人全員を関与リストに追加
+                    addAll(
+                        pendingBetPerPlayer.map { it.key }.distinct()
+                    )
+                }.distinct(), // 重複を無くして上書き
+                isClosed = true
+            )
+            return updatePotList(potList, currentPot)
+        }
+
         // 一番小さいBetのサイズを探す
         val minBetSize = pendingBetPerPlayer.map {
             it.value
@@ -102,15 +118,7 @@ constructor(
             involvedPlayerIds = involvedPlayerIds.distinct(), // 重複を無くして上書き
             isClosed = isClosed
         )
-        val updatedPotList = potList.toMutableList()
-        val index = updatedPotList.indexOfFirstOrNull { it.id == currentPot.id }
-        if (index != null) {
-            // 既存ポットがあれば上書き
-            updatedPotList[index] = currentPot
-        } else {
-            // 新規ポットであれば追加
-            updatedPotList.add(currentPot)
-        }
+        val updatedPotList = updatePotList(potList, currentPot)
         if (updatedPendingPrePlayer.isEmpty()) {
             // もうベットが無いなら、ポットを返す
             // 現在のpotを返す
@@ -123,6 +131,22 @@ constructor(
             pendingBetPerPlayer = updatedPendingPrePlayer,
             activePlayerIds = activePlayerIds
         )
+    }
+
+    private fun updatePotList(
+        potList: List<Pot>,
+        currentPot: Pot,
+    ): List<Pot> {
+        val updatedPotList = potList.toMutableList()
+        val index = updatedPotList.indexOfFirstOrNull { it.id == currentPot.id }
+        if (index != null) {
+            // 既存ポットがあれば上書き
+            updatedPotList[index] = currentPot
+        } else {
+            // 新規ポットであれば追加
+            updatedPotList.add(currentPot)
+        }
+        return updatedPotList
     }
 
     private fun createPot(potNumber: Int) = Pot(
