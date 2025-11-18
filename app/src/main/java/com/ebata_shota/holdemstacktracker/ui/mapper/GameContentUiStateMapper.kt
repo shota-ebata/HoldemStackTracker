@@ -251,7 +251,7 @@ constructor(
             // 現在ベットされている最高額より自分がベットしてる額が少ない
             // コールしてもAll-Inにならない場合
             isEnableCallButton = maxBetSize > myPendingBetSize
-                    && gamePlayer.stack > callSize
+                    && myPendingBetSize + gamePlayer.stack > callSize
             callSizeStringSource = if (isEnableCallButton) {
                 when (betViewMode) {
                     BetViewMode.Number -> {
