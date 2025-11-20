@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.R
+import com.ebata_shota.holdemstacktracker.domain.model.GameType
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
+import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
@@ -16,7 +18,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.GmsBarcodeScannerRep
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RemoteConfigRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
-import com.ebata_shota.holdemstacktracker.domain.repository.TableSummaryRepository
+import com.ebata_shota.holdemstacktracker.infra.extension.blindText
 import com.ebata_shota.holdemstacktracker.ui.compose.content.MainContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.AppCloseAlertDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.JoinByIdDialogEvent
@@ -59,7 +61,6 @@ import javax.inject.Inject
 class MainViewModel
 @Inject
 constructor(
-    private val tableSummaryRepository: TableSummaryRepository,
     private val tableRepository: TableRepository,
     private val scannerRepository: GmsBarcodeScannerRepository,
     private val prefRepository: PrefRepository,
@@ -125,27 +126,31 @@ constructor(
         // UiState生成の監視
         viewModelScope.launch {
             combine(
-                // FIXME: ページングは実装したほうがいいかも
-                tableSummaryRepository.getTableSummaryListFlow(),
+                tableStateFlow,
                 isLoadingOnScreenContent
-            ) { tableSummaryList, isLoadingOnScreenContent ->
+            ) { table, isLoadingOnScreenContent ->
                 _uiState.update {
                     MainScreenUiState.Content(
                         mainContentUiState = MainContentUiState(
-                            tableSummaryList = tableSummaryList.map {
+                            table = table?.let {
                                 val zoneId = ZoneId.systemDefault()
                                 val updateLocalDateTime = LocalDateTime.ofInstant(it.updateTime, zoneId)
                                 val formatterDefault = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
                                     .withLocale(Locale.getDefault())
                                 TableSummaryCardRowUiState(
-                                    tableId = it.tableId,
-                                    gameTypeText = StringSource(it.gameType.labelResId()),
-                                    blindText = StringSource(it.blindText),
-                                    hostName = it.hostName,
-                                    isJoined = tableRepository.currentTableId == it.tableId,
-                                    playerSize = it.playerSize,
+                                    tableId = it.id,
+                                    gameTypeText = StringSource(
+                                        when (table.rule) {
+                                            is Rule.RingGame -> GameType.RingGame
+                                        }.labelResId()),
+                                    blindText = StringSource(table.rule.blindText()),
+                                    hostName = table.hostPlayerId.let { hostPlayerId ->
+                                        table.basePlayers.find { it.id == hostPlayerId }?.name.orEmpty()
+                                    },
+                                    isJoined = true,
+                                    playerSize = "${table.playerOrder.size}/10", // FIXME: 10人上限がハードコーディングされている,
                                     updateTime = updateLocalDateTime.format(formatterDefault),
-                                    createTime = LocalDateTime.ofInstant(it.updateTime, zoneId)
+                                    createTime = LocalDateTime.ofInstant(table.tableCreateTime, zoneId)
                                 )
                             }
                         ),

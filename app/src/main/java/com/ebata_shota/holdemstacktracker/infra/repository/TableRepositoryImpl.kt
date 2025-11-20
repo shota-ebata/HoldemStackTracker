@@ -14,7 +14,6 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
-import com.ebata_shota.holdemstacktracker.domain.repository.TableSummaryRepository
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -44,15 +43,14 @@ import javax.inject.Inject
 class TableRepositoryImpl
 @Inject
 constructor(
-    private val firebaseDatabase: FirebaseDatabase,
+    firebaseDatabase: FirebaseDatabase,
     private val prefRepository: PrefRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
-    private val tableSummaryRepository: TableSummaryRepository,
     private val tableMapper: TableMapper,
     @ApplicationScope
     private val appCoroutineScope: CoroutineScope,
     @CoroutineDispatcherIO
-    private val ioDispatcher: CoroutineDispatcher
+    private val ioDispatcher: CoroutineDispatcher,
 ) : TableRepository {
 
     @Suppress("KotlinConstantConditions")
@@ -160,7 +158,6 @@ constructor(
                             tableMap = tableMap,
                             connectionPlayerIds = connectionPlayerIds
                         )
-                        tableSummaryRepository.saveTable(tableState)
                         _tableStateFlow.emit(Result.success(tableState))
                     } else {
                         // FIXME: 例外の種類を豊富にしたい

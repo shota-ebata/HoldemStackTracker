@@ -2,64 +2,8 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "9b3d4de18ed99cc7c0c5f8925b94eece",
+    "identityHash": "7b42ac685526e3584722cf5999b66b51",
     "entities": [
-      {
-        "tableName": "table_summary_entities",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`table_id` TEXT NOT NULL, `game_type` INTEGER NOT NULL, `blind_text` TEXT NOT NULL, `host_name` TEXT NOT NULL, `player_size` TEXT NOT NULL, `update_time` INTEGER NOT NULL, `create_time` INTEGER NOT NULL, PRIMARY KEY(`table_id`))",
-        "fields": [
-          {
-            "fieldPath": "tableId",
-            "columnName": "table_id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "gameType",
-            "columnName": "game_type",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "blindText",
-            "columnName": "blind_text",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "hostName",
-            "columnName": "host_name",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "playerSize",
-            "columnName": "player_size",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "updateTime",
-            "columnName": "update_time",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "createTime",
-            "columnName": "create_time",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "table_id"
-          ]
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
       {
         "tableName": "action_history_entities",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`table_id` TEXT NOT NULL, `action_id` TEXT NOT NULL, `had_seen` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`table_id`, `action_id`))",
@@ -142,7 +86,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9b3d4de18ed99cc7c0c5f8925b94eece')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7b42ac685526e3584722cf5999b66b51')"
     ]
   }
 }
