@@ -305,7 +305,7 @@ data class GamePlayerUiState(
     val shouldShowActionNextLine: Boolean = isBtn && positionLabelResId != null
 
 
-    val expanded: Boolean = isMine || isCurrentPlayer && !isFolded
+    val expanded: Boolean = isMine || !isFolded
 
     enum class BetTextPosition {
         TOP,
