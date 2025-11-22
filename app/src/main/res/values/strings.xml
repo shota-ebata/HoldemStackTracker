@@ -39,6 +39,8 @@
     <string name="error_message_in_table">There is a problem with the table.</string>
 
     <string name="ok_label">OK</string>
+    <string name="label_cancel">Cancel</string>
+    <string name="label_exit">Exit</string>
 
     <string name="player_remove_dialog_title">Select remove player from table</string>
     <string name="player_remove_dialog_toast">Host cannot remove from table</string>
@@ -119,4 +121,7 @@
     <string name="message_lower_version">Please update your application at Google PlayStore.</string>
 
     <string name="button_label_ok" translatable="false">OK</string>
+
+    <string name="title_exit_alert_dialog">Would you like to exit?</string>
+    <string name="message_exit_alert_dialog">After leaving the room, it will auto-fold.</string>
 </resources>

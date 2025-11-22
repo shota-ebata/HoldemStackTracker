@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameTableInfoDetailContentUiState
@@ -88,7 +89,8 @@ fun GameScreen(
 
             if (shouldShowExitAlertDialog) {
                 GameExitAlertDialogContent(
-                    onClickExitButton = viewModel::onClickExitButton,
+                    messageRes = R.string.message_exit_alert_dialog,
+                    onClickExitButton = viewModel::onClickExitAlertDialogExitButton,
                     onDismissDialogRequest = viewModel::onDismissGameExitAlertDialogRequest,
                 )
             }

@@ -67,6 +67,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -119,7 +120,7 @@ constructor(
     val navigateEvent = _navigateEvent.asSharedFlow()
 
     sealed interface Navigate {
-        data object Back : Navigate
+        data object Finish : Navigate
         data class Game(val tableId: TableId) : Navigate
     }
 
@@ -603,7 +604,7 @@ constructor(
     }
 
     private suspend fun navigateToBack() {
-        _navigateEvent.emit(Navigate.Back)
+        _navigateEvent.emit(Navigate.Finish)
     }
 
     fun onClickEditBtnPlayerButton() {
@@ -866,8 +867,35 @@ constructor(
         _navigateEvent.emit(Navigate.Game(tableId))
     }
 
+    fun onClickExitExitAlertDialogButton() {
+        viewModelScope.launch {
+            _navigateEvent.emit(Navigate.Finish)
+            tableRepository.stopCollectTableFlow()
+        }
+    }
+
+    fun onDismissGameExitAlertDialogRequest() {
+        _dialogUiState.update {
+            it.copy(shouldShowAlertDialog = false)
+        }
+    }
+
     fun onResumed() {
         tableRepository.startCurrentTableConnectionIfNeed(tableId)
+    }
+
+    fun onBackPressed() {
+        viewModelScope.launch {
+            val table = tableStateFlow.firstOrNull() ?: return@launch
+            when (table.tableStatus) {
+                TableStatus.PAUSED -> TODO()
+                TableStatus.PREPARING, TableStatus.PLAYING -> {
+                    _dialogUiState.update {
+                        it.copy(shouldShowAlertDialog = true)
+                    }
+                }
+            }
+        }
     }
 
     companion object {

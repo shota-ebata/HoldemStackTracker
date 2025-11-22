@@ -1,7 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
 import android.os.Bundle
-import android.util.Log
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
@@ -78,6 +77,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
@@ -203,7 +203,6 @@ constructor(
 
     // ExitAlertDialog
     val shouldShowExitAlertDialog = MutableStateFlow(false)
-
 
     // QR画像を保持
     private val qrPainterStateFlow = MutableStateFlow<Painter?>(null)
@@ -999,7 +998,7 @@ constructor(
         }
     }
 
-    fun onClickExitButton() {
+    fun onClickExitAlertDialogExitButton() {
         viewModelScope.launch {
             _navigateEvent.emit(Navigate.Finish)
             tableRepository.stopCollectTableFlow()
@@ -1015,7 +1014,18 @@ constructor(
     }
 
     fun onBackPressed() {
-        shouldShowExitAlertDialog.update { true }
+        viewModelScope.launch {
+            val table = tableStateFlow.firstOrNull() ?: return@launch
+            when (table.tableStatus) {
+                TableStatus.PREPARING -> {
+                    _navigateEvent.emit(Navigate.TablePrepare(tableId))
+                }
+                TableStatus.PAUSED -> TODO()
+                TableStatus.PLAYING -> {
+                    shouldShowExitAlertDialog.update { true }
+                }
+            }
+        }
     }
 
     companion object {

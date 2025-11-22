@@ -12,6 +12,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.content.TablePrepareContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.EditGameRuleDialog
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameExitAlertDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerEditDialog
@@ -35,7 +36,7 @@ fun TablePrepareScreen(
 
     viewModel.navigateEvent.collectWithLifecycle {
         when (it) {
-            is Navigate.Back -> navigateToBack()
+            is Navigate.Finish -> navigateToBack()
             is Navigate.Game -> navigateToGameScreen(it.tableId)
         }
     }
@@ -109,6 +110,13 @@ fun TablePrepareScreen(
             event = viewModel
         )
     }
+    if (dialogUiState.shouldShowAlertDialog) {
+        GameExitAlertDialogContent(
+            messageRes = null,
+            onClickExitButton = viewModel::onClickExitExitAlertDialogButton,
+            onDismissDialogRequest = viewModel::onDismissGameExitAlertDialogRequest
+        )
+    }
 }
 
 sealed interface TablePrepareScreenUiState {
@@ -126,4 +134,5 @@ data class TablePrepareScreenDialogUiState(
     val myNameInputDialogUiState: MyNameInputDialogUiState? = null,
     val backErrorDialog: ErrorDialogUiState? = null,
     val alertErrorDialog: ErrorDialogUiState? = null,
+    val shouldShowAlertDialog: Boolean = false,
 )

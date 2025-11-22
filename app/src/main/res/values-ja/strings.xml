@@ -39,6 +39,8 @@
     <string name="error_message_in_table">テーブルに問題が発生しました</string>
 
     <string name="ok_label">OK</string>
+    <string name="label_cancel">キャンセル</string>
+    <string name="label_exit">退室</string>
 
     <string name="player_remove_dialog_title">プレイヤーを退出させる</string>
     <string name="player_remove_dialog_toast">ホストは退出できません</string>
@@ -78,5 +80,7 @@
     <string name="message_maintenance">現在メンテナンス中のため\nアプリをご利用いただけません。</string>
     <string name="message_lower_version">Google PlayStoreにて\nアプリの新しいバージョンをインストールしてください。</string>
 
+    <string name="title_exit_alert_dialog">退室しますか？</string>
+    <string name="message_exit_alert_dialog">退室後はオートFoldします。</string>
 
 </resources>
