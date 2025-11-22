@@ -74,7 +74,7 @@ constructor(
         // AutoActionがあれば追加する
         val addedAutoActionGame = getAddedAutoActionsGame.invoke(
             game = newGame,
-            rule = copiedTable.rule
+            rule = copiedTable.rule,
         )
         gameRepository.sendGame(
             tableId = copiedTable.id,
