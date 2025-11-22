@@ -53,6 +53,7 @@ fun GameScreen(
                 onClickMinusButton = viewModel::onClickMinusButton,
                 onClickPlusButton = viewModel::onClickPlusButton,
                 onClickSettingButton = viewModel::onClickSettingButton,
+                onClickAutoCheckFoldButton = viewModel::onClickAutoCheckFoldButton,
                 onClickPlayerCard = viewModel::onClickPlayerCard,
                 onChangeSlider = viewModel::onChangeSlider,
             )

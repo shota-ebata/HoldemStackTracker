@@ -25,6 +25,7 @@ fun GameSettingsDialog(
                 uiState = uiState.contentUiState,
                 onClickKeepScreenSwitch = event::onClickKeepScreenSwitch,
                 onClickSettingSliderStepSwitch = event::onClickSettingSliderStepSwitch,
+                onClickEnableAutoCheckFoldButtonSwitch = event::onClickEnableAutoCheckFoldButtonSwitch,
             )
         }
     }

@@ -6,6 +6,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.ThemeMode
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
+import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.EnableAutoCheckFoldButton
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultBetViewMode
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultSizeOfBb
 import com.ebata_shota.holdemstacktracker.infra.AppPreferencesKeys.DefaultSizeOfSb
@@ -96,11 +97,20 @@ constructor(
 
     override val isKeepScreenOn: Flow<Boolean> by dataStore.prefFlow(
         key = KeepScreenOn,
-        defaultValue = { false }
+        defaultValue = { true }
     )
 
     override suspend fun saveKeepScreenOn(value: Boolean) {
         dataStore.setPrefValue(KeepScreenOn, value)
+    }
+
+    override val enableAutoCheckFoldButton: Flow<Boolean> by dataStore.prefFlow(
+        key = EnableAutoCheckFoldButton,
+        defaultValue = { false }
+    )
+
+    override suspend fun saveEnableAutoCheckFoldButton(value: Boolean) {
+        dataStore.setPrefValue(EnableAutoCheckFoldButton, value)
     }
 
     private val _themeMode: Flow<String> by dataStore.prefFlow(

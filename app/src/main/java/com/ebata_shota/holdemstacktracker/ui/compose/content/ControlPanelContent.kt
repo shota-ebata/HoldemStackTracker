@@ -7,33 +7,42 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Label
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -58,6 +67,7 @@ fun ControlPanelContent(
     onClickAllInButton: () -> Unit,
     onClickCallButton: () -> Unit,
     onClickRaiseButton: () -> Unit,
+    onClickAutoCheckFoldButton: () -> Unit,
     onClickRaiseSizeButton: (Int) -> Unit,
     onClickMinusButton: () -> Unit,
     onChangeSlider: (Float) -> Unit,
@@ -80,7 +90,8 @@ fun ControlPanelContent(
                     onClickCheckButton = onClickCheckButton,
                     onClickAllInButton = onClickAllInButton,
                     onClickCallButton = onClickCallButton,
-                    onClickRaiseButton = onClickRaiseButton
+                    onClickRaiseButton = onClickRaiseButton,
+                    onClickAutoCheckFoldButton = onClickAutoCheckFoldButton,
                 )
                 RaiseSizeChangeButtons(
                     uiState = uiState,
@@ -113,6 +124,7 @@ private fun ActionButtons(
     delayState: DelayState,
     onClickFoldButton: () -> Unit,
     onClickCheckButton: () -> Unit,
+    onClickAutoCheckFoldButton: () -> Unit,
     onClickAllInButton: () -> Unit,
     onClickCallButton: () -> Unit,
     onClickRaiseButton: () -> Unit,
@@ -120,34 +132,86 @@ private fun ActionButtons(
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Button(
-            modifier = Modifier
-                .weight(1.0f)
-                .heightIn(min = 56.dp),
-            onClick = dropRedundantEvent(delayState = delayState) {
-                onClickFoldButton()
-            },
-            enabled = uiState.isEnableFoldButton
-        ) {
-            Text(
-                text = stringResource(R.string.button_label_fold),
-                style = MaterialTheme.typography.titleMedium
-            )
+        if (uiState.shouldShowAutoCheckFoldButton) {
+            if (uiState.isCheckedCheckFoldButton) {
+                Button(
+                    modifier = Modifier
+                        .weight(3.0f)
+                        .heightIn(min = 56.dp),
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        // チェック時はコンテナ色を変えるなどの工夫
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
+                    onClick = {
+                        onClickAutoCheckFoldButton()
+                    },
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = "Localized description",
+                            modifier = Modifier.size(ButtonDefaults.IconSize),
+                        )
+                        Text(
+                            text = "Auto\nCheck Fold",
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(Modifier.size(ButtonDefaults.IconSize))
+                    }
+
+                }
+            } else {
+                OutlinedButton(
+                    modifier = Modifier
+                        .weight(3.0f)
+                        .heightIn(min = 56.dp),
+                    onClick = {
+                        onClickAutoCheckFoldButton()
+                    },
+                ) {
+                    Text(
+                        text = "Auto\nCheck Fold",
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        } else {
+            Button(
+                modifier = Modifier
+                    .weight(1.0f)
+                    .heightIn(min = 56.dp),
+                onClick = dropRedundantEvent(delayState = delayState) {
+                    onClickFoldButton()
+                },
+                enabled = uiState.isEnableFoldButton
+            ) {
+                Text(
+                    text = stringResource(R.string.button_label_fold),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            Button(
+                modifier = Modifier
+                    .weight(2.0f)
+                    .heightIn(min = 56.dp),
+                onClick = dropRedundantEvent(delayState = delayState) {
+                    onClickCheckButton()
+                },
+                enabled = uiState.isEnableCheckButton
+            ) {
+                Text(
+                    text = stringResource(R.string.button_label_check),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
         }
-        Button(
-            modifier = Modifier
-                .weight(2.0f)
-                .heightIn(min = 56.dp),
-            onClick = dropRedundantEvent(delayState = delayState) {
-                onClickCheckButton()
-            },
-            enabled = uiState.isEnableCheckButton
-        ) {
-            Text(
-                text = stringResource(R.string.button_label_check),
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
+
+
         Button(
             modifier = Modifier
                 .weight(1.0f)
@@ -475,6 +539,9 @@ sealed interface ControlPanelUiState {
         val isEnableFoldButton: Boolean,
         // Check
         val isEnableCheckButton: Boolean,
+        // Check Fold
+        val shouldShowAutoCheckFoldButton: Boolean,
+        val isCheckedCheckFoldButton: Boolean,
         // AllIn
         val isEnableAllInButton: Boolean,
         val myPendingBetSizeStringSource: StringSource?,
@@ -515,6 +582,8 @@ class ControlPanelUiStatePreviewParam :
             shouldShowBBSuffix = false,
             isEnableFoldButton = true,
             isEnableCheckButton = true,
+            shouldShowAutoCheckFoldButton = false,
+            isCheckedCheckFoldButton = false,
             isEnableAllInButton = true,
             myPendingBetSizeStringSource = StringSource("0"),
             isEnableCallButton = true,
@@ -552,6 +621,50 @@ class ControlPanelUiStatePreviewParam :
             stackRatioText = "".toStringSource(),
             potRatioText = "".toStringSource(),
             isEnableRaiseUpSizeButton = true,
+        ),
+        ControlPanelUiState.ActiveControlPanelUiState(
+            shouldShowBBSuffix = false,
+            isEnableFoldButton = false,
+            isEnableCheckButton = false,
+            shouldShowAutoCheckFoldButton = true,
+            isCheckedCheckFoldButton = false,
+            isEnableAllInButton = false,
+            myPendingBetSizeStringSource = StringSource("0"),
+            isEnableCallButton = false,
+            callSizeStringSource = StringSource("200"),
+            isEnableRaiseButton = false,
+            raiseButtonMainLabelResId = R.string.button_label_raise,
+            raiseSizeStringSource = StringSource("400"),
+            raiseSizeButtonUiStates = listOf(
+                RaiseSizeChangeButtonUiState(
+                    labelStringSource = StringSource("2 BB"),
+                    raiseSize = 200,
+                    isEnable = false,
+                ),
+                RaiseSizeChangeButtonUiState(
+                    labelStringSource = StringSource("2.5 BB"),
+                    raiseSize = 250,
+                    isEnable = false,
+                ),
+                RaiseSizeChangeButtonUiState(
+                    labelStringSource = StringSource("3 BB"),
+                    raiseSize = 300,
+                    isEnable = false,
+                ),
+                RaiseSizeChangeButtonUiState(
+                    labelStringSource = StringSource("4 BB"),
+                    raiseSize = 400,
+                    isEnable = false,
+                ),
+            ),
+            isEnableMinusButton = false,
+            isEnablePlusButton = false,
+            isEnableSlider = false,
+            sliderPosition = 0.0f,
+            isEnableSliderStep = true,
+            stackRatioText = "".toStringSource(),
+            potRatioText = "".toStringSource(),
+            isEnableRaiseUpSizeButton = true,
         )
     )
 }
@@ -583,6 +696,7 @@ private fun ControlPanelContentPreview(
                 onChangeSlider = {},
                 onClickPlusButton = {},
                 onClickSettingButton = {},
+                onClickAutoCheckFoldButton = {},
             )
         }
     }

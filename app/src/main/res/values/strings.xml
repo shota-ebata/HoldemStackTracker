@@ -107,6 +107,7 @@
 
     <string name="setting_keep_screen_on">Prevent screen from turning off during game.</string>
     <string name="setting_slider_step_on">Show steps on bet size slider.</string>
+    <string name="setting_auto_check_fold">Show Auto-Check Collapse Button.</string>
 
     <string name="label_is_leaved">Out Of Seat</string>
 

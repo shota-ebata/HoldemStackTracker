@@ -38,6 +38,7 @@ fun GameContent(
     onClickMinusButton: () -> Unit,
     onClickPlusButton: () -> Unit,
     onClickSettingButton: () -> Unit,
+    onClickAutoCheckFoldButton: () -> Unit,
     onClickPlayerCard: () -> Unit,
     onChangeSlider: (Float) -> Unit,
     modifier: Modifier = Modifier,
@@ -76,6 +77,7 @@ fun GameContent(
                 onChangeSlider = onChangeSlider,
                 onClickPlusButton = onClickPlusButton,
                 onClickSettingButton = onClickSettingButton,
+                onClickAutoCheckFoldButton = onClickAutoCheckFoldButton,
             )
 
         }
@@ -238,7 +240,9 @@ private class GameContentUiStatePreviewParam :
                 shouldShowBBSuffix = false,
                 isEnableFoldButton = true,
                 isEnableCheckButton = true,
+                isCheckedCheckFoldButton = false,
                 isEnableAllInButton = true,
+                shouldShowAutoCheckFoldButton = false,
                 myPendingBetSizeStringSource = StringSource("0"),
                 isEnableCallButton = true,
                 callSizeStringSource = StringSource("200"),
@@ -312,6 +316,7 @@ private fun GameContentPreview(
             onClickMinusButton = {},
             onClickPlusButton = {},
             onClickSettingButton = {},
+            onClickAutoCheckFoldButton = {},
             onClickPlayerCard = {},
             onChangeSlider = {},
         )

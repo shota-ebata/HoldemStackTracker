@@ -52,6 +52,9 @@ interface PrefRepository {
     val isKeepScreenOn: Flow<Boolean>
     suspend fun saveKeepScreenOn(value: Boolean)
 
+    val enableAutoCheckFoldButton: Flow<Boolean>
+    suspend fun saveEnableAutoCheckFoldButton(value: Boolean)
+
     /**
      * テーマ
      */

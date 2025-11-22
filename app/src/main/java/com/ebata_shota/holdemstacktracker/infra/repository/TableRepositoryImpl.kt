@@ -160,6 +160,7 @@ constructor(
         myTableConnectionRef?.setValue(null)
         myTableConnectionRef?.onDisconnect()
         myTableConnectionRef = null
+        // TODO: 旧テーブルを離席状態にするなど
         _tableStateFlow.update { null }
         collectTableJob?.cancel()
         collectTableJob = null

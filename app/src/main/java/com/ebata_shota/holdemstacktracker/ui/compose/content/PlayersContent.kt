@@ -131,6 +131,7 @@ fun PlayersContent(
     }
 }
 
+// TODO: 必要以上のデータを渡しているので修正
 private class PlayersFor10ContentPreviewParameterProvider :
     PreviewParameterProvider<GameContentUiState> {
     override val values: Sequence<GameContentUiState> = sequenceOf(
@@ -282,6 +283,8 @@ private class PlayersFor10ContentPreviewParameterProvider :
                 shouldShowBBSuffix = false,
                 isEnableFoldButton = true,
                 isEnableCheckButton = true,
+                shouldShowAutoCheckFoldButton = false,
+                isCheckedCheckFoldButton = false,
                 isEnableAllInButton = true,
                 myPendingBetSizeStringSource = StringSource("0"),
                 isEnableCallButton = true,
@@ -417,6 +420,8 @@ private class PlayersFor10ContentPreviewParameterProvider :
                 shouldShowBBSuffix = false,
                 isEnableFoldButton = true,
                 isEnableCheckButton = true,
+                shouldShowAutoCheckFoldButton = false,
+                isCheckedCheckFoldButton = false,
                 isEnableAllInButton = true,
                 myPendingBetSizeStringSource = StringSource("0"),
                 isEnableCallButton = true,
@@ -525,6 +530,8 @@ private class PlayersFor10ContentPreviewParameterProvider :
                 shouldShowBBSuffix = false,
                 isEnableFoldButton = true,
                 isEnableCheckButton = true,
+                shouldShowAutoCheckFoldButton = false,
+                isCheckedCheckFoldButton = false,
                 isEnableAllInButton = true,
                 myPendingBetSizeStringSource = StringSource("0"),
                 isEnableCallButton = true,
@@ -620,6 +627,8 @@ private class PlayersFor10ContentPreviewParameterProvider :
                 shouldShowBBSuffix = false,
                 isEnableFoldButton = true,
                 isEnableCheckButton = true,
+                shouldShowAutoCheckFoldButton = false,
+                isCheckedCheckFoldButton = false,
                 isEnableAllInButton = true,
                 myPendingBetSizeStringSource = StringSource("0"),
                 isEnableCallButton = true,
@@ -701,6 +710,8 @@ private class PlayersFor10ContentPreviewParameterProvider :
                 shouldShowBBSuffix = false,
                 isEnableFoldButton = true,
                 isEnableCheckButton = true,
+                shouldShowAutoCheckFoldButton = false,
+                isCheckedCheckFoldButton = false,
                 isEnableAllInButton = true,
                 myPendingBetSizeStringSource = StringSource("0"),
                 isEnableCallButton = true,

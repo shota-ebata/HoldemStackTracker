@@ -12,6 +12,7 @@ object AppPreferencesKeys {
     val DefaultSizeOfSb = intPreferencesKey("default_size_of_sb")
     val DefaultSizeOfBb = intPreferencesKey("default_size_of_bb")
     val DefaultStackSize = intPreferencesKey("default_stack_size")
+    val EnableAutoCheckFoldButton = booleanPreferencesKey("enable_auto_check_fold_button")
     val EnableRaiseUpSliderStep = booleanPreferencesKey("enable_slider_step")
     val PotSliderMaxRatio = intPreferencesKey("pot_slider_max_ratio")
     val KeepScreenOn = booleanPreferencesKey("keep_screen_on")

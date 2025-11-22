@@ -11,6 +11,7 @@ import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtFind
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.ActionId
+import com.ebata_shota.holdemstacktracker.domain.model.AutoCheckOrFoldType
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.Game
@@ -46,6 +47,8 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneDownRaiseSizeUseC
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneUpRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlider
+import com.ebata_shota.holdemstacktracker.domain.usecase.IsCurrentPlayerUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.IsEnableCheckUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.SetPotSettlementInfoUseCase
@@ -116,6 +119,8 @@ constructor(
     private val setPotSettlementInfo: SetPotSettlementInfoUseCase,
     private val getNextPhase: GetNextPhaseUseCase,
     private val getAddedAutoActionsGame: GetAddedAutoActionsGameUseCase,
+    private val isEnableCheck: IsEnableCheckUseCase,
+    private val isCurrentPlayer: IsCurrentPlayerUseCase,
     private val uiStateMapper: GameContentUiStateMapper,
 ) : ViewModel(),
     GameSettingsDialogEvent,
@@ -165,6 +170,9 @@ constructor(
         replay = 1
     )
 
+    private val autoCheckFoldTypeState: MutableStateFlow<AutoCheckOrFoldType> =
+        MutableStateFlow(AutoCheckOrFoldType.None)
+
     // 画面の常時点灯
     val isKeepScreenOn: Flow<Boolean> = prefRepository.isKeepScreenOn
 
@@ -174,12 +182,14 @@ constructor(
         shouldShowGameSettingDialog,
         prefRepository.isKeepScreenOn,
         prefRepository.isEnableRaiseUpSliderStep,
-    ) { shouldShow, isKeepScreenOn, isEnableRaiseUpSliderStep ->
+        prefRepository.enableAutoCheckFoldButton,
+    ) { shouldShow, isKeepScreenOn, isEnableRaiseUpSliderStep, shouldShowAutoCheckFoldButton ->
         if (shouldShow) {
             GameSettingsDialogUiState(
                 GameSettingsContentUiState(
                     isKeepScreenOn = isKeepScreenOn,
-                    isEnableSliderStep = isEnableRaiseUpSliderStep
+                    isEnableSliderStep = isEnableRaiseUpSliderStep,
+                    isAutoCheckFoldButton = shouldShowAutoCheckFoldButton,
                 )
             )
         } else {
@@ -232,6 +242,7 @@ constructor(
                 gameStateFlow.filterNotNull(),
                 raiseSizeStateFlow,
                 minRaiseSizeFlow,
+                autoCheckFoldTypeState,
                 prefRepository.isEnableRaiseUpSliderStep,
                 prefRepository.defaultBetViewMode, // FIXME: 引数を減らすために、PrefRepository系をまとめてもいいかも
                 transform = ::observer
@@ -475,6 +486,7 @@ constructor(
         game: Game,
         raiseSize: Int?,
         minRaiseSize: Int,
+        autoCheckOrFoldType: AutoCheckOrFoldType,
         isEnableSliderStep: Boolean,
         betViewMode: BetViewMode,
     ) {
@@ -482,7 +494,32 @@ constructor(
             // GameIdが一致しない場合はUI不整合が起きる可能性があるので無視する
             return
         }
-        // オートアクションがない場合だけ、UiStateを更新する
+
+        if (
+            autoCheckOrFoldType is AutoCheckOrFoldType.ByGame
+            && autoCheckOrFoldType.gameId != game.gameId
+        ) {
+            // GameIDが変わって別のゲームが始まったので、AutoCheckOrFoldType.Noneにする
+            autoCheckFoldTypeState.update { AutoCheckOrFoldType.None }
+        }
+
+        if (
+            isCurrentPlayer.invoke(game, myPlayerId) == true
+            && autoCheckOrFoldType is AutoCheckOrFoldType.ByGame
+            && autoCheckOrFoldType.gameId == game.gameId
+        ) {
+            // 自分の手番で
+            // AutoCheck or AutoFold モードのときに
+            // オートアクションを実行
+            val isEnableCheck = isEnableCheck.invoke(game, myPlayerId) ?: return
+            if (isEnableCheck) {
+                doCheck(game, myPlayerId)
+            } else {
+                doFold(game, myPlayerId)
+            }
+            return
+        }
+
         val contentUiState: GameContentUiState? = uiStateMapper.createUiState(
             game = game,
             table = table,
@@ -490,7 +527,8 @@ constructor(
             raiseSize = raiseSize ?: minRaiseSize,
             minRaiseSize = minRaiseSize,
             isEnableSliderStep = isEnableSliderStep,
-            betViewMode = betViewMode
+            betViewMode = betViewMode,
+            autoCheckOrFoldType = autoCheckOrFoldType,
         )
         if (contentUiState == null) {
             // contentUiStateが何かしらの理由で作成されなかった場合は
@@ -807,6 +845,20 @@ constructor(
         }
     }
 
+    fun onClickAutoCheckFoldButton() {
+        viewModelScope.launch {
+            autoCheckFoldTypeState.update { autoCheckOrFoldType ->
+                when (autoCheckOrFoldType) {
+                    is AutoCheckOrFoldType.ByGame -> AutoCheckOrFoldType.None
+                    is AutoCheckOrFoldType.None -> {
+                        val gameId = gameStateFlow.value?.gameId ?: return@launch
+                        AutoCheckOrFoldType.ByGame(gameId)
+                    }
+                }
+            }
+        }
+    }
+
     fun onClickPlayerCard() {
         viewModelScope.launch {
             prefRepository.saveDefaultBetViewMode(
@@ -861,6 +913,12 @@ constructor(
     override fun onClickSettingSliderStepSwitch(isChecked: Boolean) {
         viewModelScope.launch {
             prefRepository.saveEnableRaiseUpSliderStep(isChecked)
+        }
+    }
+
+    override fun onClickEnableAutoCheckFoldButtonSwitch(isChecked: Boolean) {
+        viewModelScope.launch {
+            prefRepository.saveEnableAutoCheckFoldButton(isChecked)
         }
     }
 

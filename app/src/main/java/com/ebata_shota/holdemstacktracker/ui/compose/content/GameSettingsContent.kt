@@ -24,6 +24,7 @@ fun GameSettingsContent(
     uiState: GameSettingsContentUiState,
     onClickKeepScreenSwitch: (Boolean) -> Unit,
     onClickSettingSliderStepSwitch: (Boolean) -> Unit,
+    onClickEnableAutoCheckFoldButtonSwitch: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val rememberScrollState = rememberScrollState()
@@ -80,17 +81,41 @@ fun GameSettingsContent(
                 )
             }
         )
+
+        ListItem(
+            headlineContent = {
+                Text(
+                    text = stringResource(R.string.setting_auto_check_fold),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            trailingContent = {
+                Switch(
+                    modifier = Modifier
+                        .padding(
+                            start = 24.dp,
+                            end = 4.dp
+                        ),
+                    checked = uiState.isAutoCheckFoldButton,
+                    onCheckedChange = {
+                        onClickEnableAutoCheckFoldButtonSwitch(it)
+                    }
+                )
+            }
+        )
     }
 }
 
 data class GameSettingsContentUiState(
     val isKeepScreenOn: Boolean,
     val isEnableSliderStep: Boolean,
+    val isAutoCheckFoldButton: Boolean,
 )
 
 interface GameSettingsContentEvent {
     fun onClickKeepScreenSwitch(isChecked: Boolean)
     fun onClickSettingSliderStepSwitch(isChecked: Boolean)
+    fun onClickEnableAutoCheckFoldButtonSwitch(isChecked: Boolean)
 }
 
 
@@ -106,11 +131,13 @@ private fun GameSettingsContentPreview() {
     HoldemStackTrackerTheme {
         GameSettingsContent(
             uiState = GameSettingsContentUiState(
-                isKeepScreenOn = false,
+                isKeepScreenOn = true,
                 isEnableSliderStep = true,
+                isAutoCheckFoldButton = false,
             ),
             onClickKeepScreenSwitch = {},
             onClickSettingSliderStepSwitch = {},
+            onClickEnableAutoCheckFoldButtonSwitch = {},
         )
     }
 }

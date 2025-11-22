@@ -4,6 +4,7 @@ import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.extension.rearrangeListFromIndex
 import com.ebata_shota.holdemstacktracker.domain.extension.roundDigit
+import com.ebata_shota.holdemstacktracker.domain.model.AutoCheckOrFoldType
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.Game
@@ -19,6 +20,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionTypeInLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
@@ -46,6 +48,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.Playe
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.TOP
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.roundToInt
@@ -59,6 +62,7 @@ constructor(
     private val getCurrentPlayerId: GetCurrentPlayerIdUseCase,
     private val isNotRaisedYet: IsNotRaisedYetUseCase,
     private val getActionTypeInLastPhaseAsBetPhase: GetActionTypeInLastPhaseAsBetPhaseUseCase,
+    private val prefRepository: PrefRepository,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher,
 ) {
@@ -71,6 +75,7 @@ constructor(
         minRaiseSize: Int,
         isEnableSliderStep: Boolean,
         betViewMode: BetViewMode,
+        autoCheckOrFoldType: AutoCheckOrFoldType,
     ): GameContentUiState? = withContext(dispatcher) {
         val tableId = table.id
         val playerOrder = game.playerOrder
@@ -124,6 +129,7 @@ constructor(
                 positions = positions,
                 phaseList = phaseList,
                 blindText = blindText,
+                isActiveCheckFold = autoCheckOrFoldType == AutoCheckOrFoldType.ByGame(game.gameId),
                 isEnableSliderStep = isEnableSliderStep,
                 sbPlayerId = sbPlayerId,
                 bbPlayerId = bbPlayerId,
@@ -170,6 +176,7 @@ constructor(
         positions: List<GamePlayerUiState.PlayerPosition>,
         phaseList: List<Phase>,
         blindText: String,
+        isActiveCheckFold: Boolean,
         isEnableSliderStep: Boolean,
         sbPlayerId: PlayerId,
         bbPlayerId: PlayerId,
@@ -187,19 +194,33 @@ constructor(
             actionStateList = betPhase.actionStateList
         )
         val btnPlayerIndex = playerOrder.indexOf(btnPlayerId)
-        val sbIndex = if (playerOrder.size > 2) {
+        if (playerOrder.size > 2) {
             (btnPlayerIndex + 1) % playerOrder.size
         } else {
             btnPlayerIndex
         }
-        val bbIndex = if (playerOrder.size > 2) {
+        if (playerOrder.size > 2) {
             (btnPlayerIndex + 2) % playerOrder.size
         } else {
             (btnPlayerIndex + 1) % playerOrder.size
         }
 
+        val actionType: BetPhaseActionType? = getActionTypeInLastPhaseAsBetPhase.invoke(
+            phaseList = phaseList,
+            playerId = myPlayerId
+        )
+        // アクションを残しているか
+        val isRemainAction = when (actionType) {
+            Blind, Check, Call, Bet, Raise, null -> true
+            Fold, FoldSkip, AllIn, AllInSkip -> false
+        }
+        //  私の手番か
+        val isCurrentPlayer = myPlayerId == currentPlayerId
+
         val isEnableFoldButton: Boolean
         val isEnableCheckButton: Boolean
+        // まだアクションを残していて、他人の手番の場合
+        val shouldShowAutoCheckFoldButton: Boolean = (isRemainAction && !isCurrentPlayer) && prefRepository.enableAutoCheckFoldButton.first()
         val isEnableAllInButton: Boolean
         val isEnableCallButton: Boolean
         val myPendingBetSizeStringSource: StringSource?
@@ -213,8 +234,6 @@ constructor(
         val sliderLabelStackBody: StringSource
         val sliderLabelPotBody: StringSource
         val isEnableRaiseSizeButton: Boolean
-        //  私のターンか
-        val isCurrentPlayer = myPlayerId == currentPlayerId
         if (isCurrentPlayer) {
             // 現在ベット中の最高額
             val maxBetSize = getMaxBetSize.invoke(actionStateList = betPhase.actionStateList)
@@ -388,6 +407,8 @@ constructor(
                 shouldShowBBSuffix = betViewMode == BetViewMode.BB,
                 isEnableFoldButton = isEnableFoldButton,
                 isEnableCheckButton = isEnableCheckButton,
+                shouldShowAutoCheckFoldButton = shouldShowAutoCheckFoldButton ,
+                isCheckedCheckFoldButton = isActiveCheckFold,
                 isEnableAllInButton = isEnableAllInButton,
                 myPendingBetSizeStringSource = myPendingBetSizeStringSource,
                 isEnableCallButton = isEnableCallButton,
@@ -631,6 +652,8 @@ constructor(
                 isEnableFoldButton = false,
                 isEnableCheckButton = false,
                 isEnableAllInButton = false,
+                shouldShowAutoCheckFoldButton = false,
+                isCheckedCheckFoldButton = false,
                 myPendingBetSizeStringSource = null,
                 isEnableCallButton = false,
                 callSizeStringSource = null,
