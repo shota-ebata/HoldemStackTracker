@@ -640,7 +640,7 @@ constructor(
         // AutoActionがあれば追加する
         val addedAutoActionGame = getAddedAutoActionsGame.invoke(
             game = nextGame,
-            rule = table.rule
+            rule = table.rule,
         )
         gameRepository.sendGame(
             tableId = tableId,
