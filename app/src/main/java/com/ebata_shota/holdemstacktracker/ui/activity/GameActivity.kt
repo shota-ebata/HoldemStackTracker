@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -31,14 +32,30 @@ class GameActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        onBackPressedDispatcher.addCallback(owner = this,
+            onBackPressedCallback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    viewModel.onBackPressed()
+                }
+            }
+        )
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.isKeepScreenOn.collect {
-                    if (it) {
-                        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                    } else {
-                        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            launch {
+                repeatOnLifecycle(Lifecycle.State.CREATED) {
+                    viewModel.isKeepScreenOn.collect {
+                        if (it) {
+                            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                        } else {
+                            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                        }
                     }
+                }
+            }
+
+            launch {
+                repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                    viewModel.onResumed()
                 }
             }
         }
@@ -68,6 +85,9 @@ class GameActivity : ComponentActivity() {
                     tableId = navigate.tableId,
                 )
                 startActivity(intent)
+                finish()
+            }
+            is GameViewModel.Navigate.Finish -> {
                 finish()
             }
         }

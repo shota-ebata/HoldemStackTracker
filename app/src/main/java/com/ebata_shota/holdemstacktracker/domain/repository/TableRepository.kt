@@ -36,4 +36,7 @@ interface TableRepository {
         playerId: PlayerId,
         name: String
     )
+
+    fun startCurrentTableConnectionIfNeed(tableId: TableId)
+    fun stopCurrentTableCurrentTableConnection(tableId: TableId)
 }

@@ -30,7 +30,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SelectThemeDialogEve
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SelectThemeDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.extension.labelResId
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
-import com.ebata_shota.holdemstacktracker.ui.compose.row.TableSummaryCardRowUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.row.TableSummaryCardUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.MainScreenDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.MainScreenUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -101,7 +101,6 @@ constructor(
     // Tableの状態を保持 (遷移用として利用を想定）
     private val tableStateFlow: StateFlow<Table?> = tableRepository.tableStateFlow
         .map { it?.getOrNull() }
-        .filterNotNull()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Lazily,
@@ -137,7 +136,7 @@ constructor(
                                 val updateLocalDateTime = LocalDateTime.ofInstant(it.updateTime, zoneId)
                                 val formatterDefault = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
                                     .withLocale(Locale.getDefault())
-                                TableSummaryCardRowUiState(
+                                TableSummaryCardUiState(
                                     tableId = it.id,
                                     gameTypeText = StringSource(
                                         when (table.rule) {
@@ -335,7 +334,7 @@ constructor(
         }
     }
 
-    fun onClickTableRow(tableId: TableId) {
+    fun onClickTableCard(tableId: TableId) {
         loadingOnScreenJob = viewModelScope.launch {
             isLoadingOnScreenContent.update { true }
             tableRepository.startCollectTableFlow(tableId)

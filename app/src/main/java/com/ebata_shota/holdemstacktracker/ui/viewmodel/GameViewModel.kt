@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
 import android.os.Bundle
+import android.util.Log
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
@@ -90,8 +91,8 @@ class GameViewModel
 @Inject
 constructor(
     savedStateHandle: SavedStateHandle,
-    tableRepository: TableRepository,
     updateTableUseCase: UpdateTableUseCase,
+    val tableRepository: TableRepository,
     private val gameRepository: GameRepository,
     private val prefRepository: PrefRepository,
     private val renameTablePlayer: RenameTablePlayerUseCase,
@@ -200,6 +201,10 @@ constructor(
     // PotSettlementDialog
     val potSettlementDialogUiState = MutableStateFlow<PotSettlementDialogUiState?>(null)
 
+    // ExitAlertDialog
+    val shouldShowExitAlertDialog = MutableStateFlow(false)
+
+
     // QR画像を保持
     private val qrPainterStateFlow = MutableStateFlow<Painter?>(null)
 
@@ -210,6 +215,8 @@ constructor(
         data class TablePrepare(
             val tableId: TableId,
         ) : Navigate
+
+        data object Finish : Navigate
     }
 
     init {
@@ -990,6 +997,25 @@ constructor(
                 }
             }
         }
+    }
+
+    fun onClickExitButton() {
+        viewModelScope.launch {
+            _navigateEvent.emit(Navigate.Finish)
+            tableRepository.stopCollectTableFlow()
+        }
+    }
+
+    fun onDismissGameExitAlertDialogRequest() {
+        shouldShowExitAlertDialog.update { false }
+    }
+
+    fun onResumed() {
+        tableRepository.startCurrentTableConnectionIfNeed(tableId)
+    }
+
+    fun onBackPressed() {
+        shouldShowExitAlertDialog.update { true }
     }
 
     companion object {

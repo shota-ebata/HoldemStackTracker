@@ -1,7 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.row
 
 import android.content.res.Configuration
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,8 +36,8 @@ import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import java.time.LocalDateTime
 
 @Composable
-fun TableSummaryCardRow(
-    uiState: TableSummaryCardRowUiState,
+fun TableSummaryCard(
+    uiState: TableSummaryCardUiState,
     onClickTableRow: (TableId) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -141,7 +140,7 @@ fun TableSummaryCardRow(
     }
 }
 
-data class TableSummaryCardRowUiState(
+data class TableSummaryCardUiState(
     val tableId: TableId,
     val gameTypeText: StringSource,
     val blindText: StringSource,
@@ -152,10 +151,10 @@ data class TableSummaryCardRowUiState(
     val createTime: LocalDateTime
 )
 
-private class TableSummaryCardRowPreviewParam :
-    PreviewParameterProvider<TableSummaryCardRowUiState> {
-    override val values: Sequence<TableSummaryCardRowUiState> = sequenceOf(
-        TableSummaryCardRowUiState(
+private class TableSummaryCardPreviewParam :
+    PreviewParameterProvider<TableSummaryCardUiState> {
+    override val values: Sequence<TableSummaryCardUiState> = sequenceOf(
+        TableSummaryCardUiState(
             tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
             gameTypeText = StringSource(R.string.game_type_ring),
             blindText = StringSource("1/2"),
@@ -165,7 +164,7 @@ private class TableSummaryCardRowPreviewParam :
             updateTime = "2024/12/08 22:54:01",
             createTime = LocalDateTime.now()
         ),
-        TableSummaryCardRowUiState(
+        TableSummaryCardUiState(
             tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
             hostName = "ホスト名",
             gameTypeText = StringSource(R.string.game_type_ring),
@@ -185,12 +184,12 @@ private class TableSummaryCardRowPreviewParam :
     name = "Dark Mode"
 )
 @Composable
-private fun TableSummaryCardRowPreview(
-    @PreviewParameter(TableSummaryCardRowPreviewParam::class)
-    uiState: TableSummaryCardRowUiState
+private fun TableSummaryCardPreview(
+    @PreviewParameter(TableSummaryCardPreviewParam::class)
+    uiState: TableSummaryCardUiState
 ) {
     HoldemStackTrackerTheme {
-        TableSummaryCardRow(
+        TableSummaryCard(
             uiState = uiState,
             onClickTableRow = {}
         )

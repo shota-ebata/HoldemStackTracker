@@ -866,6 +866,10 @@ constructor(
         _navigateEvent.emit(Navigate.Game(tableId))
     }
 
+    fun onResumed() {
+        tableRepository.startCurrentTableConnectionIfNeed(tableId)
+    }
+
     companion object {
         fun bundle(
             tableId: TableId,

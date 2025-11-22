@@ -8,6 +8,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameTableInfoDetailContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameExitAlertDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialog
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameTableInfoDetailDialog
@@ -28,6 +29,8 @@ fun GameScreen(
     val phaseIntervalImageDialogUiState: PhaseIntervalImageDialogUiState? by viewModel.phaseIntervalImageDialog.collectAsStateWithLifecycle()
     val gameTableInfoDetailDialogUiState: GameTableInfoDetailContentUiState? by viewModel.gameTableInfoDetailDialogUiState.collectAsStateWithLifecycle()
     val potSettlementDialogUiState: PotSettlementDialogUiState? by viewModel.potSettlementDialogUiState.collectAsStateWithLifecycle()
+    val shouldShowExitAlertDialog: Boolean by viewModel.shouldShowExitAlertDialog.collectAsStateWithLifecycle()
+
 
     viewModel.navigateEvent.collectWithLifecycle {
         navigateTo(it)
@@ -80,6 +83,13 @@ fun GameScreen(
                 PotSettlementDialogContent(
                     uiState = it,
                     event = viewModel
+                )
+            }
+
+            if (shouldShowExitAlertDialog) {
+                GameExitAlertDialogContent(
+                    onClickExitButton = viewModel::onClickExitButton,
+                    onDismissDialogRequest = viewModel::onDismissGameExitAlertDialogRequest,
                 )
             }
         }

@@ -15,8 +15,8 @@ import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
-import com.ebata_shota.holdemstacktracker.ui.compose.row.TableSummaryCardRow
-import com.ebata_shota.holdemstacktracker.ui.compose.row.TableSummaryCardRowUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.row.TableSummaryCard
+import com.ebata_shota.holdemstacktracker.ui.compose.row.TableSummaryCardUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.util.dropRedundantEventWith
 import com.ebata_shota.holdemstacktracker.ui.compose.util.rememberDelayState
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
@@ -28,7 +28,7 @@ fun MainContent(
     onClickTableCreator: () -> Unit,
     onClickJoinTableByQr: () -> Unit,
     onClickJoinTableById: () -> Unit,
-    onClickTableRow: (TableId) -> Unit,
+    onClickTableCard: (TableId) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val delayState = rememberDelayState()
@@ -49,11 +49,11 @@ fun MainContent(
                     modifier = Modifier
                         .height(32.dp)
                 )
-                TableSummaryCardRow(
+                TableSummaryCard(
                     uiState = it,
                     onClickTableRow = { tableId ->
                         dropRedundantEventWith(delayState = delayState) {
-                            onClickTableRow.invoke(tableId)
+                            onClickTableCard.invoke(tableId)
                         }
                     }
                 )
@@ -63,7 +63,7 @@ fun MainContent(
 }
 
 data class MainContentUiState(
-    val table: TableSummaryCardRowUiState?,
+    val table: TableSummaryCardUiState?,
 )
 
 @Preview(showBackground = true, showSystemUi = false, name = "Light Mode")
@@ -79,7 +79,7 @@ fun MainContentPreview() {
         Surface {
             MainContent(
                 uiState = MainContentUiState(
-                    table = TableSummaryCardRowUiState(
+                    table = TableSummaryCardUiState(
                         tableId = TableId("33698e51-9cd4-4dac-a556-10455b43164e"),
                         gameTypeText = StringSource(R.string.game_type_ring),
                         blindText = StringSource("1/2"),
@@ -93,7 +93,7 @@ fun MainContentPreview() {
                 onClickTableCreator = {},
                 onClickJoinTableByQr = {},
                 onClickJoinTableById = {},
-                onClickTableRow = {}
+                onClickTableCard = {}
             )
         }
     }
