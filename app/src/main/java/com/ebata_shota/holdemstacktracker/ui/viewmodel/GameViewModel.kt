@@ -92,7 +92,7 @@ class GameViewModel
 constructor(
     savedStateHandle: SavedStateHandle,
     updateTableUseCase: UpdateTableUseCase,
-    val tableRepository: TableRepository,
+    private val tableRepository: TableRepository,
     private val gameRepository: GameRepository,
     private val prefRepository: PrefRepository,
     private val renameTablePlayer: RenameTablePlayerUseCase,
