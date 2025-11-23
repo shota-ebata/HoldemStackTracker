@@ -29,7 +29,7 @@ constructor(
 
     /**
      * インターバル状態にGameから
-     * ポッドに反映して次のフェーズにする
+     * ポッドに反映して次のフェーズにしたGameを返す
      */
     override suspend fun invoke(
         currentGame: Game,

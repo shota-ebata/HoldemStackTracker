@@ -6,6 +6,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.DoAllInUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoCallUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoCheckUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoFoldUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.DoTransitionToNextPhaseIfNeedUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoRaiseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionTypeInLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionablePlayerIdsUseCase
@@ -51,6 +52,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoAllInUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoCallUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoCheckUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoFoldUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoTransitionToNextPhaseIfNeedUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoRaiseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActionTypeInLastPhaseAsBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActionablePlayerIdsUseCaseImpl
@@ -94,7 +96,6 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -232,5 +233,8 @@ interface UseCaseModule {
     fun bindDoRaiseUseCase(useCase: DoRaiseUseCaseImpl): DoRaiseUseCase
 
     @Binds
-    fun bindGetRaiseSizeUseCase(userCase: GetRaiseSizeUseCaseImpl): GetRaiseSizeUseCase
+    fun bindGetRaiseSizeUseCase(useCase: GetRaiseSizeUseCaseImpl): GetRaiseSizeUseCase
+
+    @Binds
+    fun bindDoProceedGameIfNeedUseCase(useCase: DoTransitionToNextPhaseIfNeedUseCaseImpl): DoTransitionToNextPhaseIfNeedUseCase
 }

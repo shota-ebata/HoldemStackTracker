@@ -31,11 +31,10 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.DoAllInUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoCallUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoCheckUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoFoldUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.DoTransitionToNextPhaseIfNeedUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoRaiseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetAddedAutoActionsGameUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetFirstActionPlayerIdOfNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameFromIntervalUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneDownRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneUpRaiseSizeUseCase
@@ -97,11 +96,9 @@ constructor(
     private val actionHistoryRepository: ActionHistoryRepository,
     private val phaseHistoryRepository: PhaseHistoryRepository,
     private val qrBitmapRepository: QrBitmapRepository,
-    private val getNextGameFromInterval: GetNextGameFromIntervalUseCase,
     private val getMinRaiseSize: GetMinRaiseSizeUseCase,
     private val getOneDownRaiseSize: GetOneDownRaiseSizeUseCase,
     private val getOneUpRaiseSize: GetOneUpRaiseSizeUseCase,
-    private val getNextPlayerIdOfNextPhase: GetFirstActionPlayerIdOfNextPhaseUseCase,
     private val setPotSettlementInfo: SetPotSettlementInfoUseCase,
     private val getNextPhase: GetNextPhaseUseCase,
     private val getAddedAutoActionsGame: GetAddedAutoActionsGameUseCase,
@@ -113,6 +110,7 @@ constructor(
     private val doCall: DoCallUseCase,
     private val doRaise: DoRaiseUseCase,
     private val getRaiseSize: GetRaiseSizeUseCase,
+    private val doTransitionToNextPhaseIfNeed: DoTransitionToNextPhaseIfNeedUseCase,
     private val uiStateMapper: GameContentUiStateMapper,
     private val phaseIntervalImageDialogUiStateMapper: PhaseIntervalImageDialogUiStateMapper,
     private val gameTableInfoDetailContentUiStateMapper: GameTableInfoDetailContentUiStateMapper,
@@ -818,34 +816,11 @@ constructor(
             phaseIntervalImageDialog.update { null }
             val table = tableStateFlow.value ?: return@launch
             val game = gameStateFlow.value ?: return@launch
-            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
-            val nextPlayerId = getNextPlayerIdOfNextPhase.invoke(
-                btnPlayerId = game.btnPlayerId,
-                currentGame = game,
+            doTransitionToNextPhaseIfNeed.invoke(
+                game = game,
+                hostPlayerId = table.hostPlayerId,
+                rule = table.rule,
             )
-            when (myPlayerId) {
-                // 次のプレイヤーだった場合
-                nextPlayerId -> {
-                    val nextGame = getNextGameFromInterval.invoke(
-                        currentGame = game
-                    )
-                    // ダイアログを消してから、実際に消した扱いにするまで
-                    // delayをかける
-                    delay(1000L)
-                    sendNextGame(nextGame = nextGame)
-                }
-
-                // ホストプレイヤーの場合（ホストの操作はフェーズを進める力を持たせる、特に精算のときはホストも操作できたほうが都合が良い）
-                table.hostPlayerId -> {
-                    val nextGame = getNextGameFromInterval.invoke(
-                        currentGame = game
-                    )
-                    // ダイアログを消してから、実際に消した扱いにするまで
-                    // delayをかける
-                    delay(1000L)
-                    sendNextGame(nextGame = nextGame)
-                }
-            }
         }
     }
 

@@ -2,9 +2,12 @@ package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
+import com.ebata_shota.holdemstacktracker.domain.model.Rule
 
-interface GetFirstActionPlayerIdOfNextPhaseUseCase {
+interface DoTransitionToNextPhaseIfNeedUseCase {
     suspend fun invoke(
-        currentGame: Game,
-    ): PlayerId?
+        game: Game,
+        hostPlayerId: PlayerId,
+        rule: Rule,
+    )
 }

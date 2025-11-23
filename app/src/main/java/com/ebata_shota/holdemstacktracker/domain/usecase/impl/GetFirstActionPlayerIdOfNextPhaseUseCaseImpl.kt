@@ -24,7 +24,6 @@ constructor(
      * 次のフェーズで、最初にアクションするプレイヤーのIDを取得する
      */
     override suspend fun invoke(
-        btnPlayerId: PlayerId,
         currentGame: Game,
     ): PlayerId? = withContext(dispatcher) {
         val currentPhase = currentGame.phaseList.lastOrNull()
@@ -34,11 +33,11 @@ constructor(
                     // 2人しかいない場合
                     // 次のフェーズであるPreFlopの最初のアクションプレイヤーは
                     // BTNからSBを始めるのでnextPlayerはBTNとなる。
-                    btnPlayerId
+                    currentGame.btnPlayerId
                 } else {
                     // 3人以上なら普通に最初のPlayerを返す
                     getFirstActionPlayerId(
-                        btnPlayerId = btnPlayerId,
+                        btnPlayerId = currentGame.btnPlayerId,
                         currentGame = currentGame
                     )
                 }
@@ -50,7 +49,7 @@ constructor(
                 -> {
                 // 次のフェーズはベットフェーズなので普通に最初のプレイヤーIDを返す
                 getFirstActionPlayerId(
-                    btnPlayerId = btnPlayerId,
+                    btnPlayerId = currentGame.btnPlayerId,
                     currentGame = currentGame
                 )
             }
