@@ -1,6 +1,8 @@
 package com.ebata_shota.holdemstacktracker.di.module
 
 import android.content.Context
+import android.os.Vibrator
+import androidx.core.content.ContextCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
@@ -117,6 +119,15 @@ class AppModule {
     ): AppDatabase {
         return Room.databaseBuilder(appContext, AppDatabase::class.java, "app-database")
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideVibrator(
+        @ApplicationContext
+        appContext: Context,
+    ): Vibrator {
+        return ContextCompat.getSystemService(appContext, Vibrator::class.java)!!
     }
 
 //    @Provides

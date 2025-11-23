@@ -1,6 +1,9 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
@@ -31,8 +34,8 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.DoAllInUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoCallUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoCheckUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoFoldUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.DoTransitionToNextPhaseIfNeedUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoRaiseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.DoTransitionToNextPhaseIfNeedUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetAddedAutoActionsGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
@@ -115,6 +118,7 @@ constructor(
     private val phaseIntervalImageDialogUiStateMapper: PhaseIntervalImageDialogUiStateMapper,
     private val gameTableInfoDetailContentUiStateMapper: GameTableInfoDetailContentUiStateMapper,
     private val potSettlementDialogUiStateMapper: PotSettlementDialogUiStateMapper,
+    private val vibrator: Vibrator,
 ) : ViewModel(),
     GameSettingsDialogEvent,
     PotSettlementDialogEvent {
@@ -546,6 +550,7 @@ constructor(
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
+            startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL)
             doFold(
                 game = game,
                 myPlayerId = myPlayerId,
@@ -558,6 +563,7 @@ constructor(
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
+            startVibrateCheck()
             doCheck(
                 game = game,
                 myPlayerId = myPlayerId,
@@ -570,6 +576,7 @@ constructor(
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
+            startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE)
             doAllIn(
                 game = game,
                 myPlayerId = myPlayerId,
@@ -582,6 +589,7 @@ constructor(
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
 
+            startVibrate(VibrationEffect.Composition.PRIMITIVE_CLICK)
             doCall(
                 game = game,
                 myPlayerId = myPlayerId,
@@ -598,6 +606,7 @@ constructor(
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
             val raiseSize = raiseSizeStateFlow.value ?: return@launch
 
+            startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE)
             doRaise(
                 game = game,
                 myPlayerId = myPlayerId,
@@ -613,6 +622,7 @@ constructor(
      */
     fun onClickRaiseSizeButton(value: Int) {
         viewModelScope.launch {
+            startVibrate(VibrationEffect.Composition.PRIMITIVE_TICK)
             raiseSizeStateFlow.update { value }
         }
     }
@@ -625,7 +635,10 @@ constructor(
                 currentRaiseSize = currentRaiseSize,
                 minRaiseSize = minRaiseSize,
             )
-            raiseSizeStateFlow.update { nextRaiseSize }
+            if (nextRaiseSize != raiseSizeStateFlow.value) {
+                startVibrate(VibrationEffect.Composition.PRIMITIVE_TICK)
+                raiseSizeStateFlow.update { nextRaiseSize }
+            }
         }
     }
 
@@ -638,7 +651,10 @@ constructor(
                 currentRaiseSize = currentRaiseSize,
                 game = game,
             )
-            raiseSizeStateFlow.update { nextRaiseSize }
+            if (nextRaiseSize != raiseSizeStateFlow.value) {
+                startVibrate(VibrationEffect.Composition.PRIMITIVE_TICK)
+                raiseSizeStateFlow.update { nextRaiseSize }
+            }
         }
     }
 
@@ -652,9 +668,13 @@ constructor(
         viewModelScope.launch {
             autoCheckFoldTypeState.update { autoCheckOrFoldType ->
                 when (autoCheckOrFoldType) {
-                    is AutoCheckOrFoldType.ByGame -> AutoCheckOrFoldType.None
+                    is AutoCheckOrFoldType.ByGame -> {
+                        startVibrate(VibrationEffect.Composition.PRIMITIVE_LOW_TICK)
+                        AutoCheckOrFoldType.None
+                    }
                     is AutoCheckOrFoldType.None -> {
                         val gameId = gameStateFlow.value?.gameId ?: return@launch
+                        startVibrate(VibrationEffect.Composition.PRIMITIVE_CLICK)
                         AutoCheckOrFoldType.ByGame(gameId)
                     }
                 }
@@ -672,7 +692,6 @@ constructor(
             )
         }
     }
-
     fun onChangeSlider(sliderPosition: Float) {
         viewModelScope.launch {
             val game = gameStateFlow.value ?: return@launch
@@ -684,6 +703,16 @@ constructor(
                 minRaiseSize = minRaiseSize,
                 sliderPosition = sliderPosition
             )
+            if (raiseSize != raiseSizeStateFlow.value) {
+                val isEnableRaiseUpSliderStep = prefRepository.isEnableRaiseUpSliderStep.first()
+                startVibrate(
+                    if (isEnableRaiseUpSliderStep) {
+                        VibrationEffect.Composition.PRIMITIVE_TICK
+                    } else {
+                        VibrationEffect.Composition.PRIMITIVE_LOW_TICK
+                    }
+                )
+            }
             raiseSizeStateFlow.update { raiseSize }
         }
     }
@@ -792,6 +821,27 @@ constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun startVibrate(primitiveId: Int) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            vibrator.vibrate(
+                VibrationEffect.startComposition()
+                    .addPrimitive(primitiveId)
+                    .compose()
+            )
+        }
+    }
+
+    private fun startVibrateCheck() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            vibrator.vibrate(
+                VibrationEffect.startComposition()
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f)
+                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 150)
+                    .compose()
+            )
         }
     }
 
