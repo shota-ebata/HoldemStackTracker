@@ -38,15 +38,13 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.DoFoldUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoRaiseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetAddedAutoActionsGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetFirstActionPlayerIdOfNextPhaseUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameFromIntervalUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNotFoldPlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneDownRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneUpRaiseSizeUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSizeUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlider
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsCurrentPlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsEnableCheckUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
@@ -103,10 +101,7 @@ constructor(
     private val phaseHistoryRepository: PhaseHistoryRepository,
     private val qrBitmapRepository: QrBitmapRepository,
     private val getNextGameFromInterval: GetNextGameFromIntervalUseCase,
-    private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
     private val getMinRaiseSize: GetMinRaiseSizeUseCase,
-    private val getRaiseSizeByStackSlider: GetRaiseSizeByStackSlider,
-    private val getPendingBetSize: GetPendingBetSizeUseCase,
     private val getOneDownRaiseSize: GetOneDownRaiseSizeUseCase,
     private val getOneUpRaiseSize: GetOneUpRaiseSizeUseCase,
     private val getNotFoldPlayerIds: GetNotFoldPlayerIdsUseCase,
@@ -121,6 +116,7 @@ constructor(
     private val doAllIn: DoAllInUseCase,
     private val doCall: DoCallUseCase,
     private val doRaise: DoRaiseUseCase,
+    private val getRaiseSize: GetRaiseSizeUseCase,
     private val uiStateMapper: GameContentUiStateMapper,
 ) : ViewModel(),
     GameSettingsDialogEvent,
@@ -621,29 +617,6 @@ constructor(
         )
     }
 
-    private suspend fun getRaiseSize(
-        game: Game,
-        myPlayerId: PlayerId,
-        sliderPosition: Float,
-    ): Int {
-        val player = game.players.find { it.id == myPlayerId }!!
-        val stackSize = player.stack
-        val minRaiseSize = minRaiseSizeFlow.first()
-        val myPendingBetSize = getPendingBetSize.invoke(
-            actionList = getLastPhaseAsBetPhase.invoke(game.phaseList).actionStateList,
-            playerOrder = game.playerOrder,
-            playerId = myPlayerId
-        )
-
-        val raiseSize: Int = getRaiseSizeByStackSlider.invoke(
-            stackSize = stackSize,
-            minRaiseSize = minRaiseSize,
-            myPendingBetSize = myPendingBetSize,
-            sliderPosition = sliderPosition,
-        )
-        return raiseSize
-    }
-
     fun onClickCenterPanel() {
         viewModelScope.launch {
             val game = gameStateFlow.value ?: return@launch
@@ -807,10 +780,11 @@ constructor(
         viewModelScope.launch {
             val game = gameStateFlow.value ?: return@launch
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
-
-            val raiseSize: Int = getRaiseSize(
+            val minRaiseSize = minRaiseSizeFlow.first()
+            val raiseSize: Int = getRaiseSize.invoke(
                 game = game,
                 myPlayerId = myPlayerId,
+                minRaiseSize = minRaiseSize,
                 sliderPosition = sliderPosition
             )
             raiseSizeStateFlow.update { raiseSize }
@@ -934,7 +908,6 @@ constructor(
                 }
             }
         }
-
     }
 
     fun getTableQrPainter(): Painter? {

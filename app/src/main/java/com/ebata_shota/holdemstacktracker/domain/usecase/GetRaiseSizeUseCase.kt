@@ -1,0 +1,13 @@
+package com.ebata_shota.holdemstacktracker.domain.usecase
+
+import com.ebata_shota.holdemstacktracker.domain.model.Game
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
+
+interface GetRaiseSizeUseCase {
+    suspend fun invoke(
+        game: Game,
+        myPlayerId: PlayerId,
+        minRaiseSize: Int,
+        sliderPosition: Float,
+    ): Int
+}
