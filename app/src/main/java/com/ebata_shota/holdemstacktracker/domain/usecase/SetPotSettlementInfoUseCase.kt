@@ -1,14 +1,11 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.domain.model.Game
-import com.ebata_shota.holdemstacktracker.domain.model.PotSettlementInfo
-import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogUiState
 
 interface SetPotSettlementInfoUseCase {
-
     suspend fun invoke(
-        tableId: TableId,
         game: Game,
-        potSettlementInfoList: List<PotSettlementInfo>,
+        pots: List<PotSettlementDialogUiState.PotUiState>,
     )
 }

@@ -16,7 +16,6 @@ import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
-import com.ebata_shota.holdemstacktracker.domain.model.PotSettlementInfo
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
@@ -782,21 +781,9 @@ constructor(
             val game = gameStateFlow.value ?: return@launch
             if (currentPotIndex == dialogUiState.pots.lastIndex) {
                 // Pot精算する
-                val potSettlementInfoList: List<PotSettlementInfo> = game.potList.map { pot ->
-                    val potUiState = dialogUiState.pots.find { it.potNumber == pot.potNumber }!!
-                    val selectedPlayerIds: List<PlayerId> = potUiState.players
-                        .filter { it.isSelected }
-                        .map { it.playerId }
-                    PotSettlementInfo(
-                        potId = pot.id,
-                        potSize = pot.potSize,
-                        acquirerPlayerIds = selectedPlayerIds,
-                    )
-                }
                 setPotSettlementInfo.invoke(
-                    tableId = tableId,
                     game = game,
-                    potSettlementInfoList = potSettlementInfoList
+                    pots = dialogUiState.pots,
                 )
                 potSettlementDialogUiState.update { null }
             } else {

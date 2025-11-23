@@ -11,6 +11,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNotFoldPlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.SetPotSettlementInfoUseCase
 import com.ebata_shota.holdemstacktracker.domain.util.getSortedByActionOrder
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogUiState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -29,9 +30,8 @@ constructor(
 ) : SetPotSettlementInfoUseCase {
 
     override suspend fun invoke(
-        tableId: TableId,
         game: Game,
-        potSettlementInfoList: List<PotSettlementInfo>,
+        pots: List<PotSettlementDialogUiState.PotUiState>,
     ) = withContext(dispatcher) {
         val playerOrder = game.playerOrder
         val actionOrder = playerOrder.getSortedByActionOrder(btnPlayerId = game.btnPlayerId)
@@ -39,6 +39,18 @@ constructor(
         val nearestSbPlayerId = actionOrder.first { playerId ->
             notFoldPlayerIds.any { it == playerId }
         }
+        val potSettlementInfoList: List<PotSettlementInfo> = game.potList.map { pot ->
+            val potUiState = pots.find { it.potNumber == pot.potNumber }!!
+            val selectedPlayerIds: List<PlayerId> = potUiState.players
+                .filter { it.isSelected }
+                .map { it.playerId }
+            PotSettlementInfo(
+                potId = pot.id,
+                potSize = pot.potSize,
+                acquirerPlayerIds = selectedPlayerIds,
+            )
+        }
+
         val gamePlayers = getNewGamePlayers(
             players = game.players,
             nearestSbPlayerId = nearestSbPlayerId,
@@ -47,7 +59,7 @@ constructor(
         val nextPhase = getNextPhase.invoke(playerOrder = playerOrder, phaseList = game.phaseList)
         // FIXME: Potの分配を、「関係者の承認を以て完了」とする仕様に変更したい。
         gameRepository.sendGame(
-            tableId = tableId,
+            tableId = game.tableId,
             newGame = game.copy(
                 players = gamePlayers,
                 phaseList = game.phaseList + nextPhase,
