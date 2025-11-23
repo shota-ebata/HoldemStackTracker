@@ -7,7 +7,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtFind
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.ActionId
@@ -16,10 +15,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
-import com.ebata_shota.holdemstacktracker.domain.model.PhaseStatus
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.PotSettlementInfo
-import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
@@ -41,7 +38,6 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetFirstActionPlayerIdO
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameFromIntervalUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetNotFoldPlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneDownRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneUpRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeUseCase
@@ -59,10 +55,12 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogUi
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PhaseIntervalImageDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.row.PotSettlementCheckboxRowUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
 import com.ebata_shota.holdemstacktracker.ui.mapper.GameContentUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.mapper.GameTableInfoDetailContentUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.mapper.PhaseIntervalImageDialogUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.mapper.PotSettlementDialogUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -104,7 +102,6 @@ constructor(
     private val getMinRaiseSize: GetMinRaiseSizeUseCase,
     private val getOneDownRaiseSize: GetOneDownRaiseSizeUseCase,
     private val getOneUpRaiseSize: GetOneUpRaiseSizeUseCase,
-    private val getNotFoldPlayerIds: GetNotFoldPlayerIdsUseCase,
     private val getNextPlayerIdOfNextPhase: GetFirstActionPlayerIdOfNextPhaseUseCase,
     private val setPotSettlementInfo: SetPotSettlementInfoUseCase,
     private val getNextPhase: GetNextPhaseUseCase,
@@ -118,6 +115,9 @@ constructor(
     private val doRaise: DoRaiseUseCase,
     private val getRaiseSize: GetRaiseSizeUseCase,
     private val uiStateMapper: GameContentUiStateMapper,
+    private val phaseIntervalImageDialogUiStateMapper: PhaseIntervalImageDialogUiStateMapper,
+    private val gameTableInfoDetailContentUiStateMapper: GameTableInfoDetailContentUiStateMapper,
+    private val potSettlementDialogUiStateMapper: PotSettlementDialogUiStateMapper,
 ) : ViewModel(),
     GameSettingsDialogEvent,
     PotSettlementDialogEvent {
@@ -285,73 +285,7 @@ constructor(
                 // FIXME: PhaseHistoryをPhaseIdから見て、見た後であれば表示しない対応を入れたい
                 // FIXME: AllInCloseのケースを実装したい
                 val phaseIntervalImageDialogUiState =
-                    when (val lastPhase = game.phaseList.lastOrNull()) {
-                        is Phase.Standby -> null
-                        is Phase.PreFlop -> {
-                            when (lastPhase.phaseStatus) {
-                                PhaseStatus.Close -> {
-                                    PhaseIntervalImageDialogUiState(
-                                        imageResId = R.drawable.flopimage
-                                    )
-                                }
-                                PhaseStatus.AllInClose -> PhaseIntervalImageDialogUiState(
-                                    imageResId = R.drawable.all_in_show_down
-                                )
-
-                                PhaseStatus.Active -> null
-                            }
-                        }
-
-                        is Phase.Flop -> {
-                            when (lastPhase.phaseStatus) {
-                                PhaseStatus.Close -> {
-                                    PhaseIntervalImageDialogUiState(
-                                        imageResId = R.drawable.turnimage
-                                    )
-                                }
-                                PhaseStatus.AllInClose -> PhaseIntervalImageDialogUiState(
-                                    imageResId = R.drawable.all_in_show_down
-                                )
-
-                                PhaseStatus.Active -> null
-                            }
-                        }
-
-                        is Phase.Turn -> {
-                            when (lastPhase.phaseStatus) {
-                                PhaseStatus.Close -> {
-                                    PhaseIntervalImageDialogUiState(
-                                        imageResId = R.drawable.riverimage
-                                    )
-                                }
-
-                                PhaseStatus.AllInClose -> PhaseIntervalImageDialogUiState(
-                                    imageResId = R.drawable.all_in_show_down
-                                )
-
-                                PhaseStatus.Active -> null
-                            }
-                        }
-
-                        is Phase.River -> {
-                            when (lastPhase.phaseStatus) {
-                                PhaseStatus.Close -> {
-                                    PhaseIntervalImageDialogUiState(
-                                        imageResId = R.drawable.showdownimage
-                                    )
-                                }
-
-                                PhaseStatus.Active,
-                                PhaseStatus.AllInClose,
-                                    -> null
-                            }
-                        }
-
-                        is Phase.PotSettlement -> null
-                        is Phase.End -> null
-                        null -> null
-                    }
-
+                    phaseIntervalImageDialogUiStateMapper.createUiState(game)
                 if (phaseIntervalImageDialogUiState != null) {
                     // ダイアログの表示の場合は1秒待つ
                     delay(1000L)
@@ -382,31 +316,9 @@ constructor(
                             // ポットマネージャー以外では表示しない
                             return@collect
                         }
-                        val notFoldPlayerIds = getNotFoldPlayerIds.invoke(
-                            playerOrder = game.playerOrder,
-                            phaseList = game.phaseList
-                        )
-                        val dialogUiState = PotSettlementDialogUiState(
-                            currentPotIndex = 0,
-                            pots = game.potList.reversed().map { pot ->
-                                PotSettlementDialogUiState.PotUiState(
-                                    potNumber = pot.potNumber,
-                                    potSizeString = StringSource(pot.potSize.toString()),
-                                    players = pot.involvedPlayerIds.map { involvedPlayerId ->
-                                        val isEnable = notFoldPlayerIds.any {
-                                            it == involvedPlayerId
-                                        }
-                                        PotSettlementCheckboxRowUiState(
-                                            playerId = involvedPlayerId,
-                                            playerName = StringSource(
-                                                table.basePlayers.find { it.id == involvedPlayerId }!!.name
-                                            ),
-                                            isEnable = isEnable,
-                                            shouldShowFoldLabel = !isEnable
-                                        )
-                                    }
-                                )
-                            },
+                        val dialogUiState = potSettlementDialogUiStateMapper.createUiState(
+                            table = table,
+                            game = game
                         )
                         potSettlementDialogUiState.update { dialogUiState }
                     }
@@ -619,26 +531,14 @@ constructor(
 
     fun onClickCenterPanel() {
         viewModelScope.launch {
-            val game = gameStateFlow.value ?: return@launch
-            val gameScreenUiState =
-                screenUiState.value as? GameScreenUiState.Content ?: return@launch
+            val game = gameStateFlow.value
+                ?: return@launch
+            val gameScreenUiState = screenUiState.value as? GameScreenUiState.Content
+                ?: return@launch
             gameTableInfoDetailDialogUiState.update {
-                // FIXME: UiStateMapperへ移動したいかも？
-                GameTableInfoDetailContentUiState(
-                    tableId = tableId,
-                    blindText = gameScreenUiState.contentUiState.gameMainPanelUiState.centerPanelContentUiState.blindText,
-                    potList = game.potList.mapIndexed { index, pot ->
-                        GameTableInfoDetailContentUiState.Pot(
-                            id = pot.id,
-                            potName = if (index == 0) {
-                                StringSource(R.string.label_main_pot)
-                            } else {
-                                StringSource(R.string.label_side_pot, pot.potNumber)
-                            },
-                            potSize = StringSource(pot.potSize.toString())
-                        )
-                    },
-                    pendingTotalBetSize = gameScreenUiState.contentUiState.gameMainPanelUiState.centerPanelContentUiState.pendingTotalBetSize
+                gameTableInfoDetailContentUiStateMapper.createUiState(
+                    game = game,
+                    gameScreenUiState = gameScreenUiState,
                 )
             }
         }
