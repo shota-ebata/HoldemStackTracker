@@ -720,7 +720,7 @@ constructor(
                 // FIXME: UiStateMapperへ移動したいかも？
                 GameTableInfoDetailContentUiState(
                     tableId = tableId,
-                    blindText = gameScreenUiState.contentUiState.centerPanelContentUiState.blindText,
+                    blindText = gameScreenUiState.contentUiState.gameMainPanelUiState.centerPanelContentUiState.blindText,
                     potList = game.potList.mapIndexed { index, pot ->
                         GameTableInfoDetailContentUiState.Pot(
                             id = pot.id,
@@ -732,7 +732,7 @@ constructor(
                             potSize = StringSource(pot.potSize.toString())
                         )
                     },
-                    pendingTotalBetSize = gameScreenUiState.contentUiState.centerPanelContentUiState.pendingTotalBetSize
+                    pendingTotalBetSize = gameScreenUiState.contentUiState.gameMainPanelUiState.centerPanelContentUiState.pendingTotalBetSize
                 )
             }
         }

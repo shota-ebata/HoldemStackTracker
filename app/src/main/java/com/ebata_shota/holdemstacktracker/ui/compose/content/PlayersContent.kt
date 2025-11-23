@@ -1,6 +1,5 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,16 +13,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.ebata_shota.holdemstacktracker.R
-import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
-import com.ebata_shota.holdemstacktracker.domain.model.toStringSource
-import com.ebata_shota.holdemstacktracker.ui.compose.parts.RaiseSizeChangeButtonUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerCard
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
 
 @Composable
 fun PlayersContent(
-    uiState: GameContentUiState,
+    uiState: GameMainPanelUiState,
     onClickCenterPanel: () -> Unit,
     onClickPlayerCard: () -> Unit,
     modifier: Modifier = Modifier,
@@ -133,11 +129,10 @@ fun PlayersContent(
 
 // TODO: 必要以上のデータを渡しているので修正
 private class PlayersFor10ContentPreviewParameterProvider :
-    PreviewParameterProvider<GameContentUiState> {
-    override val values: Sequence<GameContentUiState> = sequenceOf(
+    PreviewParameterProvider<GameMainPanelUiState> {
+    override val values: Sequence<GameMainPanelUiState> = sequenceOf(
         // 10人フル
-        GameContentUiState(
-            currentActionId = ActionId("actionId"),
+        GameMainPanelUiState(
             players = listOf(
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -279,54 +274,9 @@ private class PlayersFor10ContentPreviewParameterProvider :
                 pendingTotalBetSize = StringSource("2"),
                 shouldShowBBSuffix = false
             ),
-            controlPanelUiState = ControlPanelUiState.ActiveControlPanelUiState(
-                shouldShowBBSuffix = false,
-                isEnableFoldButton = true,
-                isEnableCheckButton = true,
-                shouldShowAutoCheckFoldButton = false,
-                isCheckedCheckFoldButton = false,
-                isEnableAllInButton = true,
-                myPendingBetSizeStringSource = StringSource("0"),
-                isEnableCallButton = true,
-                callSizeStringSource = StringSource("200"),
-                isEnableRaiseButton = true,
-                raiseButtonMainLabelResId = R.string.button_label_raise,
-                raiseSizeStringSource = StringSource("400"),
-                raiseSizeButtonUiStates = listOf(
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("2 BB"),
-                        raiseSize = 200,
-                        isEnable = true,
-                    ),
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("2.5 BB"),
-                        raiseSize = 250,
-                        isEnable = true,
-                    ),
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("3 BB"),
-                        raiseSize = 300,
-                        isEnable = true,
-                    ),
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("4 BB"),
-                        raiseSize = 400,
-                        isEnable = true,
-                    ),
-                ),
-                isEnableMinusButton = true,
-                isEnablePlusButton = true,
-                isEnableSlider = true,
-                sliderPosition = 0.0f,
-                isEnableSliderStep = true,
-                stackRatioText = "".toStringSource(),
-                potRatioText = "".toStringSource(),
-                isEnableRaiseUpSizeButton = true,
-            )
         ),
         // 6人
-        GameContentUiState(
-            currentActionId = ActionId("actionId"),
+        GameMainPanelUiState(
             players = listOf(
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -416,54 +366,9 @@ private class PlayersFor10ContentPreviewParameterProvider :
                 pendingTotalBetSize = StringSource("2"),
                 shouldShowBBSuffix = false
             ),
-            controlPanelUiState = ControlPanelUiState.ActiveControlPanelUiState(
-                shouldShowBBSuffix = false,
-                isEnableFoldButton = true,
-                isEnableCheckButton = true,
-                shouldShowAutoCheckFoldButton = false,
-                isCheckedCheckFoldButton = false,
-                isEnableAllInButton = true,
-                myPendingBetSizeStringSource = StringSource("0"),
-                isEnableCallButton = true,
-                callSizeStringSource = StringSource("200"),
-                isEnableRaiseButton = true,
-                raiseButtonMainLabelResId = R.string.button_label_raise,
-                raiseSizeStringSource = StringSource("400"),
-                raiseSizeButtonUiStates = listOf(
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("2 BB"),
-                        raiseSize = 200,
-                        isEnable = true,
-                    ),
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("2.5 BB"),
-                        raiseSize = 250,
-                        isEnable = true,
-                    ),
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("3 BB"),
-                        raiseSize = 300,
-                        isEnable = true,
-                    ),
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("4 BB"),
-                        raiseSize = 400,
-                        isEnable = true,
-                    ),
-                ),
-                isEnableMinusButton = true,
-                isEnablePlusButton = true,
-                isEnableSlider = true,
-                sliderPosition = 0.0f,
-                isEnableSliderStep = true,
-                stackRatioText = "".toStringSource(),
-                potRatioText = "".toStringSource(),
-                isEnableRaiseUpSizeButton = true,
-            )
         ),
         // 4人
-        GameContentUiState(
-            currentActionId = ActionId("actionId"),
+        GameMainPanelUiState(
             players = listOf(
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -526,54 +431,9 @@ private class PlayersFor10ContentPreviewParameterProvider :
                 pendingTotalBetSize = StringSource("2"),
                 shouldShowBBSuffix = false
             ),
-            controlPanelUiState = ControlPanelUiState.ActiveControlPanelUiState(
-                shouldShowBBSuffix = false,
-                isEnableFoldButton = true,
-                isEnableCheckButton = true,
-                shouldShowAutoCheckFoldButton = false,
-                isCheckedCheckFoldButton = false,
-                isEnableAllInButton = true,
-                myPendingBetSizeStringSource = StringSource("0"),
-                isEnableCallButton = true,
-                callSizeStringSource = StringSource("200"),
-                isEnableRaiseButton = true,
-                raiseButtonMainLabelResId = R.string.button_label_raise,
-                raiseSizeStringSource = StringSource("400"),
-                raiseSizeButtonUiStates = listOf(
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("2 BB"),
-                        raiseSize = 200,
-                        isEnable = true,
-                    ),
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("2.5 BB"),
-                        raiseSize = 250,
-                        isEnable = true,
-                    ),
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("3 BB"),
-                        raiseSize = 300,
-                        isEnable = true,
-                    ),
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("4 BB"),
-                        raiseSize = 400,
-                        isEnable = true,
-                    ),
-                ),
-                isEnableMinusButton = true,
-                isEnablePlusButton = true,
-                isEnableSlider = true,
-                sliderPosition = 0.0f,
-                isEnableSliderStep = true,
-                stackRatioText = "".toStringSource(),
-                potRatioText = "".toStringSource(),
-                isEnableRaiseUpSizeButton = true,
-            )
         ),
         // 3人
-        GameContentUiState(
-            currentActionId = ActionId("actionId"),
+        GameMainPanelUiState(
             players = listOf(
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -623,54 +483,9 @@ private class PlayersFor10ContentPreviewParameterProvider :
                 pendingTotalBetSize = StringSource("2"),
                 shouldShowBBSuffix = false
             ),
-            controlPanelUiState = ControlPanelUiState.ActiveControlPanelUiState(
-                shouldShowBBSuffix = false,
-                isEnableFoldButton = true,
-                isEnableCheckButton = true,
-                shouldShowAutoCheckFoldButton = false,
-                isCheckedCheckFoldButton = false,
-                isEnableAllInButton = true,
-                myPendingBetSizeStringSource = StringSource("0"),
-                isEnableCallButton = true,
-                callSizeStringSource = StringSource("200"),
-                isEnableRaiseButton = true,
-                raiseButtonMainLabelResId = R.string.button_label_raise,
-                raiseSizeStringSource = StringSource("400"),
-                raiseSizeButtonUiStates = listOf(
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("2 BB"),
-                        raiseSize = 200,
-                        isEnable = true,
-                    ),
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("2.5 BB"),
-                        raiseSize = 250,
-                        isEnable = true,
-                    ),
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("3 BB"),
-                        raiseSize = 300,
-                        isEnable = true,
-                    ),
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("4 BB"),
-                        raiseSize = 400,
-                        isEnable = true,
-                    ),
-                ),
-                isEnableMinusButton = true,
-                isEnablePlusButton = true,
-                isEnableSlider = true,
-                sliderPosition = 0.0f,
-                isEnableSliderStep = true,
-                stackRatioText = "".toStringSource(),
-                potRatioText = "".toStringSource(),
-                isEnableRaiseUpSizeButton = true,
-            )
         ),
         // 2人
-        GameContentUiState(
-            currentActionId = ActionId("actionId"),
+        GameMainPanelUiState(
             players = listOf(
                 GamePlayerUiState(
                     playerName = "PlayerName",
@@ -706,53 +521,14 @@ private class PlayersFor10ContentPreviewParameterProvider :
                 pendingTotalBetSize = StringSource("2"),
                 shouldShowBBSuffix = false
             ),
-            controlPanelUiState = ControlPanelUiState.ActiveControlPanelUiState(
-                shouldShowBBSuffix = false,
-                isEnableFoldButton = true,
-                isEnableCheckButton = true,
-                shouldShowAutoCheckFoldButton = false,
-                isCheckedCheckFoldButton = false,
-                isEnableAllInButton = true,
-                myPendingBetSizeStringSource = StringSource("0"),
-                isEnableCallButton = true,
-                callSizeStringSource = StringSource("200"),
-                isEnableRaiseButton = true,
-                raiseButtonMainLabelResId = R.string.button_label_raise,
-                raiseSizeStringSource = StringSource("400"),
-                raiseSizeButtonUiStates = listOf(
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("2 BB"),
-                        raiseSize = 200,
-                        isEnable = true,
-                    ),
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("2.5 BB"),
-                        raiseSize = 250,
-                        isEnable = true,
-                    ),
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("3 BB"),
-                        raiseSize = 300,
-                        isEnable = true,
-                    ),
-                    RaiseSizeChangeButtonUiState(
-                        labelStringSource = StringSource("4 BB"),
-                        raiseSize = 400,
-                        isEnable = true,
-                    ),
-                ),
-                isEnableMinusButton = true,
-                isEnablePlusButton = true,
-                isEnableSlider = true,
-                sliderPosition = 0.0f,
-                isEnableSliderStep = true,
-                stackRatioText = "".toStringSource(),
-                potRatioText = "".toStringSource(),
-                isEnableRaiseUpSizeButton = true,
-            )
         ),
     )
 }
+
+data class GameMainPanelUiState(
+    val players: List<GamePlayerUiState>,
+    val centerPanelContentUiState: CenterPanelContentUiState,
+)
 
 @Preview(
     showBackground = true,
@@ -763,7 +539,7 @@ private class PlayersFor10ContentPreviewParameterProvider :
 @Composable
 private fun PlayersContentPreview(
     @PreviewParameter(PlayersFor10ContentPreviewParameterProvider::class)
-    uiState: GameContentUiState,
+    uiState: GameMainPanelUiState,
 ) {
     PlayersContent(
         uiState = uiState,

@@ -19,7 +19,6 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerBase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.Table
-import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionTypeInLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetCurrentPlayerIdUseCase
@@ -40,6 +39,7 @@ import com.ebata_shota.holdemstacktracker.infra.model.BetPhaseActionType.Raise
 import com.ebata_shota.holdemstacktracker.ui.compose.content.CenterPanelContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.ControlPanelUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.content.GameMainPanelUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.RaiseSizeChangeButtonUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.BOTTOM
@@ -77,7 +77,6 @@ constructor(
         betViewMode: BetViewMode,
         autoCheckOrFoldType: AutoCheckOrFoldType,
     ): GameContentUiState? = withContext(dispatcher) {
-        val tableId = table.id
         val playerOrder = game.playerOrder
         val basePlayers = table.basePlayers
         val minBetSize = table.rule.minBetSize
@@ -123,7 +122,6 @@ constructor(
                 raiseSize = raiseSize,
                 minRaiseSize = minRaiseSize,
                 totalPotSize = totalPotSize,
-                tableId = tableId,
                 sortedPlayerOrder = sortedPlayerOrder,
                 basePlayers = basePlayers,
                 positions = positions,
@@ -143,7 +141,6 @@ constructor(
                 betViewMode = betViewMode,
                 minBetSize = minBetSize,
                 totalPotSize = totalPotSize,
-                tableId = tableId,
                 sortedPlayerOrder = sortedPlayerOrder,
                 basePlayers = basePlayers,
                 positions = positions,
@@ -170,7 +167,6 @@ constructor(
         raiseSize: Int,
         minRaiseSize: Int,
         totalPotSize: Int,
-        tableId: TableId,
         sortedPlayerOrder: List<PlayerId>,
         basePlayers: List<PlayerBase>,
         positions: List<GamePlayerUiState.PlayerPosition>,
@@ -356,52 +352,54 @@ constructor(
 
         return GameContentUiState(
             currentActionId = betPhase.actionStateList.lastOrNull()?.actionId,
-            players = gamePlayerUiStates(
-                sortedPlayerOrder = sortedPlayerOrder,
-                basePlayers = basePlayers,
-                gamePlayers = gamePlayers,
-                positions = positions,
-                pendingBetPerPlayer = pendingBetPerPlayer,
-                currentPlayerId = currentPlayerId,
-                phaseList = phaseList,
-                betViewMode = betViewMode,
-                minBetSize = minBetSize,
-                myPlayerId = myPlayerId,
-                btnPlayerId = btnPlayerId,
-                sbPlayerId = sbPlayerId,
-                bbPlayerId = bbPlayerId
-            ),
-            centerPanelContentUiState = CenterPanelContentUiState(
-                blindText = StringSource(blindText),
-                betPhaseText = when (betPhase) {
-                    is PreFlop -> StringSource(R.string.label_pre_flop)
-                    is Flop -> StringSource(R.string.label_flop)
-                    is Turn -> StringSource(R.string.label_turn)
-                    is River -> StringSource(R.string.label_river)
-                },
-                totalPot = when (betViewMode) {
-                    BetViewMode.Number -> {
-                        StringSource("%,d".format(totalPotSize))
-                    }
+            gameMainPanelUiState = GameMainPanelUiState(
+                players = gamePlayerUiStates(
+                    sortedPlayerOrder = sortedPlayerOrder,
+                    basePlayers = basePlayers,
+                    gamePlayers = gamePlayers,
+                    positions = positions,
+                    pendingBetPerPlayer = pendingBetPerPlayer,
+                    currentPlayerId = currentPlayerId,
+                    phaseList = phaseList,
+                    betViewMode = betViewMode,
+                    minBetSize = minBetSize,
+                    myPlayerId = myPlayerId,
+                    btnPlayerId = btnPlayerId,
+                    sbPlayerId = sbPlayerId,
+                    bbPlayerId = bbPlayerId
+                ),
+                centerPanelContentUiState = CenterPanelContentUiState(
+                    blindText = StringSource(blindText),
+                    betPhaseText = when (betPhase) {
+                        is PreFlop -> StringSource(R.string.label_pre_flop)
+                        is Flop -> StringSource(R.string.label_flop)
+                        is Turn -> StringSource(R.string.label_turn)
+                        is River -> StringSource(R.string.label_river)
+                    },
+                    totalPot = when (betViewMode) {
+                        BetViewMode.Number -> {
+                            StringSource("%,d".format(totalPotSize))
+                        }
 
-                    BetViewMode.BB -> {
-                        val bb = (totalPotSize
-                            .toFloat() / minBetSize.toFloat())
-                        StringSource(bb.roundDigit(2).toString())
-                    }
-                },
-                pendingTotalBetSize = when (betViewMode) {
-                    BetViewMode.Number -> {
-                        StringSource("%,d".format(pendingBetPerPlayer.map { it.value }.sum()))
-                    }
+                        BetViewMode.BB -> {
+                            val bb = (totalPotSize
+                                .toFloat() / minBetSize.toFloat())
+                            StringSource(bb.roundDigit(2).toString())
+                        }
+                    },
+                    pendingTotalBetSize = when (betViewMode) {
+                        BetViewMode.Number -> {
+                            StringSource("%,d".format(pendingBetPerPlayer.map { it.value }.sum()))
+                        }
 
-                    BetViewMode.BB -> {
-                        val bb = (pendingBetPerPlayer.map { it.value }.sum()
-                            .toFloat() / minBetSize.toFloat())
-                        StringSource(bb.roundDigit(2).toString())
-                    }
-                },
-                shouldShowBBSuffix = betViewMode == BetViewMode.BB
+                        BetViewMode.BB -> {
+                            val bb = (pendingBetPerPlayer.map { it.value }.sum()
+                                .toFloat() / minBetSize.toFloat())
+                            StringSource(bb.roundDigit(2).toString())
+                        }
+                    },
+                    shouldShowBBSuffix = betViewMode == BetViewMode.BB
+                ),
             ),
             controlPanelUiState = ControlPanelUiState.ActiveControlPanelUiState(
                 shouldShowBBSuffix = betViewMode == BetViewMode.BB,
@@ -581,7 +579,6 @@ constructor(
      */
     private suspend fun createGameContentUiState(
         lastPhase: Phase,
-        tableId: TableId,
         sortedPlayerOrder: List<PlayerId>,
         btnPlayerId: PlayerId,
         basePlayers: List<PlayerBase>,
@@ -600,52 +597,54 @@ constructor(
         val pendingBetPerPlayer = emptyMap<PlayerId, Int>()
         return GameContentUiState(
             currentActionId = null,
-            players = gamePlayerUiStates(
-                sortedPlayerOrder = sortedPlayerOrder,
-                basePlayers = basePlayers,
-                gamePlayers = gamePlayers,
-                positions = positions,
-                pendingBetPerPlayer = pendingBetPerPlayer,
-                currentPlayerId = null,
-                phaseList = phaseList,
-                betViewMode = betViewMode,
-                minBetSize = minBetSize,
-                myPlayerId = myPlayerId,
-                btnPlayerId = btnPlayerId,
-                sbPlayerId = sbPlayerId,
-                bbPlayerId = bbPlayerId,
-            ),
-            centerPanelContentUiState = CenterPanelContentUiState(
-                blindText = StringSource(blindText),
-                betPhaseText = when (lastPhase) {
-                    is Phase.Standby -> StringSource(R.string.table_status_preparing)
-                    is Phase.PotSettlement -> StringSource(R.string.phase_label_pot_settlement)
-                    is Phase.End -> StringSource(R.string.table_status_preparing)
-                    is BetPhase -> throw IllegalStateException("BetPhase はここには来ない想定")
-                },
-                totalPot = when (betViewMode) {
-                    BetViewMode.Number -> {
-                        StringSource("%,d".format(totalPotSize))
-                    }
+            gameMainPanelUiState = GameMainPanelUiState(
+                players = gamePlayerUiStates(
+                    sortedPlayerOrder = sortedPlayerOrder,
+                    basePlayers = basePlayers,
+                    gamePlayers = gamePlayers,
+                    positions = positions,
+                    pendingBetPerPlayer = pendingBetPerPlayer,
+                    currentPlayerId = null,
+                    phaseList = phaseList,
+                    betViewMode = betViewMode,
+                    minBetSize = minBetSize,
+                    myPlayerId = myPlayerId,
+                    btnPlayerId = btnPlayerId,
+                    sbPlayerId = sbPlayerId,
+                    bbPlayerId = bbPlayerId,
+                ),
+                centerPanelContentUiState = CenterPanelContentUiState(
+                    blindText = StringSource(blindText),
+                    betPhaseText = when (lastPhase) {
+                        is Phase.Standby -> StringSource(R.string.table_status_preparing)
+                        is Phase.PotSettlement -> StringSource(R.string.phase_label_pot_settlement)
+                        is Phase.End -> StringSource(R.string.table_status_preparing)
+                        is BetPhase -> throw IllegalStateException("BetPhase はここには来ない想定")
+                    },
+                    totalPot = when (betViewMode) {
+                        BetViewMode.Number -> {
+                            StringSource("%,d".format(totalPotSize))
+                        }
 
-                    BetViewMode.BB -> {
-                        val bb = (totalPotSize
-                            .toFloat() / minBetSize.toFloat())
-                        StringSource(bb.roundDigit(2).toString())
-                    }
-                },
-                pendingTotalBetSize = when (betViewMode) {
-                    BetViewMode.Number -> {
-                        StringSource("%,d".format(pendingBetPerPlayer.map { it.value }.sum()))
-                    }
+                        BetViewMode.BB -> {
+                            val bb = (totalPotSize
+                                .toFloat() / minBetSize.toFloat())
+                            StringSource(bb.roundDigit(2).toString())
+                        }
+                    },
+                    pendingTotalBetSize = when (betViewMode) {
+                        BetViewMode.Number -> {
+                            StringSource("%,d".format(pendingBetPerPlayer.map { it.value }.sum()))
+                        }
 
-                    BetViewMode.BB -> {
-                        val bb = (pendingBetPerPlayer.map { it.value }.sum()
-                            .toFloat() / minBetSize.toFloat())
-                        StringSource(bb.roundDigit(2).toString())
-                    }
-                },
-                shouldShowBBSuffix = betViewMode == BetViewMode.BB
+                        BetViewMode.BB -> {
+                            val bb = (pendingBetPerPlayer.map { it.value }.sum()
+                                .toFloat() / minBetSize.toFloat())
+                            StringSource(bb.roundDigit(2).toString())
+                        }
+                    },
+                    shouldShowBBSuffix = betViewMode == BetViewMode.BB
+                ),
             ),
             controlPanelUiState = ControlPanelUiState.ActiveControlPanelUiState(
                 shouldShowBBSuffix = betViewMode == BetViewMode.BB,
@@ -680,7 +679,6 @@ constructor(
             ),
         )
     }
-
 
     private fun createRaiseSizeChangeButtonUiStates(
         isNotRaisedYet: Boolean,
