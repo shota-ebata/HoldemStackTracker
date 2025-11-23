@@ -12,11 +12,9 @@ import com.ebata_shota.holdemstacktracker.domain.extension.mapAtFind
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtIndex
 import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.AutoCheckOrFoldType
-import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.BetViewMode
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
-import com.ebata_shota.holdemstacktracker.domain.model.Phase.BetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseStatus
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -32,13 +30,15 @@ import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PhaseHistoryRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
-import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
-import com.ebata_shota.holdemstacktracker.domain.usecase.AddBetPhaseActionInToGameUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.DoAllInUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.DoCallUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.DoCheckUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.DoFoldUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.DoRaiseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetAddedAutoActionsGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetFirstActionPlayerIdOfNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameFromIntervalUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
@@ -49,7 +49,6 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSizeUseCas
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlider
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsCurrentPlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsEnableCheckUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.SetPotSettlementInfoUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.UpdateTableUseCase
@@ -100,16 +99,12 @@ constructor(
     private val prefRepository: PrefRepository,
     private val renameTablePlayer: RenameTablePlayerUseCase,
     private val firebaseAuthRepository: FirebaseAuthRepository,
-    private val randomIdRepository: RandomIdRepository,
     private val actionHistoryRepository: ActionHistoryRepository,
     private val phaseHistoryRepository: PhaseHistoryRepository,
     private val qrBitmapRepository: QrBitmapRepository,
-    private val addBetPhaseActionInToGame: AddBetPhaseActionInToGameUseCase,
     private val getNextGameFromInterval: GetNextGameFromIntervalUseCase,
     private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
-    private val getMaxBetSize: GetMaxBetSizeUseCase,
     private val getMinRaiseSize: GetMinRaiseSizeUseCase,
-    private val isNotRaisedYet: IsNotRaisedYetUseCase,
     private val getRaiseSizeByStackSlider: GetRaiseSizeByStackSlider,
     private val getPendingBetSize: GetPendingBetSizeUseCase,
     private val getOneDownRaiseSize: GetOneDownRaiseSizeUseCase,
@@ -121,6 +116,11 @@ constructor(
     private val getAddedAutoActionsGame: GetAddedAutoActionsGameUseCase,
     private val isEnableCheck: IsEnableCheckUseCase,
     private val isCurrentPlayer: IsCurrentPlayerUseCase,
+    private val doFold: DoFoldUseCase,
+    private val doCheck: DoCheckUseCase,
+    private val doAllIn: DoAllInUseCase,
+    private val doCall: DoCallUseCase,
+    private val doRaise: DoRaiseUseCase,
     private val uiStateMapper: GameContentUiStateMapper,
 ) : ViewModel(),
     GameSettingsDialogEvent,
@@ -548,86 +548,48 @@ constructor(
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        val nextGame = addBetPhaseActionInToGame.invoke(
+        val table = tableStateFlow.value ?: return
+        doFold.invoke(
             currentGame = game,
-            betPhaseAction = BetPhaseAction.Fold(
-                actionId = ActionId(randomIdRepository.generateRandomId()),
-                playerId = myPlayerId
-            ),
+            rule = table.rule,
+            myPlayerId = myPlayerId,
         )
-        sendNextGame(nextGame)
     }
 
     private suspend fun doCheck(
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        val nextGame = addBetPhaseActionInToGame.invoke(
+        val table = tableStateFlow.value ?: return
+        doCheck.invoke(
             currentGame = game,
-            betPhaseAction = BetPhaseAction.Check(
-                actionId = ActionId(randomIdRepository.generateRandomId()),
-                playerId = myPlayerId
-            ),
+            rule = table.rule,
+            myPlayerId = myPlayerId,
         )
-        sendNextGame(nextGame)
     }
 
     private suspend fun doAllIn(
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        val player = game.players.find { it.id == myPlayerId }!!
-        val myPendingBetSize = getPendingBetSize.invoke(
-            actionList = getLastPhaseAsBetPhase.invoke(game.phaseList).actionStateList,
-            playerOrder = game.playerOrder,
-            playerId = myPlayerId
-        )
-        val nextGame = addBetPhaseActionInToGame.invoke(
+        val table = tableStateFlow.value ?: return
+        doAllIn.invoke(
             currentGame = game,
-            betPhaseAction = BetPhaseAction.AllIn(
-                actionId = ActionId(randomIdRepository.generateRandomId()),
-                playerId = myPlayerId,
-                betSize = player.stack + myPendingBetSize
-            ),
+            rule = table.rule,
+            myPlayerId = myPlayerId,
         )
-        sendNextGame(nextGame)
     }
 
     private suspend fun doCall(
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        val betPhase: BetPhase = try {
-            getLastPhaseAsBetPhase.invoke(game.phaseList)
-        } catch (e: IllegalStateException) {
-            return
-        }
-        val player = game.players.find { it.id == myPlayerId }!!
-        val actionList = betPhase.actionStateList
-        val callSize = getMaxBetSize.invoke(actionStateList = actionList)
-        val currentPendingBetSize = getPendingBetSize.invoke(
-            actionList = actionList,
-            playerOrder = game.playerOrder,
-            playerId = myPlayerId,
-        )
-        val nextGame = addBetPhaseActionInToGame.invoke(
+        val table = tableStateFlow.value ?: return
+        doCall.invoke(
             currentGame = game,
-            betPhaseAction = if (callSize == player.stack + currentPendingBetSize) {
-                // コールサイズ == スタックサイズ + PendingBetサイズ の場合はAllIn
-                BetPhaseAction.AllIn(
-                    actionId = ActionId(randomIdRepository.generateRandomId()),
-                    playerId = myPlayerId,
-                    betSize = callSize
-                )
-            } else {
-                BetPhaseAction.Call(
-                    actionId = ActionId(randomIdRepository.generateRandomId()),
-                    playerId = myPlayerId,
-                    betSize = callSize
-                )
-            },
+            rule = table.rule,
+            myPlayerId = myPlayerId,
         )
-        sendNextGame(nextGame)
     }
 
     private suspend fun doRaise(
@@ -635,42 +597,13 @@ constructor(
         myPlayerId: PlayerId,
         raiseSize: Int,
     ) {
-        val player = game.players.find { it.id == myPlayerId }!!
-        val betPhase = getLastPhaseAsBetPhase.invoke(game.phaseList)
-        val actionList = betPhase.actionStateList
-        // このフェーズ中、まだBetやAllInをしていない(オープンアクション)
-        val isNotRaisedYet = isNotRaisedYet.invoke(actionList)
-        val currentPendingBetSize = getPendingBetSize.invoke(
-            actionList = actionList,
-            playerOrder = game.playerOrder,
-            playerId = myPlayerId,
-        )
-        val nextGame = addBetPhaseActionInToGame.invoke(
+        val table = tableStateFlow.value ?: return
+        doRaise.invoke(
             currentGame = game,
-            betPhaseAction = if (raiseSize == player.stack + currentPendingBetSize) {
-                // レイズサイズ == スタックサイズ + PendingBetサイズ の場合はAllIn
-                BetPhaseAction.AllIn(
-                    actionId = ActionId(randomIdRepository.generateRandomId()),
-                    playerId = myPlayerId,
-                    betSize = raiseSize
-                )
-            } else {
-                if (isNotRaisedYet) {
-                    BetPhaseAction.Bet(
-                        actionId = ActionId(randomIdRepository.generateRandomId()),
-                        playerId = myPlayerId,
-                        betSize = raiseSize
-                    )
-                } else {
-                    BetPhaseAction.Raise(
-                        actionId = ActionId(randomIdRepository.generateRandomId()),
-                        playerId = myPlayerId,
-                        betSize = raiseSize
-                    )
-                }
-            },
+            rule = table.rule,
+            myPlayerId = myPlayerId,
+            raiseSize = raiseSize,
         )
-        sendNextGame(nextGame)
     }
 
     private suspend fun sendNextGame(nextGame: Game) {

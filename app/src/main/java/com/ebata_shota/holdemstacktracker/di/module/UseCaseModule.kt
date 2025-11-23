@@ -2,6 +2,11 @@ package com.ebata_shota.holdemstacktracker.di.module
 
 import com.ebata_shota.holdemstacktracker.domain.usecase.AddBetPhaseActionInToGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.DoAllInUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.DoCallUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.DoCheckUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.DoFoldUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.DoRaiseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionTypeInLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionablePlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetAddedAutoActionsGameUseCase
@@ -41,6 +46,11 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.SetPotSettlementInfoUse
 import com.ebata_shota.holdemstacktracker.domain.usecase.UpdateTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.AddBetPhaseActionInToGameUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.CreateNewGameUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoAllInUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoCallUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoCheckUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoFoldUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoRaiseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActionTypeInLastPhaseAsBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActionablePlayerIdsUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetAddedAutoActionsGameUseCaseImpl
@@ -203,4 +213,19 @@ interface UseCaseModule {
 
     @Binds
     fun bindIsCurrentPlayerUseCase(useCase: IsCurrentPlayerUseCaseImpl): IsCurrentPlayerUseCase
+
+    @Binds
+    fun bindDoFoldUseCase(useCase: DoFoldUseCaseImpl): DoFoldUseCase
+
+    @Binds
+    fun bindDoCheckUseCase(useCase: DoCheckUseCaseImpl): DoCheckUseCase
+
+    @Binds
+    fun bindDoAllInUseCase(useCase: DoAllInUseCaseImpl): DoAllInUseCase
+
+    @Binds
+    fun bindDoCallUseCase(useCase: DoCallUseCaseImpl): DoCallUseCase
+
+    @Binds
+    fun bindDoRaiseUseCase(useCase: DoRaiseUseCaseImpl): DoRaiseUseCase
 }
