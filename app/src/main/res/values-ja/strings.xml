@@ -84,4 +84,7 @@
     <string name="title_exit_alert_dialog">退室しますか？</string>
     <string name="message_exit_alert_dialog">退室後はオートFoldします。</string>
 
+    <string name="button_label_navigate_to_prepare">準備画面へ</string>
+    <string name="button_label_enter_next_game">次のゲームへ</string>
+
 </resources>

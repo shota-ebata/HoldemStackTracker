@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundTableException
-import com.ebata_shota.holdemstacktracker.domain.extension.indexOfFirstOrNull
 import com.ebata_shota.holdemstacktracker.domain.extension.mapAtFind
 import com.ebata_shota.holdemstacktracker.domain.extension.toIntOrZero
 import com.ebata_shota.holdemstacktracker.domain.model.Game
@@ -31,6 +30,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextBtnPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.HasErrorChipSizeTextValueUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
@@ -93,6 +93,7 @@ constructor(
     private val removePlayers: RemovePlayersUseCase,
     private val renameTablePlayer: RenameTablePlayerUseCase,
     private val hasErrorChipSizeTextValue: HasErrorChipSizeTextValueUseCase,
+    private val getNextBtnPlayerId: GetNextBtnPlayerIdUseCase,
     private val uiStateMapper: TablePrepareScreenUiStateMapper,
     private val tableCreatorUiStateMapper: TableCreatorUiStateMapper,
 ) : ViewModel(),
@@ -159,16 +160,7 @@ constructor(
                 tableStateFlow.filterNotNull(),
                 gameStateFlow.filterNotNull(),
             ) { table, game ->
-                val lastBtnPlayerId = game.btnPlayerId
-                val lastBtnPlayerIndex =
-                    table.playerOrderWithoutLeaved.indexOfFirstOrNull { it == lastBtnPlayerId }
-                val nextIndex = if (lastBtnPlayerIndex != null) {
-                    (lastBtnPlayerIndex + 1) % table.playerOrderWithoutLeaved.size
-                } else {
-                    null
-                }
-                val defaultBtnId = nextIndex?.let { table.playerOrderWithoutLeaved[nextIndex] }
-                defaultBtnId
+                getNextBtnPlayerId.invoke(table = table, game = game)
             }.first()
             selectedBtnPlayerId.update { defaultBtnId }
         }

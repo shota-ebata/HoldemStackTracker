@@ -30,6 +30,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.PhaseHistoryReposito
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
+import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoAllInUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoCallUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoCheckUseCase
@@ -38,6 +39,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.DoRaiseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoTransitionToNextPhaseIfNeedUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetAddedAutoActionsGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextBtnPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneDownRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneUpRaiseSizeUseCase
@@ -51,6 +53,7 @@ import com.ebata_shota.holdemstacktracker.domain.util.combine
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameSettingsContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameTableInfoDetailContentUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.EnterNextGameDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PhaseIntervalImageDialogUiState
@@ -114,6 +117,8 @@ constructor(
     private val doRaise: DoRaiseUseCase,
     private val getRaiseSize: GetRaiseSizeUseCase,
     private val doTransitionToNextPhaseIfNeed: DoTransitionToNextPhaseIfNeedUseCase,
+    private val getNextBtnPlayerId: GetNextBtnPlayerIdUseCase,
+    private val createNewGame: CreateNewGameUseCase,
     private val uiStateMapper: GameContentUiStateMapper,
     private val phaseIntervalImageDialogUiStateMapper: PhaseIntervalImageDialogUiStateMapper,
     private val gameTableInfoDetailContentUiStateMapper: GameTableInfoDetailContentUiStateMapper,
@@ -121,7 +126,8 @@ constructor(
     private val vibrator: Vibrator,
 ) : ViewModel(),
     GameSettingsDialogEvent,
-    PotSettlementDialogEvent {
+    PotSettlementDialogEvent,
+    EnterNextGameDialogEvent {
     private val tableId: TableId by savedStateHandle.param()
 
     private val _screenUiState = MutableStateFlow<GameScreenUiState>(GameScreenUiState.Loading)
@@ -209,7 +215,12 @@ constructor(
     val potSettlementDialogUiState = MutableStateFlow<PotSettlementDialogUiState?>(null)
 
     // ExitAlertDialog
-    val shouldShowExitAlertDialog = MutableStateFlow(false)
+    private val _shouldShowExitAlertDialog = MutableStateFlow(false)
+    val shouldShowExitAlertDialog = _shouldShowExitAlertDialog.asStateFlow()
+
+    // EnterNextGameDialog
+    private val _shouldShowEnterNextGameDialog = MutableStateFlow(false)
+    val shouldShowEnterNextGameDialog = _shouldShowEnterNextGameDialog.asStateFlow()
 
     // QR画像を保持
     private val qrPainterStateFlow = MutableStateFlow<Painter?>(null)
@@ -370,12 +381,8 @@ constructor(
                     && game.phaseList.lastOrNull() is Phase.Standby
                     && table.tableStatus == TableStatus.PREPARING
                 ) {
-                    // ホストでスタンバイフェーズでTableが準備中なら準備画面に戻す
-                    _navigateEvent.emit(
-                        Navigate.TablePrepare(
-                            tableId = tableId,
-                        )
-                    )
+                    // ホストでスタンバイフェーズでTableが準備中なら次の画面への
+                    _shouldShowEnterNextGameDialog.update { true }
                 }
             }
         }
@@ -824,6 +831,24 @@ constructor(
         }
     }
 
+    override fun onClickNavigateToPrepareButton() {
+        viewModelScope.launch {
+            _navigateEvent.emit(Navigate.TablePrepare(tableId))
+        }
+    }
+
+    override fun onClickEnterNextButton() {
+        viewModelScope.launch {
+            val table = tableStateFlow.firstOrNull() ?: return@launch
+            val game = gameStateFlow.firstOrNull() ?: return@launch
+            val nextBtnPlayerId = getNextBtnPlayerId.invoke(table, game)
+            nextBtnPlayerId?.let {
+                createNewGame.invoke(table.copy(btnPlayerId = nextBtnPlayerId))
+            }
+            _shouldShowEnterNextGameDialog.update { false }
+        }
+    }
+
     private fun startVibrate(primitiveId: Int) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             vibrator.vibrate(
@@ -882,7 +907,7 @@ constructor(
     }
 
     fun onDismissGameExitAlertDialogRequest() {
-        shouldShowExitAlertDialog.update { false }
+        _shouldShowExitAlertDialog.update { false }
     }
 
     fun onResumed() {
@@ -898,7 +923,7 @@ constructor(
                 }
                 TableStatus.PAUSED -> TODO()
                 TableStatus.PLAYING -> {
-                    shouldShowExitAlertDialog.update { true }
+                    _shouldShowExitAlertDialog.update { true }
                 }
             }
         }

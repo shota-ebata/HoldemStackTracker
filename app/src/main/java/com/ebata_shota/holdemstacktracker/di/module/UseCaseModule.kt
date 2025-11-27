@@ -18,6 +18,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseU
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextBtnPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameFromIntervalUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGamePlayerStateListUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
@@ -64,6 +65,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLastPhaseAsBetP
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMinRaiseSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextAutoActionUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextBtnPlayerIdUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextGameFromIntervalUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextGamePlayerStateListUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextPhaseUseCaseImpl
@@ -237,4 +239,7 @@ interface UseCaseModule {
 
     @Binds
     fun bindDoProceedGameIfNeedUseCase(useCase: DoTransitionToNextPhaseIfNeedUseCaseImpl): DoTransitionToNextPhaseIfNeedUseCase
+
+    @Binds
+    fun bindGetNextBtnPlayerIdUseCase(useCase: GetNextBtnPlayerIdUseCaseImpl): GetNextBtnPlayerIdUseCase
 }

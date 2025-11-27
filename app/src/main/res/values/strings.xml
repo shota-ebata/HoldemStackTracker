@@ -125,4 +125,7 @@
 
     <string name="title_exit_alert_dialog">Would you like to exit?</string>
     <string name="message_exit_alert_dialog">After leaving the room, it will auto-fold.</string>
+
+    <string name="button_label_navigate_to_prepare">Back</string>
+    <string name="button_label_enter_next_game">Next Game</string>
 </resources>
