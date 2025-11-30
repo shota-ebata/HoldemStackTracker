@@ -14,6 +14,7 @@
 /.idea/codeStyles/Project.xml
 /.idea/modules/app/HoldemStackTracker.app.iml
 /.idea/deploymentTargetSelector.xml
+/.idea/appInsightsSettings.xml
 .DS_Store
 /build
 /captures
