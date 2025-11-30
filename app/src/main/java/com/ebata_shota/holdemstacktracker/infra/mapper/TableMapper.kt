@@ -131,6 +131,6 @@ constructor() {
             START_TIME to it.toEpochMilli()
         },
         TABLE_CREATE_TIME to table.tableCreateTime.toEpochMilli(),
-        UPDATE_TIME to table.updateTime.toEpochMilli()
+        UPDATE_TIME to table.updateTime.toEpochMilli() // TODO: ServerValue.TIMESTAMPにしたほうがいいかも？
     ).toMap()
 }

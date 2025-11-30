@@ -127,7 +127,7 @@ constructor(
         }
         stopCollectTableFlow()
         currentTableId = tableId
-        collectTableJob = appCoroutineScope.launch {
+        collectTableJob = appCoroutineScope.launch(ioDispatcher) {
             startCurrentTableConnectionIfNeed(tableId)
 
             launch {
@@ -183,29 +183,40 @@ constructor(
             return
         }
         if (currentTableId != null && currentTableId == tableId) {
-            tableConnectionJob = appCoroutineScope.launch {
+            tableConnectionJob = appCoroutineScope.launch(ioDispatcher) {
                 val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
-                myTableConnectionRef =
-                    tableConnectionRef.child(tableId.value).child(myPlayerId.value)
-                myTableConnectionRef?.setValue(true)
-                myTableConnectionRefOnDisconnect = myTableConnectionRef?.onDisconnect()
-                myTableConnectionRefOnDisconnect?.removeValue { error, _ ->
-                    if (error != null) {
-                        Log.e(
-                            "TableRepository",
-                            "Failed to set onDisconnect removeValue: ${error.message} $myPlayerId"
-                        )
-                    }
+                myTableConnectionRef = createTableConnectionRef(tableId, myPlayerId)
+            }
+        }
+    }
+
+    private fun createTableConnectionRef(
+        tableId: TableId,
+        myPlayerId: PlayerId,
+    ): DatabaseReference = tableConnectionRef.child(tableId.value).child(myPlayerId.value).also {
+        it.setValue(true)
+        myTableConnectionRefOnDisconnect = createTableOnDisconnect(myPlayerId)
+    }
+
+    private fun createTableOnDisconnect(myPlayerId: PlayerId): OnDisconnect? =
+        myTableConnectionRef?.onDisconnect()?.also { onDisconnect ->
+            onDisconnect.removeValue { error, _ ->
+                if (error != null) {
+                    Log.e(
+                        "TableRepository",
+                        "Failed to set onDisconnect removeValue: ${error.message} $myPlayerId"
+                    )
                     tableConnectionJob = null
                 }
             }
         }
-    }
 
     override fun stopCurrentTableCurrentTableConnection(tableId: TableId) {
         if (currentTableId != null && currentTableId == tableId) {
             myTableConnectionRefOnDisconnect?.cancel()
             myTableConnectionRef?.setValue(null)
+            myTableConnectionRef?.onDisconnect()
+            myTableConnectionRef = null
         }
     }
 
