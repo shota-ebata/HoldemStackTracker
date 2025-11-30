@@ -32,6 +32,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextBtnPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.HasErrorChipSizeTextValueUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.JoinPlayerFromWaitPlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
@@ -94,6 +95,7 @@ constructor(
     private val renameTablePlayer: RenameTablePlayerUseCase,
     private val hasErrorChipSizeTextValue: HasErrorChipSizeTextValueUseCase,
     private val getNextBtnPlayerId: GetNextBtnPlayerIdUseCase,
+    private val joinPlayerFormWaitPlayer: JoinPlayerFromWaitPlayerUseCase,
     private val uiStateMapper: TablePrepareScreenUiStateMapper,
     private val tableCreatorUiStateMapper: TableCreatorUiStateMapper,
 ) : ViewModel(),
@@ -233,7 +235,23 @@ constructor(
                 firebaseAuthRepository.myPlayerIdFlow,
                 prefRepository.myName.filterNotNull(),
             ) { table, myPlayerId, myName ->
-                joinTable.invoke(table, myPlayerId, myName)
+                if (table.hostPlayerId == myPlayerId) {
+                    // ホストのときに
+                    when (table.tableStatus) {
+                        TableStatus.PLAYING -> {
+                            // ゲーム中のときは何もしない？
+                        }
+
+                        TableStatus.PREPARING,
+                        TableStatus.PAUSED -> { // FIXME: PAUSEDでは table.rule is Rule.RingGame じゃないとまずいか？
+                            // ゲーム中以外のとき
+                            joinPlayerFormWaitPlayer.invoke(table)
+                        }
+                    }
+                } else {
+                    // ホストじゃないとき
+                    joinTable.invoke(table, myPlayerId, myName)
+                }
             }.collect()
         }
 

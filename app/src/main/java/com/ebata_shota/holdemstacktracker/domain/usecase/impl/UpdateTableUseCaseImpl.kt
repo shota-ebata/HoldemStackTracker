@@ -27,11 +27,14 @@ constructor(
         table: Table,
         updateTime: Instant,
     ) = withContext(dispatcher) {
-        tableRepository.sendTable(
-            table.copy(
-                updateTime = updateTime,
-                version = table.version + 1
+        val current = tableRepository.tableStateFlow.value?.getOrNull()
+        if (table != current) {
+            tableRepository.sendTable(
+                table.copy(
+                    updateTime = updateTime,
+                    version = table.version + 1
+                )
             )
-        )
+        }
     }
 }
