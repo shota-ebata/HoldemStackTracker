@@ -33,4 +33,10 @@ data class Table(
     val basePlayersWithoutLeaved: List<PlayerBase> = basePlayers.filter {
         !it.isLeaved && playerOrder.contains(it.id)
     }
+
+    fun getPlayerName(playerId: PlayerId): String? {
+        return basePlayers.find { it.id == playerId }?.name
+    }
+
+    fun getPlayerNameMap(): Map<PlayerId, String> = basePlayers.associate { it.id to it.name }
 }

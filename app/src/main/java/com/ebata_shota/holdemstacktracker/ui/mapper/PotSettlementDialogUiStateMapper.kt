@@ -36,7 +36,7 @@ constructor(
                         PotSettlementCheckboxRowUiState(
                             playerId = involvedPlayerId,
                             playerName = StringSource(
-                                table.basePlayers.find { it.id == involvedPlayerId }!!.name
+                                table.getPlayerName(involvedPlayerId) ?: "???"
                             ),
                             isEnable = isEnable,
                             shouldShowFoldLabel = !isEnable

@@ -15,7 +15,6 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase.Flop
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.PreFlop
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.River
 import com.ebata_shota.holdemstacktracker.domain.model.Phase.Turn
-import com.ebata_shota.holdemstacktracker.domain.model.PlayerBase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.domain.model.Table
@@ -78,7 +77,7 @@ constructor(
         autoCheckOrFoldType: AutoCheckOrFoldType,
     ): GameContentUiState? = withContext(dispatcher) {
         val playerOrder = game.playerOrder
-        val basePlayers = table.basePlayers
+        val playerNameMap = table.getPlayerNameMap()
         val minBetSize = table.rule.minBetSize
         val blindText = table.rule.blindText()
         val btnPlayerId = game.btnPlayerId
@@ -123,7 +122,7 @@ constructor(
                 minRaiseSize = minRaiseSize,
                 totalPotSize = totalPotSize,
                 sortedPlayerOrder = sortedPlayerOrder,
-                basePlayers = basePlayers,
+                playerNameMap = playerNameMap,
                 positions = positions,
                 phaseList = phaseList,
                 blindText = blindText,
@@ -142,7 +141,7 @@ constructor(
                 minBetSize = minBetSize,
                 totalPotSize = totalPotSize,
                 sortedPlayerOrder = sortedPlayerOrder,
-                basePlayers = basePlayers,
+                playerNameMap = playerNameMap,
                 positions = positions,
                 phaseList = phaseList,
                 blindText = blindText,
@@ -168,7 +167,7 @@ constructor(
         minRaiseSize: Int,
         totalPotSize: Int,
         sortedPlayerOrder: List<PlayerId>,
-        basePlayers: List<PlayerBase>,
+        playerNameMap: Map<PlayerId, String>,
         positions: List<GamePlayerUiState.PlayerPosition>,
         phaseList: List<Phase>,
         blindText: String,
@@ -355,7 +354,7 @@ constructor(
             gameMainPanelUiState = GameMainPanelUiState(
                 players = gamePlayerUiStates(
                     sortedPlayerOrder = sortedPlayerOrder,
-                    basePlayers = basePlayers,
+                    playerNameMap = playerNameMap,
                     gamePlayers = gamePlayers,
                     positions = positions,
                     pendingBetPerPlayer = pendingBetPerPlayer,
@@ -366,7 +365,7 @@ constructor(
                     myPlayerId = myPlayerId,
                     btnPlayerId = btnPlayerId,
                     sbPlayerId = sbPlayerId,
-                    bbPlayerId = bbPlayerId
+                    bbPlayerId = bbPlayerId,
                 ),
                 centerPanelContentUiState = CenterPanelContentUiState(
                     blindText = StringSource(blindText),
@@ -441,7 +440,7 @@ constructor(
 
     private suspend fun gamePlayerUiStates(
         sortedPlayerOrder: List<PlayerId>,
-        basePlayers: List<PlayerBase>,
+        playerNameMap: Map<PlayerId, String>,
         gamePlayers: List<GamePlayer>,
         positions: List<GamePlayerUiState.PlayerPosition>,
         pendingBetPerPlayer: Map<PlayerId, Int>,
@@ -454,8 +453,7 @@ constructor(
         sbPlayerId: PlayerId,
         bbPlayerId: PlayerId,
     ): List<GamePlayerUiState> = sortedPlayerOrder.mapIndexedNotNull { index, playerId ->
-        val basePlayer = basePlayers.find { it.id == playerId }
-            ?: return@mapIndexedNotNull null
+        val playerName = playerNameMap[playerId] ?: return@mapIndexedNotNull null
         val gamePlayer = gamePlayers.find { it.id == playerId }
             ?: return@mapIndexedNotNull null
         val playerPosition: GamePlayerUiState.PlayerPosition = positions[index]
@@ -466,7 +464,7 @@ constructor(
         )
 
         getGamePlayerUiState(
-            basePlayer = basePlayer,
+            playerName = playerName,
             betViewMode = betViewMode,
             gamePlayer = gamePlayer,
             minBetSize = minBetSize,
@@ -483,7 +481,7 @@ constructor(
     }
 
     private fun getGamePlayerUiState(
-        basePlayer: PlayerBase,
+        playerName: String,
         betViewMode: BetViewMode,
         gamePlayer: GamePlayer,
         minBetSize: Int,
@@ -497,7 +495,7 @@ constructor(
         bbPlayerId: PlayerId,
         actionType: BetPhaseActionType?,
     ): GamePlayerUiState = GamePlayerUiState(
-        playerName = basePlayer.name,
+        playerName = playerName,
         stack = when (betViewMode) {
             BetViewMode.Number -> {
                 StringSource("%,d".format(gamePlayer.stack))
@@ -581,7 +579,7 @@ constructor(
         lastPhase: Phase,
         sortedPlayerOrder: List<PlayerId>,
         btnPlayerId: PlayerId,
-        basePlayers: List<PlayerBase>,
+        playerNameMap: Map<PlayerId, String>,
         gamePlayers: List<GamePlayer>,
         positions: List<GamePlayerUiState.PlayerPosition>,
         phaseList: List<Phase>,
@@ -600,7 +598,7 @@ constructor(
             gameMainPanelUiState = GameMainPanelUiState(
                 players = gamePlayerUiStates(
                     sortedPlayerOrder = sortedPlayerOrder,
-                    basePlayers = basePlayers,
+                    playerNameMap = playerNameMap,
                     gamePlayers = gamePlayers,
                     positions = positions,
                     pendingBetPerPlayer = pendingBetPerPlayer,

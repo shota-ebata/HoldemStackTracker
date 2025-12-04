@@ -144,7 +144,7 @@ constructor(
                                         }.labelResId()),
                                     blindText = StringSource(table.rule.blindText()),
                                     hostName = table.hostPlayerId.let { hostPlayerId ->
-                                        table.basePlayers.find { it.id == hostPlayerId }?.name.orEmpty()
+                                        table.getPlayerName(hostPlayerId).orEmpty()
                                     },
                                     isJoined = true,
                                     playerSize = "${table.playerOrder.size}/10", // FIXME: 10人上限がハードコーディングされている,
