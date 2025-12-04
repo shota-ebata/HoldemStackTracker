@@ -642,7 +642,7 @@ constructor(
     ) + table.playerOrderWithoutLeaved.map { playerId ->
         SelectBtnPlayerDialogUiState.BtnChosenUiState.Player(
             id = playerId,
-            name = table.basePlayers.find { it.id == playerId }!!.name,
+            name = table.getPlayerName(playerId)!!,
             isSelected = btnPlayerId == playerId
         )
     }
