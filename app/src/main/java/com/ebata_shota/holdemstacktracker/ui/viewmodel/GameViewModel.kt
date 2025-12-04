@@ -336,11 +336,11 @@ constructor(
                     }
 
                     is Phase.End -> {
+                        // TODO: UseCase化
                         if (table.hostPlayerId == myPlayerId) {
                             // Tableにもスタックを反映
                             var basePlayers = table.basePlayers
                             game.players.forEach { gamePlayer ->
-                                gamePlayer.stack
                                 basePlayers = basePlayers.mapAtFind({ it.id == gamePlayer.id }) {
                                     it.copy(stack = gamePlayer.stack)
                                 }
@@ -381,6 +381,8 @@ constructor(
                     && game.phaseList.lastOrNull() is Phase.Standby
                     && table.tableStatus == TableStatus.PREPARING
                 ) {
+                    // TODO: 準備画面に戻らなくちゃいけない条件があるはず。
+                    //  その時は強制戻るにしたほうがいいのでは？(メンバー増えたとか)
                     // ホストでスタンバイフェーズでTableが準備中なら次の画面への
                     _shouldShowEnterNextGameDialog.update { true }
                 }
