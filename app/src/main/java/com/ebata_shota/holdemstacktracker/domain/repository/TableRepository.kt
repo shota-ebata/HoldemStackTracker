@@ -1,5 +1,6 @@
 package com.ebata_shota.holdemstacktracker.domain.repository
 
+import com.ebata_shota.holdemstacktracker.domain.model.PlayerBase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.Table
@@ -20,6 +21,18 @@ interface TableRepository {
     fun stopCollectTableFlow()
     // FIXME: updateTimeとかversionの更新処理を行うUseCaseを用意したほうがいいね
     suspend fun sendTable(table: Table)
+
+    suspend fun addBasePlayer(
+        tableId: TableId,
+        playerId: PlayerId,
+        name: String,
+    )
+
+    suspend fun addPlayerOrder(
+        tableId: TableId,
+        newPlayerOrder: List<PlayerId>,
+        addPlayerIds: Map<String, PlayerId>,
+    )
 
     suspend fun isExistsTable(tableId: TableId): Boolean
 

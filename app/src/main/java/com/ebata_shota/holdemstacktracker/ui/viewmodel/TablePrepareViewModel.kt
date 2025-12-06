@@ -360,7 +360,7 @@ constructor(
                 playerEditDialogUiState = PlayerEditDialogUiState(
                     playerId = basePlayer.id,
                     playerName = StringSource(basePlayer.name),
-                    checkedLeaved = basePlayer.isLeaved,
+                    checkedLeaved = !basePlayer.isSeated,
                     stackValue = TextFieldValue(stackText)
                 )
             )
@@ -473,7 +473,7 @@ constructor(
                 }) { playerBase ->
                     val stackSize = playerEditDialogUiState.stackValue.text.toIntOrZero()
                     playerBase.copy(
-                        isLeaved = playerEditDialogUiState.checkedLeaved,
+                        isSeated = !playerEditDialogUiState.checkedLeaved,
                         stack = max(stackSize, 0)
                     )
                 },

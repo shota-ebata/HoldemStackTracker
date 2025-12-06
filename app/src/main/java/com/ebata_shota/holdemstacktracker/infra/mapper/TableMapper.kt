@@ -7,6 +7,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
+import com.google.firebase.database.DataSnapshot
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,7 +18,7 @@ class TableMapper
 constructor() {
 
     companion object {
-        private const val TABLE_VERSION = "tableVersion"
+        const val TABLE_VERSION = "tableVersion"
         private const val HOST_APP_VERSION_CODE = "hostAppVersionCode"
         private const val HOST_PLAYER_ID = "hostPlayerId"
         private const val POT_MANAGER_ID = "potManagerId"
@@ -27,28 +28,28 @@ constructor() {
         private const val RULE_SB_SIZE = "sbSize"
         private const val RULE_BB_SIZE = "bbSize"
         private const val RULE_DEFAULT_STACK = "defaultStack"
-        private const val BASE_PLAYERS = "basePlayers"
-        private const val WAIT_PLAYER_IDS = "waitPlayerIds"
-        private const val PLAYER_ID = "playerId"
-        private const val PLAYER_NAME = "name"
-        private const val PLAYER_STACK = "stack"
-        private const val PLAYER_IS_LEAVED = "isLeaved"
-        private const val PLAYER_ORDER = "playerOrder"
+        const val BASE_PLAYER_IDS = "basePlayerIds"
+        const val PLAYER_NAME_INFO = "playerNameInfo"
+        const val PLAYER_SEATED_INFO = "playerSeatedInfo"
+        const val PLAYER_CONNECTION_INFO = "playerConnectionInfo"
+        const val PLAYER_STACK_INFO = "playerStackInfo"
+        const val WAIT_PLAYER_IDS = "waitPlayerIds"
+        const val PLAYER_ORDER = "playerOrder"
         private const val BTN_PLAYER_ID = "btnPlayerId"
         private const val TABLE_STATUS = "tableStatus"
         private const val CURRENT_TABLE_ID = "currentTableId"
         private const val START_TIME = "startTime"
         private const val TABLE_CREATE_TIME = "tableCreateTime"
-        private const val UPDATE_TIME = "updateTime"
+        const val UPDATE_TIME = "updateTime"
     }
 
     private fun Any.getInt() = (this as? Long)?.toInt()
 
     fun mapToTableState(
         tableId: TableId,
-        tableMap: Map<*, *>,
-        connectionPlayerIds: List<PlayerId>
+        tableSnapshot: DataSnapshot,
     ): Table {
+        val tableMap: Map<*, *> = tableSnapshot.value as Map<*, *>
         return Table(
             id = tableId,
             version = tableMap[TABLE_VERSION] as Long,
@@ -56,9 +57,18 @@ constructor() {
             hostPlayerId = PlayerId(tableMap[HOST_PLAYER_ID] as String),
             potManagerPlayerId = PlayerId(tableMap[POT_MANAGER_ID] as String),
             rule = mapToRuleState(tableMap[RULE] as Map<*, *>),
-            basePlayers = mapToBasePlayers(tableMap[BASE_PLAYERS] as List<*>),
-            waitPlayerIds = (tableMap[WAIT_PLAYER_IDS] as? List<*>)?.map { PlayerId(it as String) } ?: emptyList(),
-            connectionPlayerIds = connectionPlayerIds,
+            basePlayers = mapToBasePlayers(
+                basePlayerIds = tableSnapshot.child(BASE_PLAYER_IDS).children.map {
+                    PlayerId(it.value as String)
+                },
+                playerNameInfoMap = tableMap[PLAYER_NAME_INFO] as Map<*, *>,
+                platerSeatedInfoMap = tableMap[PLAYER_SEATED_INFO] as Map<*, *>,
+                connectionInfoMap = tableMap[PLAYER_CONNECTION_INFO] as Map<*, *>,
+                playerStackInfoMap = tableMap[PLAYER_STACK_INFO] as Map<*, *>,
+            ),
+            waitPlayerIds = tableSnapshot.child(WAIT_PLAYER_IDS).children.associate {
+                it.key!! to PlayerId(it.value!! as String)
+            },
             playerOrder = (tableMap[PLAYER_ORDER] as List<*>).map { PlayerId(it as String) },
             btnPlayerId = PlayerId(tableMap[BTN_PLAYER_ID] as String),
             tableStatus = TableStatus.of(tableMap[TABLE_STATUS] as String),
@@ -71,13 +81,26 @@ constructor() {
         )
     }
 
-    private fun mapToBasePlayers(basePlayers: List<*>) = basePlayers.map { it as Map<*, *> }.map {
-        PlayerBase(
-            id = PlayerId(it[PLAYER_ID] as String),
-            name = it[PLAYER_NAME] as String,
-            stack = it[PLAYER_STACK]?.getInt() ?: 0,
-            isLeaved = (it[PLAYER_IS_LEAVED] as? Boolean) ?: false
-        )
+    private fun mapToBasePlayers(
+        basePlayerIds: List<PlayerId>,
+        playerNameInfoMap: Map<*, *>,
+        platerSeatedInfoMap: Map<*, *>,
+        connectionInfoMap: Map<*, *>,
+        playerStackInfoMap: Map<*, *>,
+    ): List<PlayerBase> {
+        return basePlayerIds.map { playerId ->
+            val connectionInfo = (connectionInfoMap[playerId.value] as? Map<*, *>).orEmpty()
+            PlayerBase(
+                id = playerId,
+                name = playerNameInfoMap[playerId.value] as String,
+                stack = playerStackInfoMap[playerId.value]?.getInt() ?: 0,
+                isSeated = (platerSeatedInfoMap[playerId.value] as? Boolean) ?: true,
+                isConnected = (platerSeatedInfoMap[playerId.value] as? Boolean) ?: false,
+                lostConnectTimestamp = (platerSeatedInfoMap[playerId.value] as? Long)?.let {
+                    Instant.ofEpochMilli(it)
+                },
+            )
+        }
     }
 
     private fun mapToRuleState(rule: Map<*, *>) = when (val ruleType = rule[RULE_TYPE] as String) {
@@ -108,13 +131,20 @@ constructor() {
                 )
             }
         },
-        BASE_PLAYERS to table.basePlayers.map {
-            hashMapOf(
-                PLAYER_ID to it.id.value,
-                PLAYER_NAME to it.name,
-                PLAYER_STACK to it.stack,
-                PLAYER_IS_LEAVED to it.isLeaved,
-            )
+//        BASE_PLAYER_IDS to table.basePlayers.map {
+//            it.id.value
+//        },
+        PLAYER_NAME_INFO to table.basePlayers.associate {
+            it.id.value to it.name
+        },
+        PLAYER_STACK_INFO to table.basePlayers.associate {
+            it.id.value to it.stack
+        },
+        PLAYER_SEATED_INFO to table.basePlayers.associate {
+            it.id.value to it.isSeated
+        },
+        PLAYER_CONNECTION_INFO to table.basePlayers.associate {
+            it.id.value to it.isConnected
         },
         WAIT_PLAYER_IDS to table.waitPlayerIds.map {
             it.value

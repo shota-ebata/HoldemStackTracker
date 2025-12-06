@@ -10,8 +10,7 @@ data class Table(
     val potManagerPlayerId: PlayerId,
     val rule: Rule,
     val basePlayers: List<PlayerBase>,
-    val waitPlayerIds: List<PlayerId>,
-    val connectionPlayerIds: List<PlayerId>, // 現在接続しているプレイヤーIDリスト 別テーブルから取得している
+    val waitPlayerIds: Map<String, PlayerId>,
     val playerOrder: List<PlayerId>,
     val btnPlayerId: PlayerId,
     val tableStatus: TableStatus,
@@ -21,17 +20,17 @@ data class Table(
     val updateTime: Instant
 ) {
     /**
-     * 退席しているプレイヤーを除いたプレイヤー順リスト
+     * 離席しているプレイヤーを除いたプレイヤー順リスト
      */
     val playerOrderWithoutLeaved: List<PlayerId> = playerOrder.filter {
-        basePlayers.find { playerBase -> playerBase.id == it }?.isLeaved == false
+        basePlayers.find { playerBase -> playerBase.id == it }?.isSeated == true
     }
 
     /**
-     * 堆積しているプレイヤーを除いたBasePlayerリスト
+     * 離席しているプレイヤーを除いたBasePlayerリスト
      */
     val basePlayersWithoutLeaved: List<PlayerBase> = basePlayers.filter {
-        !it.isLeaved && playerOrder.contains(it.id)
+        it.isSeated && playerOrder.contains(it.id)
     }
 
     fun getPlayerName(playerId: PlayerId): String? {

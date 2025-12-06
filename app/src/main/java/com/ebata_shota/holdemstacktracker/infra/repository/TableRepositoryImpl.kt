@@ -15,11 +15,23 @@ import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthReposito
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.BASE_PLAYER_IDS
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.PLAYER_CONNECTION_INFO
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.PLAYER_NAME_INFO
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.PLAYER_ORDER
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.PLAYER_SEATED_INFO
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.PLAYER_STACK_INFO
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.TABLE_VERSION
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.UPDATE_TIME
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.WAIT_PLAYER_IDS
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.MutableData
 import com.google.firebase.database.OnDisconnect
+import com.google.firebase.database.ServerValue
+import com.google.firebase.database.Transaction
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -30,11 +42,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.time.Instant
@@ -62,15 +74,6 @@ constructor(
         }
     )
 
-    @Suppress("KotlinConstantConditions")
-    private val tableConnectionRef: DatabaseReference = firebaseDatabase.getReference(
-        if (BuildConfig.BUILD_TYPE == "debug") {
-            "debug_table_connections"
-        } else {
-            "table_connections"
-        }
-    )
-
     private var myTableConnectionRef: DatabaseReference? = null
     private var myTableConnectionRefOnDisconnect: OnDisconnect? = null
 
@@ -79,7 +82,7 @@ constructor(
 
     override suspend fun createNewTable(
         tableId: TableId,
-        rule: Rule
+        rule: Rule,
     ) {
         withContext(ioDispatcher) {
             val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
@@ -99,18 +102,41 @@ constructor(
                         id = myPlayerId,
                         name = myName,
                         stack = rule.defaultStack,
-                        isLeaved = false,
+                        isSeated = true,
+                        isConnected = false, // falseにする。true化は別の場所でやるので。
+                        lostConnectTimestamp = null,
                     )
                 ),
-                waitPlayerIds = emptyList(),
-                connectionPlayerIds = emptyList(),
+                waitPlayerIds = emptyMap(),
                 tableStatus = TableStatus.PREPARING,
                 currentGameId = null,
                 startTime = null,
                 tableCreateTime = tableCreateTime,
                 updateTime = tableCreateTime
             )
-            sendTable(table)
+            val tableMap = tableMapper.toMap(table)
+            val tableRef = tablesRef.child(table.id.value)
+            val basePlayerIdsKey = tableRef
+                .child(BASE_PLAYER_IDS)
+                .push().key!!
+            tableRef.runTransaction(object : Transaction.Handler {
+                override fun doTransaction(currentData: MutableData): Transaction.Result {
+                    currentData.setValue(tableMap)
+                    currentData
+                        .child(BASE_PLAYER_IDS)
+                        .child(basePlayerIdsKey)
+                        .setValue(myPlayerId.value)
+                    return Transaction.success(currentData)
+                }
+
+                override fun onComplete(
+                    error: DatabaseError?,
+                    committed: Boolean,
+                    currentData: DataSnapshot?,
+                ) {
+                    // TODO: ログ
+                }
+            })
         }
     }
 
@@ -128,37 +154,29 @@ constructor(
         stopCollectTableFlow()
         currentTableId = tableId
         collectTableJob = appCoroutineScope.launch(ioDispatcher) {
-            startCurrentTableConnectionIfNeed(tableId)
+            startCurrentTableConnectionIfNeed(tableId) // TODO: いらんかも、いらんなら消す
 
             launch {
-                combine(
-                    firebaseDatabaseTableFlow(tableId),
-                    firebaseDatabaseTableConnectionFlow(tableId)
-                ) { tableSnapshot: DataSnapshot, tableConnectionSnapshot: DataSnapshot ->
-                    if (tableSnapshot.exists() && tableConnectionSnapshot.exists()) {
-                        val connectionPlayerIds: List<PlayerId> = tableConnectionSnapshot.children
-                            .map { it.key!! }
-                            .map { PlayerId(it) }
-                        val tableMap: Map<*, *> = tableSnapshot.value as Map<*, *>
+                firebaseDatabaseTableFlow(tableId).collect { tableSnapshot: DataSnapshot ->
+                    if (tableSnapshot.exists()) {
                         val tableState = tableMapper.mapToTableState(
                             tableId = tableId,
-                            tableMap = tableMap,
-                            connectionPlayerIds = connectionPlayerIds
+                            tableSnapshot = tableSnapshot,
                         )
                         _tableStateFlow.emit(Result.success(tableState))
                     } else {
                         // FIXME: 例外の種類を豊富にしたい
                         _tableStateFlow.emit(Result.failure(NotFoundTableException()))
                     }
-                }.collect()
+                }
             }
         }
     }
 
     override fun stopCollectTableFlow() {
         myTableConnectionRefOnDisconnect?.cancel()
-        myTableConnectionRef?.setValue(null)
-        myTableConnectionRef?.onDisconnect()
+        myTableConnectionRefOnDisconnect = null
+        myTableConnectionRef?.setValue(ServerValue.TIMESTAMP)
         myTableConnectionRef = null
         // TODO: 旧テーブルを離席状態にするなど
         _tableStateFlow.update { null }
@@ -170,22 +188,160 @@ constructor(
     }
 
     override suspend fun sendTable(
-        table: Table
+        table: Table,
     ) {
         val tableMap = tableMapper.toMap(table)
         val tableRef = tablesRef.child(table.id.value)
         tableRef.setValue(tableMap)
     }
 
-    override fun startCurrentTableConnectionIfNeed(tableId: TableId) {
-        if (tableConnectionJob != null) {
-            // すでに接続中の場合は無視
+    override suspend fun addBasePlayer(
+        tableId: TableId,
+        playerId: PlayerId,
+        name: String,
+    ) {
+        val table = tableStateFlow.value?.getOrNull() ?: return
+        if (tableId != table.id) {
             return
         }
+        val tableRef = tablesRef.child(tableId.value)
+
+        val waitPlayerIdsKey = tableRef
+            .child(WAIT_PLAYER_IDS)
+            .push().key!!
+
+        val basePlayerIdsKey = tableRef
+            .child(BASE_PLAYER_IDS)
+            .push().key!!
+
+        tableRef.runTransaction(object : Transaction.Handler {
+            override fun doTransaction(currentData: MutableData): Transaction.Result {
+                currentData
+                    .child(PLAYER_NAME_INFO)
+                    .child(playerId.value)
+                    .setValue(name)
+                currentData
+                    .child(PLAYER_SEATED_INFO)
+                    .child(playerId.value)
+                    .setValue(true)
+                currentData
+                    .child(PLAYER_STACK_INFO)
+                    .child(playerId.value)
+                    .setValue(table.rule.defaultStack)
+                currentData
+                    .child(WAIT_PLAYER_IDS)
+                    .child(waitPlayerIdsKey)
+                    .setValue(playerId.value)
+                currentData
+                    .child(BASE_PLAYER_IDS)
+                    .child(basePlayerIdsKey)
+                    .setValue(playerId.value)
+                updateVersionAndUpdateTimeInTransaction(currentData)
+                return Transaction.success(currentData)
+            }
+
+            override fun onComplete(
+                error: DatabaseError?,
+                committed: Boolean,
+                currentData: DataSnapshot?,
+            ) {
+            }
+
+        })
+    }
+
+    override suspend fun addPlayerOrder(
+        tableId: TableId,
+        newPlayerOrder: List<PlayerId>,
+        addPlayerIds: Map<String, PlayerId>,
+    ) {
+        val table = tableStateFlow.value?.getOrNull() ?: return
+        if (tableId != table.id) {
+            return
+        }
+
+        val tableRef = tablesRef.child(tableId.value)
+
+        tableRef.runTransaction(object : Transaction.Handler {
+            override fun doTransaction(currentData: MutableData): Transaction.Result {
+                addPlayerIds.forEach {
+                    currentData
+                        .child(WAIT_PLAYER_IDS)
+                        .child(it.key)
+                        .value = null
+                }
+
+                currentData
+                    .child(PLAYER_ORDER)
+                    .setValue(newPlayerOrder.map { it.value })
+
+                updateVersionAndUpdateTimeInTransaction(currentData)
+                return Transaction.success(currentData)
+            }
+
+            override fun onComplete(
+                error: DatabaseError?,
+                committed: Boolean,
+                currentData: DataSnapshot?,
+            ) {
+
+            }
+        })
+    }
+
+    private fun updateVersionAndUpdateTimeInTransaction(currentData: MutableData) {
+        val currentVersion = currentData.child(TABLE_VERSION).value as Long
+        currentData.child(TABLE_VERSION).value = currentVersion + 1
+        // ServerValue.TIMESTAMP だと無駄に2回発火するっぽい？
+        // ので、 Instant.now().toEpochMilli()を送っている
+        currentData.child(UPDATE_TIME).value = Instant.now().toEpochMilli()
+    }
+
+    private val connectionMutex = Mutex()
+    override fun startCurrentTableConnectionIfNeed(tableId: TableId) {
         if (currentTableId != null && currentTableId == tableId) {
-            tableConnectionJob = appCoroutineScope.launch(ioDispatcher) {
-                val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
-                myTableConnectionRef = createTableConnectionRef(tableId, myPlayerId)
+            appCoroutineScope.launch(ioDispatcher) {
+                connectionMutex.withLock {
+                    val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+                    val isConnected = (tablesRef
+                        .child(tableId.value)
+                        .child(PLAYER_CONNECTION_INFO)
+                        .child(myPlayerId.value)
+                        .get()
+                        .await()
+                        .value as? Boolean) ?: false
+                    if (isConnected) {
+                        // すでに接続中の場合は無視
+                        return@launch
+                    }
+                    tablesRef.child(tableId.value).also { ref ->
+                        ref.runTransaction(object : Transaction.Handler {
+                            override fun doTransaction(currentData: MutableData): Transaction.Result {
+                                currentData
+                                    .child(PLAYER_CONNECTION_INFO)
+                                    .child(myPlayerId.value)
+                                    .value = true
+                                updateVersionAndUpdateTimeInTransaction(currentData)
+                                return Transaction.success(currentData)
+                            }
+
+                            override fun onComplete(
+                                error: DatabaseError?,
+                                committed: Boolean,
+                                currentData: DataSnapshot?,
+                            ) {
+                                // TODO: ログ
+                            }
+                        })
+                    }
+                    myTableConnectionRef = createTableConnectionRef(
+                        tableId = tableId,
+                        myPlayerId = myPlayerId,
+                    )
+                    myTableConnectionRefOnDisconnect = myTableConnectionRef?.onDisconnect()?.also {
+                        it.setValue(ServerValue.TIMESTAMP)
+                    }
+                }
             }
         }
     }
@@ -193,29 +349,16 @@ constructor(
     private fun createTableConnectionRef(
         tableId: TableId,
         myPlayerId: PlayerId,
-    ): DatabaseReference = tableConnectionRef.child(tableId.value).child(myPlayerId.value).also {
-        it.setValue(true)
-        myTableConnectionRefOnDisconnect = createTableOnDisconnect(myPlayerId)
-    }
-
-    private fun createTableOnDisconnect(myPlayerId: PlayerId): OnDisconnect? =
-        myTableConnectionRef?.onDisconnect()?.also { onDisconnect ->
-            onDisconnect.removeValue { error, _ ->
-                if (error != null) {
-                    Log.e(
-                        "TableRepository",
-                        "Failed to set onDisconnect removeValue: ${error.message} $myPlayerId"
-                    )
-                    tableConnectionJob = null
-                }
-            }
-        }
+    ): DatabaseReference = tablesRef
+        .child(tableId.value)
+        .child(PLAYER_CONNECTION_INFO)
+        .child(myPlayerId.value)
 
     override fun stopCurrentTableCurrentTableConnection(tableId: TableId) {
         if (currentTableId != null && currentTableId == tableId) {
             myTableConnectionRefOnDisconnect?.cancel()
-            myTableConnectionRef?.setValue(null)
-            myTableConnectionRef?.onDisconnect()
+            myTableConnectionRefOnDisconnect = null
+            myTableConnectionRef?.setValue(ServerValue.TIMESTAMP)
             myTableConnectionRef = null
         }
     }
@@ -237,27 +380,6 @@ constructor(
         }
     }
 
-    private fun firebaseDatabaseTableConnectionFlow(tableId: TableId): Flow<DataSnapshot> =
-        callbackFlow {
-            val listener = object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    trySend(snapshot)
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.d(
-                        "TableRepository",
-                        "Failed to read table connection data: ${error.message}"
-                    )
-                }
-            }
-            tableConnectionRef.child(tableId.value).addValueEventListener(listener)
-
-            awaitClose {
-                tableConnectionRef.child(tableId.value).removeEventListener(listener)
-            }
-        }
-
     override suspend fun isExistsTable(tableId: TableId): Boolean {
         return withContext(ioDispatcher) {
             tablesRef.child(tableId.value)
@@ -271,8 +393,10 @@ constructor(
         tableId: TableId,
         indexOfBasePlayers: Long,
         playerId: PlayerId,
-        name: String
+        name: String,
     ) {
+        // TODO: トランザクション
+        Log.d("hoge", "renameTableBasePlayer")
         val tableRef = tablesRef.child(tableId.value)
         val nameRef = tableRef.child("basePlayers/${indexOfBasePlayers}/name")
         nameRef.setValue(name)
@@ -282,8 +406,10 @@ constructor(
         tableId: TableId,
         indexOfWaitPlayers: Long,
         playerId: PlayerId,
-        name: String
+        name: String,
     ) {
+        // TODO: トランザクション
+        Log.d("hoge", "renameTableWaitPlayer")
         val tableRef = tablesRef.child(tableId.value)
         val nameRef = tableRef.child("waitPlayers/${indexOfWaitPlayers}/name")
         nameRef.setValue(name)

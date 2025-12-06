@@ -40,7 +40,7 @@ constructor() {
                         playerId = playerId,
                         playerName = player.name,
                         stackSize = playerStackString,
-                        isLeaved = player.isLeaved,
+                        isLeaved = !player.isSeated,
                         isEditable = isHost
                     )
                 },
