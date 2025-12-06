@@ -45,7 +45,6 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.SeatOutPlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.SetPotSettlementInfoUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.UpdateTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.AddBetPhaseActionInToGameUseCaseImpl
@@ -93,7 +92,6 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.JoinTableUseCaseIm
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.MovePositionUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.RemovePlayersUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.RenameTablePlayerUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.SeatOutPlayersUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.SetPotSettlementInfoUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.UpdateTableUseCaseImpl
 import dagger.Binds
@@ -205,9 +203,6 @@ interface UseCaseModule {
 
     @Binds
     fun bindHasErrorChipSizeTextValueUseCase(useCase: HasErrorChipSizeTextValueUseCaseImpl): HasErrorChipSizeTextValueUseCase
-
-    @Binds
-    fun bindSeatOutPlayersUseCase(useCase: SeatOutPlayersUseCaseImpl): SeatOutPlayersUseCase
 
     @Binds
     fun bindGetAddedAutoActionsGameUseCase(useCase: GetAddedAutoActionsGameUseCaseImpl): GetAddedAutoActionsGameUseCase
