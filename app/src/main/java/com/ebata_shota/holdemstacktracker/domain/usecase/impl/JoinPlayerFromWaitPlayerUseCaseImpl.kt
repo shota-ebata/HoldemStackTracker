@@ -13,6 +13,7 @@ constructor(
 ) : JoinPlayerFromWaitPlayerUseCase {
 
     override suspend fun invoke(table: Table) {
+
         val newPlayerOrder = table.playerOrder.toMutableList()
         if (table.waitPlayerIds.isEmpty() || newPlayerOrder.size >= MAX_PLAYER_SIZE) {
             // 待機中だったり、これ以上追加できないなら何もしない
@@ -32,11 +33,13 @@ constructor(
                 }
             }
         }
-        tableRepository.addPlayerOrder(
-            tableId = table.id,
-            newPlayerOrder = newPlayerOrder,
-            addPlayerIds = addPlayerIds,
-        )
+        if (addPlayerIds.isNotEmpty()) {
+            tableRepository.addPlayerOrder(
+                tableId = table.id,
+                newPlayerOrder = newPlayerOrder,
+                addPlayerIds = addPlayerIds,
+            )
+        }
     }
 
     companion object {

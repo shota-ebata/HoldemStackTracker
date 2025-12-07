@@ -22,12 +22,12 @@ constructor() {
         private const val HOST_APP_VERSION_CODE = "hostAppVersionCode"
         private const val HOST_PLAYER_ID = "hostPlayerId"
         private const val POT_MANAGER_ID = "potManagerId"
-        private const val RULE = "rule"
-        private const val RULE_TYPE = "type"
-        private const val RULE_TYPE_RING_GAME = "RingGame"
-        private const val RULE_SB_SIZE = "sbSize"
-        private const val RULE_BB_SIZE = "bbSize"
-        private const val RULE_DEFAULT_STACK = "defaultStack"
+        const val RULE = "rule"
+        const val RULE_TYPE = "type"
+        const val RULE_TYPE_RING_GAME = "RingGame"
+        const val RULE_SB_SIZE = "sbSize"
+        const val RULE_BB_SIZE = "bbSize"
+        const val RULE_DEFAULT_STACK = "defaultStack"
         const val BASE_PLAYER_IDS = "basePlayerIds"
         const val PLAYER_NAME_INFO = "playerNameInfo"
         const val PLAYER_SEATED_INFO = "playerSeatedInfo"
@@ -36,8 +36,8 @@ constructor() {
         const val WAIT_PLAYER_IDS = "waitPlayerIds"
         const val PLAYER_ORDER = "playerOrder"
         private const val BTN_PLAYER_ID = "btnPlayerId"
-        private const val TABLE_STATUS = "tableStatus"
-        private const val CURRENT_TABLE_ID = "currentTableId"
+        const val TABLE_STATUS = "tableStatus"
+        const val CURRENT_GAME_ID = "currentGameId"
         private const val START_TIME = "startTime"
         private const val TABLE_CREATE_TIME = "tableCreateTime"
         const val UPDATE_TIME = "updateTime"
@@ -72,7 +72,7 @@ constructor() {
             playerOrder = (tableMap[PLAYER_ORDER] as List<*>).map { PlayerId(it as String) },
             btnPlayerId = PlayerId(tableMap[BTN_PLAYER_ID] as String),
             tableStatus = TableStatus.of(tableMap[TABLE_STATUS] as String),
-            currentGameId = (tableMap[CURRENT_TABLE_ID] as? String)?.let { GameId(it) },
+            currentGameId = (tableMap[CURRENT_GAME_ID] as? String)?.let { GameId(it) },
             startTime = tableMap.getOrDefault(START_TIME, null)?.let {
                 Instant.ofEpochMilli(it as Long)
             },
@@ -89,14 +89,13 @@ constructor() {
         playerStackInfoMap: Map<*, *>,
     ): List<PlayerBase> {
         return basePlayerIds.map { playerId ->
-            val connectionInfo = (connectionInfoMap[playerId.value] as? Map<*, *>).orEmpty()
             PlayerBase(
                 id = playerId,
                 name = playerNameInfoMap[playerId.value] as String,
                 stack = playerStackInfoMap[playerId.value]?.getInt() ?: 0,
                 isSeated = (platerSeatedInfoMap[playerId.value] as? Boolean) ?: true,
-                isConnected = (platerSeatedInfoMap[playerId.value] as? Boolean) ?: false,
-                lostConnectTimestamp = (platerSeatedInfoMap[playerId.value] as? Long)?.let {
+                isConnected = (connectionInfoMap[playerId.value]as? Boolean) ?: false,
+                lostConnectTimestamp = (connectionInfoMap[playerId.value] as? Long)?.let {
                     Instant.ofEpochMilli(it)
                 },
             )
@@ -131,9 +130,6 @@ constructor() {
                 )
             }
         },
-//        BASE_PLAYER_IDS to table.basePlayers.map {
-//            it.id.value
-//        },
         PLAYER_NAME_INFO to table.basePlayers.associate {
             it.id.value to it.name
         },
@@ -155,7 +151,7 @@ constructor() {
         BTN_PLAYER_ID to table.btnPlayerId.value,
         TABLE_STATUS to table.tableStatus.name,
         table.currentGameId?.let {
-            CURRENT_TABLE_ID to it.value
+            CURRENT_GAME_ID to it.value
         },
         table.startTime?.let {
             START_TIME to it.toEpochMilli()

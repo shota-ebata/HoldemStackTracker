@@ -48,7 +48,6 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.IsCurrentPlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsEnableCheckUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.SetPotSettlementInfoUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.UpdateTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.util.combine
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameSettingsContentUiState
@@ -93,7 +92,6 @@ class GameViewModel
 @Inject
 constructor(
     savedStateHandle: SavedStateHandle,
-    updateTableUseCase: UpdateTableUseCase,
     private val tableRepository: TableRepository,
     private val gameRepository: GameRepository,
     private val prefRepository: PrefRepository,
@@ -318,7 +316,10 @@ constructor(
                     is Phase.Standby -> {
                         if (table.hostPlayerId == myPlayerId) {
                             // スタンバイフェーズになったら、テーブルを準備中にする
-                            updateTableUseCase.invoke(table.copy(tableStatus = TableStatus.PREPARING))
+                            tableRepository.updateTableStatus(
+                                tableId = table.id,
+                                tableStatus = TableStatus.PREPARING,
+                            )
                         }
                     }
 
@@ -339,16 +340,12 @@ constructor(
                         // TODO: UseCase化
                         if (table.hostPlayerId == myPlayerId) {
                             // Tableにもスタックを反映
-                            var basePlayers = table.basePlayers
-                            game.players.forEach { gamePlayer ->
-                                basePlayers = basePlayers.mapAtFind({ it.id == gamePlayer.id }) {
-                                    it.copy(stack = gamePlayer.stack)
-                                }
+                            val newStacks = game.players.associate { gamePlayer ->
+                                gamePlayer.id to gamePlayer.stack
                             }
-                            updateTableUseCase.invoke(
-                                table.copy(
-                                    basePlayers = basePlayers
-                                )
+                            tableRepository.updateBasePlayerStacks(
+                                tableId = table.id,
+                                stacks = newStacks
                             )
 
                             val nextPhase = getNextPhase.invoke(

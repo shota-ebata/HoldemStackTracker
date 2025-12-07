@@ -37,7 +37,6 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.UpdateTableUseCase
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.EditGameRuleDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogUiState
@@ -74,7 +73,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.max
 
 @HiltViewModel
 class TablePrepareViewModel
@@ -87,7 +85,6 @@ constructor(
     private val qrBitmapRepository: QrBitmapRepository,
     private val prefRepository: PrefRepository,
     private val defaultRuleStateOfRingRepository: DefaultRuleStateOfRingRepository,
-    private val updateTableUseCase: UpdateTableUseCase,
     private val joinTable: JoinTableUseCase,
     private val createNewGame: CreateNewGameUseCase,
     private val movePositionUseCase: MovePositionUseCase,
@@ -235,6 +232,7 @@ constructor(
                 firebaseAuthRepository.myPlayerIdFlow,
                 prefRepository.myName.filterNotNull(),
             ) { table, myPlayerId, myName ->
+
                 if (table.hostPlayerId == myPlayerId) {
                     // ホストのときに
                     when (table.tableStatus) {
@@ -467,18 +465,28 @@ constructor(
         val playerEditDialogUiState = dialogUiState.value.playerEditDialogUiState ?: return
 
         viewModelScope.launch {
-            val copiedTable = table.copy(
-                basePlayers = table.basePlayers.mapAtFind({ playerBase ->
-                    playerBase.id == playerEditDialogUiState.playerId
-                }) { playerBase ->
-                    val stackSize = playerEditDialogUiState.stackValue.text.toIntOrZero()
-                    playerBase.copy(
-                        isSeated = !playerEditDialogUiState.checkedLeaved,
-                        stack = max(stackSize, 0)
-                    )
-                },
+            val playerId = playerEditDialogUiState.playerId
+            val basePlayer = table.basePlayers.find { it.id == playerId } ?: return@launch
+            val inputStack = playerEditDialogUiState.stackValue.text.toIntOrZero()
+            val newStack: Int? = if (basePlayer.stack != inputStack) {
+                inputStack
+            } else {
+                null
+            }
+
+            val inputIsSeated = !playerEditDialogUiState.checkedLeaved
+            val newIsSeated: Boolean? = if (basePlayer.isSeated != inputIsSeated) {
+                inputIsSeated
+            } else {
+                null
+            }
+
+            tableRepository.updateBasePlayer(
+                tableId = table.id,
+                playerId = playerId,
+                newStack = newStack,
+                newIsSeated = newIsSeated,
             )
-            updateTableUseCase.invoke(copiedTable)
         }
         onDismissRequestPlayerEditDialog()
     }
@@ -781,15 +789,14 @@ constructor(
         } else {
             val table = tableStateFlow.value ?: return
             viewModelScope.launch {
-                val newTable = table.copy(
-                    // FIXME: ルールに応じて
+                tableRepository.updateRule(
+                    tableId = table.id,
                     rule = Rule.RingGame(
                         sbSize = sbSize,
                         bbSize = bbSize,
                         defaultStack = defaultStack,
-                    )
+                    ),
                 )
-                updateTableUseCase.invoke(newTable)
                 onDismissEditGameRuleDialog()
             }
         }

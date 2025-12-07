@@ -5,6 +5,7 @@ import com.ebata_shota.holdemstacktracker.BuildConfig
 import com.ebata_shota.holdemstacktracker.di.annotation.ApplicationScope
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherIO
 import com.ebata_shota.holdemstacktracker.domain.exception.NotFoundTableException
+import com.ebata_shota.holdemstacktracker.domain.model.GameId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerBase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
@@ -16,11 +17,19 @@ import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.BASE_PLAYER_IDS
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.CURRENT_GAME_ID
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.PLAYER_CONNECTION_INFO
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.PLAYER_NAME_INFO
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.PLAYER_ORDER
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.PLAYER_SEATED_INFO
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.PLAYER_STACK_INFO
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.RULE
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.RULE_BB_SIZE
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.RULE_DEFAULT_STACK
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.RULE_SB_SIZE
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.RULE_TYPE
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.RULE_TYPE_RING_GAME
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.TABLE_STATUS
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.TABLE_VERSION
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.UPDATE_TIME
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.WAIT_PLAYER_IDS
@@ -236,7 +245,7 @@ constructor(
                     .child(BASE_PLAYER_IDS)
                     .child(basePlayerIdsKey)
                     .setValue(playerId.value)
-                updateVersionAndUpdateTimeInTransaction(currentData)
+                currentData.updateVersionAndUpdateTimeInTransaction()
                 return Transaction.success(currentData)
             }
 
@@ -275,7 +284,7 @@ constructor(
                     .child(PLAYER_ORDER)
                     .setValue(newPlayerOrder.map { it.value })
 
-                updateVersionAndUpdateTimeInTransaction(currentData)
+                currentData.updateVersionAndUpdateTimeInTransaction()
                 return Transaction.success(currentData)
             }
 
@@ -289,12 +298,188 @@ constructor(
         })
     }
 
-    private fun updateVersionAndUpdateTimeInTransaction(currentData: MutableData) {
-        val currentVersion = currentData.child(TABLE_VERSION).value as Long
-        currentData.child(TABLE_VERSION).value = currentVersion + 1
+    override suspend fun updateBasePlayer(
+        tableId: TableId,
+        playerId: PlayerId,
+        newStack: Int?,
+        newIsSeated: Boolean?,
+    ) {
+        val table = tableStateFlow.value?.getOrNull() ?: return
+        if (tableId != table.id) {
+            return
+        }
+        if (newStack == null && newIsSeated == null) {
+            return
+        }
+        val tableRef = tablesRef.child(tableId.value)
+        tableRef.runTransaction(object : Transaction.Handler {
+            override fun doTransaction(currentData: MutableData): Transaction.Result {
+                if (newStack != null) {
+                    currentData
+                        .child(PLAYER_STACK_INFO)
+                        .child(playerId.value)
+                        .value = newStack
+                }
+                if (newIsSeated != null) {
+                    currentData
+                        .child(PLAYER_SEATED_INFO)
+                        .child(playerId.value)
+                        .value = newIsSeated
+                }
+                currentData.updateVersionAndUpdateTimeInTransaction()
+                return Transaction.success(currentData)
+            }
+
+            override fun onComplete(
+                error: DatabaseError?,
+                committed: Boolean,
+                currentData: DataSnapshot?,
+            ) {
+                // TODO
+            }
+        })
+    }
+
+    override suspend fun updateBasePlayerStacks(
+        tableId: TableId,
+        stacks: Map<PlayerId, Int>,
+    ) {
+        val table = tableStateFlow.value?.getOrNull() ?: return
+        if (tableId != table.id) {
+            return
+        }
+        val tableRef = tablesRef.child(tableId.value)
+        tableRef.runTransaction(object : Transaction.Handler {
+            override fun doTransaction(currentData: MutableData): Transaction.Result {
+                val playerStackInfoRef = currentData.child(PLAYER_STACK_INFO)
+                stacks.forEach { (key, value) ->
+                    playerStackInfoRef.child(key.value).value = value
+                }
+                currentData.updateVersionAndUpdateTimeInTransaction()
+                return Transaction.success(currentData)
+            }
+
+            override fun onComplete(
+                error: DatabaseError?,
+                committed: Boolean,
+                currentData: DataSnapshot?,
+            ) {
+                // TODO
+            }
+        })
+    }
+
+    override suspend fun updatePlayerOrder(
+        tableId: TableId,
+        playerOrder: List<PlayerId>,
+    ) {
+        val table = tableStateFlow.value?.getOrNull() ?: return
+        if (tableId != table.id) {
+            return
+        }
+        val tableRef = tablesRef.child(tableId.value)
+        tableRef.runTransaction(object : Transaction.Handler {
+            override fun doTransaction(currentData: MutableData): Transaction.Result {
+                currentData.child(PLAYER_ORDER).value = playerOrder.map { it.value }
+                currentData.updateVersionAndUpdateTimeInTransaction()
+                return Transaction.success(currentData)
+            }
+
+            override fun onComplete(
+                error: DatabaseError?,
+                committed: Boolean,
+                currentData: DataSnapshot?,
+            ) {
+                // TODO
+            }
+        })
+    }
+
+    override suspend fun updateRule(
+        tableId: TableId,
+        rule: Rule,
+    ) {
+        val table = tableStateFlow.value?.getOrNull() ?: return
+        if (tableId != table.id) {
+            return
+        }
+        val tableRef = tablesRef.child(tableId.value)
+        tableRef.runTransaction(object : Transaction.Handler {
+            override fun doTransaction(currentData: MutableData): Transaction.Result {
+                currentData.child(RULE).value = when (rule) {
+                    is Rule.RingGame -> {
+                        mapOf(
+                            RULE_TYPE to RULE_TYPE_RING_GAME,
+                            RULE_SB_SIZE to rule.sbSize,
+                            RULE_BB_SIZE to rule.bbSize,
+                            RULE_DEFAULT_STACK to rule.defaultStack
+                        )
+                    }
+                }
+                currentData.updateVersionAndUpdateTimeInTransaction()
+                return Transaction.success(currentData)
+            }
+
+            override fun onComplete(
+                error: DatabaseError?,
+                committed: Boolean,
+                currentData: DataSnapshot?,
+            ) {
+                // TODO
+            }
+
+        })
+    }
+
+    override suspend fun updateTableStatus(
+        tableId: TableId,
+        tableStatus: TableStatus,
+        gameId: GameId?,
+    ) {
+        val table = tableStateFlow.value?.getOrNull() ?: return
+        if (tableId != table.id) {
+            return
+        }
+        val tableRef = tablesRef.child(tableId.value)
+
+        tableRef.runTransaction(
+            object : Transaction.Handler {
+                override fun doTransaction(currentData: MutableData): Transaction.Result {
+                    currentData
+                        .child(TABLE_STATUS)
+                        .value = tableStatus.name
+                    if (gameId != null) {
+                        currentData
+                            .child(CURRENT_GAME_ID)
+                            .value = gameId.value
+                    }
+                    currentData.updateVersionAndUpdateTimeInTransaction()
+                    return Transaction.success(currentData)
+                }
+
+                override fun onComplete(
+                    error: DatabaseError?,
+                    committed: Boolean,
+                    currentData: DataSnapshot?,
+                ) {
+                    // TODO
+                }
+
+            }
+        )
+
+    }
+
+    /**
+     * TABLE_VERSIONとUPDATE_TIMEを更新する
+     * TableRefに対してのみ実行できることに注意
+     */
+    private fun MutableData.updateVersionAndUpdateTimeInTransaction() {
+        val currentVersion = child(TABLE_VERSION).value as Long
+        child(TABLE_VERSION).value = currentVersion + 1
         // ServerValue.TIMESTAMP だと無駄に2回発火するっぽい？
         // ので、 Instant.now().toEpochMilli()を送っている
-        currentData.child(UPDATE_TIME).value = Instant.now().toEpochMilli()
+        child(UPDATE_TIME).value = Instant.now().toEpochMilli()
     }
 
     private val connectionMutex = Mutex()
@@ -321,7 +506,7 @@ constructor(
                                     .child(PLAYER_CONNECTION_INFO)
                                     .child(myPlayerId.value)
                                     .value = true
-                                updateVersionAndUpdateTimeInTransaction(currentData)
+                                currentData.updateVersionAndUpdateTimeInTransaction()
                                 return Transaction.success(currentData)
                             }
 
@@ -395,23 +580,29 @@ constructor(
         playerId: PlayerId,
         name: String,
     ) {
-        // TODO: トランザクション
-        Log.d("hoge", "renameTableBasePlayer")
+        val table = tableStateFlow.value?.getOrNull() ?: return
+        if (tableId != table.id) {
+            return
+        }
         val tableRef = tablesRef.child(tableId.value)
-        val nameRef = tableRef.child("basePlayers/${indexOfBasePlayers}/name")
-        nameRef.setValue(name)
-    }
 
-    override suspend fun renameTableWaitPlayer(
-        tableId: TableId,
-        indexOfWaitPlayers: Long,
-        playerId: PlayerId,
-        name: String,
-    ) {
-        // TODO: トランザクション
-        Log.d("hoge", "renameTableWaitPlayer")
-        val tableRef = tablesRef.child(tableId.value)
-        val nameRef = tableRef.child("waitPlayers/${indexOfWaitPlayers}/name")
-        nameRef.setValue(name)
+        tableRef.runTransaction(object : Transaction.Handler {
+            override fun doTransaction(currentData: MutableData): Transaction.Result {
+                currentData
+                    .child(PLAYER_NAME_INFO)
+                    .child(playerId.value)
+                    .value = name
+                currentData.updateVersionAndUpdateTimeInTransaction()
+                return Transaction.success(currentData)
+            }
+
+            override fun onComplete(
+                error: DatabaseError?,
+                committed: Boolean,
+                currentData: DataSnapshot?,
+            ) {
+                // TODO:
+            }
+        })
     }
 }

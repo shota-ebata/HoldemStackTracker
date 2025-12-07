@@ -14,7 +14,6 @@ import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetAddedAutoActionsGameUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.UpdateTableUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.time.Instant
@@ -24,7 +23,7 @@ class CreateNewGameUseCaseImpl
 @Inject
 constructor(
     private val getAddedAutoActionsGame: GetAddedAutoActionsGameUseCase,
-    private val updateTableUseCase: UpdateTableUseCase,
+    private val tableRepository: TableRepository,
     private val gameRepository: GameRepository,
     private val randomIdRepository: RandomIdRepository,
     @CoroutineDispatcherDefault
@@ -34,12 +33,7 @@ constructor(
     override suspend fun invoke(table: Table) = withContext(dispatcher) {
         val updateTime = Instant.now()
         val gameId = GameId(randomIdRepository.generateRandomId())
-        val copiedTable = table.copy(
-            tableStatus = TableStatus.PLAYING,
-            currentGameId = gameId,
-            startTime = updateTime,
-            updateTime = updateTime,
-        )
+
         val newGame = Game(
             gameId = gameId,
             tableId = table.id, // MEMO: RealtimeDBには保存はされない
@@ -67,17 +61,18 @@ constructor(
             ),
             updateTime = updateTime
         )
-        updateTableUseCase.invoke(
-            table = copiedTable,
-            updateTime = updateTime
+        tableRepository.updateTableStatus(
+            tableId = table.id,
+            tableStatus = TableStatus.PLAYING,
+            gameId = gameId
         )
         // AutoActionがあれば追加する
         val addedAutoActionGame = getAddedAutoActionsGame.invoke(
             game = newGame,
-            rule = copiedTable.rule,
+            rule = table.rule,
         )
         gameRepository.sendGame(
-            tableId = copiedTable.id,
+            tableId = table.id,
             newGame = addedAutoActionGame
         )
     }

@@ -1,10 +1,11 @@
 package com.ebata_shota.holdemstacktracker.domain.repository
 
-import com.ebata_shota.holdemstacktracker.domain.model.PlayerBase
+import com.ebata_shota.holdemstacktracker.domain.model.GameId
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
+import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import kotlinx.coroutines.flow.StateFlow
 
 interface TableRepository {
@@ -34,18 +35,39 @@ interface TableRepository {
         addPlayerIds: Map<String, PlayerId>,
     )
 
+    suspend fun updateBasePlayer(
+        tableId: TableId,
+        playerId: PlayerId,
+        newStack: Int? = null,
+        newIsSeated: Boolean? = null,
+    )
+
+    suspend fun updateBasePlayerStacks(
+        tableId: TableId,
+        stacks: Map<PlayerId, Int>,
+    )
+
+    suspend fun updatePlayerOrder(
+        tableId: TableId,
+        playerOrder: List<PlayerId>,
+    )
+
+    suspend fun updateRule(
+        tableId: TableId,
+        rule: Rule,
+    )
+
+    suspend fun updateTableStatus(
+        tableId: TableId,
+        tableStatus: TableStatus,
+        gameId: GameId? = null,
+    )
+
     suspend fun isExistsTable(tableId: TableId): Boolean
 
     suspend fun renameTableBasePlayer(
         tableId: TableId,
         indexOfBasePlayers: Long,
-        playerId: PlayerId,
-        name: String
-    )
-
-    suspend fun renameTableWaitPlayer(
-        tableId: TableId,
-        indexOfWaitPlayers: Long,
         playerId: PlayerId,
         name: String
     )

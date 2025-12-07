@@ -6,8 +6,8 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.DoAllInUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoCallUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoCheckUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoFoldUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.DoTransitionToNextPhaseIfNeedUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoRaiseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.DoTransitionToNextPhaseIfNeedUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionTypeInLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionablePlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetAddedAutoActionsGameUseCase
@@ -46,15 +46,14 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.SetPotSettlementInfoUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.UpdateTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.AddBetPhaseActionInToGameUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.CreateNewGameUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoAllInUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoCallUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoCheckUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoFoldUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoTransitionToNextPhaseIfNeedUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoRaiseUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoTransitionToNextPhaseIfNeedUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActionTypeInLastPhaseAsBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActionablePlayerIdsUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetAddedAutoActionsGameUseCaseImpl
@@ -93,7 +92,6 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.MovePositionUseCas
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.RemovePlayersUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.RenameTablePlayerUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.SetPotSettlementInfoUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.UpdateTableUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -206,9 +204,6 @@ interface UseCaseModule {
 
     @Binds
     fun bindGetAddedAutoActionsGameUseCase(useCase: GetAddedAutoActionsGameUseCaseImpl): GetAddedAutoActionsGameUseCase
-
-    @Binds
-    fun bindUpdateTableUseCase(useCase: UpdateTableUseCaseImpl): UpdateTableUseCase
 
     @Binds
     fun bindIsEnableCheckUseCase(useCase: IsEnableCheckUseCaseImpl): IsEnableCheckUseCase
