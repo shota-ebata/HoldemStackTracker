@@ -128,24 +128,13 @@ constructor(
             val basePlayerIdsKey = tableRef
                 .child(BASE_PLAYER_IDS)
                 .push().key!!
-            tableRef.runTransaction(object : Transaction.Handler {
-                override fun doTransaction(currentData: MutableData): Transaction.Result {
-                    currentData.setValue(tableMap)
-                    currentData
-                        .child(BASE_PLAYER_IDS)
-                        .child(basePlayerIdsKey)
-                        .setValue(myPlayerId.value)
-                    return Transaction.success(currentData)
-                }
-
-                override fun onComplete(
-                    error: DatabaseError?,
-                    committed: Boolean,
-                    currentData: DataSnapshot?,
-                ) {
-                    // TODO: ログ
-                }
-            })
+            tableRef.runTransaction { currentData ->
+                currentData.setValue(tableMap)
+                currentData
+                    .child(BASE_PLAYER_IDS)
+                    .child(basePlayerIdsKey)
+                    .setValue(myPlayerId.value)
+            }
         }
     }
 
@@ -204,6 +193,25 @@ constructor(
         tableRef.setValue(tableMap)
     }
 
+    private fun DatabaseReference.runTransaction(
+        doTransaction: (currentData: MutableData) -> Unit
+    ) {
+        runTransaction(object : Transaction.Handler{
+            override fun doTransaction(currentData: MutableData): Transaction.Result {
+                doTransaction.invoke(currentData)
+                return Transaction.success(currentData)
+            }
+
+            override fun onComplete(
+                error: DatabaseError?,
+                committed: Boolean,
+                currentData: DataSnapshot?,
+            ) {
+                // TODO:
+            }
+        })
+    }
+
     override suspend fun addBasePlayer(
         tableId: TableId,
         playerId: PlayerId,
@@ -223,40 +231,29 @@ constructor(
             .child(BASE_PLAYER_IDS)
             .push().key!!
 
-        tableRef.runTransaction(object : Transaction.Handler {
-            override fun doTransaction(currentData: MutableData): Transaction.Result {
-                currentData
-                    .child(PLAYER_NAME_INFO)
-                    .child(playerId.value)
-                    .setValue(name)
-                currentData
-                    .child(PLAYER_SEATED_INFO)
-                    .child(playerId.value)
-                    .setValue(true)
-                currentData
-                    .child(PLAYER_STACK_INFO)
-                    .child(playerId.value)
-                    .setValue(table.rule.defaultStack)
-                currentData
-                    .child(WAIT_PLAYER_IDS)
-                    .child(waitPlayerIdsKey)
-                    .setValue(playerId.value)
-                currentData
-                    .child(BASE_PLAYER_IDS)
-                    .child(basePlayerIdsKey)
-                    .setValue(playerId.value)
-                currentData.updateVersionAndUpdateTimeInTransaction()
-                return Transaction.success(currentData)
-            }
-
-            override fun onComplete(
-                error: DatabaseError?,
-                committed: Boolean,
-                currentData: DataSnapshot?,
-            ) {
-            }
-
-        })
+        tableRef.runTransaction { currentData ->
+            currentData
+                .child(PLAYER_NAME_INFO)
+                .child(playerId.value)
+                .setValue(name)
+            currentData
+                .child(PLAYER_SEATED_INFO)
+                .child(playerId.value)
+                .setValue(true)
+            currentData
+                .child(PLAYER_STACK_INFO)
+                .child(playerId.value)
+                .setValue(table.rule.defaultStack)
+            currentData
+                .child(WAIT_PLAYER_IDS)
+                .child(waitPlayerIdsKey)
+                .setValue(playerId.value)
+            currentData
+                .child(BASE_PLAYER_IDS)
+                .child(basePlayerIdsKey)
+                .setValue(playerId.value)
+            currentData.updateVersionAndUpdateTimeInTransaction()
+        }
     }
 
     override suspend fun addPlayerOrder(
@@ -271,31 +268,20 @@ constructor(
 
         val tableRef = tablesRef.child(tableId.value)
 
-        tableRef.runTransaction(object : Transaction.Handler {
-            override fun doTransaction(currentData: MutableData): Transaction.Result {
-                addPlayerIds.forEach {
-                    currentData
-                        .child(WAIT_PLAYER_IDS)
-                        .child(it.key)
-                        .value = null
-                }
-
+        tableRef.runTransaction { currentData ->
+            addPlayerIds.forEach {
                 currentData
-                    .child(PLAYER_ORDER)
-                    .setValue(newPlayerOrder.map { it.value })
-
-                currentData.updateVersionAndUpdateTimeInTransaction()
-                return Transaction.success(currentData)
+                    .child(WAIT_PLAYER_IDS)
+                    .child(it.key)
+                    .value = null
             }
 
-            override fun onComplete(
-                error: DatabaseError?,
-                committed: Boolean,
-                currentData: DataSnapshot?,
-            ) {
+            currentData
+                .child(PLAYER_ORDER)
+                .setValue(newPlayerOrder.map { it.value })
 
-            }
-        })
+            currentData.updateVersionAndUpdateTimeInTransaction()
+        }
     }
 
     override suspend fun updateBasePlayer(
@@ -312,32 +298,21 @@ constructor(
             return
         }
         val tableRef = tablesRef.child(tableId.value)
-        tableRef.runTransaction(object : Transaction.Handler {
-            override fun doTransaction(currentData: MutableData): Transaction.Result {
-                if (newStack != null) {
-                    currentData
-                        .child(PLAYER_STACK_INFO)
-                        .child(playerId.value)
-                        .value = newStack
-                }
-                if (newIsSeated != null) {
-                    currentData
-                        .child(PLAYER_SEATED_INFO)
-                        .child(playerId.value)
-                        .value = newIsSeated
-                }
-                currentData.updateVersionAndUpdateTimeInTransaction()
-                return Transaction.success(currentData)
+        tableRef.runTransaction { currentData ->
+            if (newStack != null) {
+                currentData
+                    .child(PLAYER_STACK_INFO)
+                    .child(playerId.value)
+                    .value = newStack
             }
-
-            override fun onComplete(
-                error: DatabaseError?,
-                committed: Boolean,
-                currentData: DataSnapshot?,
-            ) {
-                // TODO
+            if (newIsSeated != null) {
+                currentData
+                    .child(PLAYER_SEATED_INFO)
+                    .child(playerId.value)
+                    .value = newIsSeated
             }
-        })
+            currentData.updateVersionAndUpdateTimeInTransaction()
+        }
     }
 
     override suspend fun updateBasePlayerStacks(
@@ -349,24 +324,13 @@ constructor(
             return
         }
         val tableRef = tablesRef.child(tableId.value)
-        tableRef.runTransaction(object : Transaction.Handler {
-            override fun doTransaction(currentData: MutableData): Transaction.Result {
-                val playerStackInfoRef = currentData.child(PLAYER_STACK_INFO)
-                stacks.forEach { (key, value) ->
-                    playerStackInfoRef.child(key.value).value = value
-                }
-                currentData.updateVersionAndUpdateTimeInTransaction()
-                return Transaction.success(currentData)
+        tableRef.runTransaction { currentData ->
+            val playerStackInfoRef = currentData.child(PLAYER_STACK_INFO)
+            stacks.forEach { (key, value) ->
+                playerStackInfoRef.child(key.value).value = value
             }
-
-            override fun onComplete(
-                error: DatabaseError?,
-                committed: Boolean,
-                currentData: DataSnapshot?,
-            ) {
-                // TODO
-            }
-        })
+            currentData.updateVersionAndUpdateTimeInTransaction()
+        }
     }
 
     override suspend fun updatePlayerOrder(
@@ -378,21 +342,10 @@ constructor(
             return
         }
         val tableRef = tablesRef.child(tableId.value)
-        tableRef.runTransaction(object : Transaction.Handler {
-            override fun doTransaction(currentData: MutableData): Transaction.Result {
-                currentData.child(PLAYER_ORDER).value = playerOrder.map { it.value }
-                currentData.updateVersionAndUpdateTimeInTransaction()
-                return Transaction.success(currentData)
-            }
-
-            override fun onComplete(
-                error: DatabaseError?,
-                committed: Boolean,
-                currentData: DataSnapshot?,
-            ) {
-                // TODO
-            }
-        })
+        tableRef.runTransaction { currentData ->
+            currentData.child(PLAYER_ORDER).value = playerOrder.map { it.value }
+            currentData.updateVersionAndUpdateTimeInTransaction()
+        }
     }
 
     override suspend fun updateRule(
@@ -404,31 +357,19 @@ constructor(
             return
         }
         val tableRef = tablesRef.child(tableId.value)
-        tableRef.runTransaction(object : Transaction.Handler {
-            override fun doTransaction(currentData: MutableData): Transaction.Result {
-                currentData.child(RULE).value = when (rule) {
-                    is Rule.RingGame -> {
-                        mapOf(
-                            RULE_TYPE to RULE_TYPE_RING_GAME,
-                            RULE_SB_SIZE to rule.sbSize,
-                            RULE_BB_SIZE to rule.bbSize,
-                            RULE_DEFAULT_STACK to rule.defaultStack
-                        )
-                    }
+        tableRef.runTransaction { currentData ->
+            currentData.child(RULE).value = when (rule) {
+                is Rule.RingGame -> {
+                    mapOf(
+                        RULE_TYPE to RULE_TYPE_RING_GAME,
+                        RULE_SB_SIZE to rule.sbSize,
+                        RULE_BB_SIZE to rule.bbSize,
+                        RULE_DEFAULT_STACK to rule.defaultStack
+                    )
                 }
-                currentData.updateVersionAndUpdateTimeInTransaction()
-                return Transaction.success(currentData)
             }
-
-            override fun onComplete(
-                error: DatabaseError?,
-                committed: Boolean,
-                currentData: DataSnapshot?,
-            ) {
-                // TODO
-            }
-
-        })
+            currentData.updateVersionAndUpdateTimeInTransaction()
+        }
     }
 
     override suspend fun updateTableStatus(
@@ -441,33 +382,17 @@ constructor(
             return
         }
         val tableRef = tablesRef.child(tableId.value)
-
-        tableRef.runTransaction(
-            object : Transaction.Handler {
-                override fun doTransaction(currentData: MutableData): Transaction.Result {
-                    currentData
-                        .child(TABLE_STATUS)
-                        .value = tableStatus.name
-                    if (gameId != null) {
-                        currentData
-                            .child(CURRENT_GAME_ID)
-                            .value = gameId.value
-                    }
-                    currentData.updateVersionAndUpdateTimeInTransaction()
-                    return Transaction.success(currentData)
-                }
-
-                override fun onComplete(
-                    error: DatabaseError?,
-                    committed: Boolean,
-                    currentData: DataSnapshot?,
-                ) {
-                    // TODO
-                }
-
+        tableRef.runTransaction { currentData ->
+            currentData
+                .child(TABLE_STATUS)
+                .value = tableStatus.name
+            if (gameId != null) {
+                currentData
+                    .child(CURRENT_GAME_ID)
+                    .value = gameId.value
             }
-        )
-
+            currentData.updateVersionAndUpdateTimeInTransaction()
+        }
     }
 
     /**
@@ -499,25 +424,13 @@ constructor(
                         // すでに接続中の場合は無視
                         return@launch
                     }
-                    tablesRef.child(tableId.value).also { ref ->
-                        ref.runTransaction(object : Transaction.Handler {
-                            override fun doTransaction(currentData: MutableData): Transaction.Result {
-                                currentData
-                                    .child(PLAYER_CONNECTION_INFO)
-                                    .child(myPlayerId.value)
-                                    .value = true
-                                currentData.updateVersionAndUpdateTimeInTransaction()
-                                return Transaction.success(currentData)
-                            }
-
-                            override fun onComplete(
-                                error: DatabaseError?,
-                                committed: Boolean,
-                                currentData: DataSnapshot?,
-                            ) {
-                                // TODO: ログ
-                            }
-                        })
+                    val tableRef = tablesRef.child(tableId.value)
+                    tableRef.runTransaction { currentData ->
+                        currentData
+                            .child(PLAYER_CONNECTION_INFO)
+                            .child(myPlayerId.value)
+                            .value = true
+                        currentData.updateVersionAndUpdateTimeInTransaction()
                     }
                     myTableConnectionRef = createTableConnectionRef(
                         tableId = tableId,
@@ -585,24 +498,12 @@ constructor(
             return
         }
         val tableRef = tablesRef.child(tableId.value)
-
-        tableRef.runTransaction(object : Transaction.Handler {
-            override fun doTransaction(currentData: MutableData): Transaction.Result {
-                currentData
-                    .child(PLAYER_NAME_INFO)
-                    .child(playerId.value)
-                    .value = name
-                currentData.updateVersionAndUpdateTimeInTransaction()
-                return Transaction.success(currentData)
-            }
-
-            override fun onComplete(
-                error: DatabaseError?,
-                committed: Boolean,
-                currentData: DataSnapshot?,
-            ) {
-                // TODO:
-            }
-        })
+        tableRef.runTransaction { currentData ->
+            currentData
+                .child(PLAYER_NAME_INFO)
+                .child(playerId.value)
+                .value = name
+            currentData.updateVersionAndUpdateTimeInTransaction()
+        }
     }
 }
