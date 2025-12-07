@@ -15,6 +15,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.TableStatus
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
+import com.ebata_shota.holdemstacktracker.infra.extension.runTransaction
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.BASE_PLAYER_IDS
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.CURRENT_GAME_ID
@@ -40,7 +41,6 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.MutableData
 import com.google.firebase.database.OnDisconnect
 import com.google.firebase.database.ServerValue
-import com.google.firebase.database.Transaction
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -191,25 +191,6 @@ constructor(
         val tableMap = tableMapper.toMap(table)
         val tableRef = tablesRef.child(table.id.value)
         tableRef.setValue(tableMap)
-    }
-
-    private fun DatabaseReference.runTransaction(
-        doTransaction: (currentData: MutableData) -> Unit
-    ) {
-        runTransaction(object : Transaction.Handler{
-            override fun doTransaction(currentData: MutableData): Transaction.Result {
-                doTransaction.invoke(currentData)
-                return Transaction.success(currentData)
-            }
-
-            override fun onComplete(
-                error: DatabaseError?,
-                committed: Boolean,
-                currentData: DataSnapshot?,
-            ) {
-                // TODO:
-            }
-        })
     }
 
     override suspend fun addBasePlayer(
@@ -395,18 +376,6 @@ constructor(
         }
     }
 
-    /**
-     * TABLE_VERSIONとUPDATE_TIMEを更新する
-     * TableRefに対してのみ実行できることに注意
-     */
-    private fun MutableData.updateVersionAndUpdateTimeInTransaction() {
-        val currentVersion = child(TABLE_VERSION).value as Long
-        child(TABLE_VERSION).value = currentVersion + 1
-        // ServerValue.TIMESTAMP だと無駄に2回発火するっぽい？
-        // ので、 Instant.now().toEpochMilli()を送っている
-        child(UPDATE_TIME).value = Instant.now().toEpochMilli()
-    }
-
     private val connectionMutex = Mutex()
     override fun startCurrentTableConnectionIfNeed(tableId: TableId) {
         if (currentTableId != null && currentTableId == tableId) {
@@ -505,5 +474,17 @@ constructor(
                 .value = name
             currentData.updateVersionAndUpdateTimeInTransaction()
         }
+    }
+
+    /**
+     * TABLE_VERSIONとUPDATE_TIMEを更新する
+     * TableRefに対してのみ実行することを想定している
+     */
+    private fun MutableData.updateVersionAndUpdateTimeInTransaction() {
+        val currentVersion = child(TABLE_VERSION).value as Long
+        child(TABLE_VERSION).value = currentVersion + 1
+        // ServerValue.TIMESTAMP だと無駄に2回発火するっぽい？
+        // ので、 Instant.now().toEpochMilli()を送っている
+        child(UPDATE_TIME).value = Instant.now().toEpochMilli()
     }
 }
