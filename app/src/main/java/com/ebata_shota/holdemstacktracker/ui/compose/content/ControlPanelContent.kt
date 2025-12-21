@@ -2,6 +2,7 @@ package com.ebata_shota.holdemstacktracker.ui.compose.content
 
 import android.content.res.Configuration
 import androidx.annotation.StringRes
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,11 +21,11 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Label
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.PlainTooltip
@@ -33,12 +34,12 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
@@ -57,6 +58,8 @@ import com.ebata_shota.holdemstacktracker.ui.compose.util.dropRedundantEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.util.getChipString
 import com.ebata_shota.holdemstacktracker.ui.compose.util.rememberDelayState
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -352,17 +355,51 @@ private fun BetSizeChangeSlider(
     onChangeSlider: (Float) -> Unit,
     onClickPlusButton: () -> Unit,
 ) {
+    // 長押し処理のためのコルーチンスコープを取得
+    val coroutineScope = rememberCoroutineScope()
+    // 長押し状態を管理するためのState
+    val isMinusButtonPressed = remember { mutableStateOf(false) }
+    val isPlusButtonPressed = remember { mutableStateOf(false) }
+
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(
-            onClick = onClickMinusButton,
-            enabled = uiState.isEnableMinusButton,
+        val isMinusEnabled = uiState.isEnableMinusButton
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(48.dp) // IconButtonのデフォルトサイズに近い大きさを指定
+                .pointerInput(isMinusEnabled) {
+                    if (!isMinusEnabled) return@pointerInput
+                    detectTapGestures(
+                        onTap = { onClickMinusButton() },
+                        onPress = {
+                            isMinusButtonPressed.value = true
+                            tryAwaitRelease()
+                            isMinusButtonPressed.value = false
+                        },
+                        onLongPress = {
+                            coroutineScope.launch {
+                                while (isMinusButtonPressed.value) {
+                                    onClickMinusButton()
+                                    delay(REPEAT_PRESS_INTERVAL_MS)
+                                }
+                            }
+                        }
+                    )
+                }
         ) {
             Icon(
                 painter = painterResource(R.drawable.remove_24),
-                contentDescription = null
+                contentDescription = null, // BoxがButtonの役割を持つので、アイコン自体の説明は不要
+                tint = if (isMinusEnabled) {
+                    LocalContentColor.current
+                } else {
+                    MaterialTheme.colorScheme.onSurface.copy(
+                        alpha = 0.38f
+                    )
+                }
             )
         }
         Box(
@@ -438,13 +475,41 @@ private fun BetSizeChangeSlider(
                 }
             )
         }
-        IconButton(
-            onClick = onClickPlusButton,
-            enabled = uiState.isEnablePlusButton,
+        val isPlusEnabled = uiState.isEnablePlusButton
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(48.dp) // IconButtonのデフォルトサイズに近い大きさを指定
+                .pointerInput(isPlusEnabled) {
+                    if (!isPlusEnabled) return@pointerInput
+                    detectTapGestures(
+                        onTap = { onClickPlusButton() },
+                        onPress = {
+                            isPlusButtonPressed.value = true
+                            tryAwaitRelease()
+                            isPlusButtonPressed.value = false
+                        },
+                        onLongPress = {
+                            coroutineScope.launch {
+                                while (isPlusButtonPressed.value) {
+                                    onClickPlusButton()
+                                    delay(REPEAT_PRESS_INTERVAL_MS)
+                                }
+                            }
+                        }
+                    )
+                }
         ) {
             Icon(
                 painter = painterResource(R.drawable.add_24),
-                contentDescription = null
+                contentDescription = null,
+                tint = if (isPlusEnabled) {
+                    LocalContentColor.current
+                } else {
+                    MaterialTheme.colorScheme.onSurface.copy(
+                        alpha = 0.38f
+                    )
+                }
             )
         }
     }
@@ -530,6 +595,8 @@ private fun BottomSetting(
         }
     }
 }
+
+private const val REPEAT_PRESS_INTERVAL_MS = 100L
 
 sealed interface ControlPanelUiState {
 
@@ -668,7 +735,6 @@ class ControlPanelUiStatePreviewParam :
         )
     )
 }
-
 
 @Preview(showBackground = true, showSystemUi = false, name = "Light Mode")
 @Preview(
