@@ -116,7 +116,7 @@ fun GameTableInfoDetailContent(
                 )
                 Text(
                     modifier = Modifier.padding(start = 4.dp),
-                    text = "100/200",
+                    text = uiState.blindText.getString(),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
