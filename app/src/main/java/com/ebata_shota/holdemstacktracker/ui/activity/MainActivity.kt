@@ -24,6 +24,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.ThemeMode
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.MainScreen
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.MainViewModel
+import com.ebata_shota.holdemstacktracker.ui.viewmodel.MainViewModel.NavigateEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -59,12 +60,7 @@ class MainActivity : ComponentActivity() {
             HoldemStackTrackerTheme(
                 darkTheme = isEnableDarkTheme
             ) {
-                MainScreen(
-                    navigateToTableCreator = ::navigateToTableCreator,
-                    navigateToTableStandby = ::navigateToTableStandby,
-                    navigateToGame = ::navigateToGame,
-                    closeApp = { finish() },
-                )
+                MainScreen()
             }
         }
 
@@ -77,6 +73,16 @@ class MainActivity : ComponentActivity() {
                                 this@MainActivity, getString(R.string.toast_message_kicked),
                                 Toast.LENGTH_SHORT
                             ).show()
+                        }
+                    }
+                    launch {
+                        viewModel.navigateEvent.collect {
+                            when (it) {
+                                is NavigateEvent.TableCreator -> navigateToTableCreator()
+                                is NavigateEvent.TablePrepare -> navigateToTableStandby(it.tableId)
+                                is NavigateEvent.Game -> navigateToGame(it.tableId)
+                                is NavigateEvent.CloseApp -> finish()
+                            }
                         }
                     }
                 }

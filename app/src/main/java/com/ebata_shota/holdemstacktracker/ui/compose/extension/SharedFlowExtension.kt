@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 @SuppressLint("ComposableNaming")
+@Deprecated("ComposeでSharedFlowをCollectしないほうがいいね")
 inline fun <reified T> SharedFlow<T>.collectWithLifecycle(
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     minActiveState: Lifecycle.State = Lifecycle.State.CREATED,

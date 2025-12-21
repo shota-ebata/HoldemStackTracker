@@ -48,10 +48,6 @@ import com.ebata_shota.holdemstacktracker.ui.viewmodel.MainViewModel.NavigateEve
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    navigateToTableCreator: () -> Unit,
-    navigateToTableStandby: (TableId) -> Unit,
-    navigateToGame: (TableId) -> Unit,
-    closeApp: () -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val uiState: MainScreenUiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -62,15 +58,6 @@ fun MainScreen(
 
     OnResumedEffect {
         viewModel.onResume()
-    }
-
-    viewModel.navigateEvent.collectWithLifecycle {
-        when (it) {
-            is NavigateEvent.TableCreator -> navigateToTableCreator()
-            is NavigateEvent.TablePrepare -> navigateToTableStandby(it.tableId)
-            is NavigateEvent.Game -> navigateToGame(it.tableId)
-            is NavigateEvent.CloseApp -> closeApp()
-        }
     }
 
     when (val castUiState = uiState) {
