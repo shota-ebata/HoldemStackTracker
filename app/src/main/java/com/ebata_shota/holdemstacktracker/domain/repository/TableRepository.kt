@@ -63,6 +63,12 @@ interface TableRepository {
         gameId: GameId? = null,
     )
 
+    suspend fun addBanPlayers(
+        tableId: TableId,
+        newPlayerOrder: List<PlayerId>,
+        banPlayerIds: List<PlayerId>,
+    )
+
     suspend fun isExistsTable(tableId: TableId): Boolean
 
     suspend fun renameTableBasePlayer(

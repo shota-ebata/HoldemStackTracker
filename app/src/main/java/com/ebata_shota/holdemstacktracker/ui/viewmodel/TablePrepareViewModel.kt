@@ -29,13 +29,13 @@ import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
+import com.ebata_shota.holdemstacktracker.domain.usecase.BanPlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextBtnPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.HasErrorChipSizeTextValueUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinPlayerFromWaitPlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.EditGameRuleDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.ErrorDialogEvent
@@ -88,7 +88,7 @@ constructor(
     private val joinTable: JoinTableUseCase,
     private val createNewGame: CreateNewGameUseCase,
     private val movePositionUseCase: MovePositionUseCase,
-    private val removePlayers: RemovePlayersUseCase,
+    private val banPlayersUseCase: BanPlayersUseCase,
     private val renameTablePlayer: RenameTablePlayerUseCase,
     private val hasErrorChipSizeTextValue: HasErrorChipSizeTextValueUseCase,
     private val getNextBtnPlayerId: GetNextBtnPlayerIdUseCase,
@@ -121,6 +121,7 @@ constructor(
 
     sealed interface Navigate {
         data object Finish : Navigate
+        data object BanFinish : Navigate
         data class Game(val tableId: TableId) : Navigate
     }
 
@@ -248,7 +249,13 @@ constructor(
                     }
                 } else {
                     // ホストじゃないとき
-                    joinTable.invoke(table, myPlayerId, myName)
+                    if (table.banPlayerIds.any { it == myPlayerId }) {
+                        // BANされている場合
+                        navigateToBackWithBan()
+                    } else {
+                        // BANされていないならJoinする
+                        joinTable.invoke(table, myPlayerId, myName)
+                    }
                 }
             }.collect()
         }
@@ -526,9 +533,9 @@ constructor(
             val removePlayerIds = playerRemoveDialogUiState.players
                 .filter { it.isSelected }
                 .map { it.playerId }
-            removePlayers.invoke(
+            banPlayersUseCase.invoke(
                 currentTable = table,
-                removePlayerIds = removePlayerIds
+                banPlayerIds = removePlayerIds
             )
             dismissPlayerRemoveDialog()
         }
@@ -623,6 +630,10 @@ constructor(
 
     private suspend fun navigateToBack() {
         _navigateEvent.emit(Navigate.Finish)
+    }
+
+    private suspend fun navigateToBackWithBan() {
+        _navigateEvent.emit(Navigate.BanFinish)
     }
 
     fun onClickEditBtnPlayerButton() {

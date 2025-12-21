@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableCreatorContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TablePrepareContent
@@ -21,25 +20,14 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialog
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PlayerRemoveDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SelectBtnPlayerDialog
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.SelectBtnPlayerDialogUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.TablePrepareViewModel
-import com.ebata_shota.holdemstacktracker.ui.viewmodel.TablePrepareViewModel.Navigate
 
 @Composable
 fun TablePrepareScreen(
-    navigateToGameScreen: (TableId) -> Unit,
-    navigateToBack: () -> Unit,
     viewModel: TablePrepareViewModel = hiltViewModel()
 ) {
     val screenUiState: TablePrepareScreenUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val dialogUiState: TablePrepareScreenDialogUiState by viewModel.dialogUiState.collectAsStateWithLifecycle()
-
-    viewModel.navigateEvent.collectWithLifecycle {
-        when (it) {
-            is Navigate.Finish -> navigateToBack()
-            is Navigate.Game -> navigateToGameScreen(it.tableId)
-        }
-    }
 
     when (val uiState = screenUiState) {
         is TablePrepareScreenUiState.Loading -> {

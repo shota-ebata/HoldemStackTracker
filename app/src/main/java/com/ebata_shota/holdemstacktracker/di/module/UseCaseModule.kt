@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.di.module
 
 import com.ebata_shota.holdemstacktracker.domain.usecase.AddBetPhaseActionInToGameUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.BanPlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoAllInUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoCallUseCase
@@ -47,6 +48,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.SetPotSettlementInfoUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.AddBetPhaseActionInToGameUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.BanPlayersUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.CreateNewGameUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoAllInUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoCallUseCaseImpl
@@ -237,4 +239,7 @@ interface UseCaseModule {
 
     @Binds
     fun bindJoinPlayerFromWaitPlayer(useCase: JoinPlayerFromWaitPlayerUseCaseImpl): JoinPlayerFromWaitPlayerUseCase
+
+    @Binds
+    fun bindBanPlayersUseCase(useCase: BanPlayersUseCaseImpl): BanPlayersUseCase
 }

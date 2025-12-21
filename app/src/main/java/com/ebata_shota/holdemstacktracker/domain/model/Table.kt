@@ -12,6 +12,7 @@ data class Table(
     val basePlayers: List<PlayerBase>,
     val waitPlayerIds: Map<String, PlayerId>,
     val playerOrder: List<PlayerId>,
+    val banPlayerIds: List<PlayerId>,
     val btnPlayerId: PlayerId,
     val tableStatus: TableStatus,
     val currentGameId: GameId?,

@@ -35,6 +35,7 @@ constructor() {
         const val PLAYER_STACK_INFO = "playerStackInfo"
         const val WAIT_PLAYER_IDS = "waitPlayerIds"
         const val PLAYER_ORDER = "playerOrder"
+        const val BAN_PLAYER_IDS = "banPlayerIds"
         private const val BTN_PLAYER_ID = "btnPlayerId"
         const val TABLE_STATUS = "tableStatus"
         const val CURRENT_GAME_ID = "currentGameId"
@@ -70,6 +71,9 @@ constructor() {
                 it.key!! to PlayerId(it.value!! as String)
             },
             playerOrder = (tableMap[PLAYER_ORDER] as List<*>).map { PlayerId(it as String) },
+            banPlayerIds = tableSnapshot.child(BAN_PLAYER_IDS).children.map {
+                PlayerId(it.value as String)
+            },
             btnPlayerId = PlayerId(tableMap[BTN_PLAYER_ID] as String),
             tableStatus = TableStatus.of(tableMap[TABLE_STATUS] as String),
             currentGameId = (tableMap[CURRENT_GAME_ID] as? String)?.let { GameId(it) },

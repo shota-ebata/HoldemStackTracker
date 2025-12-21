@@ -20,6 +20,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.screen.TablePrepareScreen
 import com.ebata_shota.holdemstacktracker.ui.compose.util.SetWindowConfig
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.TablePrepareViewModel
+import com.ebata_shota.holdemstacktracker.ui.viewmodel.TablePrepareViewModel.Navigate
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -41,6 +42,22 @@ class TablePrepareActivity : ComponentActivity() {
         )
         lifecycleScope.launch {
             launch {
+                repeatOnLifecycle(Lifecycle.State.CREATED) {
+                    viewModel.navigateEvent.collect {
+                        when (it) {
+                            is Navigate.Finish -> finish()
+                            is Navigate.BanFinish -> {
+                                // TODO: 通常のfinishとは違う、強制退室用のfinishを実行したい
+                                // 戻った先（MainActivity）でトーストを表示したい
+                                finish()
+                            }
+                            is Navigate.Game -> navigateToGameActivity(it.tableId)
+                        }
+                    }
+                }
+            }
+
+            launch {
                 repeatOnLifecycle(Lifecycle.State.RESUMED) {
                     viewModel.onResumed()
                 }
@@ -57,10 +74,7 @@ class TablePrepareActivity : ComponentActivity() {
             HoldemStackTrackerTheme(
                 darkTheme = isEnableDarkTheme
             ) {
-                TablePrepareScreen(
-                    navigateToBack = { finish() },
-                    navigateToGameScreen = ::navigateToGameActivity
-                )
+                TablePrepareScreen()
             }
         }
     }

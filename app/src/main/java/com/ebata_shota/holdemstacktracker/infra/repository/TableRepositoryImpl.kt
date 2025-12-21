@@ -17,6 +17,7 @@ import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.infra.extension.runTransaction
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper
+import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.BAN_PLAYER_IDS
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.BASE_PLAYER_IDS
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.CURRENT_GAME_ID
 import com.ebata_shota.holdemstacktracker.infra.mapper.TableMapper.Companion.PLAYER_CONNECTION_INFO
@@ -117,6 +118,7 @@ constructor(
                     )
                 ),
                 waitPlayerIds = emptyMap(),
+                banPlayerIds = emptyList(),
                 tableStatus = TableStatus.PREPARING,
                 currentGameId = null,
                 startTime = null,
@@ -371,6 +373,42 @@ constructor(
                 currentData
                     .child(CURRENT_GAME_ID)
                     .value = gameId.value
+            }
+            currentData.updateVersionAndUpdateTimeInTransaction()
+        }
+    }
+
+    override suspend fun addBanPlayers(
+        tableId: TableId,
+        newPlayerOrder: List<PlayerId>,
+        banPlayerIds: List<PlayerId>,
+    ) {
+        val table = tableStateFlow.value?.getOrNull() ?: return
+        if (tableId != table.id) {
+            return
+        }
+        val tableRef = tablesRef.child(tableId.value)
+        tableRef.runTransaction { currentData ->
+            val banPlayerIdsData = currentData
+                .child(BAN_PLAYER_IDS)
+
+            banPlayerIds.forEach { playerId ->
+                val isNotBanPlayer = banPlayerIdsData.children.map { it.value }.none { it == playerId }
+                if (isNotBanPlayer) {
+                    // BANされてないなら、BANリストに追加
+                    val banPlayerIdsKey = tableRef
+                        .child(BAN_PLAYER_IDS)
+                        .push().key!!
+
+                    currentData
+                        .child(PLAYER_ORDER)
+                        .value = newPlayerOrder.map { it.value }
+
+                    currentData
+                        .child(BAN_PLAYER_IDS)
+                        .child(banPlayerIdsKey)
+                        .value = playerId.value
+                }
             }
             currentData.updateVersionAndUpdateTimeInTransaction()
         }
