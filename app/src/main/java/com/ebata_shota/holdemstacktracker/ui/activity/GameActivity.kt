@@ -43,11 +43,19 @@ class GameActivity : ComponentActivity() {
         lifecycleScope.launch {
             launch {
                 repeatOnLifecycle(Lifecycle.State.CREATED) {
-                    viewModel.isKeepScreenOn.collect {
-                        if (it) {
-                            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                        } else {
-                            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    launch {
+                        viewModel.isKeepScreenOn.collect {
+                            if (it) {
+                                window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                            } else {
+                                window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                            }
+                        }
+                    }
+
+                    launch {
+                        viewModel.navigateEvent.collect {
+                            navigateTo(it)
                         }
                     }
                 }
@@ -70,7 +78,7 @@ class GameActivity : ComponentActivity() {
             HoldemStackTrackerTheme(
                 darkTheme = isEnableDarkTheme
             ) {
-                GameScreen(navigateTo = ::navigateTo)
+                GameScreen()
             }
         }
     }

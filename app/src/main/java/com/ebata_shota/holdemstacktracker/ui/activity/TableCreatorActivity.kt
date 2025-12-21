@@ -9,7 +9,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.ebata_shota.holdemstacktracker.domain.model.TableId
 import com.ebata_shota.holdemstacktracker.domain.model.ThemeMode
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableCreatorScreen
@@ -17,6 +20,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.util.SetWindowConfig
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.TableCreatorViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class TableCreatorActivity : ComponentActivity() {
@@ -37,10 +41,21 @@ class TableCreatorActivity : ComponentActivity() {
             HoldemStackTrackerTheme(
                 darkTheme = isEnableDarkTheme
             ) {
-                TableCreatorScreen(
-                    navigateToGame = ::navigateToGame,
-                    navigateToBack = { finish() }
-                )
+                TableCreatorScreen()
+            }
+        }
+        lifecycleScope.launch {
+            launch {
+                repeatOnLifecycle(Lifecycle.State.CREATED) {
+                    launch {
+                        viewModel.navigateEvent.collect {
+                            when (it) {
+                                is TableCreatorViewModel.NavigateEvent.Back -> finish()
+                                is TableCreatorViewModel.NavigateEvent.TablePrepare -> navigateToGame(it.tableId)
+                            }
+                        }
+                    }
+                }
             }
         }
     }

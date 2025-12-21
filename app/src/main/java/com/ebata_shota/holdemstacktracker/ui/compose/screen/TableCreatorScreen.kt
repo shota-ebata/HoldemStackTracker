@@ -6,28 +6,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ebata_shota.holdemstacktracker.domain.model.TableId
-
 import com.ebata_shota.holdemstacktracker.ui.compose.content.LoadingContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableCreatorContent
 import com.ebata_shota.holdemstacktracker.ui.compose.content.TableCreatorContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.TableCreatorViewModel
 
 @Composable
 fun TableCreatorScreen(
-    navigateToGame: (TableId) -> Unit,
-    navigateToBack: () -> Unit,
     viewModel: TableCreatorViewModel = hiltViewModel()
 ) {
-    viewModel.navigateEvent.collectWithLifecycle {
-        when (it) {
-            is TableCreatorViewModel.NavigateEvent.Back -> navigateToBack()
-            is TableCreatorViewModel.NavigateEvent.TablePrepare -> navigateToGame(it.tableId)
-        }
-    }
 
     val uiState: TableCreatorUiState by viewModel.screenUiState.collectAsStateWithLifecycle()
     val dialogUiState: TableCreatorDialogUiState by viewModel.dialogUiState.collectAsStateWithLifecycle()

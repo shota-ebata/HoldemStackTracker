@@ -18,13 +18,11 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PhaseIntervalImageDi
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PhaseIntervalImageDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.extension.collectWithLifecycle
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.GameViewModel
 
 @Composable
 fun GameScreen(
     viewModel: GameViewModel = hiltViewModel(),
-    navigateTo: (GameViewModel.Navigate) -> Unit,
 ) {
     val screenUiState: GameScreenUiState by viewModel.screenUiState.collectAsStateWithLifecycle()
     val gameSettingDialogUiState: GameSettingsDialogUiState? by viewModel.gameSettingsDialogUiState.collectAsStateWithLifecycle()
@@ -33,10 +31,6 @@ fun GameScreen(
     val potSettlementDialogUiState: PotSettlementDialogUiState? by viewModel.potSettlementDialogUiState.collectAsStateWithLifecycle()
     val shouldShowExitAlertDialog: Boolean by viewModel.shouldShowExitAlertDialog.collectAsStateWithLifecycle()
     val shouldShowEnterNextGameDialog: Boolean by viewModel.shouldShowEnterNextGameDialog.collectAsStateWithLifecycle()
-
-    viewModel.navigateEvent.collectWithLifecycle {
-        navigateTo(it)
-    }
 
     when (val uiState = screenUiState) {
         GameScreenUiState.Loading -> LoadingContent()

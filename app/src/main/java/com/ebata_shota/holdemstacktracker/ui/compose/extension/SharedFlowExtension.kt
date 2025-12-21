@@ -10,7 +10,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.SharedFlow
 
-
+// FIXME: 削除する
 @Composable
 @SuppressLint("ComposableNaming")
 @Deprecated("ComposeでSharedFlowをCollectしないほうがいいね")
