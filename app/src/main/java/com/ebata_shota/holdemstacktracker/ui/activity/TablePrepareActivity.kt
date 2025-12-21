@@ -46,11 +46,7 @@ class TablePrepareActivity : ComponentActivity() {
                     viewModel.navigateEvent.collect {
                         when (it) {
                             is Navigate.Finish -> finish()
-                            is Navigate.BanFinish -> {
-                                // TODO: 通常のfinishとは違う、強制退室用のfinishを実行したい
-                                // 戻った先（MainActivity）でトーストを表示したい
-                                finish()
-                            }
+                            is Navigate.KickedFinish -> finishWithKicked()
                             is Navigate.Game -> navigateToGameActivity(it.tableId)
                         }
                     }
@@ -85,7 +81,18 @@ class TablePrepareActivity : ComponentActivity() {
         finish()
     }
 
+    private fun finishWithKicked() {
+        val resultIntent = Intent().apply {
+            putExtra(TablePrepareActivity.Companion.EXTRA_BAN_MESSAGE, true)
+        }
+        setResult(TablePrepareActivity.Companion.RESULT_CODE_BAN_FINISH, resultIntent)
+        finish()
+    }
+
     companion object {
+        const val RESULT_CODE_BAN_FINISH = RESULT_FIRST_USER + 1
+        const val EXTRA_BAN_MESSAGE = "com.ebata_shota.holdemstacktracker.ui.activity.EXTRA_BAN_MESSAGE"
+
         fun intent(
             context: Context,
             tableId: TableId,

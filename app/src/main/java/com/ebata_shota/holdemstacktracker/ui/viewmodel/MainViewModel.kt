@@ -95,6 +95,10 @@ constructor(
     // 画面に被さるローディングのジョブ
     private var loadingOnScreenJob: Job? = null
 
+    // トースト表示のイベント
+    private val _toastEvent = MutableSharedFlow<Int>()
+    val toastEvent = _toastEvent.asSharedFlow()
+
     private val _navigateEvent = MutableSharedFlow<NavigateEvent>()
     val navigateEvent = _navigateEvent.asSharedFlow()
 
@@ -196,6 +200,16 @@ constructor(
         //   jobをここでキャンセルしている。
         loadingOnScreenJob?.cancel()
         isLoadingOnScreenContent.update { false }
+    }
+
+    fun onResultNavigation(
+        isKicked: Boolean
+    ) {
+        viewModelScope.launch {
+            if (isKicked) {
+                _toastEvent.emit(R.string.toast_message_kicked)
+            }
+        }
     }
 
     fun onClickFAB() {

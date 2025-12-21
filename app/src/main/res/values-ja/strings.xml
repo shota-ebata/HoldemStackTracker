@@ -7,6 +7,8 @@
     <string name="button_qr_scanner">QRコード</string>
     <string name="button_table_id_search">ID検索</string>
 
+    <string name="toast_message_kicked">ホストによって強制退室</string>
+
     <string name="game_type">ゲームモード</string>
     <string name="game_type_ring">リングゲーム</string>
     <string name="sb_size_label">SBサイズ</string>

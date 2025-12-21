@@ -121,7 +121,7 @@ constructor(
 
     sealed interface Navigate {
         data object Finish : Navigate
-        data object BanFinish : Navigate
+        data object KickedFinish : Navigate
         data class Game(val tableId: TableId) : Navigate
     }
 
@@ -633,7 +633,7 @@ constructor(
     }
 
     private suspend fun navigateToBackWithBan() {
-        _navigateEvent.emit(Navigate.BanFinish)
+        _navigateEvent.emit(Navigate.KickedFinish)
     }
 
     fun onClickEditBtnPlayerButton() {

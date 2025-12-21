@@ -7,6 +7,8 @@
     <string name="button_qr_scanner">QR scanner</string>
     <string name="button_table_id_search">Search table ID</string>
 
+    <string name="toast_message_kicked">You have been kicked from the table.</string>
+
     <string name="game_type">Game Mode</string>
     <string name="game_type_ring">Ring Game</string>
     <string name="sb_size_label">SB Size</string>
