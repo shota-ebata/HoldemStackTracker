@@ -44,7 +44,7 @@ constructor() {
                         isEditable = isHost
                     )
                 },
-                enableSubmitButton = table.playerOrderWithoutLeaved.size >= 2,
+                enableSubmitButton = table.playerOrderWithoutLeaved.size in 2..10,
                 isEditable = isHost,
                 btnPlayerName = btnPlayerId?.let {
                     table.basePlayersWithoutLeaved.find { it.id == btnPlayerId }?.name?.let {
