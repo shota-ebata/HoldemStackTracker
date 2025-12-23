@@ -256,7 +256,7 @@ constructor(
                 currentData
                     .child(WAIT_PLAYER_IDS)
                     .child(it.key)
-                    .value = null
+                    .setValue(null)
             }
 
             currentData
@@ -286,13 +286,13 @@ constructor(
                 currentData
                     .child(PLAYER_STACK_INFO)
                     .child(playerId.value)
-                    .value = newStack
+                    .setValue(newStack)
             }
             if (newIsSeated != null) {
                 currentData
                     .child(PLAYER_SEATED_INFO)
                     .child(playerId.value)
-                    .value = newIsSeated
+                    .setValue(newIsSeated)
             }
             currentData.updateVersionAndUpdateTimeInTransaction()
         }
@@ -310,7 +310,9 @@ constructor(
         tableRef.runTransaction { currentData ->
             val playerStackInfoRef = currentData.child(PLAYER_STACK_INFO)
             stacks.forEach { (key, value) ->
-                playerStackInfoRef.child(key.value).value = value
+                playerStackInfoRef
+                    .child(key.value)
+                    .setValue(value)
             }
             currentData.updateVersionAndUpdateTimeInTransaction()
         }
@@ -326,7 +328,9 @@ constructor(
         }
         val tableRef = tablesRef.child(tableId.value)
         tableRef.runTransaction { currentData ->
-            currentData.child(PLAYER_ORDER).value = playerOrder.map { it.value }
+            currentData
+                .child(PLAYER_ORDER)
+                .setValue(playerOrder.map { it.value })
             currentData.updateVersionAndUpdateTimeInTransaction()
         }
     }
@@ -392,6 +396,7 @@ constructor(
             val banPlayerIdsData = currentData
                 .child(BAN_PLAYER_IDS)
 
+            var isUpdated = false
             banPlayerIds.forEach { playerId ->
                 val isNotBanPlayer = banPlayerIdsData.children.map { it.value }.none { it == playerId }
                 if (isNotBanPlayer) {
@@ -408,8 +413,30 @@ constructor(
                         .child(BAN_PLAYER_IDS)
                         .child(banPlayerIdsKey)
                         .value = playerId.value
+                    isUpdated = true
                 }
             }
+            if (isUpdated) {
+                currentData.updateVersionAndUpdateTimeInTransaction()
+            }
+        }
+    }
+
+    override suspend fun updateSeat(
+        tableId: TableId,
+        playerId: PlayerId,
+        isSeat: Boolean,
+    ) {
+        val table = tableStateFlow.value?.getOrNull() ?: return
+        if (tableId != table.id) {
+            return
+        }
+        val tableRef = tablesRef.child(tableId.value)
+        tableRef.runTransaction { currentData ->
+            currentData
+                .child(PLAYER_SEATED_INFO)
+                .child(playerId.value)
+                .setValue(isSeat)
             currentData.updateVersionAndUpdateTimeInTransaction()
         }
     }

@@ -42,7 +42,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.IsCurrentPlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsEnableCheckUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsNotRaisedYetUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinPlayerFromWaitPlayerUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.RequestJoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RemovePlayersUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
@@ -89,7 +89,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsCurrentPlayerUse
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsEnableCheckUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsNotRaisedYetUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.JoinPlayerFromWaitPlayerUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.JoinTableUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.RequestJoinTableUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.MovePositionUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.RemovePlayersUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.RenameTablePlayerUseCaseImpl
@@ -136,7 +136,7 @@ interface UseCaseModule {
     fun bindGetCurrentPlayerIdUseCase(useCase: GetCurrentPlayerIdUseCaseImpl): GetCurrentPlayerIdUseCase
 
     @Binds
-    fun bindJoinTableUseCase(useCase: JoinTableUseCaseImpl): JoinTableUseCase
+    fun bindJoinTableUseCase(useCase: RequestJoinTableUseCaseImpl): RequestJoinTableUseCase
 
     @Binds
     fun bindCreateNewGameUseCase(useCase: CreateNewGameUseCaseImpl): CreateNewGameUseCase

@@ -34,7 +34,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextBtnPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.HasErrorChipSizeTextValueUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.JoinPlayerFromWaitPlayerUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.JoinTableUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.RequestJoinTableUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.MovePositionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.EditGameRuleDialogEvent
@@ -85,7 +85,7 @@ constructor(
     private val qrBitmapRepository: QrBitmapRepository,
     private val prefRepository: PrefRepository,
     private val defaultRuleStateOfRingRepository: DefaultRuleStateOfRingRepository,
-    private val joinTable: JoinTableUseCase,
+    private val requestJoinTable: RequestJoinTableUseCase,
     private val createNewGame: CreateNewGameUseCase,
     private val movePositionUseCase: MovePositionUseCase,
     private val banPlayersUseCase: BanPlayersUseCase,
@@ -154,6 +154,22 @@ constructor(
         // テーブル情報の監視をスタートする
         tableRepository.startCollectTableFlow(tableId)
 
+        // テーブルの読み込みが完了した時点
+        // 初期化処理
+        viewModelScope.launch {
+            val (table, myPlayerId, myName) = combine(
+                tableStateFlow.filterNotNull(),
+                firebaseAuthRepository.myPlayerIdFlow,
+                prefRepository.myName.filterNotNull(),
+            ) { table, myPlayerId, myName ->
+                Triple(table, myPlayerId, myName)
+            }.first()
+            if (table.hostPlayerId != myPlayerId) {
+                // ホストじゃないなら参加したときにJoin依頼を投げる
+                requestJoinTable.invoke(table, myPlayerId, myName)
+            }
+        }
+
         // Tableの初回取得時の処理
         viewModelScope.launch {
             val defaultBtnId = combine(
@@ -220,19 +236,22 @@ constructor(
                     // ゲーム画面に遷移
                     // FIXME: 押下されてから、ここに来るまでにローディング表記はしたほうがいいかも
                     navigateToGame(table.id)
+                }
+                if (table.hostPlayerId != myPlayerId && table.banPlayerIds.any { it == myPlayerId }) {
+                    // BANされている場合
+                    navigateToBackWithBan()
                     // 一度きり
                     this.cancel()
                 }
             }.collect()
         }
 
-        // 参加プレイヤーに自分が入るための監視
+        // ホストがやるべきことの監視
         viewModelScope.launch {
             combine(
                 tableStateFlow.filterNotNull(),
                 firebaseAuthRepository.myPlayerIdFlow,
-                prefRepository.myName.filterNotNull(),
-            ) { table, myPlayerId, myName ->
+            ) { table, myPlayerId ->
 
                 if (table.hostPlayerId == myPlayerId) {
                     // ホストのときに
@@ -242,19 +261,11 @@ constructor(
                         }
 
                         TableStatus.PREPARING,
-                        TableStatus.PAUSED -> { // FIXME: PAUSEDでは table.rule is Rule.RingGame じゃないとまずいか？
+                        TableStatus.PAUSED,
+                            -> { // FIXME: PAUSEDでは table.rule is Rule.RingGame じゃないとまずいか？
                             // ゲーム中以外のとき
                             joinPlayerFormWaitPlayer.invoke(table)
                         }
-                    }
-                } else {
-                    // ホストじゃないとき
-                    if (table.banPlayerIds.any { it == myPlayerId }) {
-                        // BANされている場合
-                        navigateToBackWithBan()
-                    } else {
-                        // BANされていないならJoinする
-                        joinTable.invoke(table, myPlayerId, myName)
                     }
                 }
             }.collect()
@@ -407,7 +418,7 @@ constructor(
         _dialogUiState.update {
             it.copy(
                 playerRemoveDialogUiState = PlayerRemoveDialogUiState(
-                    players = table.playerOrder.mapNotNull { playerId ->
+                    players = table.playerOrderWithoutLeaved.mapNotNull { playerId ->
                         val player = table.basePlayers
                             .find { basePlayer -> basePlayer.id == playerId }
                             ?: return@mapNotNull null
@@ -897,7 +908,9 @@ constructor(
 
     fun onClickExitExitAlertDialogButton() {
         viewModelScope.launch {
-            _navigateEvent.emit(Navigate.Finish)
+            navigateToBack()
+            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+            tableRepository.updateSeat(tableId, myPlayerId, isSeat = false)
             tableRepository.stopCollectTableFlow()
         }
     }

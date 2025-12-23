@@ -29,9 +29,9 @@ constructor() {
                 tableStatus = table.tableStatus,
                 gameTypeTextResId = table.rule.gameTextResId(),
                 blindText = table.rule.blindText(),
-                playerSizeText = "${table.playerOrder.size}/10", // FIXME: ハードコーディングしている
+                playerSizeText = "${table.playerOrderWithoutLeaved.size}/10", // FIXME: ハードコーディングしている
                 // プレイヤー一覧
-                playerEditRows = table.playerOrder.mapNotNull { playerId ->
+                playerEditRows = table.playerOrderWithoutLeaved.mapNotNull { playerId ->
                     val player = table.basePlayers.find { it.id == playerId }
                         ?: return@mapNotNull null
 

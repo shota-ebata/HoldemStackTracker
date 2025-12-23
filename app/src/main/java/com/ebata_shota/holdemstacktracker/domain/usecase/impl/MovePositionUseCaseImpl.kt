@@ -13,38 +13,55 @@ constructor(
     private val tableRepository: TableRepository,
 ) : MovePositionUseCase {
 
+    // TODO: UT書きたい
     override suspend fun invoke(
         playerId: PlayerId,
         table: Table,
         movePosition: MovePosition,
     ) {
         val playerOrder = table.playerOrder
+        val playerOrderWithoutLeaved = table.playerOrderWithoutLeaved
         val currentIndex = playerOrder.indexOf(playerId)
-        val index = when (movePosition) {
+        val toIndex = when (movePosition) {
             MovePosition.PREV -> {
-                if (currentIndex - 1 in 0..playerOrder.lastIndex) {
-                    currentIndex - 1
+                // プレイ中のプレイヤーリスト内での現在のインデックスを取得
+                val currentPlayerIndexInLeaved = playerOrderWithoutLeaved.indexOf(playerId)
+                // プレイ中のプレイヤーリスト内で、1つ前のプレイヤーのインデックスを計算
+                val prevPlayerIndexInLeaved = if (currentPlayerIndexInLeaved - 1 >= 0) {
+                    currentPlayerIndexInLeaved - 1
                 } else {
-                    table.playerOrder.lastIndex
+                    playerOrderWithoutLeaved.lastIndex
                 }
+
+                // 1つ前のプレイヤーのIDを取得
+                val prevPlayerId = playerOrderWithoutLeaved[prevPlayerIndexInLeaved]
+                // 全員のリスト（playerOrder）での、そのプレイヤーのインデックスを入れ替え先とする
+                playerOrder.indexOf(prevPlayerId)
             }
 
             MovePosition.NEXT -> {
-                if (currentIndex + 1 in 0..playerOrder.lastIndex) {
-                    currentIndex + 1
+                // プレイ中のプレイヤーリスト内での現在のインデックスを取得
+                val currentPlayerIndexInLeaved = playerOrderWithoutLeaved.indexOf(playerId)
+                // プレイ中のプレイヤーリスト内で、1つ後のプレイヤーのインデックスを計算
+                val nextPlayerIndexInLeaved = if (currentPlayerIndexInLeaved + 1 <= playerOrderWithoutLeaved.lastIndex) {
+                    currentPlayerIndexInLeaved + 1
                 } else {
                     0
                 }
+                // 1つ後のプレイヤーのIDを取得
+                val nextPlayerId = playerOrderWithoutLeaved[nextPlayerIndexInLeaved]
+                // 全員のリスト（playerOrder）での、そのプレイヤーのインデックスを入れ替え先とする
+                playerOrder.indexOf(nextPlayerId)
             }
         }
-        if (currentIndex == index) {
+        if (currentIndex == toIndex) {
             // 変化ないので更新しない
             return
         }
         val movedPlayerOrder = moveItem(
             list = playerOrder.toMutableList(),
             fromIndex = currentIndex,
-            toIndex = index
+            toIndex = toIndex
         )
         tableRepository.updatePlayerOrder(
             tableId = table.id,

@@ -36,6 +36,7 @@ fun createDummyTable(
     potManagerPlayerId = PlayerId(""),
     rule = Rule.RingGame(sbSize = 100, bbSize = 200, defaultStack = 1000),
     playerOrder = playerOrder,
+    banPlayerIds = emptyList(),
     btnPlayerId = PlayerId(""),
     currentGameId = GameId(""),
     basePlayers = emptyList(),

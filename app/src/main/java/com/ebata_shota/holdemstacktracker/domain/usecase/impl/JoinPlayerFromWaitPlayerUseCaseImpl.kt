@@ -15,8 +15,8 @@ constructor(
     override suspend fun invoke(table: Table) {
 
         val newPlayerOrder = table.playerOrder.toMutableList()
-        if (table.waitPlayerIds.isEmpty() || newPlayerOrder.size >= MAX_PLAYER_SIZE) {
-            // 待機中だったり、これ以上追加できないなら何もしない
+        if (table.waitPlayerIds.isEmpty()) {
+            // 待機中の人がいない場合は何もしない
             return
         }
 
@@ -25,12 +25,8 @@ constructor(
         table.waitPlayerIds.forEach { (key, waitPlayerId) ->
             if (table.playerOrder.none { it == waitPlayerId }) {
                 // waitのプレイヤーがplayerOrderにいない場合
-                if (newPlayerOrder.size < MAX_PLAYER_SIZE) {
-                    // 10人未満なら
-                    // orderに追加
-                    newPlayerOrder.add(waitPlayerId)
-                    addPlayerIds[key] = waitPlayerId
-                }
+                newPlayerOrder.add(waitPlayerId)
+                addPlayerIds[key] = waitPlayerId
             }
         }
         if (addPlayerIds.isNotEmpty()) {
@@ -40,9 +36,5 @@ constructor(
                 addPlayerIds = addPlayerIds,
             )
         }
-    }
-
-    companion object {
-        private const val MAX_PLAYER_SIZE = 10
     }
 }

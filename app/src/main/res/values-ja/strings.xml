@@ -44,7 +44,7 @@
     <string name="label_cancel">キャンセル</string>
     <string name="label_exit">退室</string>
 
-    <string name="player_remove_dialog_title">プレイヤーを退出させる</string>
+    <string name="player_remove_dialog_title">プレイヤーを強制退出させる</string>
     <string name="player_remove_dialog_toast">ホストは退出できません</string>
 
     <string name="player_seat_out_dialog_title">離席させるプレイヤーを選択してください</string>

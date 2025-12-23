@@ -44,7 +44,7 @@
     <string name="label_cancel">Cancel</string>
     <string name="label_exit">Exit</string>
 
-    <string name="player_remove_dialog_title">Select remove player from table</string>
+    <string name="player_remove_dialog_title">Select kick out player from table</string>
     <string name="player_remove_dialog_toast">Host cannot remove from table</string>
 
     <string name="player_seat_out_dialog_title">Select seat out player</string>
