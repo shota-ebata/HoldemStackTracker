@@ -901,6 +901,8 @@ constructor(
     fun onClickExitAlertDialogExitButton() {
         viewModelScope.launch {
             _navigateEvent.emit(Navigate.Finish)
+            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+            tableRepository.updateSeat(tableId, myPlayerId, isSeat = false)
             tableRepository.stopCollectTableFlow()
         }
     }
