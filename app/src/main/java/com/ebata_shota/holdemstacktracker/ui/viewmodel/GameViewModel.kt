@@ -378,8 +378,6 @@ constructor(
                     && game.phaseList.lastOrNull() is Phase.Standby
                     && table.tableStatus == TableStatus.PREPARING
                 ) {
-                    // TODO: 準備画面に戻らなくちゃいけない条件があるはず。
-                    //  その時は強制戻るにしたほうがいいのでは？(メンバー増えたとか)
                     // ホストでスタンバイフェーズでTableが準備中なら次の画面への
                     _shouldShowEnterNextGameDialog.update { true }
                 }
@@ -832,7 +830,7 @@ constructor(
 
     override fun onClickNavigateToPrepareButton() {
         viewModelScope.launch {
-            _navigateEvent.emit(Navigate.TablePrepare(tableId))
+            navigateToTablePrepare()
         }
     }
 
@@ -840,11 +838,24 @@ constructor(
         viewModelScope.launch {
             val table = tableStateFlow.firstOrNull() ?: return@launch
             val game = gameStateFlow.firstOrNull() ?: return@launch
-            val nextBtnPlayerId = getNextBtnPlayerId.invoke(table, game)
-            nextBtnPlayerId?.let {
-                createNewGame.invoke(table.copy(btnPlayerId = nextBtnPlayerId))
+            // TODO: ゲームを継続できる条件はもっと厳しいかもしれないので問題ないか確認したい
+            // TODO: UseCase化したい
+            if (table.playerOrderWithoutLeaved.size in 2 .. 10) {
+                // 次のゲームに行けそうなら行く
+                val nextBtnPlayerId = getNextBtnPlayerId.invoke(table, game)
+                if (nextBtnPlayerId != null) {
+                    createNewGame.invoke(table.copy(btnPlayerId = nextBtnPlayerId))
+                } else {
+                    // TODO: ゲーム開始できない旨のトーストを表示する
+                    // BTNが取得できないなら、準備画面に戻る
+                    navigateToTablePrepare()
+                }
+                _shouldShowEnterNextGameDialog.update { false }
+            } else {
+                // TODO: ゲーム開始できない旨のトーストを表示する
+                // 次のゲームに行けないなら、準備画面に戻る
+                navigateToTablePrepare()
             }
-            _shouldShowEnterNextGameDialog.update { false }
         }
     }
 
@@ -919,15 +930,17 @@ constructor(
         viewModelScope.launch {
             val table = tableStateFlow.firstOrNull() ?: return@launch
             when (table.tableStatus) {
-                TableStatus.PREPARING -> {
-                    _navigateEvent.emit(Navigate.TablePrepare(tableId))
-                }
+                TableStatus.PREPARING -> navigateToTablePrepare()
                 TableStatus.PAUSED -> TODO()
                 TableStatus.PLAYING -> {
                     _shouldShowExitAlertDialog.update { true }
                 }
             }
         }
+    }
+
+    private suspend fun navigateToTablePrepare() {
+        _navigateEvent.emit(Navigate.TablePrepare(tableId))
     }
 
     companion object {
