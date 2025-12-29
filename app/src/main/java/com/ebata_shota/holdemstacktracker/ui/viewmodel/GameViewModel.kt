@@ -428,6 +428,7 @@ constructor(
             // 自分の手番で
             // AutoCheck or AutoFold モードのときに
             // オートアクションを実行
+            // TODO: ちょっとディレイをかけてもいいかも？
             val isEnableCheck = isEnableCheck.invoke(game, myPlayerId) ?: return
             if (isEnableCheck) {
                 doCheck(game, myPlayerId)
@@ -558,7 +559,9 @@ constructor(
             val game = getCurrentGame() ?: return@launch
             val myPlayerId = getMyPlayerId.invoke() ?: return@launch
 
-            startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL)
+            }
             doFold(
                 game = game,
                 myPlayerId = myPlayerId,
@@ -584,7 +587,9 @@ constructor(
             val game = getCurrentGame() ?: return@launch
             val myPlayerId = getMyPlayerId.invoke() ?: return@launch
 
-            startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE)
+            }
             doAllIn(
                 game = game,
                 myPlayerId = myPlayerId,
@@ -597,7 +602,9 @@ constructor(
             val game = getCurrentGame() ?: return@launch
             val myPlayerId = getMyPlayerId.invoke() ?: return@launch
 
-            startVibrate(VibrationEffect.Composition.PRIMITIVE_CLICK)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                startVibrate(VibrationEffect.Composition.PRIMITIVE_CLICK)
+            }
             doCall(
                 game = game,
                 myPlayerId = myPlayerId,
@@ -614,7 +621,9 @@ constructor(
             val myPlayerId = getMyPlayerId.invoke() ?: return@launch
             val raiseSize = raiseSizeStateFlow.value ?: return@launch
 
-            startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE)
+            }
             doRaise(
                 game = game,
                 myPlayerId = myPlayerId,
@@ -630,7 +639,9 @@ constructor(
      */
     fun onClickRaiseSizeButton(value: Int) {
         viewModelScope.launch {
-            startVibrate(VibrationEffect.Composition.PRIMITIVE_TICK)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                startVibrate(VibrationEffect.Composition.PRIMITIVE_TICK)
+            }
             raiseSizeStateFlow.update { value }
         }
     }
@@ -644,7 +655,9 @@ constructor(
                 minRaiseSize = minRaiseSize,
             )
             if (nextRaiseSize != raiseSizeStateFlow.value) {
-                startVibrate(VibrationEffect.Composition.PRIMITIVE_TICK)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    startVibrate(VibrationEffect.Composition.PRIMITIVE_TICK)
+                }
                 raiseSizeStateFlow.update { nextRaiseSize }
             }
         }
@@ -660,7 +673,9 @@ constructor(
                 game = game,
             )
             if (nextRaiseSize != raiseSizeStateFlow.value) {
-                startVibrate(VibrationEffect.Composition.PRIMITIVE_TICK)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    startVibrate(VibrationEffect.Composition.PRIMITIVE_TICK)
+                }
                 raiseSizeStateFlow.update { nextRaiseSize }
             }
         }
@@ -677,12 +692,16 @@ constructor(
             autoCheckFoldTypeState.update { autoCheckOrFoldType ->
                 when (autoCheckOrFoldType) {
                     is AutoCheckOrFoldType.ByGame -> {
-                        startVibrate(VibrationEffect.Composition.PRIMITIVE_LOW_TICK)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            startVibrate(VibrationEffect.Composition.PRIMITIVE_LOW_TICK)
+                        }
                         AutoCheckOrFoldType.None
                     }
                     is AutoCheckOrFoldType.None -> {
                         val gameId = getCurrentGame()?.gameId ?: return@launch
-                        startVibrate(VibrationEffect.Composition.PRIMITIVE_CLICK)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                            startVibrate(VibrationEffect.Composition.PRIMITIVE_CLICK)
+                        }
                         AutoCheckOrFoldType.ByGame(gameId)
                     }
                 }
@@ -713,13 +732,15 @@ constructor(
             )
             if (raiseSize != raiseSizeStateFlow.value) {
                 val isEnableRaiseUpSliderStep = prefRepository.isEnableRaiseUpSliderStep.first()
-                startVibrate(
-                    if (isEnableRaiseUpSliderStep) {
-                        VibrationEffect.Composition.PRIMITIVE_TICK
-                    } else {
-                        VibrationEffect.Composition.PRIMITIVE_LOW_TICK
-                    }
-                )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    startVibrate(
+                        if (isEnableRaiseUpSliderStep) {
+                            VibrationEffect.Composition.PRIMITIVE_TICK
+                        } else {
+                            VibrationEffect.Composition.PRIMITIVE_LOW_TICK
+                        }
+                    )
+                }
             }
             raiseSizeStateFlow.update { raiseSize }
         }
