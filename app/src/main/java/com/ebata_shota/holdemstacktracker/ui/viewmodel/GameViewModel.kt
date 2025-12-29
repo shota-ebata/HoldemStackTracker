@@ -39,6 +39,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.DoRaiseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoTransitionToNextPhaseIfNeedUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetAddedAutoActionsGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetMyPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextBtnPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneDownRaiseSizeUseCase
@@ -117,6 +118,7 @@ constructor(
     private val doTransitionToNextPhaseIfNeed: DoTransitionToNextPhaseIfNeedUseCase,
     private val getNextBtnPlayerId: GetNextBtnPlayerIdUseCase,
     private val createNewGame: CreateNewGameUseCase,
+    private val getMyPlayerId: GetMyPlayerIdUseCase,
     private val uiStateMapper: GameContentUiStateMapper,
     private val phaseIntervalImageDialogUiStateMapper: PhaseIntervalImageDialogUiStateMapper,
     private val gameTableInfoDetailContentUiStateMapper: GameTableInfoDetailContentUiStateMapper,
@@ -145,6 +147,7 @@ constructor(
             started = SharingStarted.Lazily,
             initialValue = null
         )
+    private fun getCurrentTable(): Table? = tableStateFlow.value
 
     // Gameの状態を保持
     private val gameStateFlow: StateFlow<Game?> = gameRepository.gameStateFlow
@@ -154,6 +157,7 @@ constructor(
             started = SharingStarted.Lazily,
             initialValue = null
         )
+    private fun getCurrentGame(): Game? = gameStateFlow.value
 
     private val raiseSizeStateFlow: MutableStateFlow<Int?> = MutableStateFlow(null)
 
@@ -309,9 +313,9 @@ constructor(
         // フェーズ変更時に特定の人だけがやることの監視
         viewModelScope.launch {
             gameStateFlow.filterNotNull().collect { game ->
-                val table = tableStateFlow.value ?: return@collect
+                val table = getCurrentTable() ?: return@collect
                 val lastPhase = game.phaseList.lastOrNull()
-                val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+                val myPlayerId = getMyPlayerId.invoke() ?: return@collect
                 when (lastPhase) {
                     is Phase.Standby -> {
                         if (table.hostPlayerId == myPlayerId) {
@@ -372,7 +376,7 @@ constructor(
                 gameStateFlow.filterNotNull(),
                 transform = ::Pair
             ).collect { (table, game) ->
-                val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+                val myPlayerId = getMyPlayerId.invoke() ?: return@collect
                 if (
                     table.hostPlayerId == myPlayerId
                     && game.phaseList.lastOrNull() is Phase.Standby
@@ -461,7 +465,7 @@ constructor(
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        val table = tableStateFlow.value ?: return
+        val table = getCurrentTable() ?: return
         doFold.invoke(
             currentGame = game,
             rule = table.rule,
@@ -473,7 +477,7 @@ constructor(
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        val table = tableStateFlow.value ?: return
+        val table = getCurrentTable() ?: return
         doCheck.invoke(
             currentGame = game,
             rule = table.rule,
@@ -485,7 +489,7 @@ constructor(
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        val table = tableStateFlow.value ?: return
+        val table = getCurrentTable() ?: return
         doAllIn.invoke(
             currentGame = game,
             rule = table.rule,
@@ -497,7 +501,7 @@ constructor(
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        val table = tableStateFlow.value ?: return
+        val table = getCurrentTable() ?: return
         doCall.invoke(
             currentGame = game,
             rule = table.rule,
@@ -510,7 +514,7 @@ constructor(
         myPlayerId: PlayerId,
         raiseSize: Int,
     ) {
-        val table = tableStateFlow.value ?: return
+        val table = getCurrentTable() ?: return
         doRaise.invoke(
             currentGame = game,
             rule = table.rule,
@@ -520,7 +524,7 @@ constructor(
     }
 
     private suspend fun sendNextGame(nextGame: Game) {
-        val table = tableStateFlow.value ?: return
+        val table = getCurrentTable() ?: return
         // AutoActionがあれば追加する
         val addedAutoActionGame = getAddedAutoActionsGame.invoke(
             game = nextGame,
@@ -536,7 +540,7 @@ constructor(
 
     fun onClickCenterPanel() {
         viewModelScope.launch {
-            val game = gameStateFlow.value
+            val game = getCurrentGame()
                 ?: return@launch
             val gameScreenUiState = screenUiState.value as? GameScreenUiState.Content
                 ?: return@launch
@@ -551,8 +555,8 @@ constructor(
 
     fun onClickFoldButton() {
         viewModelScope.launch {
-            val game = gameStateFlow.value ?: return@launch
-            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+            val game = getCurrentGame() ?: return@launch
+            val myPlayerId = getMyPlayerId.invoke() ?: return@launch
 
             startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL)
             doFold(
@@ -564,8 +568,8 @@ constructor(
 
     fun onClickCheckButton() {
         viewModelScope.launch {
-            val game = gameStateFlow.value ?: return@launch
-            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+            val game = getCurrentGame() ?: return@launch
+            val myPlayerId = getMyPlayerId.invoke() ?: return@launch
 
             startVibrateCheck()
             doCheck(
@@ -577,8 +581,8 @@ constructor(
 
     fun onClickAllInButton() {
         viewModelScope.launch {
-            val game = gameStateFlow.value ?: return@launch
-            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+            val game = getCurrentGame() ?: return@launch
+            val myPlayerId = getMyPlayerId.invoke() ?: return@launch
 
             startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE)
             doAllIn(
@@ -590,8 +594,8 @@ constructor(
 
     fun onClickCallButton() {
         viewModelScope.launch {
-            val game = gameStateFlow.value ?: return@launch
-            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+            val game = getCurrentGame() ?: return@launch
+            val myPlayerId = getMyPlayerId.invoke() ?: return@launch
 
             startVibrate(VibrationEffect.Composition.PRIMITIVE_CLICK)
             doCall(
@@ -606,8 +610,8 @@ constructor(
      */
     fun onClickRaiseButton() {
         viewModelScope.launch {
-            val game = gameStateFlow.value ?: return@launch
-            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+            val game = getCurrentGame() ?: return@launch
+            val myPlayerId = getMyPlayerId.invoke() ?: return@launch
             val raiseSize = raiseSizeStateFlow.value ?: return@launch
 
             startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE)
@@ -649,7 +653,7 @@ constructor(
     fun onClickPlusButton() {
         viewModelScope.launch {
             val currentRaiseSize = raiseSizeStateFlow.value ?: return@launch
-            val game = gameStateFlow.value ?: return@launch
+            val game = getCurrentGame() ?: return@launch
 
             val nextRaiseSize = getOneUpRaiseSize.invoke(
                 currentRaiseSize = currentRaiseSize,
@@ -677,7 +681,7 @@ constructor(
                         AutoCheckOrFoldType.None
                     }
                     is AutoCheckOrFoldType.None -> {
-                        val gameId = gameStateFlow.value?.gameId ?: return@launch
+                        val gameId = getCurrentGame()?.gameId ?: return@launch
                         startVibrate(VibrationEffect.Composition.PRIMITIVE_CLICK)
                         AutoCheckOrFoldType.ByGame(gameId)
                     }
@@ -698,8 +702,8 @@ constructor(
     }
     fun onChangeSlider(sliderPosition: Float) {
         viewModelScope.launch {
-            val game = gameStateFlow.value ?: return@launch
-            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+            val game = getCurrentGame() ?: return@launch
+            val myPlayerId = getMyPlayerId.invoke() ?: return@launch
             val minRaiseSize = minRaiseSizeFlow.first()
             val raiseSize: Int = getRaiseSize.invoke(
                 game = game,
@@ -809,7 +813,7 @@ constructor(
         viewModelScope.launch {
             val dialogUiState = potSettlementDialogUiState.value ?: return@launch
             val currentPotIndex = dialogUiState.currentPotIndex
-            val game = gameStateFlow.value ?: return@launch
+            val game = getCurrentGame() ?: return@launch
             if (currentPotIndex == dialogUiState.pots.lastIndex) {
                 // Pot精算する
                 setPotSettlementInfo.invoke(
@@ -899,8 +903,8 @@ constructor(
         viewModelScope.launch {
             // FIXME: PhaseHistoryを保存（見た扱いにしたい）
             phaseIntervalImageDialog.update { null }
-            val table = tableStateFlow.value ?: return@launch
-            val game = gameStateFlow.value ?: return@launch
+            val table = getCurrentTable() ?: return@launch
+            val game = getCurrentGame() ?: return@launch
             doTransitionToNextPhaseIfNeed.invoke(
                 game = game,
                 hostPlayerId = table.hostPlayerId,
@@ -912,7 +916,7 @@ constructor(
     fun onClickExitAlertDialogExitButton() {
         viewModelScope.launch {
             _navigateEvent.emit(Navigate.Finish)
-            val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
+            val myPlayerId = getMyPlayerId.invoke() ?: return@launch
             tableRepository.updateSeat(tableId, myPlayerId, isSeat = false)
             tableRepository.stopCollectTableFlow()
         }
