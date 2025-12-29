@@ -861,8 +861,8 @@ constructor(
 
     override fun onClickEnterNextButton() {
         viewModelScope.launch {
-            val table = tableStateFlow.firstOrNull() ?: return@launch
-            val game = gameStateFlow.firstOrNull() ?: return@launch
+            val table = getCurrentTable() ?: return@launch
+            val game = getCurrentGame() ?: return@launch
             // TODO: ゲームを継続できる条件はもっと厳しいかもしれないので問題ないか確認したい
             // TODO: UseCase化したい
             if (table.playerOrderWithoutLeaved.size in 2 .. 10) {
@@ -953,7 +953,7 @@ constructor(
 
     fun onBackPressed() {
         viewModelScope.launch {
-            val table = tableStateFlow.firstOrNull() ?: return@launch
+            val table = getCurrentTable() ?: return@launch
             when (table.tableStatus) {
                 TableStatus.PREPARING -> navigateToTablePrepare()
                 TableStatus.PAUSED -> TODO()
