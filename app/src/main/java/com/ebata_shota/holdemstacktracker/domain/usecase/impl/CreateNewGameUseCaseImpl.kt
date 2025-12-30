@@ -70,6 +70,7 @@ constructor(
         val addedAutoActionGame = getAddedAutoActionsGame.invoke(
             game = newGame,
             rule = table.rule,
+            leavedPlayerIds = table.leavedPlayerIds,
         )
         gameRepository.sendGame(
             tableId = table.id,

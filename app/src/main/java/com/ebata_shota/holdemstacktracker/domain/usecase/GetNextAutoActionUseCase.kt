@@ -8,8 +8,9 @@ import com.ebata_shota.holdemstacktracker.domain.model.Rule
 interface GetNextAutoActionUseCase {
 
     suspend fun invoke(
-        playerId: PlayerId,
+        actionPlayerId: PlayerId,
         rule: Rule,
+        leavedPlayerIds: List<PlayerId>,
         game: Game,
     ): BetPhaseAction?
 }

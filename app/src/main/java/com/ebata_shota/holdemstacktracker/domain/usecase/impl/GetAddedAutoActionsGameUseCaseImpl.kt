@@ -1,6 +1,5 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
-import com.ebata_shota.holdemstacktracker.domain.model.AutoCheckOrFoldType
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
@@ -27,30 +26,33 @@ constructor(
     override suspend fun invoke(
         game: Game,
         rule: Rule,
+        leavedPlayerIds: List<PlayerId>,
     ): Game {
-        val playerId = getAutoActionIfNeed(game = game)
+        val playerId = getAutoActionPlayerId(game = game)
         val autoAction: BetPhaseAction? = playerId?.let {
             getNextAutoAction.invoke(
-                playerId = playerId,
+                actionPlayerId = playerId,
                 game = game,
-                rule = rule
+                leavedPlayerIds = leavedPlayerIds,
+                rule = rule,
             )
         }
         if (autoAction != null) {
             val addedGame = addBetPhaseActionInToGame.invoke(
                 currentGame = game,
-                betPhaseAction = autoAction
+                betPhaseAction = autoAction,
             )
             return invoke(
                 game = addedGame,
-                rule = rule
+                rule = rule,
+                leavedPlayerIds = leavedPlayerIds,
             )
         } else {
             return game
         }
     }
 
-    private suspend fun getAutoActionIfNeed(
+    private suspend fun getAutoActionPlayerId(
         game: Game,
     ): PlayerId? {
 

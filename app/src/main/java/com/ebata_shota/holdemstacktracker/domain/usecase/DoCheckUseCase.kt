@@ -8,6 +8,7 @@ interface DoCheckUseCase {
     suspend fun invoke(
         currentGame: Game,
         rule: Rule,
+        leavedPlayerIds: List<PlayerId>,
         myPlayerId: PlayerId,
     )
 }

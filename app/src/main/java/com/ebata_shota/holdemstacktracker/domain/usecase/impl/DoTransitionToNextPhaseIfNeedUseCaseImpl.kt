@@ -27,6 +27,7 @@ constructor(
         game: Game,
         hostPlayerId: PlayerId,
         rule: Rule,
+        leavedPlayerIds: List<PlayerId>,
     ) {
         val myPlayerId = firebaseAuthRepository.myPlayerIdFlow.first()
         val nextPlayerId = getNextPlayerIdOfNextPhase.invoke(
@@ -42,6 +43,7 @@ constructor(
             val addedAutoActionGame = getAddedAutoActionsGame.invoke(
                 game = nextGame,
                 rule = rule,
+                leavedPlayerIds = leavedPlayerIds,
             )
             // ダイアログを消してから、実際に消した扱いにするまで
             // delayをかける

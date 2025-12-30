@@ -9,5 +9,6 @@ interface DoTransitionToNextPhaseIfNeedUseCase {
         game: Game,
         hostPlayerId: PlayerId,
         rule: Rule,
+        leavedPlayerIds: List<PlayerId>,
     )
 }

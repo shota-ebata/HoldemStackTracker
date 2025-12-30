@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherIO
+import com.ebata_shota.holdemstacktracker.domain.exception.getLatestBetPhase
 import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
@@ -8,7 +9,9 @@ import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetMaxBetSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextAutoActionUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetPerPlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -18,18 +21,22 @@ class GetNextAutoActionUseCaseImpl
 @Inject
 constructor(
     private val getPlayerLastActions: GetPlayerLastActionsUseCase,
+    private val getMaxBetSize: GetMaxBetSizeUseCase,
+    private val getPendingBetPerPlayer: GetPendingBetPerPlayerUseCase,
     private val randomIdRepository: RandomIdRepository,
     @CoroutineDispatcherIO
     private val dispatcher: CoroutineDispatcher,
 ) : GetNextAutoActionUseCase {
 
     /**
+     * 現状のGame状態に対して発生しうる
      * AutoActionを取得する
      */
     override suspend fun invoke(
-        playerId: PlayerId,
+        actionPlayerId: PlayerId,
         rule: Rule,
-        game: Game
+        leavedPlayerIds: List<PlayerId>,
+        game: Game,
     ): BetPhaseAction? = withContext(dispatcher) {
         return@withContext when (val latestPhase = game.phaseList.lastOrNull()) {
             is Phase.Standby -> null
@@ -38,24 +45,22 @@ constructor(
                     latestPhase = latestPhase,
                     rule = rule,
                     playerOrder = game.playerOrder,
-                    playerId = playerId,
-                    game = game
+                    actionPlayerId = actionPlayerId,
+                    game = game,
+                    leavedPlayerIds = leavedPlayerIds,
                 )
             }
-            is Phase.Flop,
-            is Phase.Turn,
-            is Phase.River -> {
+
+            is Phase.Flop, is Phase.Turn, is Phase.River -> {
                 getAutoAction(
                     game = game,
-                    playerId = playerId,
+                    actionPlayerId = actionPlayerId,
                     playerOrder = game.playerOrder,
+                    leavedPlayerIds = leavedPlayerIds,
                 )
             }
 
-            is Phase.PotSettlement,
-            is Phase.End,
-            null -> null
-
+            is Phase.PotSettlement, is Phase.End, null -> null
         }
     }
 
@@ -63,17 +68,19 @@ constructor(
         latestPhase: Phase.PreFlop,
         rule: Rule,
         playerOrder: List<PlayerId>,
-        playerId: PlayerId,
-        game: Game
+        actionPlayerId: PlayerId,
+        game: Game,
+        leavedPlayerIds: List<PlayerId>,
     ): BetPhaseAction? {
         return when (rule) {
             is Rule.RingGame -> {
                 getPreFlopRingGameAutoAction(
                     actionList = latestPhase.actionStateList,
-                    playerId = playerId,
+                    playerId = actionPlayerId,
                     rule = rule,
                     game = game,
-                    playerOrder = playerOrder
+                    playerOrder = playerOrder,
+                    leavedPlayerIds = leavedPlayerIds,
                 )
             }
         }
@@ -84,7 +91,8 @@ constructor(
         playerId: PlayerId,
         rule: Rule.RingGame,
         game: Game,
-        playerOrder: List<PlayerId>
+        playerOrder: List<PlayerId>,
+        leavedPlayerIds: List<PlayerId>,
     ): BetPhaseAction? {
         // Betアクションのみ絞り込み
         val betActionList = actionList.filterIsInstance<BetPhaseAction.BetAction>()
@@ -97,8 +105,9 @@ constructor(
             else -> {
                 getAutoAction(
                     game = game,
-                    playerId = playerId,
-                    playerOrder = playerOrder
+                    actionPlayerId = playerId,
+                    playerOrder = playerOrder,
+                    leavedPlayerIds = leavedPlayerIds,
                 )
             }
         }
@@ -164,8 +173,9 @@ constructor(
 
     private suspend fun getAutoAction(
         game: Game,
-        playerId: PlayerId,
-        playerOrder: List<PlayerId>
+        actionPlayerId: PlayerId,
+        playerOrder: List<PlayerId>,
+        leavedPlayerIds: List<PlayerId>,
     ): BetPhaseAction? {
         val lastActions: Map<PlayerId, BetPhaseAction?> =
             getPlayerLastActions.invoke(
@@ -174,18 +184,18 @@ constructor(
             )
         // プレイヤーが最後にやったアクションに応じて
         // オートアクションがある場合は返す
-        return when (lastActions[playerId]) {
+        return when (lastActions[actionPlayerId]) {
             is BetPhaseAction.Fold, is BetPhaseAction.FoldSkip -> {
                 BetPhaseAction.FoldSkip(
                     actionId = ActionId(randomIdRepository.generateRandomId()),
-                    playerId = playerId
+                    playerId = actionPlayerId
                 )
             }
 
             is BetPhaseAction.AllIn, is BetPhaseAction.AllInSkip -> {
                 BetPhaseAction.AllInSkip(
                     actionId = ActionId(randomIdRepository.generateRandomId()),
-                    playerId = playerId
+                    playerId = actionPlayerId
                 )
             }
 
@@ -194,7 +204,47 @@ constructor(
             is BetPhaseAction.Call,
             is BetPhaseAction.Bet,
             is BetPhaseAction.Raise,
-            null -> null
+            null,
+                -> {
+                // TODO: 複雑なので整理整頓したい
+                if (leavedPlayerIds.any { it == actionPlayerId }) {
+                    // 明確に離席中のプレイヤーの場合は、Check Fold をオートアクションにする
+                    val betPhase = game.phaseList.getLatestBetPhase()
+                        ?: throw IllegalStateException("betPhase以外ここに来ない想定")
+                    val isEnableCheckAction =
+                        isEnableCheckAction(betPhase, playerOrder, actionPlayerId)
+                    if (isEnableCheckAction) {
+                        // check可能ならcheck
+                        BetPhaseAction.Check(
+                            actionId = ActionId(randomIdRepository.generateRandomId()),
+                            playerId = actionPlayerId,
+                        )
+                    } else {
+                        // checkできないならFold
+                        BetPhaseAction.Fold(
+                            actionId = ActionId(randomIdRepository.generateRandomId()),
+                            playerId = actionPlayerId,
+                        )
+                    }
+                } else {
+                    null
+                }
+            }
         }
+    }
+
+    // TODO: UseCase化してGameContentUiStateMapperでも利用できるようにしたい
+    private suspend fun isEnableCheckAction(
+        betPhase: Phase.BetPhase,
+        playerOrder: List<PlayerId>,
+        actionPlayerId: PlayerId,
+    ): Boolean {
+        val maxBetSize = getMaxBetSize.invoke(actionStateList = betPhase.actionStateList)
+        val pendingBetPerPlayer = getPendingBetPerPlayer.invoke(
+            playerOrder = playerOrder,
+            actionStateList = betPhase.actionStateList
+        )
+        val pendingBetSize = pendingBetPerPlayer[actionPlayerId] ?: 0
+        return maxBetSize == pendingBetSize
     }
 }

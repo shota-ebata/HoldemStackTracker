@@ -25,6 +25,7 @@ constructor(
         currentGame: Game,
         rule: Rule,
         myPlayerId: PlayerId,
+        leavedPlayerIds: List<PlayerId>,
     ) {
         val nextGame = addBetPhaseActionInToGame.invoke(
             currentGame = currentGame,
@@ -36,6 +37,7 @@ constructor(
         val addedAutoActionGame = getAddedAutoActionsGame.invoke(
             game = nextGame,
             rule = rule,
+            leavedPlayerIds = leavedPlayerIds
         )
         gameRepository.sendGame(
             tableId = currentGame.tableId,

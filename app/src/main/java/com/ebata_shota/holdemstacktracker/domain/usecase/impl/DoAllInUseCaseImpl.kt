@@ -29,6 +29,7 @@ constructor(
         currentGame: Game,
         rule: Rule,
         myPlayerId: PlayerId,
+        leavedPlayerIds: List<PlayerId>,
     ) {
 
         val player = currentGame.players.find { it.id == myPlayerId }!!
@@ -48,6 +49,7 @@ constructor(
         val addedAutoActionGame = getAddedAutoActionsGame.invoke(
             game = nextGame,
             rule = rule,
+            leavedPlayerIds = leavedPlayerIds,
         )
         gameRepository.sendGame(
             tableId = currentGame.tableId,

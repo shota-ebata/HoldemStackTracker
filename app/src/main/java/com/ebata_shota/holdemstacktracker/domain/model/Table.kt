@@ -28,6 +28,13 @@ data class Table(
     }
 
     /**
+     * 離席しているプレイヤー一覧を取得
+     */
+    val leavedPlayerIds: List<PlayerId> = playerOrder.filter {
+        basePlayers.find { playerBase -> playerBase.id == it }?.isSeated == false
+    }
+
+    /**
      * 離席しているプレイヤーを除いたBasePlayerリスト
      */
     val basePlayersWithoutLeaved: List<PlayerBase> = basePlayers.filter {

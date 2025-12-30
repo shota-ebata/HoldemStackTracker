@@ -9,5 +9,6 @@ interface DoAllInUseCase {
         currentGame: Game,
         rule: Rule,
         myPlayerId: PlayerId,
+        leavedPlayerIds: List<PlayerId>,
     )
 }

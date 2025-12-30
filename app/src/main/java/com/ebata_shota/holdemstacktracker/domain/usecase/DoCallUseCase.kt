@@ -9,5 +9,6 @@ interface DoCallUseCase {
         currentGame: Game,
         rule: Rule,
         myPlayerId: PlayerId,
+        leavedPlayerIds: List<PlayerId>,
     )
 }

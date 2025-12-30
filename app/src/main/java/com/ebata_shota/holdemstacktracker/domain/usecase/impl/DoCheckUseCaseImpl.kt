@@ -24,6 +24,7 @@ constructor(
     override suspend fun invoke(
         currentGame: Game,
         rule: Rule,
+        leavedPlayerIds: List<PlayerId>,
         myPlayerId: PlayerId,
     ) {
         val nextGame = addBetPhaseActionInToGame.invoke(
@@ -36,6 +37,7 @@ constructor(
         val addedAutoActionGame = getAddedAutoActionsGame.invoke(
             game = nextGame,
             rule = rule,
+            leavedPlayerIds = leavedPlayerIds,
         )
         gameRepository.sendGame(
             tableId = currentGame.tableId,

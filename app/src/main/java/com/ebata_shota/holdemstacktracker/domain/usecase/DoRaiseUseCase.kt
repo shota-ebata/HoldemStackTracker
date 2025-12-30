@@ -10,5 +10,6 @@ interface DoRaiseUseCase {
         rule: Rule,
         myPlayerId: PlayerId,
         raiseSize: Int,
+        leavedPlayerIds: List<PlayerId>,
     )
 }

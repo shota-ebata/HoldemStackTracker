@@ -32,6 +32,7 @@ constructor(
         rule: Rule,
         myPlayerId: PlayerId,
         raiseSize: Int,
+        leavedPlayerIds: List<PlayerId>,
     ) {
         val player = currentGame.players.find { it.id == myPlayerId }!!
         val betPhase = getLastPhaseAsBetPhase.invoke(currentGame.phaseList)
@@ -71,6 +72,7 @@ constructor(
         val addedAutoActionGame = getAddedAutoActionsGame.invoke(
             game = nextGame,
             rule = rule,
+            leavedPlayerIds = leavedPlayerIds,
         )
         gameRepository.sendGame(
             tableId = currentGame.tableId,

@@ -79,7 +79,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
@@ -359,7 +358,8 @@ constructor(
                             sendNextGame(
                                 nextGame = game.copy(
                                     phaseList = listOf(nextPhase) // 絶対にStandbyになるのでちょっとキモい
-                                )
+                                ),
+                                leavedPlayerIds = table.leavedPlayerIds,
                             )
                         }
                     }
@@ -471,6 +471,7 @@ constructor(
             currentGame = game,
             rule = table.rule,
             myPlayerId = myPlayerId,
+            leavedPlayerIds = table.leavedPlayerIds,
         )
     }
 
@@ -483,6 +484,7 @@ constructor(
             currentGame = game,
             rule = table.rule,
             myPlayerId = myPlayerId,
+            leavedPlayerIds = table.leavedPlayerIds,
         )
     }
 
@@ -495,6 +497,7 @@ constructor(
             currentGame = game,
             rule = table.rule,
             myPlayerId = myPlayerId,
+            leavedPlayerIds = table.leavedPlayerIds,
         )
     }
 
@@ -507,6 +510,7 @@ constructor(
             currentGame = game,
             rule = table.rule,
             myPlayerId = myPlayerId,
+            leavedPlayerIds = table.leavedPlayerIds,
         )
     }
 
@@ -521,15 +525,20 @@ constructor(
             rule = table.rule,
             myPlayerId = myPlayerId,
             raiseSize = raiseSize,
+            leavedPlayerIds = table.leavedPlayerIds,
         )
     }
 
-    private suspend fun sendNextGame(nextGame: Game) {
+    private suspend fun sendNextGame(
+        nextGame: Game,
+        leavedPlayerIds: List<PlayerId>,
+    ) {
         val table = getCurrentTable() ?: return
         // AutoActionがあれば追加する
         val addedAutoActionGame = getAddedAutoActionsGame.invoke(
             game = nextGame,
             rule = table.rule,
+            leavedPlayerIds = leavedPlayerIds,
         )
         gameRepository.sendGame(
             tableId = tableId,
@@ -930,6 +939,7 @@ constructor(
                 game = game,
                 hostPlayerId = table.hostPlayerId,
                 rule = table.rule,
+                leavedPlayerIds = table.leavedPlayerIds,
             )
         }
     }

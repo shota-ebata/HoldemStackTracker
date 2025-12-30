@@ -11,7 +11,9 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Pot
 import com.ebata_shota.holdemstacktracker.domain.model.PotId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetMaxBetSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetNextAutoActionUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPendingBetPerPlayerUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionsUseCaseImpl
 import io.mockk.every
@@ -37,6 +39,15 @@ class GetNextAutoActionUseCaseImplTest {
                 ),
                 dispatcher = dispatcher,
             ),
+            getMaxBetSize = GetMaxBetSizeUseCaseImpl(
+                dispatcher = dispatcher,
+            ),
+            getPendingBetPerPlayer = GetPendingBetPerPlayerUseCaseImpl(
+                getMaxBetSize = GetMaxBetSizeUseCaseImpl(
+                    dispatcher = dispatcher,
+                ),
+                dispatcher = dispatcher,
+            ),
             randomIdRepository = mockk {
                 every { generateRandomId() } returns "hoge"
             },
@@ -58,7 +69,7 @@ class GetNextAutoActionUseCaseImplTest {
     @Test
     fun flop_BB_Fold_is_null() {
 
-        val playerId = PlayerId("")
+        val playerId = PlayerId("BTN")
         val rule = Rule.RingGame(
             sbSize = 1,
             bbSize = 2,
@@ -149,11 +160,166 @@ class GetNextAutoActionUseCaseImplTest {
         )
         runTest(dispatcher) {
             val nextBetPhaseAction = useCase.invoke(
-                playerId = playerId,
+                actionPlayerId = playerId,
                 rule = rule,
+                leavedPlayerIds = emptyList(),
                 game = game
             )
             assertThat(nextBetPhaseAction).isNull()
+        }
+    }
+
+    /**
+     * BTN: 200
+     * SB : 200
+     * BB : 200 (離席中)
+     *
+     * PreFlop：BTN（CALL）、SB（CALL）
+     *
+     * このとき、BBが Auto Checkされる
+     */
+    @Test
+    fun preFlop_bb_auto_CALL() {
+        val playerId = PlayerId("BB")
+        val rule = Rule.RingGame(
+            sbSize = 1,
+            bbSize = 2,
+            defaultStack = 200,
+        )
+        val leavedPlayerIds = listOf(
+            PlayerId("BB")
+        )
+        val game: Game = createDummyGame().copy(
+            players = listOf(
+                GamePlayer(
+                    id = PlayerId("BTN"),
+                    stack = 200,
+                ),
+                GamePlayer(
+                    id = PlayerId("SB"),
+                    stack = 200,
+                ),
+                GamePlayer(
+                    id = PlayerId("BB"),
+                    stack = 200,
+                ),
+            ),
+            potList = listOf(),
+            phaseList = listOf(
+                Phase.Standby(PhaseId("")),
+                Phase.PreFlop(
+                    phaseId = PhaseId(""),
+                    actionStateList = listOf(
+                        BetPhaseAction.Blind(
+                            actionId = ActionId(""),
+                            playerId = PlayerId("SB"),
+                            betSize = 1
+                        ),
+                        BetPhaseAction.Blind(
+                            actionId = ActionId(""),
+                            playerId = PlayerId("BB"),
+                            betSize = 2
+                        ),
+                        BetPhaseAction.Call(
+                            actionId = ActionId(""),
+                            playerId = PlayerId("BTN"),
+                            betSize = 2
+                        ),
+                        BetPhaseAction.Call(
+                            actionId = ActionId(""),
+                            playerId = PlayerId("SB"),
+                            betSize = 2
+                        ),
+                    )
+                ),
+            )
+        )
+        runTest(dispatcher) {
+            val nextBetPhaseAction = useCase.invoke(
+                actionPlayerId = playerId,
+                rule = rule,
+                leavedPlayerIds = leavedPlayerIds,
+                game = game
+            )
+            assertThat(nextBetPhaseAction).isInstanceOf(BetPhaseAction.Check::class.java)
+            assertThat(nextBetPhaseAction?.playerId).isEqualTo(PlayerId("BB"))
+        }
+    }
+
+    /**
+     * BTN: 200
+     * SB : 200
+     * BB : 200 (離席中)
+     *
+     * PreFlop：BTN（RAISE）、SB（CALL）
+     *
+     * このとき、BBが Auto FOLD される
+     */
+    @Test
+    fun preFlop_bb_auto_FOLD() {
+        val playerId = PlayerId("BB")
+        val rule = Rule.RingGame(
+            sbSize = 1,
+            bbSize = 2,
+            defaultStack = 200,
+        )
+        val leavedPlayerIds = listOf(
+            PlayerId("BB")
+        )
+        val game: Game = createDummyGame().copy(
+            players = listOf(
+                GamePlayer(
+                    id = PlayerId("BTN"),
+                    stack = 200,
+                ),
+                GamePlayer(
+                    id = PlayerId("SB"),
+                    stack = 200,
+                ),
+                GamePlayer(
+                    id = PlayerId("BB"),
+                    stack = 200,
+                ),
+            ),
+            potList = listOf(),
+            phaseList = listOf(
+                Phase.Standby(PhaseId("")),
+                Phase.PreFlop(
+                    phaseId = PhaseId(""),
+                    actionStateList = listOf(
+                        BetPhaseAction.Blind(
+                            actionId = ActionId(""),
+                            playerId = PlayerId("SB"),
+                            betSize = 1
+                        ),
+                        BetPhaseAction.Blind(
+                            actionId = ActionId(""),
+                            playerId = PlayerId("BB"),
+                            betSize = 2
+                        ),
+                        BetPhaseAction.Bet(
+                            actionId = ActionId(""),
+                            playerId = PlayerId("BTN"),
+                            betSize = 4
+                        ),
+                        BetPhaseAction.Call(
+                            actionId = ActionId(""),
+                            playerId = PlayerId("SB"),
+                            betSize = 4
+                        ),
+                    )
+                ),
+            )
+        )
+        runTest(dispatcher) {
+            val nextBetPhaseAction = useCase.invoke(
+                actionPlayerId = playerId,
+                rule = rule,
+                leavedPlayerIds = leavedPlayerIds,
+                game = game
+            )
+            assertThat(nextBetPhaseAction).isInstanceOf(BetPhaseAction.Fold::class.java)
+            assertThat(nextBetPhaseAction?.playerId).isEqualTo(PlayerId("BB"))
         }
     }
 
