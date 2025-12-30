@@ -216,7 +216,7 @@ constructor(
             }
         }
 
-        // 遷移の監視
+        // 遷移の監視 FIXME: もしかしたらResumeタイミングのスコープのほうがいいのかも？
         viewModelScope.launch {
             combine(
                 tableStateFlow.filterNotNull(),
@@ -224,6 +224,13 @@ constructor(
                 firebaseAuthRepository.myPlayerIdFlow,
                 qrPainterStateFlow.filterNotNull(),
             ) { table, game, myPlayerId, _ ->
+                if (table.hostPlayerId != myPlayerId && table.banPlayerIds.any { it == myPlayerId }) {
+                    // BANされている場合
+                    navigateToBackWithBan()
+                    // 一度きり FIXME: もしかしたら、distinctUntilChanged()による二重実行の無視を実現したほうがいいのかも？
+                    this.cancel()
+                    return@combine
+                }
                 val lastPhase = game.phaseList.lastOrNull()
                 if (
                     table.tableStatus == TableStatus.PLAYING
@@ -236,10 +243,6 @@ constructor(
                     // ゲーム画面に遷移
                     // FIXME: 押下されてから、ここに来るまでにローディング表記はしたほうがいいかも
                     navigateToGame(table.id)
-                }
-                if (table.hostPlayerId != myPlayerId && table.banPlayerIds.any { it == myPlayerId }) {
-                    // BANされている場合
-                    navigateToBackWithBan()
                     // 一度きり
                     this.cancel()
                 }
