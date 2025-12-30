@@ -16,6 +16,8 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogUi
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameTableInfoDetailDialog
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PhaseIntervalImageDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PhaseIntervalImageDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotResultDialogContent
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotResultDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogContent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.viewmodel.GameViewModel
@@ -31,6 +33,7 @@ fun GameScreen(
     val potSettlementDialogUiState: PotSettlementDialogUiState? by viewModel.potSettlementDialogUiState.collectAsStateWithLifecycle()
     val shouldShowExitAlertDialog: Boolean by viewModel.shouldShowExitAlertDialog.collectAsStateWithLifecycle()
     val shouldShowEnterNextGameDialog: Boolean by viewModel.shouldShowEnterNextGameDialog.collectAsStateWithLifecycle()
+    val shouldShowPotResultDialog: PotResultDialogUiState? by viewModel.shouldShowPotResultDialog.collectAsStateWithLifecycle()
 
     when (val uiState = screenUiState) {
         GameScreenUiState.Loading -> LoadingContent()
@@ -94,6 +97,13 @@ fun GameScreen(
             if (shouldShowEnterNextGameDialog) {
                 EnterNextGameDialogContent(
                     event = viewModel
+                )
+            }
+
+            shouldShowPotResultDialog?.let {
+                PotResultDialogContent(
+                    uiState = it,
+                    onDismissRequest = viewModel::onDismissPotResultDialog
                 )
             }
         }

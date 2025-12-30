@@ -89,6 +89,7 @@ sealed interface Phase {
 
     data class End(
         override val phaseId: PhaseId,
+        val gameResult: GameResult
     ) : Phase
 
 }

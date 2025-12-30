@@ -6,6 +6,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.GameId
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
+import com.ebata_shota.holdemstacktracker.domain.model.GameResult
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseStatus
@@ -18,6 +19,7 @@ import com.ebata_shota.holdemstacktracker.infra.model.PhaseType
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.collections.get
 
 @Singleton
 class GameMapper
@@ -42,6 +44,10 @@ constructor() {
         private const val PHASE_TYPE = "phaseType"
         private const val PHASE_ACTIONS = "actions"
         private const val PHASE_STATUS = "phaseStatus"
+        private const val END_PHASE_POT_RESULTS = "potResults"
+        private const val END_PHASE_POT_ID = "potId"
+        private const val END_PHASE_POT_SIZE = "potSize"
+        private const val END_PHASE_WINNER_PLAYER_IDS = "winnerPlayerIds"
         private const val PHASE_ACTION_ID = "actionId"
         private const val PHASE_ACTION_PLAYER_ID = "playerId"
         private const val PHASE_ACTION_ACTION_TYPE = "actionType"
@@ -96,11 +102,30 @@ constructor() {
                 PhaseType.PotSettlement -> Phase.PotSettlement(
                     phaseId = PhaseId(phaseId)
                 )
-                PhaseType.End -> Phase.End(phaseId = PhaseId(phaseId))
+                PhaseType.End -> {
+                    Phase.End(
+                        phaseId = PhaseId(phaseId),
+                        gameResult = createGameResult(it[END_PHASE_POT_RESULTS] as List<*>)
+                    )
+                }
             }
-
         }
     }
+
+
+    private fun createGameResult(potResultList: List<*>) = GameResult(
+        potResults = potResultList.mapIndexed { index, gameResult ->
+            val gameResultMap = gameResult as Map<*, *>
+            GameResult.PotResult(
+                id = PotId(gameResultMap[END_PHASE_POT_ID] as String),
+                potNumber = index,
+                potSize = gameResultMap[END_PHASE_POT_SIZE]!!.getInt()!!,
+                winnerPlayerIds = (gameResultMap[END_PHASE_WINNER_PLAYER_IDS] as List<*>).map {
+                    PlayerId(it as String)
+                },
+            )
+        }
+    )
 
     private fun mapToActionStateList(actions: List<*>): List<BetPhaseAction> {
         return actions.map { it as Map<*, *> }.map {
@@ -180,6 +205,19 @@ constructor() {
         },
         if (phase is Phase.BetPhase) {
             PHASE_STATUS to phase.phaseStatus.name
+        } else {
+            null
+        },
+        if (phase is Phase.End) {
+            END_PHASE_POT_RESULTS to phase.gameResult.potResults.map { potResult ->
+                listOf(
+                    END_PHASE_POT_ID to potResult.id.value,
+                    END_PHASE_POT_SIZE to potResult.potSize,
+                    END_PHASE_WINNER_PLAYER_IDS to potResult.winnerPlayerIds.map { winnerPlayerId ->
+                        winnerPlayerId.value
+                    }
+                ).toMap()
+            }
         } else {
             null
         }

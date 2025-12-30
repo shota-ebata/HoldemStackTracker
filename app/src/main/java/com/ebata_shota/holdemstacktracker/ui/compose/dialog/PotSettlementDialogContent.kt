@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
+import com.ebata_shota.holdemstacktracker.domain.model.PotId
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ChipSizeText
 import com.ebata_shota.holdemstacktracker.ui.compose.row.PotSettlementCheckboxRow
@@ -216,6 +217,7 @@ data class PotSettlementDialogUiState(
     }
 
     data class PotUiState(
+        val potId: PotId,
         val potNumber: Int,
         val potSizeString: StringSource,
         val players: List<PotSettlementCheckboxRowUiState>,
@@ -245,6 +247,7 @@ private fun PotSettlementDialogContentPreview() {
                 currentPotIndex = 1,
                 pots = listOf(
                     PotSettlementDialogUiState.PotUiState(
+                        potId = PotId(""),
                         potNumber = 0,
                         potSizeString = StringSource("1000"),
                         players = listOf(
@@ -263,6 +266,7 @@ private fun PotSettlementDialogContentPreview() {
                         )
                     ),
                     PotSettlementDialogUiState.PotUiState(
+                        potId = PotId(""),
                         potNumber = 1,
                         potSizeString = StringSource("2000"),
                         players = listOf(

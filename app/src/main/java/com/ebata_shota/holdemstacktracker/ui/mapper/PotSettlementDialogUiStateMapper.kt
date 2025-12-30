@@ -27,6 +27,7 @@ constructor(
             currentPotIndex = 0,
             pots = game.potList.reversed().map { pot ->
                 PotSettlementDialogUiState.PotUiState(
+                    potId = pot.id,
                     potNumber = pot.potNumber,
                     potSizeString = StringSource(pot.potSize.toString()),
                     players = pot.involvedPlayerIds.map { involvedPlayerId ->

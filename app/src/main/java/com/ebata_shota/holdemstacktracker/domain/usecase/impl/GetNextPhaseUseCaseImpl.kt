@@ -47,9 +47,7 @@ constructor(
                 latestPhase = latestPhase
             )
 
-            is PotSettlement -> End(
-                phaseId = PhaseId(randomIdRepository.generateRandomId())
-            )
+            is PotSettlement -> throw IllegalStateException("SetPotSettlementInfoUseCase で Endに変更するので あり得ない想定")
 
             is End -> Standby(
                 phaseId = PhaseId(randomIdRepository.generateRandomId())

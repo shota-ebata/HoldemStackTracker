@@ -57,6 +57,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.EnterNextGameDialogE
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.GameSettingsDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PhaseIntervalImageDialogUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotResultDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogEvent
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
@@ -64,6 +65,7 @@ import com.ebata_shota.holdemstacktracker.ui.extension.param
 import com.ebata_shota.holdemstacktracker.ui.mapper.GameContentUiStateMapper
 import com.ebata_shota.holdemstacktracker.ui.mapper.GameTableInfoDetailContentUiStateMapper
 import com.ebata_shota.holdemstacktracker.ui.mapper.PhaseIntervalImageDialogUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.mapper.PotResultDialogUiStateMapper
 import com.ebata_shota.holdemstacktracker.ui.mapper.PotSettlementDialogUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -122,6 +124,7 @@ constructor(
     private val phaseIntervalImageDialogUiStateMapper: PhaseIntervalImageDialogUiStateMapper,
     private val gameTableInfoDetailContentUiStateMapper: GameTableInfoDetailContentUiStateMapper,
     private val potSettlementDialogUiStateMapper: PotSettlementDialogUiStateMapper,
+    private val potResultDialogUiStateMapper: PotResultDialogUiStateMapper,
     private val vibrator: Vibrator,
 ) : ViewModel(),
     GameSettingsDialogEvent,
@@ -222,6 +225,9 @@ constructor(
     // EnterNextGameDialog
     private val _shouldShowEnterNextGameDialog = MutableStateFlow(false)
     val shouldShowEnterNextGameDialog = _shouldShowEnterNextGameDialog.asStateFlow()
+
+    private val _shouldShowPotResultDialog = MutableStateFlow<PotResultDialogUiState?>(null)
+    val shouldShowPotResultDialog = _shouldShowPotResultDialog.asStateFlow()
 
     // QR画像を保持
     private val qrPainterStateFlow = MutableStateFlow<Painter?>(null)
@@ -341,7 +347,7 @@ constructor(
 
                     is Phase.End -> {
                         // TODO: UseCase化
-                        if (table.hostPlayerId == myPlayerId) {
+                        if (myPlayerId == table.hostPlayerId) {
                             // Tableにもスタックを反映
                             val newStacks = game.players.associate { gamePlayer ->
                                 gamePlayer.id to gamePlayer.stack
@@ -361,6 +367,13 @@ constructor(
                                 ),
                                 leavedPlayerIds = table.leavedPlayerIds,
                             )
+                        }
+                        if (myPlayerId != table.potManagerPlayerId) {
+                            // ポッドマネージャー以外に
+                            // ポットの結果を表示してあげる
+                            _shouldShowPotResultDialog.update {
+                                potResultDialogUiStateMapper.createUiState(lastPhase, table)
+                            }
                         }
                     }
 
@@ -955,6 +968,10 @@ constructor(
 
     fun onDismissGameExitAlertDialogRequest() {
         _shouldShowExitAlertDialog.update { false }
+    }
+
+    fun onDismissPotResultDialog() {
+        _shouldShowPotResultDialog.update { null }
     }
 
     fun onResumed() {
