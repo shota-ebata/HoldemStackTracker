@@ -887,8 +887,13 @@ constructor(
             val game = getCurrentGame() ?: return@launch
             // TODO: ゲームを継続できる条件はもっと厳しいかもしれないので問題ないか確認したい
             // TODO: UseCase化したい
-            if (table.playerOrderWithoutLeaved.size in 2 .. 10) {
+            if (
+                table.playerOrderWithoutLeaved.size in 2..10
+                && table.basePlayers.none { it.stack < table.rule.minBetSize }
+            ) {
                 // 次のゲームに行けそうなら行く
+                // ・参加プレイヤー人数
+                // ・参加者のスタック
                 val nextBtnPlayerId = getNextBtnPlayerId.invoke(table, game)
                 if (nextBtnPlayerId != null) {
                     createNewGame.invoke(table.copy(btnPlayerId = nextBtnPlayerId))
