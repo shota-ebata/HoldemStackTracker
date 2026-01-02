@@ -130,6 +130,7 @@ constructor(
             val basePlayerIdsKey = tableRef
                 .child(BASE_PLAYER_IDS)
                 .push().key!!
+            // Tableの作成なので、runTransactionInTableRefは利用しない
             tableRef.runTransaction { currentData ->
                 currentData.setValue(tableMap)
                 currentData
@@ -200,21 +201,15 @@ constructor(
         playerId: PlayerId,
         name: String,
     ) {
-        val table = tableStateFlow.value?.getOrNull() ?: return
-        if (tableId != table.id) {
-            return
-        }
-        val tableRef = tablesRef.child(tableId.value)
 
-        val waitPlayerIdsKey = tableRef
-            .child(WAIT_PLAYER_IDS)
-            .push().key!!
-
-        val basePlayerIdsKey = tableRef
-            .child(BASE_PLAYER_IDS)
-            .push().key!!
-
-        tableRef.runTransaction { currentData ->
+        runTransactionWithUpdateVersionAndTimestamp(tableId) { currentData, currentTable ->
+            val tableRef = tablesRef.child(tableId.value)
+            val waitPlayerIdsKey = tableRef
+                .child(WAIT_PLAYER_IDS)
+                .push().key!!
+            val basePlayerIdsKey = tableRef
+                .child(BASE_PLAYER_IDS)
+                .push().key!!
             currentData
                 .child(PLAYER_NAME_INFO)
                 .child(playerId.value)
@@ -226,7 +221,7 @@ constructor(
             currentData
                 .child(PLAYER_STACK_INFO)
                 .child(playerId.value)
-                .setValue(table.rule.defaultStack)
+                .setValue(currentTable.rule.defaultStack)
             currentData
                 .child(WAIT_PLAYER_IDS)
                 .child(waitPlayerIdsKey)
@@ -235,7 +230,6 @@ constructor(
                 .child(BASE_PLAYER_IDS)
                 .child(basePlayerIdsKey)
                 .setValue(playerId.value)
-            currentData.updateVersionAndUpdateTimeInTransaction()
         }
     }
 
@@ -244,14 +238,7 @@ constructor(
         newPlayerOrder: List<PlayerId>,
         addPlayerIds: Map<String, PlayerId>,
     ) {
-        val table = tableStateFlow.value?.getOrNull() ?: return
-        if (tableId != table.id) {
-            return
-        }
-
-        val tableRef = tablesRef.child(tableId.value)
-
-        tableRef.runTransaction { currentData ->
+        runTransactionWithUpdateVersionAndTimestamp(tableId) { currentData, _ ->
             addPlayerIds.forEach {
                 currentData
                     .child(WAIT_PLAYER_IDS)
@@ -262,8 +249,6 @@ constructor(
             currentData
                 .child(PLAYER_ORDER)
                 .setValue(newPlayerOrder.map { it.value })
-
-            currentData.updateVersionAndUpdateTimeInTransaction()
         }
     }
 
@@ -273,15 +258,12 @@ constructor(
         newStack: Int?,
         newIsSeated: Boolean?,
     ) {
-        val table = tableStateFlow.value?.getOrNull() ?: return
-        if (tableId != table.id) {
-            return
-        }
         if (newStack == null && newIsSeated == null) {
+            // どちらもない場合は更新処理が不要（そのような想定はない）
+            // FIXME: もしかしたらメソッドをわけたほうがいい？でも同時もあり得るんよね
             return
         }
-        val tableRef = tablesRef.child(tableId.value)
-        tableRef.runTransaction { currentData ->
+        runTransactionWithUpdateVersionAndTimestamp(tableId) { currentData, _ ->
             if (newStack != null) {
                 currentData
                     .child(PLAYER_STACK_INFO)
@@ -294,7 +276,6 @@ constructor(
                     .child(playerId.value)
                     .setValue(newIsSeated)
             }
-            currentData.updateVersionAndUpdateTimeInTransaction()
         }
     }
 
@@ -302,19 +283,13 @@ constructor(
         tableId: TableId,
         stacks: Map<PlayerId, Int>,
     ) {
-        val table = tableStateFlow.value?.getOrNull() ?: return
-        if (tableId != table.id) {
-            return
-        }
-        val tableRef = tablesRef.child(tableId.value)
-        tableRef.runTransaction { currentData ->
+        runTransactionWithUpdateVersionAndTimestamp(tableId) { currentData, _ ->
             val playerStackInfoRef = currentData.child(PLAYER_STACK_INFO)
             stacks.forEach { (key, value) ->
                 playerStackInfoRef
                     .child(key.value)
                     .setValue(value)
             }
-            currentData.updateVersionAndUpdateTimeInTransaction()
         }
     }
 
@@ -322,16 +297,10 @@ constructor(
         tableId: TableId,
         playerOrder: List<PlayerId>,
     ) {
-        val table = tableStateFlow.value?.getOrNull() ?: return
-        if (tableId != table.id) {
-            return
-        }
-        val tableRef = tablesRef.child(tableId.value)
-        tableRef.runTransaction { currentData ->
+        runTransactionWithUpdateVersionAndTimestamp(tableId) { currentData, _ ->
             currentData
                 .child(PLAYER_ORDER)
                 .setValue(playerOrder.map { it.value })
-            currentData.updateVersionAndUpdateTimeInTransaction()
         }
     }
 
@@ -339,12 +308,7 @@ constructor(
         tableId: TableId,
         rule: Rule,
     ) {
-        val table = tableStateFlow.value?.getOrNull() ?: return
-        if (tableId != table.id) {
-            return
-        }
-        val tableRef = tablesRef.child(tableId.value)
-        tableRef.runTransaction { currentData ->
+        runTransactionWithUpdateVersionAndTimestamp(tableId) { currentData, _ ->
             currentData.child(RULE).value = when (rule) {
                 is Rule.RingGame -> {
                     mapOf(
@@ -355,7 +319,6 @@ constructor(
                     )
                 }
             }
-            currentData.updateVersionAndUpdateTimeInTransaction()
         }
     }
 
@@ -364,12 +327,7 @@ constructor(
         tableStatus: TableStatus,
         gameId: GameId?,
     ) {
-        val table = tableStateFlow.value?.getOrNull() ?: return
-        if (tableId != table.id) {
-            return
-        }
-        val tableRef = tablesRef.child(tableId.value)
-        tableRef.runTransaction { currentData ->
+        runTransactionWithUpdateVersionAndTimestamp(tableId) { currentData, _ ->
             currentData
                 .child(TABLE_STATUS)
                 .value = tableStatus.name
@@ -378,7 +336,6 @@ constructor(
                     .child(CURRENT_GAME_ID)
                     .value = gameId.value
             }
-            currentData.updateVersionAndUpdateTimeInTransaction()
         }
     }
 
@@ -387,12 +344,7 @@ constructor(
         newPlayerOrder: List<PlayerId>,
         banPlayerIds: List<PlayerId>,
     ) {
-        val table = tableStateFlow.value?.getOrNull() ?: return
-        if (tableId != table.id) {
-            return
-        }
-        val tableRef = tablesRef.child(tableId.value)
-        tableRef.runTransaction { currentData ->
+        runTransactionInTable(tableId) { currentData, _ ->
             val banPlayerIdsData = currentData
                 .child(BAN_PLAYER_IDS)
 
@@ -401,6 +353,7 @@ constructor(
                 val isNotBanPlayer = banPlayerIdsData.children.map { it.value }.none { it == playerId }
                 if (isNotBanPlayer) {
                     // BANされてないなら、BANリストに追加
+                    val tableRef = tablesRef.child(tableId.value)
                     val banPlayerIdsKey = tableRef
                         .child(BAN_PLAYER_IDS)
                         .push().key!!
@@ -427,17 +380,11 @@ constructor(
         playerId: PlayerId,
         isSeat: Boolean,
     ) {
-        val table = tableStateFlow.value?.getOrNull() ?: return
-        if (tableId != table.id) {
-            return
-        }
-        val tableRef = tablesRef.child(tableId.value)
-        tableRef.runTransaction { currentData ->
+        runTransactionWithUpdateVersionAndTimestamp(tableId) { currentData, _ ->
             currentData
                 .child(PLAYER_SEATED_INFO)
                 .child(playerId.value)
                 .setValue(isSeat)
-            currentData.updateVersionAndUpdateTimeInTransaction()
         }
     }
 
@@ -527,17 +474,11 @@ constructor(
         playerId: PlayerId,
         name: String,
     ) {
-        val table = tableStateFlow.value?.getOrNull() ?: return
-        if (tableId != table.id) {
-            return
-        }
-        val tableRef = tablesRef.child(tableId.value)
-        tableRef.runTransaction { currentData ->
+        runTransactionWithUpdateVersionAndTimestamp(tableId) { currentData, _ ->
             currentData
                 .child(PLAYER_NAME_INFO)
                 .child(playerId.value)
                 .value = name
-            currentData.updateVersionAndUpdateTimeInTransaction()
         }
     }
 
@@ -551,5 +492,44 @@ constructor(
         // ServerValue.TIMESTAMP だと無駄に2回発火するっぽい？
         // ので、 Instant.now().toEpochMilli()を送っている
         child(UPDATE_TIME).value = Instant.now().toEpochMilli()
+    }
+
+    /**
+     * 指定したIDのTableとのコネクションが繋がっている場合に
+     * トランザクションを実行する
+     */
+    private fun runTransactionInTable(
+        tableId: TableId,
+        block: (currentData: MutableData, currentTable: Table) -> Unit,
+    ) {
+        val table = tableStateFlow.value?.getOrNull() ?: return
+        if (tableId != table.id) {
+            return
+        }
+        val tableRef = tablesRef.child(tableId.value)
+        tableRef.runTransaction { currentData ->
+            block.invoke(currentData, table)
+        }
+    }
+
+    /**
+     * 指定したIDのTableとのコネクションが繋がっている場合に
+     * トランザクションを実行する
+     * 最後にVERSIONとタイムスタンプを更新する
+     */
+    private fun runTransactionWithUpdateVersionAndTimestamp(
+        tableId: TableId,
+        block: (currentData: MutableData, currentTable: Table) -> Unit,
+    ) {
+        val table = tableStateFlow.value?.getOrNull() ?: return
+        if (tableId != table.id) {
+            return
+        }
+        val tableRef = tablesRef.child(tableId.value)
+        tableRef.runTransaction { currentData ->
+            block.invoke(currentData, table)
+            // バージョンとUpdateTimeを更新する
+            currentData.updateVersionAndUpdateTimeInTransaction()
+        }
     }
 }
