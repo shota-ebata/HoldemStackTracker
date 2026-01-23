@@ -330,24 +330,24 @@ constructor(
             }
         }
 
-        // テーブルの状態に応じた遷移
-        viewModelScope.launch {
-            combine(
-                tableStateFlow.filterNotNull(),
-                gameStateFlow.filterNotNull(),
-                transform = ::Pair
-            ).collect { (table, game) ->
-                val myPlayerId = getMyPlayerId.invoke() ?: return@collect
-                if (
-                    table.hostPlayerId == myPlayerId
-                    && game.phaseList.lastOrNull() is Phase.Standby
-                    && table.tableStatus == TableStatus.PREPARING
-                ) {
-                    // ホストでスタンバイフェーズでTableが準備中なら次の画面への
-                    _shouldShowEnterNextGameDialog.update { true }
-                }
-            }
-        }
+//        // テーブルの状態に応じた遷移
+//        viewModelScope.launch {
+//            combine(
+//                tableStateFlow.filterNotNull(),
+//                gameStateFlow.filterNotNull(),
+//                transform = ::Pair
+//            ).collect { (table, game) ->
+//                val myPlayerId = getMyPlayerId.invoke() ?: return@collect
+//                if (
+//                    table.hostPlayerId == myPlayerId
+//                    && game.phaseList.lastOrNull() is Phase.End
+//                    && table.tableStatus == TableStatus.PLAYING
+//                ) {
+//                    // ホストでスタンバイフェーズでTableが準備中なら次の画面への
+//                    _shouldShowEnterNextGameDialog.update { true }
+//                }
+//            }
+//        }
 
         viewModelScope.launch {
             // QRコードを生成する
@@ -362,13 +362,14 @@ constructor(
         table: Table,
         myPlayerId: PlayerId,
     ) {
-        if (table.hostPlayerId == myPlayerId) {
-            // スタンバイフェーズになったら、テーブルを準備中にする
-            tableRepository.updateTableStatus(
-                tableId = table.id,
-                tableStatus = TableStatus.PREPARING,
-            )
-        }
+        // TODO: 消す？
+//        if (table.hostPlayerId == myPlayerId) {
+//            // スタンバイフェーズになったら、テーブルを準備中にする
+//            tableRepository.updateTableStatus(
+//                tableId = table.id,
+//                tableStatus = TableStatus.PREPARING,
+//            )
+//        }
     }
 
     private suspend fun preparePotSettlementPhase(
@@ -404,17 +405,8 @@ constructor(
                 tableId = table.id,
                 stacks = newStacks
             )
-
-            val nextPhase = getNextPhase.invoke(
-                playerOrder = game.playerOrder,
-                phaseList = game.phaseList,
-            )
-            sendNextGame(
-                nextGame = game.copy(
-                    phaseList = listOf(nextPhase) // 絶対にStandbyになるのでちょっとキモい
-                ),
-                leavedPlayerIds = table.leavedPlayerIds,
-            )
+            // 次のゲームに進むかどうかのダイアログを表示
+            _shouldShowEnterNextGameDialog.update { true }
         }
         if (myPlayerId != table.potManagerPlayerId) {
             // ポッドマネージャー以外に
@@ -892,6 +884,23 @@ constructor(
 
     override fun onClickNavigateToPrepareButton() {
         viewModelScope.launch {
+            val table = getCurrentTable() ?: return@launch
+            val game = getCurrentGame() ?: return@launch
+            // TODO: 準備中にする
+            val nextPhase = getNextPhase.invoke(
+                playerOrder = game.playerOrder,
+                phaseList = game.phaseList,
+            )
+            sendNextGame(
+                nextGame = game.copy(
+                    phaseList = listOf(nextPhase) // 絶対にStandbyになるのでちょっとキモい
+                ),
+                leavedPlayerIds = table.leavedPlayerIds,
+            )
+            tableRepository.updateTableStatus(
+                tableId = table.id,
+                tableStatus = TableStatus.PREPARING,
+            )
             navigateToTablePrepare()
         }
     }
@@ -912,15 +921,27 @@ constructor(
                 val nextBtnPlayerId = getNextBtnPlayerId.invoke(table, game)
                 if (nextBtnPlayerId != null) {
                     createNewGame.invoke(table.copy(btnPlayerId = nextBtnPlayerId))
+                    tableRepository.updateTableStatus(
+                        tableId = table.id,
+                        tableStatus = TableStatus.PREPARING,
+                    )
                 } else {
                     // TODO: ゲーム開始できない旨のトーストを表示する
                     // BTNが取得できないなら、準備画面に戻る
+                    tableRepository.updateTableStatus(
+                        tableId = table.id,
+                        tableStatus = TableStatus.PREPARING,
+                    )
                     navigateToTablePrepare()
                 }
                 _shouldShowEnterNextGameDialog.update { false }
             } else {
                 // TODO: ゲーム開始できない旨のトーストを表示する
                 // 次のゲームに行けないなら、準備画面に戻る
+                tableRepository.updateTableStatus(
+                    tableId = table.id,
+                    tableStatus = TableStatus.PREPARING,
+                )
                 navigateToTablePrepare()
             }
         }
