@@ -322,61 +322,9 @@ constructor(
                 val lastPhase = game.phaseList.lastOrNull()
                 val myPlayerId = getMyPlayerId.invoke() ?: return@collect
                 when (lastPhase) {
-                    is Phase.Standby -> {
-                        if (table.hostPlayerId == myPlayerId) {
-                            // スタンバイフェーズになったら、テーブルを準備中にする
-                            tableRepository.updateTableStatus(
-                                tableId = table.id,
-                                tableStatus = TableStatus.PREPARING,
-                            )
-                        }
-                    }
-
-                    is Phase.PotSettlement -> {
-                        // ポットマネージャー
-                        if (myPlayerId != table.potManagerPlayerId) {
-                            // ポットマネージャー以外では表示しない
-                            return@collect
-                        }
-                        val dialogUiState = potSettlementDialogUiStateMapper.createUiState(
-                            table = table,
-                            game = game
-                        )
-                        potSettlementDialogUiState.update { dialogUiState }
-                    }
-
-                    is Phase.End -> {
-                        // TODO: UseCase化
-                        if (myPlayerId == table.hostPlayerId) {
-                            // Tableにもスタックを反映
-                            val newStacks = game.players.associate { gamePlayer ->
-                                gamePlayer.id to gamePlayer.stack
-                            }
-                            tableRepository.updateBasePlayerStacks(
-                                tableId = table.id,
-                                stacks = newStacks
-                            )
-
-                            val nextPhase = getNextPhase.invoke(
-                                playerOrder = game.playerOrder,
-                                phaseList = game.phaseList,
-                            )
-                            sendNextGame(
-                                nextGame = game.copy(
-                                    phaseList = listOf(nextPhase) // 絶対にStandbyになるのでちょっとキモい
-                                ),
-                                leavedPlayerIds = table.leavedPlayerIds,
-                            )
-                        }
-                        if (myPlayerId != table.potManagerPlayerId) {
-                            // ポッドマネージャー以外に
-                            // ポットの結果を表示してあげる
-                            _shouldShowPotResultDialog.update {
-                                potResultDialogUiStateMapper.createUiState(lastPhase, table)
-                            }
-                        }
-                    }
-
+                    is Phase.Standby -> prepareStandbyPhase(table, myPlayerId)
+                    is Phase.PotSettlement -> preparePotSettlementPhase(myPlayerId, table, game)
+                    is Phase.End -> prepareEndPhase(myPlayerId, table, game, lastPhase)
                     else -> Unit
                 }
             }
@@ -407,6 +355,73 @@ constructor(
                 image = qrBitmapRepository.createQrBitmap(tableId.value).asImageBitmap()
             )
             qrPainterStateFlow.update { painter }
+        }
+    }
+
+    private suspend fun prepareStandbyPhase(
+        table: Table,
+        myPlayerId: PlayerId,
+    ) {
+        if (table.hostPlayerId == myPlayerId) {
+            // スタンバイフェーズになったら、テーブルを準備中にする
+            tableRepository.updateTableStatus(
+                tableId = table.id,
+                tableStatus = TableStatus.PREPARING,
+            )
+        }
+    }
+
+    private suspend fun preparePotSettlementPhase(
+        myPlayerId: PlayerId,
+        table: Table,
+        game: Game,
+    ) {
+        // ポットマネージャー
+        if (myPlayerId != table.potManagerPlayerId) {
+            // ポットマネージャー以外では表示しない
+            return
+        }
+        val dialogUiState = potSettlementDialogUiStateMapper.createUiState(
+            table = table,
+            game = game
+        )
+        potSettlementDialogUiState.update { dialogUiState }
+    }
+
+    private suspend fun prepareEndPhase(
+        myPlayerId: PlayerId,
+        table: Table,
+        game: Game,
+        lastPhase: Phase.End,
+    ) {
+        // TODO: UseCase化
+        if (myPlayerId == table.hostPlayerId) {
+            // Tableにもスタックを反映
+            val newStacks = game.players.associate { gamePlayer ->
+                gamePlayer.id to gamePlayer.stack
+            }
+            tableRepository.updateBasePlayerStacks(
+                tableId = table.id,
+                stacks = newStacks
+            )
+
+            val nextPhase = getNextPhase.invoke(
+                playerOrder = game.playerOrder,
+                phaseList = game.phaseList,
+            )
+            sendNextGame(
+                nextGame = game.copy(
+                    phaseList = listOf(nextPhase) // 絶対にStandbyになるのでちょっとキモい
+                ),
+                leavedPlayerIds = table.leavedPlayerIds,
+            )
+        }
+        if (myPlayerId != table.potManagerPlayerId) {
+            // ポッドマネージャー以外に
+            // ポットの結果を表示してあげる
+            _shouldShowPotResultDialog.update {
+                potResultDialogUiStateMapper.createUiState(lastPhase, table)
+            }
         }
     }
 
