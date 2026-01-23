@@ -910,6 +910,7 @@ constructor(
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
             // TODO: ゲームを継続できる条件はもっと厳しいかもしれないので問題ないか確認したい
+            //  （構成メンバー変わってたら次のゲーム行かないほうがいいかも？）
             // TODO: UseCase化したい
             if (
                 table.playerOrderWithoutLeaved.size in 2..10
