@@ -864,14 +864,17 @@ constructor(
             val dialogUiState = potSettlementDialogUiState.value ?: return@launch
             val currentPotIndex = dialogUiState.currentPotIndex
             val game = getCurrentGame() ?: return@launch
+            // 最後potの選択が終わったらPot精算、まだ残っているなら次のpot選択画面へ
             if (currentPotIndex == dialogUiState.pots.lastIndex) {
                 // Pot精算する
                 setPotSettlementInfo.invoke(
                     game = game,
                     pots = dialogUiState.pots,
                 )
+                // ダイアログを閉じる
                 potSettlementDialogUiState.update { null }
             } else {
+                // 次のPot選択画面へ
                 potSettlementDialogUiState.update {
                     it ?: return@update null
                     it.copy(
