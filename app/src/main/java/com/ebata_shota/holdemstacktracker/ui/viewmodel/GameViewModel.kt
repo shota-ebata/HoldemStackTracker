@@ -585,59 +585,41 @@ constructor(
 
     fun onClickFoldButton() {
         viewModelScope.launch {
+            startVibrateForFold()
+
             val game = getCurrentGame() ?: return@launch
             val myPlayerId = getMyPlayerId.invoke() ?: return@launch
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL)
-            }
-            doFold(
-                game = game,
-                myPlayerId = myPlayerId,
-            )
+            doFold(game, myPlayerId)
         }
     }
 
     fun onClickCheckButton() {
         viewModelScope.launch {
+            startVibrateForCheck()
+
             val game = getCurrentGame() ?: return@launch
             val myPlayerId = getMyPlayerId.invoke() ?: return@launch
-
-            startVibrateCheck()
-            doCheck(
-                game = game,
-                myPlayerId = myPlayerId,
-            )
+            doCheck(game, myPlayerId)
         }
     }
 
     fun onClickAllInButton() {
         viewModelScope.launch {
+            startVibrateForClickAllIn()
+
             val game = getCurrentGame() ?: return@launch
             val myPlayerId = getMyPlayerId.invoke() ?: return@launch
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE)
-            }
-            doAllIn(
-                game = game,
-                myPlayerId = myPlayerId,
-            )
+            doAllIn(game, myPlayerId)
         }
     }
 
     fun onClickCallButton() {
         viewModelScope.launch {
+            startVibrateForCall()
+
             val game = getCurrentGame() ?: return@launch
             val myPlayerId = getMyPlayerId.invoke() ?: return@launch
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                startVibrate(VibrationEffect.Composition.PRIMITIVE_CLICK)
-            }
-            doCall(
-                game = game,
-                myPlayerId = myPlayerId,
-            )
+            doCall(game, myPlayerId)
         }
     }
 
@@ -646,18 +628,12 @@ constructor(
      */
     fun onClickRaiseButton() {
         viewModelScope.launch {
+            startVibrateForRaise()
+
             val game = getCurrentGame() ?: return@launch
             val myPlayerId = getMyPlayerId.invoke() ?: return@launch
             val raiseSize = raiseSizeStateFlow.value ?: return@launch
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE)
-            }
-            doRaise(
-                game = game,
-                myPlayerId = myPlayerId,
-                raiseSize = raiseSize,
-            )
+            doRaise(game, myPlayerId, raiseSize)
             // レイズするたびに最小Raiseサイズにする
             raiseSizeStateFlow.update { minRaiseSizeFlow.first() }
         }
@@ -668,9 +644,8 @@ constructor(
      */
     fun onClickRaiseSizeButton(value: Int) {
         viewModelScope.launch {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                startVibrate(VibrationEffect.Composition.PRIMITIVE_TICK)
-            }
+            startVibrateForChangeRaiseSize()
+
             raiseSizeStateFlow.update { value }
         }
     }
@@ -684,9 +659,8 @@ constructor(
                 minRaiseSize = minRaiseSize,
             )
             if (nextRaiseSize != raiseSizeStateFlow.value) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    startVibrate(VibrationEffect.Composition.PRIMITIVE_TICK)
-                }
+                startVibrateForChangeRaiseSize()
+
                 raiseSizeStateFlow.update { nextRaiseSize }
             }
         }
@@ -702,9 +676,8 @@ constructor(
                 game = game,
             )
             if (nextRaiseSize != raiseSizeStateFlow.value) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    startVibrate(VibrationEffect.Composition.PRIMITIVE_TICK)
-                }
+                startVibrateForChangeRaiseSize()
+
                 raiseSizeStateFlow.update { nextRaiseSize }
             }
         }
@@ -719,18 +692,12 @@ constructor(
     fun onClickAutoCheckFoldButton() {
         viewModelScope.launch {
             autoCheckFoldTypeState.update { autoCheckOrFoldType ->
+                startVibrateForAutoCheckFold(autoCheckOrFoldType)
+
                 when (autoCheckOrFoldType) {
-                    is AutoCheckOrFoldType.ByGame -> {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                            startVibrate(VibrationEffect.Composition.PRIMITIVE_LOW_TICK)
-                        }
-                        AutoCheckOrFoldType.None
-                    }
+                    is AutoCheckOrFoldType.ByGame -> AutoCheckOrFoldType.None
                     is AutoCheckOrFoldType.None -> {
                         val gameId = getCurrentGame()?.gameId ?: return@launch
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            startVibrate(VibrationEffect.Composition.PRIMITIVE_CLICK)
-                        }
                         AutoCheckOrFoldType.ByGame(gameId)
                     }
                 }
@@ -760,16 +727,7 @@ constructor(
                 sliderPosition = sliderPosition
             )
             if (raiseSize != raiseSizeStateFlow.value) {
-                val isEnableRaiseUpSliderStep = prefRepository.isEnableRaiseUpSliderStep.first()
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    startVibrate(
-                        if (isEnableRaiseUpSliderStep) {
-                            VibrationEffect.Composition.PRIMITIVE_TICK
-                        } else {
-                            VibrationEffect.Composition.PRIMITIVE_LOW_TICK
-                        }
-                    )
-                }
+                startVibrateForSlider()
             }
             raiseSizeStateFlow.update { raiseSize }
         }
@@ -961,13 +919,76 @@ constructor(
         }
     }
 
-    private fun startVibrateCheck() {
+    private fun startVibrateForFold() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL)
+        }
+    }
+
+    private fun startVibrateForCheck() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             vibrator.vibrate(
                 VibrationEffect.startComposition()
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f)
                     .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 150)
                     .compose()
+            )
+        }
+    }
+
+    private fun startVibrateForClickAllIn() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE)
+        }
+    }
+
+    private fun startVibrateForCall() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            startVibrate(VibrationEffect.Composition.PRIMITIVE_CLICK)
+        }
+    }
+
+    private fun startVibrateForRaise() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE)
+        }
+    }
+
+    private fun startVibrateForChangeRaiseSize() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            startVibrate(VibrationEffect.Composition.PRIMITIVE_TICK)
+        }
+    }
+
+    private fun startVibrateForAutoCheckFold(autoCheckOrFoldType: AutoCheckOrFoldType) {
+        when (autoCheckOrFoldType) {
+            is AutoCheckOrFoldType.ByGame -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    startVibrate(VibrationEffect.Composition.PRIMITIVE_LOW_TICK)
+                }
+            }
+
+            is AutoCheckOrFoldType.None -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    startVibrate(VibrationEffect.Composition.PRIMITIVE_CLICK)
+                }
+            }
+        }
+    }
+
+    private suspend fun startVibrateForSlider() {
+        val isEnableRaiseUpSliderStep = prefRepository.isEnableRaiseUpSliderStep.first()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            startVibrate(
+                if (isEnableRaiseUpSliderStep) {
+                    VibrationEffect.Composition.PRIMITIVE_TICK
+                } else {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        VibrationEffect.Composition.PRIMITIVE_LOW_TICK
+                    } else {
+                        VibrationEffect.Composition.PRIMITIVE_TICK
+                    }
+                }
             )
         }
     }
