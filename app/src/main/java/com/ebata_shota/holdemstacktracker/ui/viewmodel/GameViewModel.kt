@@ -66,7 +66,7 @@ import com.ebata_shota.holdemstacktracker.ui.usecase.MapGameContentUiStateUseCas
 import com.ebata_shota.holdemstacktracker.ui.usecase.MapGameTableInfoDetailContentUiStateUseCase
 import com.ebata_shota.holdemstacktracker.ui.usecase.MapPhaseIntervalImageDialogUiStateUseCase
 import com.ebata_shota.holdemstacktracker.ui.usecase.PotResultDialogUiStateMapper
-import com.ebata_shota.holdemstacktracker.ui.usecase.PotSettlementDialogUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.usecase.MapPotSettlementDialogUiStateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -123,7 +123,7 @@ constructor(
     private val mapGameContentUiState: MapGameContentUiStateUseCase,
     private val mapPhaseIntervalImageDialogUiStateUseCase: MapPhaseIntervalImageDialogUiStateUseCase,
     private val mapGameTableInfoDetailContentUiStateUseCase: MapGameTableInfoDetailContentUiStateUseCase,
-    private val potSettlementDialogUiStateMapper: PotSettlementDialogUiStateMapper,
+    private val mapPotSettlementDialogUiStateUseCase: MapPotSettlementDialogUiStateUseCase,
     private val potResultDialogUiStateMapper: PotResultDialogUiStateMapper,
     private val vibrator: Vibrator,
 ) : ViewModel(),
@@ -382,7 +382,7 @@ constructor(
             // ポットマネージャー以外では表示しない
             return
         }
-        val dialogUiState = potSettlementDialogUiStateMapper.createUiState(
+        val dialogUiState = mapPotSettlementDialogUiStateUseCase.invoke(
             table = table,
             game = game
         )

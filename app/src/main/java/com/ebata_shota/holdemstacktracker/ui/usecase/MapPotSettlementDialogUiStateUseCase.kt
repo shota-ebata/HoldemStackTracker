@@ -10,12 +10,12 @@ import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 
 @ViewModelScoped
-class PotSettlementDialogUiStateMapper
+class MapPotSettlementDialogUiStateUseCase
 @Inject
 constructor(
     private val getNotFoldPlayerIds: GetNotFoldPlayerIdsUseCase,
 ) {
-    suspend fun createUiState(
+    suspend fun invoke(
         table: Table,
         game: Game,
     ): PotSettlementDialogUiState {
