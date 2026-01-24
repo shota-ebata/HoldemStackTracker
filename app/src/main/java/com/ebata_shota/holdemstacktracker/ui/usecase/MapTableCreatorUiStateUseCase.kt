@@ -11,11 +11,11 @@ import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 
 @ViewModelScoped
-class TableCreatorUiStateMapper
+class MapTableCreatorUiStateUseCase
 @Inject
 constructor() {
 
-    fun createUiState(
+    fun invoke(
         ringGameRule: Rule.RingGame,
         submitButtonLabel: StringSource,
     ) = TableCreatorContentUiState(

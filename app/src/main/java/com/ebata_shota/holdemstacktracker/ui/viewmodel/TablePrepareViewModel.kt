@@ -52,7 +52,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TablePrepareScreenDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TablePrepareScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
-import com.ebata_shota.holdemstacktracker.ui.usecase.TableCreatorUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.usecase.MapTableCreatorUiStateUseCase
 import com.ebata_shota.holdemstacktracker.ui.usecase.TablePrepareScreenUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.cancel
@@ -94,7 +94,7 @@ constructor(
     private val getNextBtnPlayerId: GetNextBtnPlayerIdUseCase,
     private val joinPlayerFormWaitPlayer: JoinPlayerFromWaitPlayerUseCase,
     private val uiStateMapper: TablePrepareScreenUiStateMapper,
-    private val tableCreatorUiStateMapper: TableCreatorUiStateMapper,
+    private val mapTableCreatorUiStateUseCase: MapTableCreatorUiStateUseCase,
 ) : ViewModel(),
     MyNameInputDialogEvent,
     PlayerRemoveDialogEvent,
@@ -394,7 +394,7 @@ constructor(
         when (val rule = table.rule) {
             is Rule.RingGame -> _dialogUiState.update {
                 it.copy(
-                    tableCreatorContentUiState = tableCreatorUiStateMapper.createUiState(
+                    tableCreatorContentUiState = mapTableCreatorUiStateUseCase.invoke(
                         ringGameRule = rule,
                         submitButtonLabel = StringSource(R.string.game_rule_update_button),
                     )

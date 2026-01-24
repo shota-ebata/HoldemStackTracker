@@ -24,7 +24,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiS
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableCreatorDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableCreatorUiState
-import com.ebata_shota.holdemstacktracker.ui.usecase.TableCreatorUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.usecase.MapTableCreatorUiStateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,7 +51,7 @@ constructor(
     private val defaultRuleStateOfRingRepository: DefaultRuleStateOfRingRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val prefRepository: PrefRepository,
-    private val uiStateMapper: TableCreatorUiStateMapper,
+    private val uiStateMapper: MapTableCreatorUiStateUseCase,
 ) : ViewModel(), MyNameInputDialogEvent {
 
     /**
@@ -80,7 +80,7 @@ constructor(
             val ringGame = defaultRuleStateOfRingRepository.ringGameFlow.first()
             _screenUiState.update {
                 TableCreatorUiState.MainContent(
-                    tableCreatorContentUiState = uiStateMapper.createUiState(
+                    tableCreatorContentUiState = uiStateMapper.invoke(
                         ringGameRule = ringGame,
                         submitButtonLabel = StringSource(R.string.table_creator_submit),
                     )
