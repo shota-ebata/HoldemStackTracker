@@ -13,10 +13,10 @@ import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 
 @ViewModelScoped
-class TablePrepareScreenUiStateMapper
+class MapTablePrepareScreenUiStateUseCase
 @Inject
 constructor() {
-    suspend fun createUiState(
+    suspend fun invoke(
         table: Table,
         myPlayerId: PlayerId,
         isNewGame: Boolean,

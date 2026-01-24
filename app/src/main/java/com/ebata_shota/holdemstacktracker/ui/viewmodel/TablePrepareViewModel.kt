@@ -53,7 +53,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.screen.TablePrepareScreenDi
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TablePrepareScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
 import com.ebata_shota.holdemstacktracker.ui.usecase.MapTableCreatorUiStateUseCase
-import com.ebata_shota.holdemstacktracker.ui.usecase.TablePrepareScreenUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.usecase.MapTablePrepareScreenUiStateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -93,7 +93,7 @@ constructor(
     private val hasErrorChipSizeTextValue: HasErrorChipSizeTextValueUseCase,
     private val getNextBtnPlayerId: GetNextBtnPlayerIdUseCase,
     private val joinPlayerFormWaitPlayer: JoinPlayerFromWaitPlayerUseCase,
-    private val uiStateMapper: TablePrepareScreenUiStateMapper,
+    private val mapTablePrepareScreenUiState: MapTablePrepareScreenUiStateUseCase,
     private val mapTableCreatorUiStateUseCase: MapTableCreatorUiStateUseCase,
 ) : ViewModel(),
     MyNameInputDialogEvent,
@@ -343,7 +343,7 @@ constructor(
     ) {
         viewModelScope.launch {
             _uiState.update {
-                uiStateMapper.createUiState(
+                mapTablePrepareScreenUiState.invoke(
                     table = table,
                     myPlayerId = myPlayerId,
                     isNewGame = lastBtnPlayerId == null,
