@@ -64,7 +64,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
 import com.ebata_shota.holdemstacktracker.ui.usecase.MapGameContentUiStateUseCase
 import com.ebata_shota.holdemstacktracker.ui.usecase.GameTableInfoDetailContentUiStateMapper
-import com.ebata_shota.holdemstacktracker.ui.usecase.PhaseIntervalImageDialogUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.usecase.MapPhaseIntervalImageDialogUiStateUseCase
 import com.ebata_shota.holdemstacktracker.ui.usecase.PotResultDialogUiStateMapper
 import com.ebata_shota.holdemstacktracker.ui.usecase.PotSettlementDialogUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -121,7 +121,7 @@ constructor(
     private val createNewGame: CreateNewGameUseCase,
     private val getMyPlayerId: GetMyPlayerIdUseCase,
     private val mapGameContentUiState: MapGameContentUiStateUseCase,
-    private val phaseIntervalImageDialogUiStateMapper: PhaseIntervalImageDialogUiStateMapper,
+    private val mapPhaseIntervalImageDialogUiStateUseCase: MapPhaseIntervalImageDialogUiStateUseCase,
     private val gameTableInfoDetailContentUiStateMapper: GameTableInfoDetailContentUiStateMapper,
     private val potSettlementDialogUiStateMapper: PotSettlementDialogUiStateMapper,
     private val potResultDialogUiStateMapper: PotResultDialogUiStateMapper,
@@ -304,7 +304,7 @@ constructor(
                 // FIXME: PhaseHistoryをPhaseIdから見て、見た後であれば表示しない対応を入れたい
                 // FIXME: AllInCloseのケースを実装したい
                 val phaseIntervalImageDialogUiState =
-                    phaseIntervalImageDialogUiStateMapper.createUiState(game)
+                    mapPhaseIntervalImageDialogUiStateUseCase.invoke(game)
                 if (phaseIntervalImageDialogUiState != null) {
                     // ダイアログの表示の場合は1秒待つ
                     delay(1000L)

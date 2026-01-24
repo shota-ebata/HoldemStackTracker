@@ -10,10 +10,10 @@ import javax.inject.Inject
 
 
 @ViewModelScoped
-class PhaseIntervalImageDialogUiStateMapper
+class MapPhaseIntervalImageDialogUiStateUseCase
 @Inject
 constructor() {
-    fun createUiState(game: Game): PhaseIntervalImageDialogUiState? {
+    fun invoke(game: Game): PhaseIntervalImageDialogUiState? {
         return when (val lastPhase = game.phaseList.lastOrNull()) {
             is Phase.Standby -> null
             is Phase.PreFlop -> {
