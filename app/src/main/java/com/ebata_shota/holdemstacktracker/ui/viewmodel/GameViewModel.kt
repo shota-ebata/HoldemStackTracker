@@ -65,7 +65,7 @@ import com.ebata_shota.holdemstacktracker.ui.extension.param
 import com.ebata_shota.holdemstacktracker.ui.usecase.MapGameContentUiStateUseCase
 import com.ebata_shota.holdemstacktracker.ui.usecase.MapGameTableInfoDetailContentUiStateUseCase
 import com.ebata_shota.holdemstacktracker.ui.usecase.MapPhaseIntervalImageDialogUiStateUseCase
-import com.ebata_shota.holdemstacktracker.ui.usecase.PotResultDialogUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.usecase.MapPotResultDialogUiStateUseCase
 import com.ebata_shota.holdemstacktracker.ui.usecase.MapPotSettlementDialogUiStateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -124,7 +124,7 @@ constructor(
     private val mapPhaseIntervalImageDialogUiStateUseCase: MapPhaseIntervalImageDialogUiStateUseCase,
     private val mapGameTableInfoDetailContentUiStateUseCase: MapGameTableInfoDetailContentUiStateUseCase,
     private val mapPotSettlementDialogUiStateUseCase: MapPotSettlementDialogUiStateUseCase,
-    private val potResultDialogUiStateMapper: PotResultDialogUiStateMapper,
+    private val mapPotResultDialogUiStateUseCase: MapPotResultDialogUiStateUseCase,
     private val vibrator: Vibrator,
 ) : ViewModel(),
     GameSettingsDialogEvent,
@@ -412,7 +412,7 @@ constructor(
             // ポッドマネージャー以外に
             // ポットの結果を表示してあげる
             _shouldShowPotResultDialog.update {
-                potResultDialogUiStateMapper.createUiState(lastPhase, table)
+                mapPotResultDialogUiStateUseCase.invoke(lastPhase, table)
             }
         }
     }

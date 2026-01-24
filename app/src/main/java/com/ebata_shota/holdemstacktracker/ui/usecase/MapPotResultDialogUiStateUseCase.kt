@@ -10,10 +10,10 @@ import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 
 @ViewModelScoped
-class PotResultDialogUiStateMapper
+class MapPotResultDialogUiStateUseCase
 @Inject
 constructor() {
-    fun createUiState(
+    fun invoke(
         lastPhase: Phase.End,
         table: Table,
     ): PotResultDialogUiState = PotResultDialogUiState(
