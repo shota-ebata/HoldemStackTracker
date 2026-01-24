@@ -53,7 +53,7 @@ import javax.inject.Inject
 import kotlin.math.roundToInt
 
 @ViewModelScoped
-class GameContentUiStateMapper
+class MapGameContentUiStateUseCase
 @Inject
 constructor(
     private val getPendingBetPerPlayer: GetPendingBetPerPlayerUseCase,
@@ -66,7 +66,7 @@ constructor(
     private val dispatcher: CoroutineDispatcher,
 ) {
 
-    suspend fun createUiState(
+    suspend fun invoke(
         game: Game,
         table: Table,
         myPlayerId: PlayerId,

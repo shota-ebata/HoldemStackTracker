@@ -62,7 +62,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogE
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
-import com.ebata_shota.holdemstacktracker.ui.usecase.GameContentUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.usecase.MapGameContentUiStateUseCase
 import com.ebata_shota.holdemstacktracker.ui.usecase.GameTableInfoDetailContentUiStateMapper
 import com.ebata_shota.holdemstacktracker.ui.usecase.PhaseIntervalImageDialogUiStateMapper
 import com.ebata_shota.holdemstacktracker.ui.usecase.PotResultDialogUiStateMapper
@@ -120,7 +120,7 @@ constructor(
     private val getNextBtnPlayerId: GetNextBtnPlayerIdUseCase,
     private val createNewGame: CreateNewGameUseCase,
     private val getMyPlayerId: GetMyPlayerIdUseCase,
-    private val uiStateMapper: GameContentUiStateMapper,
+    private val mapGameContentUiState: MapGameContentUiStateUseCase,
     private val phaseIntervalImageDialogUiStateMapper: PhaseIntervalImageDialogUiStateMapper,
     private val gameTableInfoDetailContentUiStateMapper: GameTableInfoDetailContentUiStateMapper,
     private val potSettlementDialogUiStateMapper: PotSettlementDialogUiStateMapper,
@@ -458,7 +458,7 @@ constructor(
             return
         }
 
-        val contentUiState: GameContentUiState? = uiStateMapper.createUiState(
+        val contentUiState: GameContentUiState? = mapGameContentUiState.invoke(
             game = game,
             table = table,
             myPlayerId = myPlayerId,
