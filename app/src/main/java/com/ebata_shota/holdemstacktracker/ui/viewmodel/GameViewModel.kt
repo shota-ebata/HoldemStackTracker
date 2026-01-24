@@ -451,9 +451,9 @@ constructor(
             // TODO: ちょっとディレイをかけてもいいかも？
             val isEnableCheck = isEnableCheck.invoke(game, myPlayerId) ?: return
             if (isEnableCheck) {
-                doCheck(game, myPlayerId)
+                doCheck(table, game, myPlayerId)
             } else {
-                doFold(game, myPlayerId)
+                doFold(table, game, myPlayerId)
             }
             return
         }
@@ -483,10 +483,10 @@ constructor(
     }
 
     private suspend fun doFold(
+        table: Table,
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        val table = getCurrentTable() ?: return
         doFold.invoke(
             currentGame = game,
             rule = table.rule,
@@ -496,10 +496,10 @@ constructor(
     }
 
     private suspend fun doCheck(
+        table: Table,
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        val table = getCurrentTable() ?: return
         doCheck.invoke(
             currentGame = game,
             rule = table.rule,
@@ -509,10 +509,10 @@ constructor(
     }
 
     private suspend fun doAllIn(
+        table: Table,
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        val table = getCurrentTable() ?: return
         doAllIn.invoke(
             currentGame = game,
             rule = table.rule,
@@ -522,10 +522,10 @@ constructor(
     }
 
     private suspend fun doCall(
+        table: Table,
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        val table = getCurrentTable() ?: return
         doCall.invoke(
             currentGame = game,
             rule = table.rule,
@@ -535,11 +535,11 @@ constructor(
     }
 
     private suspend fun doRaise(
+        table: Table,
         game: Game,
         myPlayerId: PlayerId,
         raiseSize: Int,
     ) {
-        val table = getCurrentTable() ?: return
         doRaise.invoke(
             currentGame = game,
             rule = table.rule,
@@ -550,10 +550,10 @@ constructor(
     }
 
     private suspend fun sendNextGame(
+        table: Table,
         nextGame: Game,
         leavedPlayerIds: List<PlayerId>,
     ) {
-        val table = getCurrentTable() ?: return
         // AutoActionがあれば追加する
         val addedAutoActionGame = getAddedAutoActionsGame.invoke(
             game = nextGame,
@@ -587,9 +587,10 @@ constructor(
         viewModelScope.launch {
             startVibrateForFold()
 
+            val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
             val myPlayerId = getMyPlayerId.invoke() ?: return@launch
-            doFold(game, myPlayerId)
+            doFold(table, game, myPlayerId)
         }
     }
 
@@ -597,9 +598,10 @@ constructor(
         viewModelScope.launch {
             startVibrateForCheck()
 
+            val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
             val myPlayerId = getMyPlayerId.invoke() ?: return@launch
-            doCheck(game, myPlayerId)
+            doCheck(table, game, myPlayerId)
         }
     }
 
@@ -607,9 +609,10 @@ constructor(
         viewModelScope.launch {
             startVibrateForClickAllIn()
 
+            val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
             val myPlayerId = getMyPlayerId.invoke() ?: return@launch
-            doAllIn(game, myPlayerId)
+            doAllIn(table, game, myPlayerId)
         }
     }
 
@@ -617,9 +620,10 @@ constructor(
         viewModelScope.launch {
             startVibrateForCall()
 
+            val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
             val myPlayerId = getMyPlayerId.invoke() ?: return@launch
-            doCall(game, myPlayerId)
+            doCall(table, game, myPlayerId)
         }
     }
 
@@ -630,10 +634,11 @@ constructor(
         viewModelScope.launch {
             startVibrateForRaise()
 
+            val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
             val myPlayerId = getMyPlayerId.invoke() ?: return@launch
             val raiseSize = raiseSizeStateFlow.value ?: return@launch
-            doRaise(game, myPlayerId, raiseSize)
+            doRaise(table, game, myPlayerId, raiseSize)
             // レイズするたびに最小Raiseサイズにする
             raiseSizeStateFlow.update { minRaiseSizeFlow.first() }
         }
@@ -853,6 +858,7 @@ constructor(
                 phaseList = game.phaseList,
             )
             sendNextGame(
+                table = table,
                 nextGame = game.copy(
                     phaseList = listOf(nextPhase) // 絶対にStandbyになるのでちょっとキモい
                 ),
