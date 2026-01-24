@@ -63,7 +63,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogU
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
 import com.ebata_shota.holdemstacktracker.ui.usecase.MapGameContentUiStateUseCase
-import com.ebata_shota.holdemstacktracker.ui.usecase.GameTableInfoDetailContentUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.usecase.MapGameTableInfoDetailContentUiStateUseCase
 import com.ebata_shota.holdemstacktracker.ui.usecase.MapPhaseIntervalImageDialogUiStateUseCase
 import com.ebata_shota.holdemstacktracker.ui.usecase.PotResultDialogUiStateMapper
 import com.ebata_shota.holdemstacktracker.ui.usecase.PotSettlementDialogUiStateMapper
@@ -122,7 +122,7 @@ constructor(
     private val getMyPlayerId: GetMyPlayerIdUseCase,
     private val mapGameContentUiState: MapGameContentUiStateUseCase,
     private val mapPhaseIntervalImageDialogUiStateUseCase: MapPhaseIntervalImageDialogUiStateUseCase,
-    private val gameTableInfoDetailContentUiStateMapper: GameTableInfoDetailContentUiStateMapper,
+    private val mapGameTableInfoDetailContentUiStateUseCase: MapGameTableInfoDetailContentUiStateUseCase,
     private val potSettlementDialogUiStateMapper: PotSettlementDialogUiStateMapper,
     private val potResultDialogUiStateMapper: PotResultDialogUiStateMapper,
     private val vibrator: Vibrator,
@@ -575,7 +575,7 @@ constructor(
             val gameScreenUiState = screenUiState.value as? GameScreenUiState.Content
                 ?: return@launch
             gameTableInfoDetailDialogUiState.update {
-                gameTableInfoDetailContentUiStateMapper.createUiState(
+                mapGameTableInfoDetailContentUiStateUseCase.invoke(
                     game = game,
                     gameScreenUiState = gameScreenUiState,
                 )

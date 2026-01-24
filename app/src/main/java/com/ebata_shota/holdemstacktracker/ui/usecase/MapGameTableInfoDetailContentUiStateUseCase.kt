@@ -9,10 +9,10 @@ import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 
 @ViewModelScoped
-class GameTableInfoDetailContentUiStateMapper
+class MapGameTableInfoDetailContentUiStateUseCase
 @Inject
 constructor() {
-    fun createUiState(
+    fun invoke(
         game: Game,
         gameScreenUiState: GameScreenUiState.Content,
     ): GameTableInfoDetailContentUiState {
