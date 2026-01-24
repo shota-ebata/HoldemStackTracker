@@ -1,4 +1,4 @@
-package com.ebata_shota.holdemstacktracker.ui.mapper
+package com.ebata_shota.holdemstacktracker.ui.usecase
 
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource

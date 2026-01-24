@@ -1,4 +1,4 @@
-package com.ebata_shota.holdemstacktracker.ui.mapper
+package com.ebata_shota.holdemstacktracker.ui.usecase
 
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault

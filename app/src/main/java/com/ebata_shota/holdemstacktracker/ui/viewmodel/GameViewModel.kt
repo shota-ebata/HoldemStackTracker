@@ -62,11 +62,11 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogE
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
-import com.ebata_shota.holdemstacktracker.ui.mapper.GameContentUiStateMapper
-import com.ebata_shota.holdemstacktracker.ui.mapper.GameTableInfoDetailContentUiStateMapper
-import com.ebata_shota.holdemstacktracker.ui.mapper.PhaseIntervalImageDialogUiStateMapper
-import com.ebata_shota.holdemstacktracker.ui.mapper.PotResultDialogUiStateMapper
-import com.ebata_shota.holdemstacktracker.ui.mapper.PotSettlementDialogUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.usecase.GameContentUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.usecase.GameTableInfoDetailContentUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.usecase.PhaseIntervalImageDialogUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.usecase.PotResultDialogUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.usecase.PotSettlementDialogUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow

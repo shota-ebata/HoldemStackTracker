@@ -52,8 +52,8 @@ import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TablePrepareScreenDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TablePrepareScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
-import com.ebata_shota.holdemstacktracker.ui.mapper.TableCreatorUiStateMapper
-import com.ebata_shota.holdemstacktracker.ui.mapper.TablePrepareScreenUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.usecase.TableCreatorUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.usecase.TablePrepareScreenUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow

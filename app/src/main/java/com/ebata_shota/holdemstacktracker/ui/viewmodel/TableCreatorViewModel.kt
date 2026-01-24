@@ -24,7 +24,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.MyNameInputDialogUiS
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ErrorMessage
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableCreatorDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.TableCreatorUiState
-import com.ebata_shota.holdemstacktracker.ui.mapper.TableCreatorUiStateMapper
+import com.ebata_shota.holdemstacktracker.ui.usecase.TableCreatorUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

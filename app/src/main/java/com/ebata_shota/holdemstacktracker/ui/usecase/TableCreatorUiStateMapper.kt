@@ -1,4 +1,4 @@
-package com.ebata_shota.holdemstacktracker.ui.mapper
+package com.ebata_shota.holdemstacktracker.ui.usecase
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.ebata_shota.holdemstacktracker.R
