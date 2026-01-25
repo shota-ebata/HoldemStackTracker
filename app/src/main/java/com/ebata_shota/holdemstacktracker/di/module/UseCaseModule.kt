@@ -9,6 +9,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.DoCheckUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoFoldUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoRaiseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoTransitionToNextPhaseIfNeedUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteOwnAutoActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionTypeInLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetActionablePlayerIdsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetAddedAutoActionsGameUseCase
@@ -57,6 +58,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoCheckUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoFoldUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoRaiseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.DoTransitionToNextPhaseIfNeedUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.ExecuteOwnAutoActionUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActionTypeInLastPhaseAsBetPhaseUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetActionablePlayerIdsUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetAddedAutoActionsGameUseCaseImpl
@@ -247,4 +249,6 @@ interface UseCaseModule {
 
     @Binds
     fun bindGetMyPlayerIdUseCase(useCase: GetMyPlayerIdUseCaseImpl): GetMyPlayerIdUseCase
+    @Binds
+    fun bindExecuteOwnAutoActionUseCase(useCase: ExecuteOwnAutoActionUseCaseImpl): ExecuteOwnAutoActionUseCase
 }

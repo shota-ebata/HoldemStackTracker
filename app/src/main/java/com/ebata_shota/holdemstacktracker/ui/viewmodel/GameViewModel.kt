@@ -37,6 +37,7 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.DoCheckUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoFoldUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoRaiseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.DoTransitionToNextPhaseIfNeedUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteOwnAutoActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetAddedAutoActionsGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMyPlayerIdUseCase
@@ -125,6 +126,7 @@ constructor(
     private val mapGameTableInfoDetailContentUiState: MapGameTableInfoDetailContentUiStateUseCase,
     private val mapPotSettlementDialogUiState: MapPotSettlementDialogUiStateUseCase,
     private val mapPotResultDialogUiState: MapPotResultDialogUiStateUseCase,
+    private val executeOwnAutoAction: ExecuteOwnAutoActionUseCase,
     private val vibrator: Vibrator,
 ) : ViewModel(),
     GameSettingsDialogEvent,
@@ -408,22 +410,9 @@ constructor(
             return
         }
 
-        if (
-            isCurrentPlayer(game, myPlayerId) == true
-            && autoCheckOrFoldType is AutoCheckOrFoldType.ByGame
-            && autoCheckOrFoldType.gameId == game.gameId
-        ) {
-            // 自分の手番で
-            // AutoCheck or AutoFold モードのときに
-            // オートアクションを実行
-            // TODO: ちょっとディレイをかけてもいいかも？
-            val isEnableCheck = isEnableCheck(game, myPlayerId) ?: return
-            if (isEnableCheck) {
-                doCheck(table, game, myPlayerId)
-            } else {
-                doFold(table, game, myPlayerId)
-            }
-            return
+        if (executeOwnAutoAction(table, game, myPlayerId, autoCheckOrFoldType)) {
+            // 自分のAutoActionの実行があれば、UiStateの作成をやめる
+            return 
         }
 
         val contentUiState: GameContentUiState = mapGameContentUiState.invoke(
