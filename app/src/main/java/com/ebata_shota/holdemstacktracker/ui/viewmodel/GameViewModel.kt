@@ -97,11 +97,11 @@ constructor(
     private val tableRepository: TableRepository,
     private val gameRepository: GameRepository,
     private val prefRepository: PrefRepository,
-    private val renameTablePlayer: RenameTablePlayerUseCase,
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val actionHistoryRepository: ActionHistoryRepository,
     private val phaseHistoryRepository: PhaseHistoryRepository,
     private val qrBitmapRepository: QrBitmapRepository,
+    private val renameTablePlayer: RenameTablePlayerUseCase,
     private val getMinRaiseSize: GetMinRaiseSizeUseCase,
     private val getOneDownRaiseSize: GetOneDownRaiseSizeUseCase,
     private val getOneUpRaiseSize: GetOneUpRaiseSizeUseCase,
@@ -121,10 +121,10 @@ constructor(
     private val createNewGame: CreateNewGameUseCase,
     private val getMyPlayerId: GetMyPlayerIdUseCase,
     private val mapGameContentUiState: MapGameContentUiStateUseCase,
-    private val mapPhaseIntervalImageDialogUiStateUseCase: MapPhaseIntervalImageDialogUiStateUseCase,
-    private val mapGameTableInfoDetailContentUiStateUseCase: MapGameTableInfoDetailContentUiStateUseCase,
-    private val mapPotSettlementDialogUiStateUseCase: MapPotSettlementDialogUiStateUseCase,
-    private val mapPotResultDialogUiStateUseCase: MapPotResultDialogUiStateUseCase,
+    private val mapPhaseIntervalImageDialogUiState: MapPhaseIntervalImageDialogUiStateUseCase,
+    private val mapGameTableInfoDetailContentUiState: MapGameTableInfoDetailContentUiStateUseCase,
+    private val mapPotSettlementDialogUiState: MapPotSettlementDialogUiStateUseCase,
+    private val mapPotResultDialogUiState: MapPotResultDialogUiStateUseCase,
     private val vibrator: Vibrator,
 ) : ViewModel(),
     GameSettingsDialogEvent,
@@ -167,7 +167,7 @@ constructor(
         tableStateFlow.filterNotNull(),
         gameStateFlow.filterNotNull()
     ) { table, game ->
-        getMinRaiseSize.invoke(
+        getMinRaiseSize(
             phaseList = game.phaseList,
             minBetSize = table.rule.minBetSize
         )
@@ -304,7 +304,7 @@ constructor(
                 // FIXME: PhaseHistoryをPhaseIdから見て、見た後であれば表示しない対応を入れたい
                 // FIXME: AllInCloseのケースを実装したい
                 val phaseIntervalImageDialogUiState =
-                    mapPhaseIntervalImageDialogUiStateUseCase.invoke(game)
+                    mapPhaseIntervalImageDialogUiState.invoke(game)
                 if (phaseIntervalImageDialogUiState != null) {
                     // ダイアログの表示の場合は1秒待つ
                     delay(1000L)
@@ -320,34 +320,15 @@ constructor(
             gameStateFlow.filterNotNull().collect { game ->
                 val table = getCurrentTable() ?: return@collect
                 val lastPhase = game.phaseList.lastOrNull()
-                val myPlayerId = getMyPlayerId.invoke() ?: return@collect
+                val myPlayerId = getMyPlayerId() ?: return@collect
                 when (lastPhase) {
-                    is Phase.Standby -> prepareStandbyPhase(table, myPlayerId)
+                    is Phase.Standby -> Unit
                     is Phase.PotSettlement -> preparePotSettlementPhase(myPlayerId, table, game)
                     is Phase.End -> prepareEndPhase(myPlayerId, table, game, lastPhase)
                     else -> Unit
                 }
             }
         }
-
-//        // テーブルの状態に応じた遷移
-//        viewModelScope.launch {
-//            combine(
-//                tableStateFlow.filterNotNull(),
-//                gameStateFlow.filterNotNull(),
-//                transform = ::Pair
-//            ).collect { (table, game) ->
-//                val myPlayerId = getMyPlayerId.invoke() ?: return@collect
-//                if (
-//                    table.hostPlayerId == myPlayerId
-//                    && game.phaseList.lastOrNull() is Phase.End
-//                    && table.tableStatus == TableStatus.PLAYING
-//                ) {
-//                    // ホストでスタンバイフェーズでTableが準備中なら次の画面への
-//                    _shouldShowEnterNextGameDialog.update { true }
-//                }
-//            }
-//        }
 
         viewModelScope.launch {
             // QRコードを生成する
@@ -356,20 +337,6 @@ constructor(
             )
             qrPainterStateFlow.update { painter }
         }
-    }
-
-    private suspend fun prepareStandbyPhase(
-        table: Table,
-        myPlayerId: PlayerId,
-    ) {
-        // TODO: 消す？
-//        if (table.hostPlayerId == myPlayerId) {
-//            // スタンバイフェーズになったら、テーブルを準備中にする
-//            tableRepository.updateTableStatus(
-//                tableId = table.id,
-//                tableStatus = TableStatus.PREPARING,
-//            )
-//        }
     }
 
     private suspend fun preparePotSettlementPhase(
@@ -382,7 +349,7 @@ constructor(
             // ポットマネージャー以外では表示しない
             return
         }
-        val dialogUiState = mapPotSettlementDialogUiStateUseCase.invoke(
+        val dialogUiState = mapPotSettlementDialogUiState.invoke(
             table = table,
             game = game
         )
@@ -412,7 +379,7 @@ constructor(
             // ポッドマネージャー以外に
             // ポットの結果を表示してあげる
             _shouldShowPotResultDialog.update {
-                mapPotResultDialogUiStateUseCase.invoke(lastPhase, table)
+                mapPotResultDialogUiState.invoke(lastPhase, table)
             }
         }
     }
@@ -441,7 +408,7 @@ constructor(
         }
 
         if (
-            isCurrentPlayer.invoke(game, myPlayerId) == true
+            isCurrentPlayer(game, myPlayerId) == true
             && autoCheckOrFoldType is AutoCheckOrFoldType.ByGame
             && autoCheckOrFoldType.gameId == game.gameId
         ) {
@@ -449,7 +416,7 @@ constructor(
             // AutoCheck or AutoFold モードのときに
             // オートアクションを実行
             // TODO: ちょっとディレイをかけてもいいかも？
-            val isEnableCheck = isEnableCheck.invoke(game, myPlayerId) ?: return
+            val isEnableCheck = isEnableCheck(game, myPlayerId) ?: return
             if (isEnableCheck) {
                 doCheck(table, game, myPlayerId)
             } else {
@@ -487,7 +454,7 @@ constructor(
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        doFold.invoke(
+        doFold(
             currentGame = game,
             rule = table.rule,
             myPlayerId = myPlayerId,
@@ -500,7 +467,7 @@ constructor(
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        doCheck.invoke(
+        doCheck(
             currentGame = game,
             rule = table.rule,
             myPlayerId = myPlayerId,
@@ -513,7 +480,7 @@ constructor(
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        doAllIn.invoke(
+        doAllIn(
             currentGame = game,
             rule = table.rule,
             myPlayerId = myPlayerId,
@@ -526,7 +493,7 @@ constructor(
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        doCall.invoke(
+        doCall(
             currentGame = game,
             rule = table.rule,
             myPlayerId = myPlayerId,
@@ -540,13 +507,15 @@ constructor(
         myPlayerId: PlayerId,
         raiseSize: Int,
     ) {
-        doRaise.invoke(
+        doRaise(
             currentGame = game,
             rule = table.rule,
             myPlayerId = myPlayerId,
             raiseSize = raiseSize,
             leavedPlayerIds = table.leavedPlayerIds,
         )
+        // レイズするたびに最小Raiseサイズにする
+        raiseSizeStateFlow.update { minRaiseSizeFlow.first() }
     }
 
     private suspend fun sendNextGame(
@@ -555,7 +524,7 @@ constructor(
         leavedPlayerIds: List<PlayerId>,
     ) {
         // AutoActionがあれば追加する
-        val addedAutoActionGame = getAddedAutoActionsGame.invoke(
+        val addedAutoActionGame = getAddedAutoActionsGame(
             game = nextGame,
             rule = table.rule,
             leavedPlayerIds = leavedPlayerIds,
@@ -575,7 +544,7 @@ constructor(
             val gameScreenUiState = screenUiState.value as? GameScreenUiState.Content
                 ?: return@launch
             gameTableInfoDetailDialogUiState.update {
-                mapGameTableInfoDetailContentUiStateUseCase.invoke(
+                mapGameTableInfoDetailContentUiState.invoke(
                     game = game,
                     gameScreenUiState = gameScreenUiState,
                 )
@@ -589,7 +558,7 @@ constructor(
 
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
-            val myPlayerId = getMyPlayerId.invoke() ?: return@launch
+            val myPlayerId = getMyPlayerId() ?: return@launch
             doFold(table, game, myPlayerId)
         }
     }
@@ -600,7 +569,7 @@ constructor(
 
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
-            val myPlayerId = getMyPlayerId.invoke() ?: return@launch
+            val myPlayerId = getMyPlayerId() ?: return@launch
             doCheck(table, game, myPlayerId)
         }
     }
@@ -611,7 +580,7 @@ constructor(
 
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
-            val myPlayerId = getMyPlayerId.invoke() ?: return@launch
+            val myPlayerId = getMyPlayerId() ?: return@launch
             doAllIn(table, game, myPlayerId)
         }
     }
@@ -622,7 +591,7 @@ constructor(
 
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
-            val myPlayerId = getMyPlayerId.invoke() ?: return@launch
+            val myPlayerId = getMyPlayerId() ?: return@launch
             doCall(table, game, myPlayerId)
         }
     }
@@ -636,11 +605,9 @@ constructor(
 
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
-            val myPlayerId = getMyPlayerId.invoke() ?: return@launch
+            val myPlayerId = getMyPlayerId() ?: return@launch
             val raiseSize = raiseSizeStateFlow.value ?: return@launch
             doRaise(table, game, myPlayerId, raiseSize)
-            // レイズするたびに最小Raiseサイズにする
-            raiseSizeStateFlow.update { minRaiseSizeFlow.first() }
         }
     }
 
@@ -659,7 +626,7 @@ constructor(
         viewModelScope.launch {
             val currentRaiseSize = raiseSizeStateFlow.value ?: return@launch
             val minRaiseSize = minRaiseSizeFlow.first()
-            val nextRaiseSize = getOneDownRaiseSize.invoke(
+            val nextRaiseSize = getOneDownRaiseSize(
                 currentRaiseSize = currentRaiseSize,
                 minRaiseSize = minRaiseSize,
             )
@@ -676,7 +643,7 @@ constructor(
             val currentRaiseSize = raiseSizeStateFlow.value ?: return@launch
             val game = getCurrentGame() ?: return@launch
 
-            val nextRaiseSize = getOneUpRaiseSize.invoke(
+            val nextRaiseSize = getOneUpRaiseSize(
                 currentRaiseSize = currentRaiseSize,
                 game = game,
             )
@@ -723,9 +690,9 @@ constructor(
     fun onChangeSlider(sliderPosition: Float) {
         viewModelScope.launch {
             val game = getCurrentGame() ?: return@launch
-            val myPlayerId = getMyPlayerId.invoke() ?: return@launch
+            val myPlayerId = getMyPlayerId() ?: return@launch
             val minRaiseSize = minRaiseSizeFlow.first()
-            val raiseSize: Int = getRaiseSize.invoke(
+            val raiseSize: Int = getRaiseSize(
                 game = game,
                 myPlayerId = myPlayerId,
                 minRaiseSize = minRaiseSize,
@@ -830,7 +797,7 @@ constructor(
             // 最後potの選択が終わったらPot精算、まだ残っているなら次のpot選択画面へ
             if (currentPotIndex == dialogUiState.pots.lastIndex) {
                 // Pot精算する
-                setPotSettlementInfo.invoke(
+                setPotSettlementInfo(
                     game = game,
                     pots = dialogUiState.pots,
                 )
@@ -853,7 +820,7 @@ constructor(
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
             // TODO: 準備中にする
-            val nextPhase = getNextPhase.invoke(
+            val nextPhase = getNextPhase(
                 playerOrder = game.playerOrder,
                 phaseList = game.phaseList,
             )
@@ -886,9 +853,9 @@ constructor(
                 // 次のゲームに行けそうなら行く
                 // ・参加プレイヤー人数
                 // ・参加者のスタック
-                val nextBtnPlayerId = getNextBtnPlayerId.invoke(table, game)
+                val nextBtnPlayerId = getNextBtnPlayerId(table, game)
                 if (nextBtnPlayerId != null) {
-                    createNewGame.invoke(table.copy(btnPlayerId = nextBtnPlayerId))
+                    createNewGame(table.copy(btnPlayerId = nextBtnPlayerId))
                     tableRepository.updateTableStatus(
                         tableId = table.id,
                         tableStatus = TableStatus.PREPARING,
@@ -1020,7 +987,7 @@ constructor(
             phaseIntervalImageDialog.update { null }
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
-            doTransitionToNextPhaseIfNeed.invoke(
+            doTransitionToNextPhaseIfNeed(
                 game = game,
                 hostPlayerId = table.hostPlayerId,
                 rule = table.rule,
@@ -1032,7 +999,7 @@ constructor(
     fun onClickExitAlertDialogExitButton() {
         viewModelScope.launch {
             _navigateEvent.emit(Navigate.Finish)
-            val myPlayerId = getMyPlayerId.invoke() ?: return@launch
+            val myPlayerId = getMyPlayerId() ?: return@launch
             tableRepository.updateSeat(tableId, myPlayerId, isSeat = false)
             tableRepository.stopCollectTableFlow()
         }
