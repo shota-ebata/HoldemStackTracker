@@ -4,8 +4,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
 
-interface GetAddedAutoActionsGameUseCase {
-    suspend fun invoke(
+fun interface GetAddedAutoActionsGameUseCase {
+    suspend operator fun invoke(
         game: Game,
         rule: Rule,
         leavedPlayerIds: List<PlayerId>,

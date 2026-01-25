@@ -34,8 +34,8 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionInPh
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPlayerLastActionsUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPotListUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByPotSlider
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlider
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByPotSliderUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSliderUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.HasErrorChipSizeTextValueUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsActionRequiredInPhaseUseCase
@@ -82,8 +82,8 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActio
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPlayerLastActionsUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetPotListUseCaseImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetRaiseSizeByPotSliderImpl
-import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetRaiseSizeByStackSliderImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetRaiseSizeByPotSliderUseCaseImpl
+import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetRaiseSizeByStackSliderUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetRaiseSizeUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.HasErrorChipSizeTextValueUseCaseImpl
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.IsActionRequiredInPhaseUseCaseImpl
@@ -162,10 +162,10 @@ interface UseCaseModule {
     fun bindIsNotRaisedYetUseCase(useCase: IsNotRaisedYetUseCaseImpl): IsNotRaisedYetUseCase
 
     @Binds
-    fun bindGetRaiseSizeByPotSlider(useCase: GetRaiseSizeByPotSliderImpl): GetRaiseSizeByPotSlider
+    fun bindGetRaiseSizeByPotSlider(useCase: GetRaiseSizeByPotSliderUseCaseImpl): GetRaiseSizeByPotSliderUseCase
 
     @Binds
-    fun bindGetRaiseSizeByStackSlider(useCase: GetRaiseSizeByStackSliderImpl): GetRaiseSizeByStackSlider
+    fun bindGetRaiseSizeByStackSlider(useCase: GetRaiseSizeByStackSliderUseCaseImpl): GetRaiseSizeByStackSliderUseCase
 
     @Binds
     fun bindGetPendingBetSize(useCase: GetPendingBetSizeUseCaseImpl): GetPendingBetSizeUseCase

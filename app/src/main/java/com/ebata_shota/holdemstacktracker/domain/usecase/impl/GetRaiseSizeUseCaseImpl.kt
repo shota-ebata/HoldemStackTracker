@@ -4,7 +4,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSizeUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlider
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSliderUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeUseCase
 import javax.inject.Inject
 
@@ -13,7 +13,7 @@ class GetRaiseSizeUseCaseImpl
 constructor(
     private val getPendingBetSize: GetPendingBetSizeUseCase,
     private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
-    private val getRaiseSizeByStackSlider: GetRaiseSizeByStackSlider,
+    private val getRaiseSizeByStackSliderUseCase: GetRaiseSizeByStackSliderUseCase,
 ) : GetRaiseSizeUseCase {
     override suspend fun invoke(
         game: Game,
@@ -28,7 +28,7 @@ constructor(
             playerOrder = game.playerOrder,
             playerId = myPlayerId
         )
-        val raiseSize: Int = getRaiseSizeByStackSlider.invoke(
+        val raiseSize: Int = getRaiseSizeByStackSliderUseCase.invoke(
             stackSize = stackSize,
             minRaiseSize = minRaiseSize,
             myPendingBetSize = myPendingBetSize,

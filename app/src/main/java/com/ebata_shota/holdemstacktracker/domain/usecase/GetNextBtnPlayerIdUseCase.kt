@@ -4,8 +4,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
 
-interface GetNextBtnPlayerIdUseCase {
-    fun invoke(
+fun interface GetNextBtnPlayerIdUseCase {
+    operator fun invoke(
         table: Table,
         game: Game,
     ): PlayerId?

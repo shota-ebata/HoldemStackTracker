@@ -2,20 +2,20 @@ package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByPotSlider
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByPotSliderUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-class GetRaiseSizeByPotSliderImpl
+class GetRaiseSizeByPotSliderUseCaseImpl
 @Inject
 constructor(
     private val prefRepository: PrefRepository,
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher
-) : GetRaiseSizeByPotSlider {
+) : GetRaiseSizeByPotSliderUseCase {
 
     /**
      * Potスライダーから

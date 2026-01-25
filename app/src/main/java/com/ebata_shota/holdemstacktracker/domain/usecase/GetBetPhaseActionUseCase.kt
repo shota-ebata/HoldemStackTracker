@@ -4,9 +4,9 @@ import com.ebata_shota.holdemstacktracker.domain.model.ActionId
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 
-interface GetBetPhaseActionUseCase {
+fun interface GetBetPhaseActionUseCase {
 
-    suspend fun invoke(
+    suspend operator fun invoke(
         game: Game,
         actionId: ActionId,
     ): BetPhaseAction?

@@ -1,8 +1,8 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
-interface GetRaiseSizeByStackSlider {
+fun interface GetRaiseSizeByStackSliderUseCase {
 
-    suspend fun invoke(
+    suspend operator fun invoke(
         stackSize: Int,
         minRaiseSize: Int,
         myPendingBetSize: Int,

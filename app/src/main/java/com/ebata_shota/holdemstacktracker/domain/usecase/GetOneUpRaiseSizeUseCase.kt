@@ -1,10 +1,9 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.domain.model.Game
-import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 
-interface GetOneUpRaiseSizeUseCase {
-    suspend fun invoke(
+fun interface GetOneUpRaiseSizeUseCase {
+    suspend operator fun invoke(
         currentRaiseSize: Int,
         game: Game,
     ): Int

@@ -4,8 +4,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.GamePlayer
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 
-interface GetNextGamePlayerStateListUseCase {
-    suspend fun invoke(
+fun interface GetNextGamePlayerStateListUseCase {
+    suspend operator fun invoke(
         pendingBetPerPlayer: Map<PlayerId, Int>,
         players: List<GamePlayer>,
         action: BetPhaseAction

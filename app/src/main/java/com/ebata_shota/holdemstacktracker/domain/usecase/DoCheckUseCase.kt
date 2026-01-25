@@ -4,8 +4,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
 
-interface DoCheckUseCase {
-    suspend fun invoke(
+fun interface DoCheckUseCase {
+    suspend operator fun invoke(
         currentGame: Game,
         rule: Rule,
         leavedPlayerIds: List<PlayerId>,

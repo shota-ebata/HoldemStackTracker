@@ -2,9 +2,9 @@ package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 
-interface GetNextGameFromIntervalUseCase {
+fun interface GetNextGameFromIntervalUseCase {
 
-    suspend fun invoke(
+    suspend operator fun invoke(
         currentGame: Game,
     ): Game
 }

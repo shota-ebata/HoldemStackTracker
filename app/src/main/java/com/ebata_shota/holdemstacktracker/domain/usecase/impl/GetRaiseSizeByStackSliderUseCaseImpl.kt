@@ -1,18 +1,18 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase.impl
 
 import com.ebata_shota.holdemstacktracker.di.annotation.CoroutineDispatcherDefault
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSlider
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeByStackSliderUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-class GetRaiseSizeByStackSliderImpl
+class GetRaiseSizeByStackSliderUseCaseImpl
 @Inject
 constructor(
     @CoroutineDispatcherDefault
     private val dispatcher: CoroutineDispatcher
-) : GetRaiseSizeByStackSlider {
+) : GetRaiseSizeByStackSliderUseCase {
 
     /**
      * Stackスライダーから

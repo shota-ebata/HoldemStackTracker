@@ -3,9 +3,9 @@ package com.ebata_shota.holdemstacktracker.domain.usecase
 import com.ebata_shota.holdemstacktracker.domain.model.BetPhaseAction
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 
-interface GetPlayerLastActionInPhaseUseCase {
+fun interface GetPlayerLastActionInPhaseUseCase {
 
-    suspend fun invoke(
+    suspend operator fun invoke(
         playerId: PlayerId,
         actionList: List<BetPhaseAction>,
     ): BetPhaseAction?
