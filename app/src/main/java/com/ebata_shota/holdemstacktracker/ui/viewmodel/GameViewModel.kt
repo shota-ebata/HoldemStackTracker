@@ -405,6 +405,7 @@ constructor(
         ) {
             // GameIDが変わって別のゲームが始まったので、AutoCheckOrFoldType.Noneにする
             autoCheckFoldTypeState.update { AutoCheckOrFoldType.None }
+            return
         }
 
         if (
@@ -425,7 +426,7 @@ constructor(
             return
         }
 
-        val contentUiState: GameContentUiState? = mapGameContentUiState.invoke(
+        val contentUiState: GameContentUiState = mapGameContentUiState.invoke(
             game = game,
             table = table,
             myPlayerId = myPlayerId,
@@ -434,18 +435,12 @@ constructor(
             isEnableSliderStep = isEnableSliderStep,
             betViewMode = betViewMode,
             autoCheckOrFoldType = autoCheckOrFoldType,
-        )
-        if (contentUiState == null) {
-            // contentUiStateが何かしらの理由で作成されなかった場合は
-            // screenUiStateの更新を行わない
-            return
-        }
-        val content = GameScreenUiState.Content(
-            contentUiState = contentUiState
-        )
+        ) ?: return // contentUiStateが何かしらの理由で作成されなかった場合はscreenUiStateの更新を行わない
 
         _screenUiState.update {
-            content
+            GameScreenUiState.Content(
+                contentUiState = contentUiState
+            )
         }
     }
 
