@@ -1,6 +1,7 @@
 package com.ebata_shota.holdemstacktracker.domain.usecase
 
 import com.ebata_shota.holdemstacktracker.createDummyGame
+import com.ebata_shota.holdemstacktracker.domain.model.GameResult
 import com.ebata_shota.holdemstacktracker.domain.model.Phase
 import com.ebata_shota.holdemstacktracker.domain.model.PhaseId
 import com.ebata_shota.holdemstacktracker.domain.usecase.impl.GetLastPhaseAsBetPhaseUseCaseImpl
@@ -122,7 +123,7 @@ class GetLastPhaseAsBetPhaseUseCaseImplTest {
             Phase.Turn(phaseId = PhaseId(""), actionStateList = emptyList()),
             Phase.River(phaseId = PhaseId(""), actionStateList = emptyList()),
             Phase.PotSettlement(phaseId = PhaseId("")),
-            Phase.End(phaseId = PhaseId("")),
+            Phase.End(phaseId = PhaseId(""), GameResult(emptyList())),
         )
         assertThrows(IllegalStateException::class.java) {
             runTest(dispatcher) {
