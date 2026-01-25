@@ -396,17 +396,7 @@ constructor(
         isEnableSliderStep: Boolean,
         betViewMode: BetViewMode,
     ) {
-        if (table.currentGameId != game.gameId) {
-            // GameIdが一致しない場合はUI不整合が起きる可能性があるので無視する
-            return
-        }
-
-        if (
-            autoCheckOrFoldType is AutoCheckOrFoldType.ByGame
-            && autoCheckOrFoldType.gameId != game.gameId
-        ) {
-            // GameIDが変わって別のゲームが始まったので、AutoCheckOrFoldType.Noneにする
-            autoCheckFoldTypeState.update { AutoCheckOrFoldType.None }
+        if (shouldSkipObserver(table, game, autoCheckOrFoldType)) {
             return
         }
 
@@ -425,12 +415,33 @@ constructor(
             betViewMode = betViewMode,
             autoCheckOrFoldType = autoCheckOrFoldType,
         ) ?: return // contentUiStateが何かしらの理由で作成されなかった場合はscreenUiStateの更新を行わない
-
         _screenUiState.update {
             GameScreenUiState.Content(
                 contentUiState = contentUiState
             )
         }
+    }
+
+    private fun shouldSkipObserver(
+        table: Table,
+        game: Game,
+        autoCheckOrFoldType: AutoCheckOrFoldType,
+    ): Boolean {
+        if (table.currentGameId != game.gameId) {
+            // GameIdが一致しない場合はUI不整合が起きる可能性があるので無視する
+            // TODO: そもそも想定していない挙動なので、ゲーム画面閉じるなどの挙動は行った方が良いがも？
+            return true
+        }
+
+        if (
+            autoCheckOrFoldType is AutoCheckOrFoldType.ByGame
+            && autoCheckOrFoldType.gameId != game.gameId
+        ) {
+            // GameIDが変わって別のゲームが始まったので、AutoCheckOrFoldType.Noneにする
+            autoCheckFoldTypeState.update { AutoCheckOrFoldType.None }
+            return true
+        }
+        return false
     }
 
     private suspend fun doFold(
