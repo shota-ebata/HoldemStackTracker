@@ -440,75 +440,6 @@ constructor(
         return false
     }
 
-    private suspend fun doFold(
-        table: Table,
-        game: Game,
-        myPlayerId: PlayerId,
-    ) {
-        executeFold(
-            currentGame = game,
-            rule = table.rule,
-            myPlayerId = myPlayerId,
-            leavedPlayerIds = table.leavedPlayerIds,
-        )
-    }
-
-    private suspend fun doCheck(
-        table: Table,
-        game: Game,
-        myPlayerId: PlayerId,
-    ) {
-        executeCheck(
-            currentGame = game,
-            rule = table.rule,
-            myPlayerId = myPlayerId,
-            leavedPlayerIds = table.leavedPlayerIds,
-        )
-    }
-
-    private suspend fun doAllIn(
-        table: Table,
-        game: Game,
-        myPlayerId: PlayerId,
-    ) {
-        executeAllIn(
-            currentGame = game,
-            rule = table.rule,
-            myPlayerId = myPlayerId,
-            leavedPlayerIds = table.leavedPlayerIds,
-        )
-    }
-
-    private suspend fun doCall(
-        table: Table,
-        game: Game,
-        myPlayerId: PlayerId,
-    ) {
-        executeCall(
-            currentGame = game,
-            rule = table.rule,
-            myPlayerId = myPlayerId,
-            leavedPlayerIds = table.leavedPlayerIds,
-        )
-    }
-
-    private suspend fun doRaise(
-        table: Table,
-        game: Game,
-        myPlayerId: PlayerId,
-        raiseSize: Int,
-    ) {
-        executeRaise(
-            currentGame = game,
-            rule = table.rule,
-            myPlayerId = myPlayerId,
-            raiseSize = raiseSize,
-            leavedPlayerIds = table.leavedPlayerIds,
-        )
-        // レイズするたびに最小Raiseサイズにする
-        raiseSizeStateFlow.update { minRaiseSizeFlow.first() }
-    }
-
     private suspend fun sendNextGame(
         table: Table,
         nextGame: Game,
@@ -550,7 +481,12 @@ constructor(
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
             val myPlayerId = getMyPlayerId() ?: return@launch
-            doFold(table, game, myPlayerId)
+            executeFold(
+                currentGame = game,
+                rule = table.rule,
+                myPlayerId = myPlayerId,
+                leavedPlayerIds = table.leavedPlayerIds,
+            )
         }
     }
 
@@ -561,7 +497,12 @@ constructor(
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
             val myPlayerId = getMyPlayerId() ?: return@launch
-            doCheck(table, game, myPlayerId)
+            executeCheck(
+                currentGame = game,
+                rule = table.rule,
+                myPlayerId = myPlayerId,
+                leavedPlayerIds = table.leavedPlayerIds,
+            )
         }
     }
 
@@ -572,7 +513,12 @@ constructor(
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
             val myPlayerId = getMyPlayerId() ?: return@launch
-            doAllIn(table, game, myPlayerId)
+            executeAllIn(
+                currentGame = game,
+                rule = table.rule,
+                myPlayerId = myPlayerId,
+                leavedPlayerIds = table.leavedPlayerIds,
+            )
         }
     }
 
@@ -583,7 +529,12 @@ constructor(
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
             val myPlayerId = getMyPlayerId() ?: return@launch
-            doCall(table, game, myPlayerId)
+            executeCall(
+                currentGame = game,
+                rule = table.rule,
+                myPlayerId = myPlayerId,
+                leavedPlayerIds = table.leavedPlayerIds,
+            )
         }
     }
 
@@ -598,7 +549,15 @@ constructor(
             val game = getCurrentGame() ?: return@launch
             val myPlayerId = getMyPlayerId() ?: return@launch
             val raiseSize = raiseSizeStateFlow.value ?: return@launch
-            doRaise(table, game, myPlayerId, raiseSize)
+            executeRaise(
+                currentGame = game,
+                rule = table.rule,
+                myPlayerId = myPlayerId,
+                raiseSize = raiseSize,
+                leavedPlayerIds = table.leavedPlayerIds,
+            )
+            // レイズするたびに最小Raiseサイズにする
+            raiseSizeStateFlow.update { minRaiseSizeFlow.first() }
         }
     }
 
