@@ -31,12 +31,12 @@ import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.DoAllInUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.DoCallUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.DoCheckUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.DoFoldUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.DoRaiseUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.DoTransitionToNextPhaseIfNeedUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteAllInUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteCallUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteCheckUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteFoldUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteRaiseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteTransitionToNextPhaseIfNeedUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteOwnAutoActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetAddedAutoActionsGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
@@ -46,8 +46,6 @@ import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneDownRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneUpRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetRaiseSizeUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.IsCurrentPlayerUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.IsEnableCheckUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.RenameTablePlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.SetPotSettlementInfoUseCase
 import com.ebata_shota.holdemstacktracker.domain.util.combine
@@ -109,13 +107,13 @@ constructor(
     private val setPotSettlementInfo: SetPotSettlementInfoUseCase,
     private val getNextPhase: GetNextPhaseUseCase,
     private val getAddedAutoActionsGame: GetAddedAutoActionsGameUseCase,
-    private val doFold: DoFoldUseCase,
-    private val doCheck: DoCheckUseCase,
-    private val doAllIn: DoAllInUseCase,
-    private val doCall: DoCallUseCase,
-    private val doRaise: DoRaiseUseCase,
+    private val executeFold: ExecuteFoldUseCase,
+    private val executeCheck: ExecuteCheckUseCase,
+    private val executeAllIn: ExecuteAllInUseCase,
+    private val executeCall: ExecuteCallUseCase,
+    private val executeRaise: ExecuteRaiseUseCase,
     private val getRaiseSize: GetRaiseSizeUseCase,
-    private val doTransitionToNextPhaseIfNeed: DoTransitionToNextPhaseIfNeedUseCase,
+    private val executeTransitionToNextPhaseIfNeed: ExecuteTransitionToNextPhaseIfNeedUseCase,
     private val getNextBtnPlayerId: GetNextBtnPlayerIdUseCase,
     private val createNewGame: CreateNewGameUseCase,
     private val getMyPlayerId: GetMyPlayerIdUseCase,
@@ -447,7 +445,7 @@ constructor(
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        doFold(
+        executeFold(
             currentGame = game,
             rule = table.rule,
             myPlayerId = myPlayerId,
@@ -460,7 +458,7 @@ constructor(
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        doCheck(
+        executeCheck(
             currentGame = game,
             rule = table.rule,
             myPlayerId = myPlayerId,
@@ -473,7 +471,7 @@ constructor(
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        doAllIn(
+        executeAllIn(
             currentGame = game,
             rule = table.rule,
             myPlayerId = myPlayerId,
@@ -486,7 +484,7 @@ constructor(
         game: Game,
         myPlayerId: PlayerId,
     ) {
-        doCall(
+        executeCall(
             currentGame = game,
             rule = table.rule,
             myPlayerId = myPlayerId,
@@ -500,7 +498,7 @@ constructor(
         myPlayerId: PlayerId,
         raiseSize: Int,
     ) {
-        doRaise(
+        executeRaise(
             currentGame = game,
             rule = table.rule,
             myPlayerId = myPlayerId,
@@ -980,7 +978,7 @@ constructor(
             phaseIntervalImageDialog.update { null }
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
-            doTransitionToNextPhaseIfNeed(
+            executeTransitionToNextPhaseIfNeed(
                 game = game,
                 hostPlayerId = table.hostPlayerId,
                 rule = table.rule,

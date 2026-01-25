@@ -4,8 +4,8 @@ import com.ebata_shota.holdemstacktracker.domain.model.AutoCheckOrFoldType
 import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Table
-import com.ebata_shota.holdemstacktracker.domain.usecase.DoCheckUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.DoFoldUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteCheckUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteFoldUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteOwnAutoActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsCurrentPlayerUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.IsEnableCheckUseCase
@@ -15,8 +15,8 @@ import javax.inject.Inject
 class ExecuteOwnAutoActionUseCaseImpl @Inject constructor(
     private val isCurrentPlayer: IsCurrentPlayerUseCase,
     private val isEnableCheck: IsEnableCheckUseCase,
-    private val doFold: DoFoldUseCase,
-    private val doCheck: DoCheckUseCase,
+    private val doFold: ExecuteFoldUseCase,
+    private val doCheck: ExecuteCheckUseCase,
 ) : ExecuteOwnAutoActionUseCase {
     override suspend fun invoke(
         table: Table,

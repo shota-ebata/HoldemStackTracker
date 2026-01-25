@@ -4,11 +4,12 @@ import com.ebata_shota.holdemstacktracker.domain.model.Game
 import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
 
-fun interface DoTransitionToNextPhaseIfNeedUseCase {
+fun interface ExecuteRaiseUseCase {
     suspend operator fun invoke(
-        game: Game,
-        hostPlayerId: PlayerId,
+        currentGame: Game,
         rule: Rule,
+        myPlayerId: PlayerId,
+        raiseSize: Int,
         leavedPlayerIds: List<PlayerId>,
     )
 }

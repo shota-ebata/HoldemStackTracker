@@ -5,7 +5,7 @@ import com.ebata_shota.holdemstacktracker.domain.model.PlayerId
 import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.repository.FirebaseAuthRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
-import com.ebata_shota.holdemstacktracker.domain.usecase.DoTransitionToNextPhaseIfNeedUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteTransitionToNextPhaseIfNeedUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetAddedAutoActionsGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetFirstActionPlayerIdOfNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextGameFromIntervalUseCase
@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.first
 import java.time.Instant
 import javax.inject.Inject
 
-class DoTransitionToNextPhaseIfNeedUseCaseImpl
+class ExecuteTransitionToNextPhaseIfNeedUseCaseImpl
 @Inject
 constructor(
     private val getNextPlayerIdOfNextPhase: GetFirstActionPlayerIdOfNextPhaseUseCase,
@@ -22,7 +22,7 @@ constructor(
     private val getAddedAutoActionsGame: GetAddedAutoActionsGameUseCase,
     private val firebaseAuthRepository: FirebaseAuthRepository,
     private val gameRepository: GameRepository,
-) : DoTransitionToNextPhaseIfNeedUseCase {
+) : ExecuteTransitionToNextPhaseIfNeedUseCase {
     override suspend fun invoke(
         game: Game,
         hostPlayerId: PlayerId,

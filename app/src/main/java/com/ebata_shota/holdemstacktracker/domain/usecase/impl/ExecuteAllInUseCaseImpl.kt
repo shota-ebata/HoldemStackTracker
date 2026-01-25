@@ -8,36 +8,48 @@ import com.ebata_shota.holdemstacktracker.domain.model.Rule
 import com.ebata_shota.holdemstacktracker.domain.repository.GameRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.RandomIdRepository
 import com.ebata_shota.holdemstacktracker.domain.usecase.AddBetPhaseActionInToGameUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.DoFoldUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteAllInUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetAddedAutoActionsGameUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetLastPhaseAsBetPhaseUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.GetPendingBetSizeUseCase
 import java.time.Instant
 import javax.inject.Inject
 
-class DoFoldUseCaseImpl
+class ExecuteAllInUseCaseImpl
 @Inject
 constructor(
-    private val addBetPhaseActionInToGame: AddBetPhaseActionInToGameUseCase,
+    private val getPendingBetSize: GetPendingBetSizeUseCase,
     private val getAddedAutoActionsGame: GetAddedAutoActionsGameUseCase,
+    private val getLastPhaseAsBetPhase: GetLastPhaseAsBetPhaseUseCase,
+    private val addBetPhaseActionInToGame: AddBetPhaseActionInToGameUseCase,
     private val randomIdRepository: RandomIdRepository,
     private val gameRepository: GameRepository,
-) : DoFoldUseCase {
+) : ExecuteAllInUseCase {
     override suspend fun invoke(
         currentGame: Game,
         rule: Rule,
         myPlayerId: PlayerId,
         leavedPlayerIds: List<PlayerId>,
     ) {
+
+        val player = currentGame.players.find { it.id == myPlayerId }!!
+        val myPendingBetSize = getPendingBetSize.invoke(
+            actionList = getLastPhaseAsBetPhase.invoke(currentGame.phaseList).actionStateList,
+            playerOrder = currentGame.playerOrder,
+            playerId = myPlayerId
+        )
         val nextGame = addBetPhaseActionInToGame.invoke(
             currentGame = currentGame,
-            betPhaseAction = BetPhaseAction.Fold(
+            betPhaseAction = BetPhaseAction.AllIn(
                 actionId = ActionId(randomIdRepository.generateRandomId()),
-                playerId = myPlayerId
+                playerId = myPlayerId,
+                betSize = player.stack + myPendingBetSize
             ),
         )
         val addedAutoActionGame = getAddedAutoActionsGame.invoke(
             game = nextGame,
             rule = rule,
-            leavedPlayerIds = leavedPlayerIds
+            leavedPlayerIds = leavedPlayerIds,
         )
         gameRepository.sendGame(
             tableId = currentGame.tableId,
