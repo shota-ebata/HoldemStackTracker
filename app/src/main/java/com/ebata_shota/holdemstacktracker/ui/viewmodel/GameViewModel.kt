@@ -109,8 +109,6 @@ constructor(
     private val setPotSettlementInfo: SetPotSettlementInfoUseCase,
     private val getNextPhase: GetNextPhaseUseCase,
     private val getAddedAutoActionsGame: GetAddedAutoActionsGameUseCase,
-    private val isEnableCheck: IsEnableCheckUseCase,
-    private val isCurrentPlayer: IsCurrentPlayerUseCase,
     private val doFold: DoFoldUseCase,
     private val doCheck: DoCheckUseCase,
     private val doAllIn: DoAllInUseCase,
