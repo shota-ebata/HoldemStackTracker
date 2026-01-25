@@ -89,7 +89,7 @@ private fun Content(
                         .padding(4.dp)
                         .height(48.dp),
                     onClick = dropRedundantEvent(delayState = buttonDelayState) {
-                        event.onClickEnterNextButton()
+                        event.onClickEnterNextGameButton()
                     },
                 ) {
                     Text(
@@ -105,7 +105,7 @@ private fun Content(
 
 interface EnterNextGameDialogEvent {
     fun onClickNavigateToPrepareButton()
-    fun onClickEnterNextButton()
+    fun onClickEnterNextGameButton()
 }
 
 @Preview(showBackground = true, showSystemUi = false, name = "Light Mode")
@@ -122,7 +122,7 @@ private fun EnterNextGameDialogContentPreview() {
             event = object : EnterNextGameDialogEvent {
                 override fun onClickNavigateToPrepareButton() {}
 
-                override fun onClickEnterNextButton() {}
+                override fun onClickEnterNextGameButton() {}
             }
         )
     }

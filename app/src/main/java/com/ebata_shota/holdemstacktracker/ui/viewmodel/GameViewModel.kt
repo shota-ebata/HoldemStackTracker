@@ -61,6 +61,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogE
 import com.ebata_shota.holdemstacktracker.ui.compose.dialog.PotSettlementDialogUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.screen.GameScreenUiState
 import com.ebata_shota.holdemstacktracker.ui.extension.param
+import com.ebata_shota.holdemstacktracker.ui.usecase.HandleNextGameDialogActionUseCase
 import com.ebata_shota.holdemstacktracker.ui.usecase.MapGameContentUiStateUseCase
 import com.ebata_shota.holdemstacktracker.ui.usecase.MapGameTableInfoDetailContentUiStateUseCase
 import com.ebata_shota.holdemstacktracker.ui.usecase.MapPhaseIntervalImageDialogUiStateUseCase
@@ -114,15 +115,14 @@ constructor(
     private val executeRaise: ExecuteRaiseUseCase,
     private val getRaiseSize: GetRaiseSizeUseCase,
     private val executeTransitionToNextPhaseIfNeed: ExecuteTransitionToNextPhaseIfNeedUseCase,
-    private val getNextBtnPlayerId: GetNextBtnPlayerIdUseCase,
-    private val createNewGame: CreateNewGameUseCase,
+    private val executeOwnAutoAction: ExecuteOwnAutoActionUseCase,
     private val getMyPlayerId: GetMyPlayerIdUseCase,
     private val mapGameContentUiState: MapGameContentUiStateUseCase,
     private val mapPhaseIntervalImageDialogUiState: MapPhaseIntervalImageDialogUiStateUseCase,
     private val mapGameTableInfoDetailContentUiState: MapGameTableInfoDetailContentUiStateUseCase,
     private val mapPotSettlementDialogUiState: MapPotSettlementDialogUiStateUseCase,
     private val mapPotResultDialogUiState: MapPotResultDialogUiStateUseCase,
-    private val executeOwnAutoAction: ExecuteOwnAutoActionUseCase,
+    private val handleNextGameDialogAction: HandleNextGameDialogActionUseCase,
     private val vibrator: Vibrator,
 ) : ViewModel(),
     GameSettingsDialogEvent,
@@ -789,47 +789,21 @@ constructor(
         }
     }
 
-    override fun onClickEnterNextButton() {
+    override fun onClickEnterNextGameButton() {
         viewModelScope.launch {
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
-            // TODO: ゲームを継続できる条件はもっと厳しいかもしれないので問題ないか確認したい
-            //  （構成メンバー変わってたら次のゲーム行かないほうがいいかも？）
-            // TODO: UseCase化したい
-            if (
-                table.playerOrderWithoutLeaved.size in 2..10
-                && table.basePlayers.none { it.stack < table.rule.minBetSize }
-            ) {
-                // 次のゲームに行けそうなら行く
-                // ・参加プレイヤー人数
-                // ・参加者のスタック
-                val nextBtnPlayerId = getNextBtnPlayerId(table, game)
-                if (nextBtnPlayerId != null) {
-                    createNewGame(table.copy(btnPlayerId = nextBtnPlayerId))
-                    tableRepository.updateTableStatus(
-                        tableId = table.id,
-                        tableStatus = TableStatus.PREPARING,
-                    )
-                } else {
-                    // TODO: ゲーム開始できない旨のトーストを表示する
-                    // BTNが取得できないなら、準備画面に戻る
-                    tableRepository.updateTableStatus(
-                        tableId = table.id,
-                        tableStatus = TableStatus.PREPARING,
-                    )
-                    navigateToTablePrepare()
-                }
-                _shouldShowEnterNextGameDialog.update { false }
-            } else {
-                // TODO: ゲーム開始できない旨のトーストを表示する
-                // 次のゲームに行けないなら、準備画面に戻る
-                tableRepository.updateTableStatus(
-                    tableId = table.id,
-                    tableStatus = TableStatus.PREPARING,
-                )
-                navigateToTablePrepare()
-            }
+            handleNextGameDialogAction.invoke(
+                table = table,
+                game = game,
+                hideNextGameDialog = ::hideNextGameDialog,
+                navigateToTablePrepare = ::navigateToTablePrepare,
+            )
         }
+    }
+
+    private fun hideNextGameDialog() {
+        _shouldShowEnterNextGameDialog.update { false }
     }
 
     private fun startVibrate(primitiveId: Int) {
