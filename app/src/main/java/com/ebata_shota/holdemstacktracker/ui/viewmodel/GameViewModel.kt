@@ -1,9 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.viewmodel
 
-import android.os.Build
 import android.os.Bundle
-import android.os.VibrationEffect
-import android.os.Vibrator
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
@@ -30,18 +27,16 @@ import com.ebata_shota.holdemstacktracker.domain.repository.PhaseHistoryReposito
 import com.ebata_shota.holdemstacktracker.domain.repository.PrefRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.QrBitmapRepository
 import com.ebata_shota.holdemstacktracker.domain.repository.TableRepository
-import com.ebata_shota.holdemstacktracker.domain.usecase.CreateNewGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteAllInUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteCallUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteCheckUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteFoldUseCase
+import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteOwnAutoActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteRaiseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteTransitionToNextPhaseIfNeedUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.ExecuteOwnAutoActionUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetAddedAutoActionsGameUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMinRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetMyPlayerIdUseCase
-import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextBtnPlayerIdUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetNextPhaseUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneDownRaiseSizeUseCase
 import com.ebata_shota.holdemstacktracker.domain.usecase.GetOneUpRaiseSizeUseCase
@@ -67,6 +62,7 @@ import com.ebata_shota.holdemstacktracker.ui.usecase.MapGameTableInfoDetailConte
 import com.ebata_shota.holdemstacktracker.ui.usecase.MapPhaseIntervalImageDialogUiStateUseCase
 import com.ebata_shota.holdemstacktracker.ui.usecase.MapPotResultDialogUiStateUseCase
 import com.ebata_shota.holdemstacktracker.ui.usecase.MapPotSettlementDialogUiStateUseCase
+import com.ebata_shota.holdemstacktracker.ui.usecase.GameActionVibrateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -123,7 +119,7 @@ constructor(
     private val mapPotSettlementDialogUiState: MapPotSettlementDialogUiStateUseCase,
     private val mapPotResultDialogUiState: MapPotResultDialogUiStateUseCase,
     private val handleNextGameDialogAction: HandleNextGameDialogActionUseCase,
-    private val vibrator: Vibrator,
+    private val startVibrate: GameActionVibrateUseCase,
 ) : ViewModel(),
     GameSettingsDialogEvent,
     PotSettlementDialogEvent,
@@ -476,7 +472,7 @@ constructor(
 
     fun onClickFoldButton() {
         viewModelScope.launch {
-            startVibrateForFold()
+            startVibrate.onFold()
 
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
@@ -492,7 +488,7 @@ constructor(
 
     fun onClickCheckButton() {
         viewModelScope.launch {
-            startVibrateForCheck()
+            startVibrate.onCheck()
 
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
@@ -508,7 +504,7 @@ constructor(
 
     fun onClickAllInButton() {
         viewModelScope.launch {
-            startVibrateForClickAllIn()
+            startVibrate.onClickAllIn()
 
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
@@ -524,7 +520,7 @@ constructor(
 
     fun onClickCallButton() {
         viewModelScope.launch {
-            startVibrateForCall()
+            startVibrate.onCall()
 
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
@@ -543,7 +539,7 @@ constructor(
      */
     fun onClickRaiseButton() {
         viewModelScope.launch {
-            startVibrateForRaise()
+            startVibrate.onRaise()
 
             val table = getCurrentTable() ?: return@launch
             val game = getCurrentGame() ?: return@launch
@@ -566,7 +562,7 @@ constructor(
      */
     fun onClickRaiseSizeButton(value: Int) {
         viewModelScope.launch {
-            startVibrateForChangeRaiseSize()
+            startVibrate.onChangeRaiseSize()
 
             raiseSizeStateFlow.update { value }
         }
@@ -581,7 +577,7 @@ constructor(
                 minRaiseSize = minRaiseSize,
             )
             if (nextRaiseSize != raiseSizeStateFlow.value) {
-                startVibrateForChangeRaiseSize()
+                startVibrate.onChangeRaiseSize()
 
                 raiseSizeStateFlow.update { nextRaiseSize }
             }
@@ -598,7 +594,7 @@ constructor(
                 game = game,
             )
             if (nextRaiseSize != raiseSizeStateFlow.value) {
-                startVibrateForChangeRaiseSize()
+                startVibrate.onChangeRaiseSize()
 
                 raiseSizeStateFlow.update { nextRaiseSize }
             }
@@ -614,7 +610,7 @@ constructor(
     fun onClickAutoCheckFoldButton() {
         viewModelScope.launch {
             autoCheckFoldTypeState.update { autoCheckOrFoldType ->
-                startVibrateForAutoCheckFold(autoCheckOrFoldType)
+                startVibrate.onAutoCheckFold(autoCheckOrFoldType)
 
                 when (autoCheckOrFoldType) {
                     is AutoCheckOrFoldType.ByGame -> AutoCheckOrFoldType.None
@@ -649,7 +645,8 @@ constructor(
                 sliderPosition = sliderPosition
             )
             if (raiseSize != raiseSizeStateFlow.value) {
-                startVibrateForSlider()
+                val isEnableRaiseUpSliderStep = prefRepository.isEnableRaiseUpSliderStep.first()
+                startVibrate.onChangeRaiseSlider(isEnableRaiseUpSliderStep)
             }
             raiseSizeStateFlow.update { raiseSize }
         }
@@ -804,90 +801,6 @@ constructor(
 
     private fun hideNextGameDialog() {
         _shouldShowEnterNextGameDialog.update { false }
-    }
-
-    private fun startVibrate(primitiveId: Int) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            vibrator.vibrate(
-                VibrationEffect.startComposition()
-                    .addPrimitive(primitiveId)
-                    .compose()
-            )
-        }
-    }
-
-    private fun startVibrateForFold() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_FALL)
-        }
-    }
-
-    private fun startVibrateForCheck() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            vibrator.vibrate(
-                VibrationEffect.startComposition()
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f)
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 150)
-                    .compose()
-            )
-        }
-    }
-
-    private fun startVibrateForClickAllIn() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE)
-        }
-    }
-
-    private fun startVibrateForCall() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            startVibrate(VibrationEffect.Composition.PRIMITIVE_CLICK)
-        }
-    }
-
-    private fun startVibrateForRaise() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            startVibrate(VibrationEffect.Composition.PRIMITIVE_QUICK_RISE)
-        }
-    }
-
-    private fun startVibrateForChangeRaiseSize() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            startVibrate(VibrationEffect.Composition.PRIMITIVE_TICK)
-        }
-    }
-
-    private fun startVibrateForAutoCheckFold(autoCheckOrFoldType: AutoCheckOrFoldType) {
-        when (autoCheckOrFoldType) {
-            is AutoCheckOrFoldType.ByGame -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    startVibrate(VibrationEffect.Composition.PRIMITIVE_LOW_TICK)
-                }
-            }
-
-            is AutoCheckOrFoldType.None -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    startVibrate(VibrationEffect.Composition.PRIMITIVE_CLICK)
-                }
-            }
-        }
-    }
-
-    private suspend fun startVibrateForSlider() {
-        val isEnableRaiseUpSliderStep = prefRepository.isEnableRaiseUpSliderStep.first()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            startVibrate(
-                if (isEnableRaiseUpSliderStep) {
-                    VibrationEffect.Composition.PRIMITIVE_TICK
-                } else {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        VibrationEffect.Composition.PRIMITIVE_LOW_TICK
-                    } else {
-                        VibrationEffect.Composition.PRIMITIVE_TICK
-                    }
-                }
-            )
-        }
     }
 
     fun getTableQrPainter(): Painter? {
