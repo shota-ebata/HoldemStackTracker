@@ -190,7 +190,7 @@ data class GameMainPanelUiState(
 
 
 @Preview(
-    showBackground = true,
+    showBackground = false,
     showSystemUi = false,
     name = "Light Mode",
     device = "spec:width=411dp,height=491dp"
