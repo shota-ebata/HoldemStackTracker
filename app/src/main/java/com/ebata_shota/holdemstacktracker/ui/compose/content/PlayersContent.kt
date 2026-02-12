@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerCard
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
+import kotlin.math.cos
 
 @Composable
 fun PlayersContent(
@@ -42,7 +43,7 @@ fun PlayersContent(
             .graphicsLayer {
                 rotationX = 10f
                 translationY = -75f
-            }
+            },
     ) {
         // Outer border/railing
         Surface(
@@ -136,6 +137,13 @@ fun PlayersContent(
                             .forEach { playerUiState ->
                                 GamePlayerCard(
                                     uiState = playerUiState,
+                                    modifier = Modifier.graphicsLayer {
+                                        // Counter-rotate to make it flat
+                                        rotationX = -10f
+                                        // Correct the perspective distortion
+                                        val angleRad = Math.toRadians(30.0).toFloat()
+                                        scaleY = cos(angleRad)
+                                    }
                                 )
                             }
                     }
@@ -172,6 +180,8 @@ data class GameMainPanelUiState(
     val centerPanelContentUiState: CenterPanelContentUiState,
 )
 
+
+
 @Preview(
     showBackground = false,
     showSystemUi = false,
@@ -179,7 +189,7 @@ data class GameMainPanelUiState(
     device = "spec:width=411dp,height=491dp"
 )
 @Preview(
-    showBackground = false,
+    showBackground = true,
     showSystemUi = false,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
     name = "Dark Mode",
