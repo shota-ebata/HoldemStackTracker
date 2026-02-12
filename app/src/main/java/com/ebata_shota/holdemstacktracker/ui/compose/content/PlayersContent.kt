@@ -46,7 +46,7 @@ fun PlayersContent(
             .fillMaxSize()
             .graphicsLayer {
                 rotationX = 8f
-                translationY = -150f
+                translationY = -100f
             },
     ) {
         // Outer border/railing
