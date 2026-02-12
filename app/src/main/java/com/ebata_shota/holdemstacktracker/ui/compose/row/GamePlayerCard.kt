@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -119,7 +121,8 @@ private fun PositionAndActionRow(
             Icon(
                 painter = painterResource(R.drawable.icon_btn),
                 contentDescription = "icon_btn",
-                tint = Color.White
+                tint = Color.White,
+                modifier = Modifier.shadow(elevation = 1.dp, shape = CircleShape)
             )
         }
         if (uiState.positionLabelResId != null) {
@@ -205,7 +208,8 @@ private fun BetSizeRow(
         if (uiState.pendingBetSize != null) {
             Icon(
                 modifier = Modifier
-                    .size(24.dp),
+                    .size(24.dp)
+                    .shadow(elevation = 1.dp, shape = CircleShape),
                 painter = painterResource(R.drawable.chip_icon),
                 contentDescription = "chip",
                 tint = Color.White
