@@ -26,9 +26,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,6 +49,13 @@ fun GamePlayerCard(
     uiState: GamePlayerUiState,
     modifier: Modifier = Modifier
 ) {
+    val textStyle = MaterialTheme.typography.bodyMedium.copy(
+        shadow = Shadow(
+            color = Color.Black,
+            offset = Offset(2f, 2f),
+            blurRadius = 4f
+        )
+    )
     when (uiState.betTextPosition) {
         GamePlayerUiState.BetTextPosition.TOP -> {
             Column(
@@ -53,16 +63,19 @@ fun GamePlayerCard(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 BetSizeRow(
-                    uiState = uiState
+                    uiState = uiState,
+                    textStyle = textStyle,
                 )
                 if (uiState.shouldShowActionNextLine) {
-                    OnlyActionRow(uiState = uiState)
+                    OnlyActionRow(uiState = uiState, textStyle = textStyle)
                 }
                 PositionAndActionRow(
-                    uiState = uiState
+                    uiState = uiState,
+                    textStyle = textStyle,
                 )
                 PlayerCard(
                     uiState = uiState,
+                    textStyle = textStyle,
                 )
             }
         }
@@ -74,13 +87,15 @@ fun GamePlayerCard(
             ) {
                 PlayerCard(
                     uiState = uiState,
+                    textStyle = textStyle,
                 )
-                PositionAndActionRow(uiState = uiState)
+                PositionAndActionRow(uiState = uiState, textStyle = textStyle)
                 if (uiState.shouldShowActionNextLine) {
-                    OnlyActionRow(uiState = uiState)
+                    OnlyActionRow(uiState = uiState, textStyle = textStyle)
                 }
                 BetSizeRow(
                     uiState = uiState,
+                    textStyle = textStyle,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
             }
@@ -92,6 +107,7 @@ fun GamePlayerCard(
 @Composable
 private fun PositionAndActionRow(
     uiState: GamePlayerUiState,
+    textStyle: TextStyle,
 ) {
     Row(
         modifier = Modifier
@@ -119,7 +135,8 @@ private fun PositionAndActionRow(
             ) {
                 Text(
                     text = stringResource(uiState.positionLabelResId),
-                    color = Color.White
+                    color = Color.White,
+                    style = textStyle,
                 )
             }
         }
@@ -135,7 +152,8 @@ private fun PositionAndActionRow(
                     .padding(horizontal = 8.dp),
                 text = lastActionText.getString(),
                 textAlign = TextAlign.Center,
-                color = Color.White
+                color = Color.White,
+                style = textStyle,
             )
 
         }
@@ -144,7 +162,8 @@ private fun PositionAndActionRow(
 
 @Composable
 private fun OnlyActionRow(
-    uiState: GamePlayerUiState
+    uiState: GamePlayerUiState,
+    textStyle: TextStyle,
 ) {
     Row(
         modifier = Modifier
@@ -164,7 +183,8 @@ private fun OnlyActionRow(
                     .padding(horizontal = 8.dp),
                 text = lastActionText.getString(),
                 textAlign = TextAlign.Center,
-                color = Color.White
+                color = Color.White,
+                style = textStyle,
             )
         }
     }
@@ -173,6 +193,7 @@ private fun OnlyActionRow(
 @Composable
 private fun BetSizeRow(
     uiState: GamePlayerUiState,
+    textStyle: TextStyle,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -194,7 +215,9 @@ private fun BetSizeRow(
                     .padding(start = 8.dp),
                 textStringSource = uiState.pendingBetSize,
                 shouldShowBBSuffix = uiState.shouldShowBBSuffix,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    shadow = textStyle.shadow
+                ),
                 suffixFontSize = MaterialTheme.typography.bodyMedium.fontSize,
                 color = Color.White
             )
@@ -205,6 +228,7 @@ private fun BetSizeRow(
 @Composable
 private fun PlayerCard(
     uiState: GamePlayerUiState,
+    textStyle: TextStyle,
     modifier: Modifier = Modifier
 ) {
     var tapForceExpanded: Boolean by remember { mutableStateOf(false) }
@@ -218,7 +242,9 @@ private fun PlayerCard(
             ChipSizeText(
                 textStringSource = uiState.stack,
                 shouldShowBBSuffix = uiState.shouldShowBBSuffix,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    shadow = textStyle.shadow
+                ),
                 suffixFontSize = MaterialTheme.typography.bodySmall.fontSize,
                 color = if (uiState.isFolded) {
                     Color.White.copy(alpha = 0.5f)
@@ -239,7 +265,7 @@ private fun PlayerCard(
                         } else {
                             Color.White
                         },
-                        style = MaterialTheme.typography.bodySmall,
+                        style = textStyle,
                     )
                 }
             }
