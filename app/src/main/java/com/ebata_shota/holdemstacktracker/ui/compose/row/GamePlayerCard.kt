@@ -122,7 +122,7 @@ private fun PositionAndActionRow(
                 painter = painterResource(R.drawable.icon_btn),
                 contentDescription = "icon_btn",
                 tint = Color.White,
-                modifier = Modifier.shadow(elevation = 1.dp, shape = CircleShape)
+                modifier = Modifier.shadow(elevation = 4.dp, shape = CircleShape)
             )
         }
         if (uiState.positionLabelResId != null) {
@@ -209,7 +209,7 @@ private fun BetSizeRow(
             Icon(
                 modifier = Modifier
                     .size(24.dp)
-                    .shadow(elevation = 1.dp, shape = CircleShape),
+                    .shadow(elevation = 4.dp, shape = CircleShape),
                 painter = painterResource(R.drawable.chip_icon),
                 contentDescription = "chip",
                 tint = Color.White
