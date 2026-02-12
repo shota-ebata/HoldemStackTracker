@@ -223,7 +223,8 @@ private fun BetSizeRow(
                     shadow = textStyle.shadow
                 ),
                 suffixFontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                color = Color.Yellow
+                color = Color.Yellow,
+                applyOutline = true,
             )
         }
     }

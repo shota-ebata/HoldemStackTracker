@@ -3,6 +3,7 @@ package com.ebata_shota.holdemstacktracker.ui.compose.content
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,11 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,9 +34,17 @@ fun CenterPanelContent(
     onClickCenterPanel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val containerColor = if (isSystemInDarkTheme()) {
+        MaterialTheme.colorScheme.surfaceVariant
+    } else {
+        MaterialTheme.colorScheme.surfaceDim
+    }
     Card(
         modifier = modifier,
         onClick = onClickCenterPanel,
+        colors = CardDefaults.cardColors(
+            containerColor = containerColor
+        ),
     ) {
         Column(
             modifier = Modifier.padding(8.dp),
@@ -96,6 +107,7 @@ fun CenterPanelContent(
                     shouldShowBBSuffix = uiState.shouldShowBBSuffix,
                     style = MaterialTheme.typography.titleLarge,
                     suffixFontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
 
@@ -120,6 +132,8 @@ fun CenterPanelContent(
                     shouldShowBBSuffix = uiState.shouldShowBBSuffix,
                     style = MaterialTheme.typography.titleLarge,
                     suffixFontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                    color = Color.Yellow,
+                    applyOutline = true
                 )
             }
         }

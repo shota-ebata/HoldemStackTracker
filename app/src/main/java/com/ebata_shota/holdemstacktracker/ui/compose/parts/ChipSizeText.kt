@@ -1,11 +1,14 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.parts
 
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -20,6 +23,7 @@ fun ChipSizeText(
     shouldShowBBSuffix: Boolean,
     style: TextStyle = MaterialTheme.typography.titleMedium,
     suffixFontSize: TextUnit = MaterialTheme.typography.bodySmall.fontSize,
+    applyOutline: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val text = getChipString(
@@ -27,12 +31,34 @@ fun ChipSizeText(
         shouldShowBBSuffix = shouldShowBBSuffix,
         suffixFontSize = suffixFontSize
     )
-    Text(
-        modifier = modifier,
-        text = text,
-        style = style,
-        color = color
-    )
+
+    if (applyOutline) {
+        Box(modifier = modifier) {
+            Text(
+                text = text,
+                style = style.copy(
+                    color = Color.Black,
+                    drawStyle = Stroke(
+                        miter = 10f,
+                        width = 4f,
+                        join = StrokeJoin.Round
+                    )
+                )
+            )
+            Text(
+                text = text,
+                style = style,
+                color = color
+            )
+        }
+    } else {
+        Text(
+            modifier = modifier,
+            text = text,
+            style = style,
+            color = color
+        )
+    }
 }
 
 @Preview(showBackground = true, showSystemUi = false, name = "Light Mode")
