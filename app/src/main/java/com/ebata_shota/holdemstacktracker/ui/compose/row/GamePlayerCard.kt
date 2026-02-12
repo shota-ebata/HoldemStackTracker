@@ -102,7 +102,8 @@ private fun PositionAndActionRow(
         if (uiState.isBtn) {
             Icon(
                 painter = painterResource(R.drawable.icon_btn),
-                contentDescription = "icon_btn"
+                contentDescription = "icon_btn",
+                tint = Color.White
             )
         }
         if (uiState.positionLabelResId != null) {
@@ -110,13 +111,16 @@ private fun PositionAndActionRow(
                 modifier = Modifier
                     .border(
                         width = OutlineLabelBorderWidth,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = Color.White,
                         shape = RoundedCornerShape(4.dp),
                     )
                     .padding(horizontal = 8.dp, vertical = 2.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = stringResource(uiState.positionLabelResId))
+                Text(
+                    text = stringResource(uiState.positionLabelResId),
+                    color = Color.White
+                )
             }
         }
         val lastActionText = uiState.lastActionText
@@ -125,13 +129,13 @@ private fun PositionAndActionRow(
                 modifier = Modifier
                     .border(
                         width = OutlineLabelBorderWidth,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = Color.White,
                         shape = RoundedCornerShape(4.dp),
                     )
                     .padding(horizontal = 8.dp),
-
                 text = lastActionText.getString(),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = Color.White
             )
 
         }
@@ -154,13 +158,13 @@ private fun OnlyActionRow(
                 modifier = Modifier
                     .border(
                         width = OutlineLabelBorderWidth,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = Color.White,
                         shape = RoundedCornerShape(4.dp),
                     )
                     .padding(horizontal = 8.dp),
-
                 text = lastActionText.getString(),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = Color.White
             )
         }
     }
@@ -182,7 +186,8 @@ private fun BetSizeRow(
                 modifier = Modifier
                     .size(24.dp),
                 painter = painterResource(R.drawable.chip_icon),
-                contentDescription = "chip"
+                contentDescription = "chip",
+                tint = Color.White
             )
             ChipSizeText(
                 modifier = Modifier
@@ -191,6 +196,7 @@ private fun BetSizeRow(
                 shouldShowBBSuffix = uiState.shouldShowBBSuffix,
                 style = MaterialTheme.typography.titleLarge,
                 suffixFontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                color = Color.White
             )
         }
     }
@@ -215,9 +221,9 @@ private fun PlayerCard(
                 style = MaterialTheme.typography.titleMedium,
                 suffixFontSize = MaterialTheme.typography.bodySmall.fontSize,
                 color = if (uiState.isFolded) {
-                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                    Color.White.copy(alpha = 0.5f)
                 } else {
-                    Color.Unspecified
+                    Color.White
                 },
             )
             if (tapForceExpanded || uiState.expanded) {
@@ -229,9 +235,9 @@ private fun PlayerCard(
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
                         color = if (uiState.isFolded) {
-                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                            Color.White.copy(alpha = 0.5f)
                         } else {
-                            Color.Unspecified
+                            Color.White
                         },
                         style = MaterialTheme.typography.bodySmall,
                     )
@@ -239,20 +245,18 @@ private fun PlayerCard(
             }
         }
     }
+    val containerColor = when {
+        uiState.isCurrentPlayer -> MaterialTheme.colorScheme.inversePrimary
+        uiState.isFolded -> Color.Black.copy(alpha = 0.2f)
+        else -> Color.Black.copy(alpha = 0.5f)
+    }
+
     if (uiState.expanded) {
         Card(
             modifier = modifier
                 .padding(horizontal = 2.dp),
             colors = CardDefaults.cardColors(
-                containerColor = if (uiState.isCurrentPlayer) {
-                    MaterialTheme.colorScheme.inversePrimary
-                } else {
-                    if (uiState.isFolded) {
-                        Color.Unspecified.copy(alpha = 0.38f)
-                    } else {
-                        Color.Unspecified
-                    }
-                }
+                containerColor = containerColor
             ),
             shape = RoundedCornerShape(8.dp),
             content = cardContent,
@@ -262,15 +266,7 @@ private fun PlayerCard(
             modifier = modifier
                 .padding(horizontal = 2.dp),
             colors = CardDefaults.cardColors(
-                containerColor = if (uiState.isCurrentPlayer) {
-                    MaterialTheme.colorScheme.inversePrimary
-                } else {
-                    if (uiState.isFolded) {
-                        Color.Unspecified.copy(alpha = 0.38f)
-                    } else {
-                        Color.Unspecified
-                    }
-                }
+                containerColor = containerColor
             ),
             onClick = {
                 tapForceExpanded = !tapForceExpanded
@@ -379,9 +375,9 @@ private class GamePlayerCardPreviewParam :
     )
 }
 
-@Preview(showBackground = false, showSystemUi = false, name = "Light Mode")
+@Preview(showBackground = true, showSystemUi = false, name = "Light Mode")
 @Preview(
-    showBackground = false,
+    showBackground = true,
     showSystemUi = false,
     widthDp = 100,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
