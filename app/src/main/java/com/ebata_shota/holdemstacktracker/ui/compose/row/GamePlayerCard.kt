@@ -270,7 +270,7 @@ private fun PlayerCard(
                         } else {
                             Color.White
                         },
-                        style = textStyle,
+                        style = textStyle.copy(shadow = null),
                     )
                 }
             }
