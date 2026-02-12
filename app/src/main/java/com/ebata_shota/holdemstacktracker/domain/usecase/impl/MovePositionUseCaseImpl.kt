@@ -13,7 +13,6 @@ constructor(
     private val tableRepository: TableRepository,
 ) : MovePositionUseCase {
 
-    // TODO: UT書きたい
     override suspend fun invoke(
         playerId: PlayerId,
         table: Table,
