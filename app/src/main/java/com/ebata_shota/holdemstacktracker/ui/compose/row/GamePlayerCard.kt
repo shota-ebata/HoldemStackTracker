@@ -212,7 +212,7 @@ private fun BetSizeRow(
                     .shadow(elevation = 4.dp, shape = CircleShape),
                 painter = painterResource(R.drawable.chip_icon),
                 contentDescription = "chip",
-                tint = Color.White
+                tint = Color.Yellow
             )
             ChipSizeText(
                 modifier = Modifier
@@ -223,7 +223,7 @@ private fun BetSizeRow(
                     shadow = textStyle.shadow
                 ),
                 suffixFontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                color = Color.White
+                color = Color.Yellow
             )
         }
     }
