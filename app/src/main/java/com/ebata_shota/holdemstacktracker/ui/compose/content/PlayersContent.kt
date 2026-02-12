@@ -1,13 +1,16 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
 import android.content.res.Configuration
+import android.widget.Space
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
@@ -32,6 +35,7 @@ fun PlayersContent(
     modifier: Modifier = Modifier,
 ) {
     val leftPlayers = uiState.players.filter { it.playerPosition == GamePlayerUiState.PlayerPosition.LEFT }
+    val topPlayers = uiState.players.filter { it.playerPosition== GamePlayerUiState.PlayerPosition.TOP }
     val rightPlayers = uiState.players.filter { it.playerPosition == GamePlayerUiState.PlayerPosition.RIGHT }
 
     val leftArrangement = if (leftPlayers.count() <= 1) Arrangement.Center else Arrangement.SpaceEvenly
@@ -73,8 +77,11 @@ fun PlayersContent(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                uiState.players
-                    .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.TOP }
+
+                if (topPlayers.isEmpty()) {
+                    Spacer(modifier = Modifier.height(80.dp))
+                }
+                topPlayers
                     .forEach { playerUiState ->
                         GamePlayerCard(
                             uiState = playerUiState,
