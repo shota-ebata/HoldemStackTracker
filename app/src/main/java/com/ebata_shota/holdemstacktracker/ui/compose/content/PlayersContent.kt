@@ -5,15 +5,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.ebata_shota.holdemstacktracker.R
-import com.ebata_shota.holdemstacktracker.domain.model.StringSource
+import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerCard
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
 
@@ -24,6 +23,12 @@ fun PlayersContent(
     onClickPlayerCard: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val leftPlayers = uiState.players.filter { it.playerPosition == GamePlayerUiState.PlayerPosition.LEFT }
+    val rightPlayers = uiState.players.filter { it.playerPosition == GamePlayerUiState.PlayerPosition.RIGHT }
+
+    val leftArrangement = if (leftPlayers.count() <= 1) Arrangement.Center else Arrangement.SpaceEvenly
+    val rightArrangement = if (rightPlayers.count() <= 1) Arrangement.Center else Arrangement.SpaceEvenly
+
     Column(
         modifier = modifier
     ) {
@@ -49,6 +54,7 @@ fun PlayersContent(
             Column(
                 modifier = modifier
                     .fillMaxHeight()
+                    .padding(bottom = if (leftPlayers.count() == 3) 0.dp else 80.dp)
                     .weight(1.0f),
                 horizontalAlignment = AbsoluteAlignment.Left,
             ) {
@@ -56,10 +62,9 @@ fun PlayersContent(
                     modifier = modifier
                         .fillMaxHeight(),
                     horizontalAlignment = AbsoluteAlignment.Left,
-                    verticalArrangement = Arrangement.Top,
+                    verticalArrangement = leftArrangement,
                 ) {
-                    uiState.players
-                        .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.LEFT }
+                    leftPlayers
                         .reversed()
                         .forEach { playerUiState ->
                             GamePlayerCard(
@@ -105,6 +110,7 @@ fun PlayersContent(
             Column(
                 modifier = modifier
                     .fillMaxHeight()
+                    .padding(bottom = if (rightPlayers.count() == 3) 0.dp else 80.dp)
                     .weight(1.0f),
                 horizontalAlignment = AbsoluteAlignment.Right,
             ) {
@@ -112,10 +118,9 @@ fun PlayersContent(
                     modifier = modifier
                         .fillMaxHeight(),
                     horizontalAlignment = AbsoluteAlignment.Right,
-                    verticalArrangement = Arrangement.Top,
+                    verticalArrangement = rightArrangement,
                 ) {
-                    uiState.players
-                        .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.RIGHT }
+                    rightPlayers
                         .forEach { playerUiState ->
                             GamePlayerCard(
                                 uiState = playerUiState,
@@ -125,404 +130,6 @@ fun PlayersContent(
             }
         }
     }
-}
-
-// TODO: 必要以上のデータを渡しているので修正
-private class PlayersFor10ContentPreviewParameterProvider :
-    PreviewParameterProvider<GameMainPanelUiState> {
-    override val values: Sequence<GameMainPanelUiState> = sequenceOf(
-        // 10人フル
-        GameMainPanelUiState(
-            players = listOf(
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = true,
-                    isCurrentPlayer = false,
-                    isBtn = false,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_bet),
-                ),
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.LEFT,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = false,
-                    isBtn = false,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_fold),
-                    isFolded = true,
-                ),
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.LEFT,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = false,
-                    isBtn = false,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_all_in),
-                ),
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.LEFT,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = false,
-                    isBtn = false,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_all_in),
-                ),
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.TOP,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = true,
-                    isBtn = false,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_all_in),
-                ),
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.TOP,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = false,
-                    isBtn = false,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_all_in),
-                ),
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.TOP,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = false,
-                    isBtn = false,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_all_in),
-                ),
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.RIGHT,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = false,
-                    isBtn = true,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_fold),
-                    isFolded = true
-                ),
-                GamePlayerUiState(
-                    playerName = "Player123456789",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.RIGHT,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = true,
-                    isBtn = false,
-                    positionLabelResId = R.string.position_label_sb,
-                    lastActionText = StringSource(R.string.action_label_bet),
-                ),
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.RIGHT,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = false,
-                    isBtn = false,
-                    positionLabelResId = R.string.position_label_bb,
-                    lastActionText = StringSource(R.string.action_label_all_in),
-                )
-            ),
-            centerPanelContentUiState = CenterPanelContentUiState(
-                blindText = StringSource("100000/200000"),
-                betPhaseText = StringSource(R.string.label_pre_flop),
-                totalPot = StringSource("0"),
-                pendingTotalBetSize = StringSource("2"),
-                shouldShowBBSuffix = false
-            ),
-        ),
-        // 6人
-        GameMainPanelUiState(
-            players = listOf(
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = true,
-                    isCurrentPlayer = false,
-                    isBtn = false,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_bet),
-                ),
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.LEFT,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = false,
-                    isBtn = false,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_fold),
-                    isFolded = true,
-                ),
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.LEFT,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = false,
-                    isBtn = false,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_all_in),
-                ),
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.TOP,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = true,
-                    isBtn = false,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_all_in),
-                ),
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.RIGHT,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = false,
-                    isBtn = true,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_fold),
-                    isFolded = true
-                ),
-                GamePlayerUiState(
-                    playerName = "Player123456789",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.RIGHT,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = false,
-                    isBtn = false,
-                    positionLabelResId = R.string.position_label_sb,
-                    lastActionText = StringSource(R.string.action_label_bet),
-                ),
-            ),
-            centerPanelContentUiState = CenterPanelContentUiState(
-                blindText = StringSource("100/200"),
-                betPhaseText = StringSource(R.string.label_pre_flop),
-                totalPot = StringSource("0"),
-                pendingTotalBetSize = StringSource("2"),
-                shouldShowBBSuffix = false
-            ),
-        ),
-        // 4人
-        GameMainPanelUiState(
-            players = listOf(
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = true,
-                    isCurrentPlayer = false,
-                    isBtn = false,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_bet),
-                ),
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.LEFT,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = false,
-                    isBtn = false,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_all_in),
-                ),
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.TOP,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = true,
-                    isBtn = false,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_all_in),
-                ),
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.RIGHT,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = false,
-                    isBtn = true,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_fold),
-                    isFolded = true
-                ),
-            ),
-            centerPanelContentUiState = CenterPanelContentUiState(
-                blindText = StringSource("100/200"),
-                betPhaseText = StringSource(R.string.label_pre_flop),
-                totalPot = StringSource("0"),
-                pendingTotalBetSize = StringSource("2"),
-                shouldShowBBSuffix = false
-            ),
-        ),
-        // 3人
-        GameMainPanelUiState(
-            players = listOf(
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = true,
-                    isCurrentPlayer = false,
-                    isBtn = false,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_bet),
-                ),
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.LEFT,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = true,
-                    isBtn = false,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_all_in),
-                ),
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.RIGHT,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = false,
-                    isBtn = true,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_fold),
-                    isFolded = true
-                ),
-            ),
-            centerPanelContentUiState = CenterPanelContentUiState(
-                blindText = StringSource("100/200"),
-                betPhaseText = StringSource(R.string.label_pre_flop),
-                totalPot = StringSource("0"),
-                pendingTotalBetSize = StringSource("2"),
-                shouldShowBBSuffix = false
-            ),
-        ),
-        // 2人
-        GameMainPanelUiState(
-            players = listOf(
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = true,
-                    isCurrentPlayer = false,
-                    isBtn = false,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_bet),
-                ),
-                GamePlayerUiState(
-                    playerName = "PlayerName",
-                    stack = StringSource("198"),
-                    shouldShowBBSuffix = false,
-                    playerPosition = GamePlayerUiState.PlayerPosition.TOP,
-                    pendingBetSize = StringSource("2"),
-                    isLeaved = false,
-                    isMine = false,
-                    isCurrentPlayer = true,
-                    isBtn = false,
-                    positionLabelResId = null,
-                    lastActionText = StringSource(R.string.action_label_all_in),
-                ),
-            ),
-            centerPanelContentUiState = CenterPanelContentUiState(
-                blindText = StringSource("100/200"),
-                betPhaseText = StringSource(R.string.label_pre_flop),
-                totalPot = StringSource("0"),
-                pendingTotalBetSize = StringSource("2"),
-                shouldShowBBSuffix = false
-            ),
-        ),
-    )
 }
 
 data class GameMainPanelUiState(
@@ -538,7 +145,7 @@ data class GameMainPanelUiState(
 )
 @Composable
 private fun PlayersContentPreview(
-    @PreviewParameter(PlayersFor10ContentPreviewParameterProvider::class)
+    @PreviewParameter(PlayersContentPreviewParameterProvider::class)
     uiState: GameMainPanelUiState,
 ) {
     PlayersContent(
