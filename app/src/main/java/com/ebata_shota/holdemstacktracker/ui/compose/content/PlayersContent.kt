@@ -41,8 +41,8 @@ fun PlayersContent(
         modifier = modifier
             .fillMaxSize()
             .graphicsLayer {
-                rotationX = 10f
-                translationY = -75f
+                rotationX = 8f
+                translationY = -150f
             },
     ) {
         // Outer border/railing
@@ -139,7 +139,7 @@ fun PlayersContent(
                                     uiState = playerUiState,
                                     modifier = Modifier.graphicsLayer {
                                         // Counter-rotate to make it flat
-                                        rotationX = -10f
+                                        rotationX = -8f
                                         // Correct the perspective distortion
                                         val angleRad = Math.toRadians(30.0).toFloat()
                                         scaleY = cos(angleRad)
