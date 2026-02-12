@@ -10,6 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -49,7 +50,8 @@ fun GameContent(
         onActionDisplayed(currentActionId)
     }
     Surface(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
+        color = Color.Black
     ) {
         Column(
             modifier = Modifier
@@ -65,21 +67,24 @@ fun GameContent(
             )
 
             // ここからコントロールパネル
-            ControlPanelContent(
-                uiState = uiState.controlPanelUiState,
-                onClickFoldButton = onClickFoldButton,
-                onClickCheckButton = onClickCheckButton,
-                onClickAllInButton = onClickAllInButton,
-                onClickCallButton = onClickCallButton,
-                onClickRaiseButton = onClickRaiseButton,
-                onClickRaiseSizeButton = onClickRaiseSizeButton,
-                onClickMinusButton = onClickMinusButton,
-                onChangeSlider = onChangeSlider,
-                onClickPlusButton = onClickPlusButton,
-                onClickSettingButton = onClickSettingButton,
-                onClickAutoCheckFoldButton = onClickAutoCheckFoldButton,
-            )
-
+            HoldemStackTrackerTheme(darkTheme = true) {
+                Surface {
+                    ControlPanelContent(
+                        uiState = uiState.controlPanelUiState,
+                        onClickFoldButton = onClickFoldButton,
+                        onClickCheckButton = onClickCheckButton,
+                        onClickAllInButton = onClickAllInButton,
+                        onClickCallButton = onClickCallButton,
+                        onClickRaiseButton = onClickRaiseButton,
+                        onClickRaiseSizeButton = onClickRaiseSizeButton,
+                        onClickMinusButton = onClickMinusButton,
+                        onChangeSlider = onChangeSlider,
+                        onClickPlusButton = onClickPlusButton,
+                        onClickSettingButton = onClickSettingButton,
+                        onClickAutoCheckFoldButton = onClickAutoCheckFoldButton,
+                    )
+                }
+            }
         }
     }
 }
