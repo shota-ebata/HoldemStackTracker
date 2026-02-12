@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerCard
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
+import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import kotlin.math.cos
 
 @Composable
@@ -188,13 +189,6 @@ data class GameMainPanelUiState(
 )
 
 
-
-@Preview(
-    showBackground = false,
-    showSystemUi = false,
-    name = "Light Mode",
-    device = "spec:width=411dp,height=491dp"
-)
 @Preview(
     showBackground = true,
     showSystemUi = false,
@@ -202,12 +196,18 @@ data class GameMainPanelUiState(
     name = "Dark Mode",
     device = "spec:width=411dp,height=491dp"
 )
+@Preview(
+    showBackground = false,
+    showSystemUi = false,
+    name = "Light Mode",
+    device = "spec:width=411dp,height=491dp"
+)
 @Composable
 private fun PlayersContentPreview(
     @PreviewParameter(PlayersContentPreviewParameterProvider::class)
     uiState: GameMainPanelUiState,
 ) {
-    Surface(color = Color.Black) {
+    HoldemStackTrackerTheme {
         PlayersContent(
             uiState = uiState,
             onClickCenterPanel = {},
