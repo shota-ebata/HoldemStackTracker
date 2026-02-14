@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ChipSizeText
+import com.ebata_shota.holdemstacktracker.ui.model.GamePlayerCardBetTextPosition
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
 
@@ -58,8 +59,8 @@ fun GamePlayerCard(
             blurRadius = 4f
         )
     )
-    when (uiState.betTextPosition) {
-        GamePlayerUiState.BetTextPosition.TOP -> {
+    when (uiState.gamePlayerCardBetTextPosition) {
+        GamePlayerCardBetTextPosition.TOP -> {
             Column(
                 modifier = modifier,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -82,7 +83,7 @@ fun GamePlayerCard(
             }
         }
 
-        GamePlayerUiState.BetTextPosition.BOTTOM -> {
+        GamePlayerCardBetTextPosition.BOTTOM -> {
             Column(
                 modifier = modifier,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -323,9 +324,9 @@ data class GamePlayerUiState(
     val lastActionText: StringSource?,
     val isFolded: Boolean = false,
 ) {
-    val betTextPosition: BetTextPosition = when (playerPosition) {
-        PlayerPosition.BOTTOM -> BetTextPosition.TOP
-        else -> BetTextPosition.BOTTOM
+    val gamePlayerCardBetTextPosition: GamePlayerCardBetTextPosition = when (playerPosition) {
+        PlayerPosition.BOTTOM -> GamePlayerCardBetTextPosition.TOP
+        else -> GamePlayerCardBetTextPosition.BOTTOM
     }
 
     // Actionを次の行に表示する
@@ -333,11 +334,6 @@ data class GamePlayerUiState(
 
 
     val expanded: Boolean = isMine || !isFolded
-
-    enum class BetTextPosition {
-        TOP,
-        BOTTOM
-    }
 
     enum class PlayerPosition {
         LEFT,
