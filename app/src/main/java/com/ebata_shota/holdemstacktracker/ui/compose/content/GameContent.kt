@@ -108,7 +108,6 @@ private class GameContentUiStatePreviewParam :
                         isMine = true,
                         isCurrentPlayer = false,
                         isBtn = false,
-                        positionLabelResId = null,
                         lastActionText = StringSource(R.string.action_label_bet),
                     ),
                     GamePlayerUiState(
@@ -121,7 +120,6 @@ private class GameContentUiStatePreviewParam :
                         isMine = false,
                         isCurrentPlayer = false,
                         isBtn = false,
-                        positionLabelResId = null,
                         lastActionText = StringSource(R.string.action_label_all_in),
                     ),
                     GamePlayerUiState(
@@ -134,7 +132,6 @@ private class GameContentUiStatePreviewParam :
                         isMine = false,
                         isCurrentPlayer = false,
                         isBtn = false,
-                        positionLabelResId = null,
                         lastActionText = StringSource(R.string.action_label_fold),
                         isFolded = true,
                     ),
@@ -148,7 +145,6 @@ private class GameContentUiStatePreviewParam :
                         isMine = false,
                         isCurrentPlayer = false,
                         isBtn = false,
-                        positionLabelResId = null,
                         lastActionText = StringSource(R.string.action_label_all_in),
                     ),
                     GamePlayerUiState(
@@ -161,7 +157,6 @@ private class GameContentUiStatePreviewParam :
                         isMine = false,
                         isCurrentPlayer = false,
                         isBtn = false,
-                        positionLabelResId = null,
                         lastActionText = StringSource(R.string.action_label_all_in),
                     ),
                     GamePlayerUiState(
@@ -174,7 +169,6 @@ private class GameContentUiStatePreviewParam :
                         isMine = false,
                         isCurrentPlayer = false,
                         isBtn = false,
-                        positionLabelResId = null,
                         lastActionText = StringSource(R.string.action_label_all_in),
                     ),
                     GamePlayerUiState(
@@ -187,7 +181,6 @@ private class GameContentUiStatePreviewParam :
                         isMine = false,
                         isCurrentPlayer = false,
                         isBtn = false,
-                        positionLabelResId = null,
                         lastActionText = StringSource(R.string.action_label_all_in),
                     ),
                     GamePlayerUiState(
@@ -200,7 +193,6 @@ private class GameContentUiStatePreviewParam :
                         isMine = false,
                         isCurrentPlayer = false,
                         isBtn = true,
-                        positionLabelResId = null,
                         lastActionText = StringSource(R.string.action_label_all_in),
                     ),
                     GamePlayerUiState(
@@ -213,7 +205,6 @@ private class GameContentUiStatePreviewParam :
                         isMine = false,
                         isCurrentPlayer = true,
                         isBtn = false,
-                        positionLabelResId = R.string.position_label_sb,
                         lastActionText = StringSource(R.string.action_label_bet),
                     ),
                     GamePlayerUiState(
@@ -226,7 +217,6 @@ private class GameContentUiStatePreviewParam :
                         isMine = false,
                         isCurrentPlayer = false,
                         isBtn = false,
-                        positionLabelResId = R.string.position_label_bb,
                         lastActionText = StringSource(R.string.action_label_all_in),
                     )
                 ),

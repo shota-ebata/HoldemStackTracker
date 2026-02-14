@@ -529,13 +529,12 @@ constructor(
         isMine = playerId == myPlayerId,
         isCurrentPlayer = playerId == currentPlayerId,
         isBtn = playerId == btnPlayerId,
-        positionLabelResId = when (playerId) {
-            sbPlayerId -> R.string.position_label_sb
-            bbPlayerId -> R.string.position_label_bb
-            else -> null
-        },
         lastActionText = when (actionType) {
-            Blind -> null
+            Blind -> when (playerId) {
+                sbPlayerId -> StringSource(R.string.position_label_sb)
+                bbPlayerId -> StringSource(R.string.position_label_bb)
+                else -> null
+            }
             Check -> if (playerId != currentPlayerId) {
                 // 自分のターン以外で、アクションを表示する
                 StringSource(R.string.action_label_check)

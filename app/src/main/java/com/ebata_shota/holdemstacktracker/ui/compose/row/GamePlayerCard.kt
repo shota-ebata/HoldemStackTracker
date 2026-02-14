@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -32,7 +31,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -70,9 +68,6 @@ fun GamePlayerCard(
                     uiState = uiState,
                     textStyle = textStyle,
                 )
-                if (uiState.shouldShowActionNextLine) {
-                    OnlyActionRow(uiState = uiState, textStyle = textStyle)
-                }
                 PositionAndActionRow(
                     uiState = uiState,
                     textStyle = textStyle,
@@ -94,9 +89,6 @@ fun GamePlayerCard(
                     textStyle = textStyle,
                 )
                 PositionAndActionRow(uiState = uiState, textStyle = textStyle)
-                if (uiState.shouldShowActionNextLine) {
-                    OnlyActionRow(uiState = uiState, textStyle = textStyle)
-                }
                 BetSizeRow(
                     uiState = uiState,
                     textStyle = textStyle,
@@ -127,26 +119,8 @@ private fun PositionAndActionRow(
                 modifier = Modifier.shadow(elevation = 4.dp, shape = CircleShape)
             )
         }
-        if (uiState.positionLabelResId != null) {
-            Box(
-                modifier = Modifier
-                    .border(
-                        width = OutlineLabelBorderWidth,
-                        color = Color.White,
-                        shape = RoundedCornerShape(4.dp),
-                    )
-                    .padding(horizontal = 8.dp, vertical = 2.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(uiState.positionLabelResId),
-                    color = Color.White,
-                    style = textStyle,
-                )
-            }
-        }
         val lastActionText = uiState.lastActionText
-        if (lastActionText != null && !uiState.shouldShowActionNextLine) {
+        if (lastActionText != null) {
             Text(
                 modifier = Modifier
                     .border(
@@ -320,8 +294,6 @@ data class GamePlayerUiState(
     val isMine: Boolean,
     val isCurrentPlayer: Boolean,
     val isBtn: Boolean,
-    @StringRes
-    val positionLabelResId: Int?,
     val lastActionText: StringSource?,
     val isFolded: Boolean = false,
 ) {
@@ -329,9 +301,6 @@ data class GamePlayerUiState(
         GamePlayerCardPlayerPosition.BOTTOM -> GamePlayerCardBetTextPosition.TOP
         else -> GamePlayerCardBetTextPosition.BOTTOM
     }
-
-    // Actionを次の行に表示する
-    val shouldShowActionNextLine: Boolean = isBtn && positionLabelResId != null
 
 
     val expanded: Boolean = isMine || !isFolded
@@ -350,7 +319,6 @@ private class GamePlayerCardPreviewParam :
             isMine = false,
             isCurrentPlayer = false,
             isBtn = true,
-            positionLabelResId = R.string.position_label_sb,
             lastActionText = StringSource(R.string.action_label_all_in)
         ),
         GamePlayerUiState(
@@ -363,7 +331,6 @@ private class GamePlayerCardPreviewParam :
             isMine = false,
             isCurrentPlayer = true,
             isBtn = false,
-            positionLabelResId = R.string.position_label_bb,
             lastActionText = StringSource(R.string.action_label_all_in)
         ),
         GamePlayerUiState(
@@ -376,7 +343,6 @@ private class GamePlayerCardPreviewParam :
             isMine = false,
             isCurrentPlayer = true,
             isBtn = false,
-            positionLabelResId = null,
             lastActionText = StringSource(R.string.action_label_all_in)
         ),
         GamePlayerUiState(
@@ -389,7 +355,6 @@ private class GamePlayerCardPreviewParam :
             isMine = false,
             isCurrentPlayer = false,
             isBtn = false,
-            positionLabelResId = null,
             lastActionText = StringSource(R.string.action_label_fold),
             isFolded = true
         )
