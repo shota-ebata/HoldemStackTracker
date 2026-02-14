@@ -41,10 +41,11 @@ import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameMainPanelUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.RaiseSizeChangeButtonUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
-import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.BOTTOM
-import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.LEFT
-import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.RIGHT
-import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState.PlayerPosition.TOP
+import com.ebata_shota.holdemstacktracker.ui.model.GamePlayerCardPlayerPosition
+import com.ebata_shota.holdemstacktracker.ui.model.GamePlayerCardPlayerPosition.TOP
+import com.ebata_shota.holdemstacktracker.ui.model.GamePlayerCardPlayerPosition.BOTTOM
+import com.ebata_shota.holdemstacktracker.ui.model.GamePlayerCardPlayerPosition.LEFT
+import com.ebata_shota.holdemstacktracker.ui.model.GamePlayerCardPlayerPosition.RIGHT
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
@@ -87,7 +88,7 @@ constructor(
 
         val startIndex = playerOrder.indexOf(myPlayerId)
         val sortedPlayerOrder = playerOrder.rearrangeListFromIndex(startIndex = startIndex)
-        val positions: List<GamePlayerUiState.PlayerPosition> = if (sortedPlayerOrder.contains(myPlayerId)) {
+        val positions: List<GamePlayerCardPlayerPosition> = if (sortedPlayerOrder.contains(myPlayerId)) {
             playerPositionsMap[sortedPlayerOrder.size]!!
         } else {
             // 自分が参加者じゃない場合の配置
@@ -168,7 +169,7 @@ constructor(
         totalPotSize: Int,
         sortedPlayerOrder: List<PlayerId>,
         playerNameMap: Map<PlayerId, String>,
-        positions: List<GamePlayerUiState.PlayerPosition>,
+        positions: List<GamePlayerCardPlayerPosition>,
         phaseList: List<Phase>,
         blindText: String,
         isActiveCheckFold: Boolean,
@@ -442,7 +443,7 @@ constructor(
         sortedPlayerOrder: List<PlayerId>,
         playerNameMap: Map<PlayerId, String>,
         gamePlayers: List<GamePlayer>,
-        positions: List<GamePlayerUiState.PlayerPosition>,
+        positions: List<GamePlayerCardPlayerPosition>,
         pendingBetPerPlayer: Map<PlayerId, Int>,
         currentPlayerId: PlayerId?,
         phaseList: List<Phase>,
@@ -456,7 +457,7 @@ constructor(
         val playerName = playerNameMap[playerId] ?: return@mapIndexedNotNull null
         val gamePlayer = gamePlayers.find { it.id == playerId }
             ?: return@mapIndexedNotNull null
-        val playerPosition: GamePlayerUiState.PlayerPosition = positions[index]
+        val playerPosition: GamePlayerCardPlayerPosition = positions[index]
         val pendingBetSize = pendingBetPerPlayer[playerId]
         val actionType: BetPhaseActionType? = getActionTypeInLastPhaseAsBetPhase.invoke(
             phaseList = phaseList,
@@ -485,7 +486,7 @@ constructor(
         betViewMode: BetViewMode,
         gamePlayer: GamePlayer,
         minBetSize: Int,
-        playerPosition: GamePlayerUiState.PlayerPosition,
+        playerPosition: GamePlayerCardPlayerPosition,
         pendingBetSize: Int?,
         playerId: PlayerId,
         myPlayerId: PlayerId,
@@ -581,7 +582,7 @@ constructor(
         btnPlayerId: PlayerId,
         playerNameMap: Map<PlayerId, String>,
         gamePlayers: List<GamePlayer>,
-        positions: List<GamePlayerUiState.PlayerPosition>,
+        positions: List<GamePlayerCardPlayerPosition>,
         phaseList: List<Phase>,
         betViewMode: BetViewMode,
         minBetSize: Int,

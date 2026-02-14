@@ -1,7 +1,6 @@
 package com.ebata_shota.holdemstacktracker.ui.compose.content
 
 import android.content.res.Configuration
-import android.widget.Space
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +24,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerCard
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
+import com.ebata_shota.holdemstacktracker.ui.model.GamePlayerCardPlayerPosition
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import kotlin.math.cos
 
@@ -35,9 +35,9 @@ fun PlayersContent(
     onClickPlayerCard: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val leftPlayers = uiState.players.filter { it.playerPosition == GamePlayerUiState.PlayerPosition.LEFT }
-    val topPlayers = uiState.players.filter { it.playerPosition== GamePlayerUiState.PlayerPosition.TOP }
-    val rightPlayers = uiState.players.filter { it.playerPosition == GamePlayerUiState.PlayerPosition.RIGHT }
+    val leftPlayers = uiState.players.filter { it.playerPosition == GamePlayerCardPlayerPosition.LEFT }
+    val topPlayers = uiState.players.filter { it.playerPosition== GamePlayerCardPlayerPosition.TOP }
+    val rightPlayers = uiState.players.filter { it.playerPosition == GamePlayerCardPlayerPosition.RIGHT }
 
     val leftArrangement = if (leftPlayers.count() <= 1) Arrangement.Center else Arrangement.SpaceEvenly
     val rightArrangement = if (rightPlayers.count() <= 1) Arrangement.Center else Arrangement.SpaceEvenly
@@ -141,7 +141,7 @@ fun PlayersContent(
                         verticalArrangement = Arrangement.Bottom
                     ) {
                         uiState.players
-                            .filter { it.playerPosition == GamePlayerUiState.PlayerPosition.BOTTOM }
+                            .filter { it.playerPosition == GamePlayerCardPlayerPosition.BOTTOM }
                             .forEach { playerUiState ->
                                 GamePlayerCard(
                                     uiState = playerUiState,

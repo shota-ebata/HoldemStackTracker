@@ -44,6 +44,7 @@ import com.ebata_shota.holdemstacktracker.R
 import com.ebata_shota.holdemstacktracker.domain.model.StringSource
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.ChipSizeText
 import com.ebata_shota.holdemstacktracker.ui.model.GamePlayerCardBetTextPosition
+import com.ebata_shota.holdemstacktracker.ui.model.GamePlayerCardPlayerPosition
 import com.ebata_shota.holdemstacktracker.ui.theme.HoldemStackTrackerTheme
 import com.ebata_shota.holdemstacktracker.ui.theme.OutlineLabelBorderWidth
 
@@ -313,7 +314,7 @@ data class GamePlayerUiState(
     val playerName: String,
     val stack: StringSource,
     val shouldShowBBSuffix: Boolean,
-    val playerPosition: PlayerPosition,
+    val playerPosition: GamePlayerCardPlayerPosition,
     val pendingBetSize: StringSource?,
     val isLeaved: Boolean, // FIXME: 退席情報を反映する
     val isMine: Boolean,
@@ -325,7 +326,7 @@ data class GamePlayerUiState(
     val isFolded: Boolean = false,
 ) {
     val gamePlayerCardBetTextPosition: GamePlayerCardBetTextPosition = when (playerPosition) {
-        PlayerPosition.BOTTOM -> GamePlayerCardBetTextPosition.TOP
+        GamePlayerCardPlayerPosition.BOTTOM -> GamePlayerCardBetTextPosition.TOP
         else -> GamePlayerCardBetTextPosition.BOTTOM
     }
 
@@ -334,13 +335,6 @@ data class GamePlayerUiState(
 
 
     val expanded: Boolean = isMine || !isFolded
-
-    enum class PlayerPosition {
-        LEFT,
-        TOP,
-        RIGHT,
-        BOTTOM
-    }
 }
 
 private class GamePlayerCardPreviewParam :
@@ -350,7 +344,7 @@ private class GamePlayerCardPreviewParam :
             playerName = "PlayerName",
             stack = StringSource("198"),
             shouldShowBBSuffix = false,
-            playerPosition = GamePlayerUiState.PlayerPosition.TOP,
+            playerPosition = GamePlayerCardPlayerPosition.TOP,
             pendingBetSize = StringSource("2"),
             isLeaved = false,
             isMine = false,
@@ -363,7 +357,7 @@ private class GamePlayerCardPreviewParam :
             playerName = "PlayerName",
             stack = StringSource("198"),
             shouldShowBBSuffix = false,
-            playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
+            playerPosition = GamePlayerCardPlayerPosition.BOTTOM,
             pendingBetSize = StringSource("2"),
             isLeaved = false,
             isMine = false,
@@ -376,7 +370,7 @@ private class GamePlayerCardPreviewParam :
             playerName = "Player123456789",
             stack = StringSource("200.0"),
             shouldShowBBSuffix = true,
-            playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
+            playerPosition = GamePlayerCardPlayerPosition.BOTTOM,
             pendingBetSize = null,
             isLeaved = false,
             isMine = false,
@@ -389,7 +383,7 @@ private class GamePlayerCardPreviewParam :
             playerName = "Player123456789",
             stack = StringSource("200.0"),
             shouldShowBBSuffix = true,
-            playerPosition = GamePlayerUiState.PlayerPosition.BOTTOM,
+            playerPosition = GamePlayerCardPlayerPosition.BOTTOM,
             pendingBetSize = null,
             isLeaved = false,
             isMine = false,
