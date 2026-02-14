@@ -39,6 +39,7 @@ import com.ebata_shota.holdemstacktracker.ui.compose.content.CenterPanelContentU
 import com.ebata_shota.holdemstacktracker.ui.compose.content.ControlPanelUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameContentUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.content.GameMainPanelUiState
+import com.ebata_shota.holdemstacktracker.ui.compose.parts.RaiseSizeChangeButton
 import com.ebata_shota.holdemstacktracker.ui.compose.parts.RaiseSizeChangeButtonUiState
 import com.ebata_shota.holdemstacktracker.ui.compose.row.GamePlayerUiState
 import com.ebata_shota.holdemstacktracker.ui.model.GamePlayerCardPlayerPosition
@@ -762,6 +763,7 @@ constructor(
         val betSizeTwoPointFive =(betSize * 2.5).roundToInt()
         val betSizeTriple = betSize * 3
         val betSizeQuadruple = betSize * 4
+        val betSizeQuintuple = betSize * 5
         listOf(
             RaiseSizeChangeButtonUiState(
                 labelStringSource = StringSource(R.string.raise_size_button_label_x, "2"),
@@ -782,6 +784,11 @@ constructor(
                 labelStringSource = StringSource(R.string.raise_size_button_label_x, "4"),
                 raiseSize = betSizeQuadruple,
                 isEnable = isEnableRaiseSizeButtons && betSizeQuadruple <= stackSize
+            ),
+            RaiseSizeChangeButtonUiState(
+                labelStringSource = StringSource(R.string.raise_size_button_label_x, "5"),
+                raiseSize = betSizeQuintuple,
+                isEnable = isEnableRaiseSizeButtons && betSizeQuintuple <= stackSize
             ),
         )
     }
